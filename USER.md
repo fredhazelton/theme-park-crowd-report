@@ -8,9 +8,10 @@
 
 ## Background
 
-- **Profession:** Statistician
+- **Profession:** Data Scientist / Statistician
+- **Day job:** Government of Canada, Infrastructure Canada — builds dashboards for clients
 - **Former:** TouringPlans.com (theme park wait time predictions & crowd analysis)
-- **Current:** Independent, building his own thing
+- **Side project:** Hazeydata.ai — building his own thing
 
 ## The Vision
 
@@ -30,6 +31,7 @@
 - **Interruptions:** Anytime is fine
 - **Strengths:** Data science, modeling, predictions, data visualization (very particular about visuals!)
 - **Pain points:** Organization, coding (not his main thing)
+- **How he works with me:** Stream of consciousness — dumps thoughts, I organize them. My job is to be the organized one.
 
 ## Tools
 
