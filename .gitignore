@@ -1,0 +1,4 @@
+# Credentials
+.credentials/
+*.credentials
+secrets.json
