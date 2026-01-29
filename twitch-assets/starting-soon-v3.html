@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      position: relative;
+      background: #040C1F;
+    }
+    .bg-container {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 140%;
+      height: 140%;
+      animation: slowPan 20s ease-in-out infinite alternate;
+    }
+    .bg-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+    }
+    @keyframes slowPan {
+      0% { transform: translate(0, 0) scale(1.1); }
+      100% { transform: translate(-8%, -5%) scale(1.15); }
+    }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(4, 12, 31, 0.7) 70%);
+    }
+    .content {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      z-index: 10;
+    }
+    .logo {
+      width: 500px;
+      height: auto;
+      filter: drop-shadow(0 0 30px rgba(166, 0, 56, 0.3));
+      animation: logoPulse 4s ease-in-out infinite;
+    }
+    @keyframes logoPulse {
+      0%, 100% { filter: drop-shadow(0 0 30px rgba(166, 0, 56, 0.3)); }
+      50% { filter: drop-shadow(0 0 50px rgba(166, 0, 56, 0.5)); }
+    }
+    .tagline {
+      margin-top: 50px;
+      text-align: center;
+    }
+    .tagline-line {
+      font-size: 42px;
+      font-weight: 500;
+      color: #E9F4FF;
+      letter-spacing: 2px;
+      text-shadow: 0 0 30px rgba(0,0,0,0.5);
+      margin: 8px 0;
+    }
+    .red-period { color: #A60038; }
+    .status {
+      font-size: 48px;
+      color: #A60038;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 8px;
+      margin-top: 60px;
+      animation: pulse 2s ease-in-out infinite;
+      text-shadow: 0 0 20px rgba(166, 0, 56, 0.5);
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.02); }
+    }
+    .subtitle {
+      font-size: 26px;
+      color: #9DCBFF;
+      margin-top: 20px;
+      text-shadow: 0 0 20px rgba(0,0,0,0.5);
+      animation: fadeInOut 3s ease-in-out infinite;
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 0.5; }
+    }
+    /* Floating particles */
+    .particles {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      z-index: 5;
+    }
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(157, 203, 255, 0.4);
+      border-radius: 50%;
+      animation: float 15s infinite linear;
+    }
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 18s; }
+    .particle:nth-child(2) { left: 25%; animation-delay: 2s; animation-duration: 15s; }
+    .particle:nth-child(3) { left: 40%; animation-delay: 4s; animation-duration: 20s; }
+    .particle:nth-child(4) { left: 55%; animation-delay: 1s; animation-duration: 16s; }
+    .particle:nth-child(5) { left: 70%; animation-delay: 3s; animation-duration: 19s; }
+    .particle:nth-child(6) { left: 85%; animation-delay: 5s; animation-duration: 17s; }
+    .particle:nth-child(7) { left: 15%; animation-delay: 6s; animation-duration: 21s; }
+    .particle:nth-child(8) { left: 60%; animation-delay: 7s; animation-duration: 14s; }
+    @keyframes float {
+      0% { transform: translateY(1100px) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-container">
+    <img src="homepage-bg.png" class="bg-image" alt="">
+  </div>
+  <div class="overlay"></div>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+  <div class="content">
+    <img src="logo_transparent.png" class="logo" alt="hazeydata.ai">
+    <div class="tagline">
+      <div class="tagline-line">Clear the Haze<span class="red-period">.</span></div>
+      <div class="tagline-line">See the Future<span class="red-period">.</span></div>
+    </div>
+    <div class="status">Starting Soon</div>
+    <div class="subtitle">Grab a coffee, we'll be right with you</div>
+  </div>
+</body>
+</html>

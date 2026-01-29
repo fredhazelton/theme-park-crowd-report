@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1200px;
+      height: 480px;
+      background: linear-gradient(135deg, #040C1F 0%, #0a1a3a 50%, #040C1F 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+    .grid-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        linear-gradient(rgba(157, 203, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(157, 203, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .content {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      z-index: 1;
+    }
+    .logo {
+      width: 280px;
+      height: 280px;
+    }
+    .text {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .brand {
+      font-size: 72px;
+      font-weight: 700;
+      color: #E9F4FF;
+      letter-spacing: -2px;
+    }
+    .tagline {
+      font-size: 28px;
+      color: #9DCBFF;
+      font-weight: 400;
+    }
+    .accent-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #A60038, #CA2360, #A60038);
+    }
+    .dot {
+      color: #A60038;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-overlay"></div>
+  <div class="content">
+    <img src="logo_dark.png" class="logo" alt="HazeyData">
+    <div class="text">
+      <div class="brand">hazeydata<span class="dot">.</span>ai</div>
+      <div class="tagline">Clear the Haze with Data</div>
+    </div>
+  </div>
+  <div class="accent-bar"></div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1920px;
+      height: 1080px;
+      background: linear-gradient(135deg, #040C1F 0%, #0a1a3a 50%, #040C1F 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+    .grid-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        linear-gradient(rgba(157, 203, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(157, 203, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      z-index: 1;
+    }
+    .logo {
+      width: 300px;
+      height: 300px;
+    }
+    .brand {
+      font-size: 64px;
+      font-weight: 700;
+      color: #E9F4FF;
+      letter-spacing: -2px;
+    }
+    .status {
+      font-size: 48px;
+      color: #A60038;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 8px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .tagline {
+      font-size: 28px;
+      color: #9DCBFF;
+      margin-top: 20px;
+    }
+    .dot {
+      color: #A60038;
+    }
+    .accent-line {
+      width: 400px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #A60038, transparent);
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-overlay"></div>
+  <div class="content">
+    <img src="logo_dark.png" class="logo" alt="HazeyData">
+    <div class="brand">hazeydata<span class="dot">.</span>ai</div>
+    <div class="accent-line"></div>
+    <div class="status">Starting Soon</div>
+    <div class="tagline">Grab a coffee, we'll be right with you</div>
+  </div>
+</body>
+</html>

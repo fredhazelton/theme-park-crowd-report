@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      position: relative;
+      background: #040C1F;
+    }
+    .bg-container {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 140%;
+      height: 140%;
+      animation: slowPan 30s ease-in-out infinite alternate;
+    }
+    .bg-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+    @keyframes slowPan {
+      0% { transform: translate(0, 0) scale(1.1); }
+      100% { transform: translate(-8%, -5%) scale(1.15); }
+    }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(4, 12, 31, 0.75) 70%);
+    }
+    .content {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      z-index: 10;
+    }
+    .logo {
+      width: 420px;
+      height: auto;
+      filter: drop-shadow(0 0 30px rgba(166, 0, 56, 0.2));
+      animation: gentlePulse 6s ease-in-out infinite;
+    }
+    @keyframes gentlePulse {
+      0%, 100% { filter: drop-shadow(0 0 30px rgba(166, 0, 56, 0.2)); }
+      50% { filter: drop-shadow(0 0 40px rgba(166, 0, 56, 0.35)); }
+    }
+    .tagline {
+      margin-top: 40px;
+      text-align: center;
+    }
+    .tagline-line {
+      font-size: 36px;
+      font-weight: 500;
+      color: #E9F4FF;
+      letter-spacing: 2px;
+      text-shadow: 0 0 30px rgba(0,0,0,0.5);
+      margin: 5px 0;
+    }
+    .red-period { color: #A60038; }
+    .status {
+      font-size: 48px;
+      color: #E9F4FF;
+      font-weight: 600;
+      letter-spacing: 4px;
+      margin-top: 50px;
+      text-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .subtitle {
+      font-size: 26px;
+      color: #9DCBFF;
+      margin-top: 20px;
+      text-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .social {
+      display: flex;
+      gap: 40px;
+      margin-top: 50px;
+      font-size: 26px;
+      color: #9DCBFF;
+    }
+    .social span {
+      opacity: 0.9;
+      text-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    /* Floating particles */
+    .particles {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      z-index: 5;
+    }
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(157, 203, 255, 0.25);
+      border-radius: 50%;
+      animation: float 20s infinite linear;
+    }
+    .particle:nth-child(1) { left: 15%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 35%; animation-delay: 4s; }
+    .particle:nth-child(3) { left: 55%; animation-delay: 8s; }
+    .particle:nth-child(4) { left: 75%; animation-delay: 2s; }
+    @keyframes float {
+      0% { transform: translateY(1100px); opacity: 0; }
+      10% { opacity: 0.4; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(-100px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-container">
+    <img src="homepage-bg.png" class="bg-image" alt="">
+  </div>
+  <div class="overlay"></div>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+  <div class="content">
+    <img src="logo_transparent.png" class="logo" alt="hazeydata.ai">
+    <div class="tagline">
+      <div class="tagline-line">Clear the Haze<span class="red-period">.</span></div>
+      <div class="tagline-line">See the Future<span class="red-period">.</span></div>
+    </div>
+    <div class="status">Thanks for Watching!</div>
+    <div class="subtitle">Follow for notifications when we go live</div>
+    <div class="social">
+      <span>twitch.tv/hazeydata</span>
+      <span>•</span>
+      <span>hazeydata.ai</span>
+    </div>
+  </div>
+</body>
+</html>

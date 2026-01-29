@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      position: relative;
+      background: #040C1F;
+    }
+    .bg-container {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 140%;
+      height: 140%;
+      animation: slowPan 60s ease-in-out infinite alternate;
+    }
+    .bg-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+    @keyframes slowPan {
+      0% { transform: translate(0, 0) scale(1.1); }
+      50% { transform: translate(-5%, -3%) scale(1.15); }
+      100% { transform: translate(-10%, -5%) scale(1.1); }
+    }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(4, 12, 31, 0.8) 70%);
+    }
+    .content {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      z-index: 10;
+    }
+    .logo {
+      width: 260px;
+      height: 260px;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 30px rgba(157, 203, 255, 0.2));
+    }
+    .brand {
+      font-size: 64px;
+      font-weight: 700;
+      color: #E9F4FF;
+      letter-spacing: -2px;
+      margin-top: 30px;
+      text-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
+    .status {
+      font-size: 56px;
+      color: #9DCBFF;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 12px;
+      margin-top: 30px;
+      text-shadow: 0 0 20px rgba(157, 203, 255, 0.3);
+    }
+    .tagline {
+      font-size: 28px;
+      color: #9DCBFF;
+      margin-top: 25px;
+      opacity: 0.8;
+      text-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .dot { color: #A60038; }
+    .accent-line {
+      width: 300px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #9DCBFF, transparent);
+      margin: 25px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-container">
+    <img src="homepage-bg.png" class="bg-image" alt="">
+  </div>
+  <div class="overlay"></div>
+  <div class="content">
+    <img src="logo_dark.png" class="logo" alt="HazeyData">
+    <div class="brand">hazeydata<span class="dot">.</span>ai</div>
+    <div class="accent-line"></div>
+    <div class="status">Be Right Back</div>
+    <div class="tagline">Crunching some numbers...</div>
+  </div>
+</body>
+</html>

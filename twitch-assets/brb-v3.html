@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      position: relative;
+      background: #040C1F;
+    }
+    .bg-container {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 140%;
+      height: 140%;
+      animation: slowPan 25s ease-in-out infinite alternate;
+    }
+    .bg-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+    @keyframes slowPan {
+      0% { transform: translate(0, 0) scale(1.1); }
+      100% { transform: translate(-8%, -5%) scale(1.15); }
+    }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(4, 12, 31, 0.8) 70%);
+    }
+    .content {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      z-index: 10;
+    }
+    .logo {
+      width: 450px;
+      height: auto;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 30px rgba(157, 203, 255, 0.2));
+      animation: logoPulse 5s ease-in-out infinite;
+    }
+    @keyframes logoPulse {
+      0%, 100% { filter: drop-shadow(0 0 30px rgba(157, 203, 255, 0.2)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 45px rgba(157, 203, 255, 0.35)); transform: scale(1.01); }
+    }
+    .tagline {
+      margin-top: 50px;
+      text-align: center;
+    }
+    .tagline-line {
+      font-size: 38px;
+      font-weight: 500;
+      color: #E9F4FF;
+      letter-spacing: 2px;
+      text-shadow: 0 0 30px rgba(0,0,0,0.5);
+      margin: 6px 0;
+      opacity: 0.9;
+    }
+    .red-period { color: #A60038; }
+    .status {
+      font-size: 56px;
+      color: #9DCBFF;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 12px;
+      margin-top: 50px;
+      text-shadow: 0 0 20px rgba(157, 203, 255, 0.3);
+      animation: breathe 3s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .subtitle {
+      font-size: 26px;
+      color: #9DCBFF;
+      margin-top: 20px;
+      opacity: 0.8;
+      text-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    /* Loading dots */
+    .loading-dots {
+      display: inline-flex;
+      gap: 8px;
+      margin-top: 30px;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      background: #9DCBFF;
+      border-radius: 50%;
+      animation: dotPulse 1.5s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.3s; }
+    .dot:nth-child(3) { animation-delay: 0.6s; }
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+    /* Floating particles */
+    .particles {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      z-index: 5;
+    }
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(157, 203, 255, 0.3);
+      border-radius: 50%;
+      animation: float 18s infinite linear;
+    }
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 30%; animation-delay: 3s; }
+    .particle:nth-child(3) { left: 50%; animation-delay: 6s; }
+    .particle:nth-child(4) { left: 70%; animation-delay: 2s; }
+    .particle:nth-child(5) { left: 90%; animation-delay: 5s; }
+    @keyframes float {
+      0% { transform: translateY(1100px); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { transform: translateY(-100px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-container">
+    <img src="homepage-bg.png" class="bg-image" alt="">
+  </div>
+  <div class="overlay"></div>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+  <div class="content">
+    <img src="logo_transparent.png" class="logo" alt="hazeydata.ai">
+    <div class="tagline">
+      <div class="tagline-line">Clear the Haze<span class="red-period">.</span></div>
+      <div class="tagline-line">See the Future<span class="red-period">.</span></div>
+    </div>
+    <div class="status">Be Right Back</div>
+    <div class="subtitle">Crunching some numbers...</div>
+    <div class="loading-dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+</body>
+</html>
