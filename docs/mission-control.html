@@ -220,6 +220,28 @@
                 </ul>
             </div>
             
+            <!-- Pipeline Status -->
+            <div class="card priority" id="pipeline-card">
+                <h2>🚀 Pipeline Status</h2>
+                <div id="pipeline-status">
+                    <div style="margin-bottom: 12px;">
+                        <strong>Current Step:</strong> <span id="current-step">Loading...</span>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <strong>Progress:</strong> <span id="etl-progress">--</span>
+                    </div>
+                    <ul class="task-list" id="step-list">
+                        <li><span class="status medium" id="step-etl">⏳</span> ETL</li>
+                        <li><span class="status medium" id="step-dimensions">⏳</span> Dimensions</li>
+                        <li><span class="status medium" id="step-aggregates">⏳</span> Aggregates</li>
+                        <li><span class="status medium" id="step-report">⏳</span> Report</li>
+                    </ul>
+                    <div style="margin-top: 12px; font-size: 0.8rem; color: var(--text-secondary);">
+                        Last update: <span id="pipeline-updated">--</span>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Quick Links -->
             <div class="card">
                 <h2>🔗 Quick Links</h2>
@@ -367,6 +389,50 @@
             hour: '2-digit',
             minute: '2-digit'
         });
+        
+        // Load pipeline status
+        async function loadPipelineStatus() {
+            try {
+                const resp = await fetch('pipeline-status.json?' + Date.now());
+                const data = await resp.json();
+                
+                document.getElementById('current-step').textContent = data.current_step || '--';
+                document.getElementById('etl-progress').textContent = data.etl_progress || '--';
+                document.getElementById('pipeline-updated').textContent = data.last_updated ? 
+                    new Date(data.last_updated).toLocaleTimeString() : '--';
+                
+                // Update step statuses
+                const statusMap = {
+                    'done': { class: 'good', text: '✅' },
+                    'running': { class: 'critical', text: '🔄' },
+                    'pending': { class: 'medium', text: '⏳' },
+                    'failed': { class: 'critical', text: '❌' },
+                    'skipped': { class: 'low', text: '⏭️' }
+                };
+                
+                ['etl', 'dimensions', 'aggregates', 'report'].forEach(step => {
+                    const el = document.getElementById('step-' + step);
+                    const status = data.steps?.[step] || 'pending';
+                    const mapped = statusMap[status] || statusMap.pending;
+                    el.className = 'status ' + mapped.class;
+                    el.textContent = mapped.text;
+                });
+                
+                // Update card border based on status
+                const card = document.getElementById('pipeline-card');
+                if (Object.values(data.steps || {}).includes('running')) {
+                    card.className = 'card priority';
+                } else if (Object.values(data.steps || {}).every(s => s === 'done' || s === 'skipped')) {
+                    card.className = 'card success';
+                }
+            } catch (e) {
+                console.error('Failed to load pipeline status:', e);
+            }
+        }
+        
+        // Load immediately and refresh every 60 seconds
+        loadPipelineStatus();
+        setInterval(loadPipelineStatus, 60000);
     </script>
 </body>
 </html>
