@@ -242,6 +242,25 @@
                 </div>
             </div>
             
+            <!-- Queue-Times Fetcher -->
+            <div class="card success" id="queue-times-card">
+                <h2>📡 Queue-Times Fetcher</h2>
+                <div id="queue-times-status">
+                    <div style="margin-bottom: 8px;">
+                        <strong>Status:</strong> <span id="qt-status" class="status good">Active</span>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <strong>Last fetch:</strong> <span id="qt-last-fetch">--</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
+                        <strong>Sample waits (MK):</strong>
+                    </div>
+                    <div id="qt-samples" style="font-size: 0.85rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+            
             <!-- Quick Links -->
             <div class="card">
                 <h2>🔗 Quick Links</h2>
@@ -430,9 +449,38 @@
             }
         }
         
+        // Load queue-times status
+        async function loadQueueTimesStatus() {
+            try {
+                const resp = await fetch('pipeline-status.json?' + Date.now());
+                const data = await resp.json();
+                
+                if (data.queue_times) {
+                    const qt = data.queue_times;
+                    document.getElementById('qt-status').textContent = qt.status || 'Unknown';
+                    document.getElementById('qt-status').className = 'status ' + (qt.status === 'Active' ? 'good' : 'critical');
+                    document.getElementById('qt-last-fetch').textContent = qt.last_fetch || '--';
+                    
+                    const samplesEl = document.getElementById('qt-samples');
+                    if (qt.samples && qt.samples.length > 0) {
+                        samplesEl.innerHTML = qt.samples.map(s => 
+                            `<span>${s.name}: <strong>${s.wait}m</strong></span>`
+                        ).join('');
+                    }
+                    
+                    const card = document.getElementById('queue-times-card');
+                    card.className = 'card ' + (qt.status === 'Active' ? 'success' : 'priority');
+                }
+            } catch (e) {
+                console.error('Failed to load queue-times status:', e);
+            }
+        }
+        
         // Load immediately and refresh every 60 seconds
         loadPipelineStatus();
+        loadQueueTimesStatus();
         setInterval(loadPipelineStatus, 60000);
+        setInterval(loadQueueTimesStatus, 60000);
     </script>
 </body>
 </html>
