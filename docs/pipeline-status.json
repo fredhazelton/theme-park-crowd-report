@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "10:58:27",
+    "last_fetch": "11:03:31",
     "samples": [
       {
         "name": "Tron",
@@ -25,7 +25,7 @@
       },
       {
         "name": "Haunted Mansion",
-        "wait": "40"
+        "wait": "45"
       },
       {
         "name": "Jungle Cruise",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-01T11:00:01.213855-05:00"
+  "last_updated": "2026-02-01T11:05:01.101104-05:00"
 }
