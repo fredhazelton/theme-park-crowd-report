@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "210/1160 (18%)",
+  "etl_progress": "211/1160 (18%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "15:17:23",
+    "last_fetch": "15:22:27",
     "samples": [
       {
         "name": "Tron",
@@ -25,7 +25,7 @@
       },
       {
         "name": "Haunted Mansion",
-        "wait": "30"
+        "wait": "25"
       },
       {
         "name": "Jungle Cruise",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-01T15:20:01.144609-05:00"
+  "last_updated": "2026-02-01T15:25:01.945201-05:00"
 }
