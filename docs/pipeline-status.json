@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "15:57:55",
+    "last_fetch": "16:03:01",
     "samples": [
       {
         "name": "Tron",
@@ -17,7 +17,7 @@
       },
       {
         "name": "MK11527",
-        "wait": "105"
+        "wait": "110"
       },
       {
         "name": "Its a Small World",
@@ -25,7 +25,7 @@
       },
       {
         "name": "Haunted Mansion",
-        "wait": "45"
+        "wait": "50"
       },
       {
         "name": "Jungle Cruise",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-01T16:00:02.103033-05:00"
+  "last_updated": "2026-02-01T16:05:01.903136-05:00"
 }
