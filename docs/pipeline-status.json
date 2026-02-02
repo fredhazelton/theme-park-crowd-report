@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "106/1160 (9%)",
+  "etl_progress": "107/1160 (9%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "14:18:56",
+    "last_fetch": "14:24:00",
     "samples": [
       {
         "name": "Tron",
@@ -25,7 +25,7 @@
       },
       {
         "name": "Its a Small World",
-        "wait": "30"
+        "wait": "15"
       },
       {
         "name": "Haunted Mansion",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-02T14:20:01.331911-05:00"
+  "last_updated": "2026-02-02T14:25:01.185234-05:00"
 }
