@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "134/1160 (12%)",
+  "etl_progress": "135/1160 (12%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,33 +9,33 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "17:10:55",
+    "last_fetch": "17:15:59",
     "samples": [
       {
-        "name": "MK11527",
-        "wait": "130"
+        "name": "Tron",
+        "wait": "5"
       },
       {
-        "name": "MK1189",
-        "wait": "20"
-      },
-      {
-        "name": "Pirates",
-        "wait": "45"
-      },
-      {
-        "name": "7 Dwarfs",
+        "name": "Speedway",
         "wait": "15"
       },
       {
-        "name": "MK1181",
-        "wait": "20"
+        "name": "Its a Small World",
+        "wait": "10"
       },
       {
-        "name": "MK126",
-        "wait": "30"
+        "name": "Jungle Cruise",
+        "wait": "10"
+      },
+      {
+        "name": "Peter Pan",
+        "wait": "45"
+      },
+      {
+        "name": "Space Mountain",
+        "wait": "55"
       }
     ]
   },
-  "last_updated": "2026-02-02T17:15:01.366090-05:00"
+  "last_updated": "2026-02-02T17:20:01.150613-05:00"
 }
