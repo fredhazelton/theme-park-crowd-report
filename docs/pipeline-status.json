@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "229/1160 (20%)",
+  "etl_progress": "230/1160 (20%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "20:47:01",
+    "last_fetch": "20:52:04",
     "samples": [
       {
         "name": "Tron",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-01T20:50:02.021685-05:00"
+  "last_updated": "2026-02-01T20:55:01.999522-05:00"
 }
