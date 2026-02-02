@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>HazeyData Stream Overlay — Production</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -261,6 +262,60 @@
             font-size: 18px;
             color: #fff;
             font-weight: 600;
+        }
+        
+        /* ============================================
+           MAIN CHART — Wait Time Display
+           ============================================ */
+        .main-chart {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            width: 900px;
+            height: 500px;
+            background: rgba(10, 22, 40, 0.92);
+            border: 1px solid rgba(74, 144, 164, 0.5);
+            border-radius: 4px;
+            padding: 20px;
+            animation: borderGlow 6s ease-in-out infinite;
+            z-index: 100;
+        }
+        .main-chart .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .main-chart .chart-title {
+            font-size: 18px;
+            color: #4a90a4;
+            font-weight: 600;
+        }
+        .main-chart .chart-subtitle {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+        }
+        .main-chart .chart-live {
+            font-size: 10px;
+            color: #00ff88;
+            animation: livePulse 2s ease-in-out infinite;
+        }
+        .main-chart .current-wait {
+            text-align: right;
+        }
+        .main-chart .current-wait .value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #6bb5c9;
+        }
+        .main-chart .current-wait .unit {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+        }
+        .main-chart canvas {
+            width: 100% !important;
+            height: calc(100% - 70px) !important;
         }
         
         /* ============================================
@@ -1453,6 +1508,21 @@
         </div>
     </div>
     
+    <!-- MAIN CHART -->
+    <div class="main-chart" id="mainChart">
+        <div class="chart-header">
+            <div>
+                <div class="chart-title" id="chartTitle">TRON Lightcycle / Run</div>
+                <div class="chart-subtitle">Magic Kingdom • Today's Wait Times</div>
+            </div>
+            <div class="current-wait">
+                <span class="chart-live">● LIVE</span>
+                <div><span class="value" id="currentWait">--</span><span class="unit"> min</span></div>
+            </div>
+        </div>
+        <canvas id="waitTimeChart"></canvas>
+    </div>
+    
     <!-- LOWER THIRD -->
     <div class="overlay-element lower-third">
         <div class="tagline">// Clear the Haze</div>
@@ -2106,6 +2176,131 @@
                 fitToViewport();
             }
         });
+        
+        // ═══════════════════════════════════════════════════════════════
+        // WAIT TIME CHART — Tron Data Visualization
+        // ═══════════════════════════════════════════════════════════════
+        
+        let waitTimeChart = null;
+        
+        async function loadWaitTimeChart() {
+            try {
+                const response = await fetch('./tron-data.json');
+                const data = await response.json();
+                
+                // Update header
+                document.getElementById('chartTitle').textContent = data.ride;
+                
+                // Get current wait (last data point)
+                const lastPoint = data.data[data.data.length - 1];
+                document.getElementById('currentWait').textContent = lastPoint.wait;
+                
+                // Prepare chart data
+                const labels = data.data.map(d => d.time);
+                const values = data.data.map(d => d.wait);
+                
+                const ctx = document.getElementById('waitTimeChart').getContext('2d');
+                
+                if (waitTimeChart) {
+                    waitTimeChart.destroy();
+                }
+                
+                waitTimeChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Wait Time (min)',
+                            data: values,
+                            borderColor: '#4a90a4',
+                            backgroundColor: 'rgba(74, 144, 164, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#6bb5c9',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(10, 22, 40, 0.95)',
+                                borderColor: '#4a90a4',
+                                borderWidth: 1,
+                                titleFont: {
+                                    family: "'JetBrains Mono', monospace",
+                                    size: 12
+                                },
+                                bodyFont: {
+                                    family: "'JetBrains Mono', monospace",
+                                    size: 14
+                                },
+                                padding: 12,
+                                displayColors: false,
+                                callbacks: {
+                                    title: (items) => `Time: ${items[0].label}`,
+                                    label: (item) => `Wait: ${item.raw} min`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'rgba(74, 144, 164, 0.1)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    font: {
+                                        family: "'JetBrains Mono', monospace",
+                                        size: 10
+                                    },
+                                    maxRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 12
+                                }
+                            },
+                            y: {
+                                min: 0,
+                                grid: {
+                                    color: 'rgba(74, 144, 164, 0.1)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    font: {
+                                        family: "'JetBrains Mono', monospace",
+                                        size: 10
+                                    },
+                                    callback: (value) => value + ' min'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Failed to load wait time data:', error);
+            }
+        }
+        
+        // Load chart on page load
+        document.addEventListener('DOMContentLoaded', loadWaitTimeChart);
+        
+        // Refresh chart every 5 minutes
+        setInterval(loadWaitTimeChart, 5 * 60 * 1000);
     </script>
 </body>
 </html>
