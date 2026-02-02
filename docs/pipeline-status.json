@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "132/1160 (11%)",
+  "etl_progress": "133/1160 (11%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "17:00:49",
+    "last_fetch": "17:05:52",
     "samples": [
       {
         "name": "Tron",
@@ -28,14 +28,14 @@
         "wait": "10"
       },
       {
-        "name": "Tiana's",
-        "wait": "10"
+        "name": "Peter Pan",
+        "wait": "15"
       },
       {
-        "name": "MK127",
-        "wait": "30"
+        "name": "Space Mountain",
+        "wait": "55"
       }
     ]
   },
-  "last_updated": "2026-02-02T17:05:01.669704-05:00"
+  "last_updated": "2026-02-02T17:10:01.435768-05:00"
 }
