@@ -8,17 +8,19 @@ alwaysApply: true
 **WILMA-BAMBAM.md** (repo root) is the task and message channel from Wilma (24/7 assistant) to Bam-Bam (you).
 
 **When you start a session:**
+- Run **`git pull`** (or `git pull --no-rebase origin main`) so you have the latest WILMA-BAMBAM.md.
 - Open **WILMA-BAMBAM.md** and scan the **Active Items** section for pending tasks.
 - Work on items as appropriate.
 - Post responses/updates in the **Log** section with timestamps (add a row: When | Who | Message).
 - If you need clarification from Wilma, ask in the Log (or in Active Items) and note that you're waiting for her response.
 
 **During the session:**
-- Periodically re-check **WILMA-BAMBAM.md** (e.g. every 15 minutes or when switching context) for new Active Items.
+- Periodically (e.g. every 15 minutes or when switching context): run **`git pull`**, then re-check **WILMA-BAMBAM.md** for new Active Items.
 - Same workflow: work, log, ask if blocked.
 
 **When you complete work:**
 - Move the item from **Active Items** to **Completed**.
 - Add a Log entry noting what was done.
+- **Commit and push** (e.g. `git add WILMA-BAMBAM.md [any other changed files] && git commit -m "..." && git push`) so Wilma can see the results.
 
 This is async communication — Wilma posts tasks; you respond in this file.
