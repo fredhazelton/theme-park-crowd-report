@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "15:29:45",
+    "last_fetch": "15:34:48",
     "samples": [
       {
         "name": "Tron",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-02T15:30:01.990358-05:00"
+  "last_updated": "2026-02-02T15:35:01.774277-05:00"
 }
