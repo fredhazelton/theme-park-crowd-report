@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "124/1160 (11%)",
+  "etl_progress": "125/1160 (11%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "16:15:18",
+    "last_fetch": "16:20:21",
     "samples": [
       {
         "name": "Tron",
@@ -25,7 +25,7 @@
       },
       {
         "name": "Its a Small World",
-        "wait": "10"
+        "wait": "15"
       },
       {
         "name": "Jungle Cruise",
@@ -33,9 +33,9 @@
       },
       {
         "name": "Peter Pan",
-        "wait": "20"
+        "wait": "15"
       }
     ]
   },
-  "last_updated": "2026-02-02T16:20:01.732943-05:00"
+  "last_updated": "2026-02-02T16:25:01.550573-05:00"
 }
