@@ -1213,41 +1213,6 @@
            RECENT EVENT (Production Element)
         ═══════════════════════════════════════════════════════════════ */
         
-        .recent-event {
-            position: fixed;
-            bottom: 15px;
-            right: 360px;
-            background: rgba(10, 22, 40, 0.92);
-            border: 1px solid rgba(74, 144, 164, 0.4);
-            border-radius: 4px;
-            padding: 10px 15px;
-            font-size: 11px;
-            z-index: 100;
-            font-family: 'JetBrains Mono', monospace;
-            animation: borderGlow 6s ease-in-out infinite;
-        }
-        
-        .recent-event .event-label {
-            color: #4a90a4;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-        
-        .recent-event .event-text {
-            color: rgba(255,255,255,0.8);
-        }
-        
-        .recent-event .event-text span {
-            color: #6bb5c9;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body class="preview-mode">
-    <div class="scanlines"></div>
-    
     <!-- ============================================
          ALERT CONTROL PANEL (Preview Only)
          ============================================ -->
@@ -1494,12 +1459,6 @@
         <div class="title" id="stream-title">Building with Code 💻</div>
     </div>
     
-    <!-- RECENT EVENT -->
-    <div class="recent-event">
-        <div class="event-label">Latest Event</div>
-        <div class="event-text" id="recent-event-text"><span>DataWizard_42</span> followed</div>
-    </div>
-
     <script>
         // ═══════════════════════════════════════════════════════════════
         // HAZEYDATA AUDIO ENGINE — Procedural Tech Sounds
@@ -1967,7 +1926,7 @@
         }
         
         function updateRecentEvent(type) {
-            const eventText = document.getElementById('recent-event-text');
+            const eventText = null; // Removed - using goal tracker instead
             const events = {
                 follower: '<span>DataWizard_42</span> followed',
                 sub: '<span>StreamSupporter</span> subscribed (Tier 3)',
