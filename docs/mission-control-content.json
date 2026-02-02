@@ -8,7 +8,7 @@
     {
       "status_class": "medium",
       "status_text": "WAITING",
-      "task": "Mac Mini in 2 DAYS \u2014 Final prep for streaming setup"
+      "task": "Mac Mini TODAY \u2014 Final prep for streaming setup"
     },
     {
       "status_class": "good",
@@ -32,9 +32,9 @@
     {
       "emoji": "\ud83d\udda5\ufe0f",
       "event": "Mac Mini arrives!",
-      "date": "Feb 4",
-      "days_out": 2,
-      "urgency": "soon"
+      "date": "Today",
+      "days_out": 0,
+      "urgency": "imminent"
     },
     {
       "emoji": "\ud83d\udcb0",
@@ -63,7 +63,7 @@
       "status_class": "critical",
       "status_text": "URGENT",
       "title": "Twitch/YouTube Stream",
-      "description": "Mac Mini arrives **Tuesday Feb 4** (2 days!)"
+      "description": "Mac Mini arrives **TODAY** (TODAY!)"
     },
     {
       "status_class": "good",
@@ -123,22 +123,22 @@
       "id": "task-004",
       "title": "Build Dino task manager integration",
       "description": "Connect Dino's tasks.json to Mission Control HTML",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
+      "status": "done",
+      "status_class": "good",
+      "status_text": "DONE",
       "priority": "medium",
       "priority_icon": "\ud83d\udccb",
       "owner": "Wilma",
-      "notes": "",
-      "updated": "2026-02-02T13:07:00"
+      "notes": "Dino tasks now display on Mission Control! Auto-refreshes every 60 seconds.",
+      "updated": "2026-02-02T13:09:00"
     }
   ],
   "dino_summary": {
     "total": 4,
-    "todo": 1,
+    "todo": 0,
     "in_progress": 1,
     "blocked": 1,
-    "done": 1
+    "done": 2
   },
-  "last_updated": "2026-02-02T12:54:22.634844-05:00"
+  "last_updated": "2026-02-02T13:02:30.911732-05:00"
 }
