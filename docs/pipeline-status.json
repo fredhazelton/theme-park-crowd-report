@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "240/1160 (21%)",
+  "etl_progress": "241/1160 (21%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,15 +9,23 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "17:36:12",
+    "last_fetch": "17:41:16",
     "samples": [
       {
         "name": "Tron",
         "wait": "5"
       },
       {
+        "name": "MK11527",
+        "wait": "115"
+      },
+      {
         "name": "Speedway",
         "wait": "5"
+      },
+      {
+        "name": "Peter Pan",
+        "wait": "15"
       },
       {
         "name": "Space Mountain",
@@ -26,16 +34,8 @@
       {
         "name": "Tiana's",
         "wait": "10"
-      },
-      {
-        "name": "MK127",
-        "wait": "25"
-      },
-      {
-        "name": "MK142",
-        "wait": "45"
       }
     ]
   },
-  "last_updated": "2026-02-02T17:40:01.371549-05:00"
+  "last_updated": "2026-02-02T17:45:01.105258-05:00"
 }
