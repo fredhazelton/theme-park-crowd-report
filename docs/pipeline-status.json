@@ -9,8 +9,33 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "08:34:33",
-    "samples": []
+    "last_fetch": "08:39:36",
+    "samples": [
+      {
+        "name": "Speedway",
+        "wait": "5"
+      },
+      {
+        "name": "Its a Small World",
+        "wait": "5"
+      },
+      {
+        "name": "Peter Pan",
+        "wait": "5"
+      },
+      {
+        "name": "MK127",
+        "wait": "5"
+      },
+      {
+        "name": "MK142",
+        "wait": "35"
+      },
+      {
+        "name": "MK161",
+        "wait": "5"
+      }
+    ]
   },
-  "last_updated": "2026-02-02T08:35:02.018946-05:00"
+  "last_updated": "2026-02-02T08:40:01.841003-05:00"
 }
