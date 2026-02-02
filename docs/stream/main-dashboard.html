@@ -2163,6 +2163,15 @@
         
         // Auto-fit on load if viewport is smaller than canvas
         document.addEventListener('DOMContentLoaded', () => {
+            // Auto-enable preview mode when viewing in a regular browser
+            // OBS/Streamlabs browser sources have specific user agents or window.obsstudio
+            const isOBS = window.obsstudio || navigator.userAgent.includes('OBS');
+            const forcePreview = new URLSearchParams(window.location.search).has('preview');
+            
+            if (!isOBS || forcePreview) {
+                document.body.classList.add('preview-mode');
+            }
+            
             if (window.innerWidth < 1920 || window.innerHeight < 1080) {
                 // Default to scroll mode for reliability
                 enableScroll();
