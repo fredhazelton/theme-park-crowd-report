@@ -1,0 +1,83 @@
+{
+  "todays_focus": [
+    {
+      "status_class": "critical",
+      "status_text": "NOW",
+      "task": "DinoLand closed \u2014 Tropical Americas construction begins"
+    },
+    {
+      "status_class": "medium",
+      "status_text": "WAITING",
+      "task": "Mac Mini in 2 DAYS \u2014 Final prep for streaming setup"
+    },
+    {
+      "status_class": "good",
+      "status_text": "READY",
+      "task": "Review stream overlay specs with Bam-Bam"
+    },
+    {
+      "status_class": "good",
+      "status_text": "ACTIVE",
+      "task": "Pipeline running smoothly on wilma-server"
+    }
+  ],
+  "key_dates": [
+    {
+      "emoji": "\ud83d\udcc5",
+      "event": "DinoLand closed \u2192 Tropical Americas begins",
+      "date": "Today",
+      "days_out": 0,
+      "urgency": "imminent"
+    },
+    {
+      "emoji": "\ud83d\udda5\ufe0f",
+      "event": "Mac Mini arrives!",
+      "date": "Feb 4",
+      "days_out": 2,
+      "urgency": "soon"
+    },
+    {
+      "emoji": "\ud83d\udcb0",
+      "event": "Wilma Autonomy Pilot begins ($500/mo)",
+      "date": "Feb 4",
+      "days_out": 2,
+      "urgency": "soon"
+    },
+    {
+      "emoji": "\ud83d\udc64",
+      "event": "John visits",
+      "date": "Feb 7",
+      "days_out": 5,
+      "urgency": ""
+    },
+    {
+      "emoji": "\u26a0\ufe0f",
+      "event": "GPT-4o retires",
+      "date": "Feb 13",
+      "days_out": 11,
+      "urgency": ""
+    }
+  ],
+  "active_projects": [
+    {
+      "status_class": "critical",
+      "status_text": "URGENT",
+      "title": "Twitch/YouTube Stream",
+      "description": "Mac Mini arrives **Tuesday Feb 4** (2 days!)"
+    },
+    {
+      "status_class": "good",
+      "status_text": "IN DEV",
+      "title": "Theme Park Crowd Report",
+      "description": "Pipeline running on wilma-server, training in progress"
+    },
+    {
+      "status_class": "low",
+      "status_text": "LIVE",
+      "title": "hazeydata.ai Website",
+      "description": "Live! Needs content updates"
+    }
+  ],
+  "theme_park_intel": [],
+  "last_updated": "2026-02-02T10:46:25.817603-05:00"
+}

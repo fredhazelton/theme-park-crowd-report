@@ -201,22 +201,11 @@
         </header>
         
         <div class="grid">
-            <!-- Today's Focus -->
+            <!-- Today's Focus (dynamic from JSON) -->
             <div class="card priority">
                 <h2>🎯 Today's Focus</h2>
-                <ul class="task-list">
-                    <li>
-                        <span class="status critical">NOW</span>
-                        <span>Historical pipeline load running (first-time ETL)</span>
-                    </li>
-                    <li>
-                        <span class="status good">DONE</span>
-                        <span>Wilma ↔ Bam-Bam async channel operational</span>
-                    </li>
-                    <li>
-                        <span class="status medium">WAITING</span>
-                        <span>Mac Mini arrives in 2 days</span>
-                    </li>
+                <ul class="task-list" id="todays-focus">
+                    <li><span class="status medium">Loading...</span></li>
                 </ul>
             </div>
             
@@ -280,24 +269,11 @@
                 </div>
             </div>
             
-            <!-- Key Dates -->
+            <!-- Key Dates (dynamic from JSON) -->
             <div class="card">
                 <h2>📅 Key Dates</h2>
-                <div class="date-card">
-                    <span>🖥️ Mac Mini arrives</span>
-                    <span class="days-out imminent">Feb 4 — 2 days</span>
-                </div>
-                <div class="date-card">
-                    <span>💰 Wilma Autonomy starts</span>
-                    <span class="days-out imminent">Feb 4 — 2 days</span>
-                </div>
-                <div class="date-card">
-                    <span>👤 John visits</span>
-                    <span class="days-out soon">Feb 7 — 5 days</span>
-                </div>
-                <div class="date-card">
-                    <span>⚠️ GPT-4o retires</span>
-                    <span class="days-out">Feb 13 — 11 days</span>
+                <div id="key-dates">
+                    <div class="date-card"><span>Loading...</span></div>
                 </div>
             </div>
             
@@ -336,22 +312,11 @@
                 </div>
             </div>
             
-            <!-- Active Projects -->
+            <!-- Active Projects (dynamic from JSON) -->
             <div class="card full-width">
                 <h2>🚀 Active Projects</h2>
-                <ul class="task-list">
-                    <li>
-                        <span class="status critical">RUNNING</span>
-                        <strong>Theme Park Crowd Report</strong> — Historical ETL in progress, then training
-                    </li>
-                    <li>
-                        <span class="status medium">BLOCKED</span>
-                        <strong>Twitch Stream</strong> — Waiting on Mac Mini (Feb 4)
-                    </li>
-                    <li>
-                        <span class="status low">LIVE</span>
-                        <strong>hazeydata.ai</strong> — Live, needs content updates
-                    </li>
+                <ul class="task-list" id="active-projects">
+                    <li><span class="status medium">Loading...</span></li>
                 </ul>
                 <!-- Benedictus scale preview -->
                 <div class="scale-preview">
@@ -476,11 +441,56 @@
             }
         }
         
+        // Load content (Today's Focus, Key Dates, Active Projects)
+        async function loadContent() {
+            try {
+                const resp = await fetch('mission-control-content.json?' + Date.now());
+                const data = await resp.json();
+                
+                // Today's Focus
+                const focusEl = document.getElementById('todays-focus');
+                if (data.todays_focus && data.todays_focus.length > 0) {
+                    focusEl.innerHTML = data.todays_focus.map(item => `
+                        <li>
+                            <span class="status ${item.status_class}">${item.status_text}</span>
+                            <span>${item.task}</span>
+                        </li>
+                    `).join('');
+                }
+                
+                // Key Dates
+                const datesEl = document.getElementById('key-dates');
+                if (data.key_dates && data.key_dates.length > 0) {
+                    datesEl.innerHTML = data.key_dates.map(item => `
+                        <div class="date-card">
+                            <span>${item.emoji} ${item.event}</span>
+                            <span class="days-out ${item.urgency}">${item.date} — ${item.days_out} day${item.days_out !== 1 ? 's' : ''}</span>
+                        </div>
+                    `).join('');
+                }
+                
+                // Active Projects
+                const projectsEl = document.getElementById('active-projects');
+                if (data.active_projects && data.active_projects.length > 0) {
+                    projectsEl.innerHTML = data.active_projects.map(item => `
+                        <li>
+                            <span class="status ${item.status_class}">${item.status_text}</span>
+                            <strong>${item.title}</strong> — ${item.description}
+                        </li>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Failed to load content:', e);
+            }
+        }
+        
         // Load immediately and refresh every 60 seconds
         loadPipelineStatus();
         loadQueueTimesStatus();
+        loadContent();
         setInterval(loadPipelineStatus, 60000);
         setInterval(loadQueueTimesStatus, 60000);
+        setInterval(loadContent, 60000);
     </script>
 </body>
 </html>
