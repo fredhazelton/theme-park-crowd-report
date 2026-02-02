@@ -79,5 +79,66 @@
     }
   ],
   "theme_park_intel": [],
-  "last_updated": "2026-02-02T12:25:01.520682-05:00"
+  "dino_tasks": [
+    {
+      "id": "task-001",
+      "title": "Historical pipeline ETL load",
+      "description": "First-time load of all historical wait time data",
+      "status": "in_progress",
+      "status_class": "critical",
+      "status_text": "IN PROGRESS",
+      "priority": "high",
+      "priority_icon": "\u26a1",
+      "owner": "Wilma",
+      "notes": "Running on wilma-server, ~55/1160 files processed",
+      "updated": "2026-02-02T12:51:00"
+    },
+    {
+      "id": "task-002",
+      "title": "Mac Mini streaming setup",
+      "description": "Set up Streamlabs for Twitch + YouTube cross-platform streaming",
+      "status": "blocked",
+      "status_class": "high",
+      "status_text": "BLOCKED",
+      "priority": "high",
+      "priority_icon": "\u26a1",
+      "owner": "Fred",
+      "notes": "Blocked until Mac Mini arrives Feb 4",
+      "updated": "2026-02-02T12:51:00"
+    },
+    {
+      "id": "task-003",
+      "title": "Wilma-BamBam async channel",
+      "description": "Set up communication channel between Wilma and Bam-Bam via shared markdown file",
+      "status": "done",
+      "status_class": "good",
+      "status_text": "DONE",
+      "priority": "medium",
+      "priority_icon": "\ud83d\udccb",
+      "owner": "Wilma",
+      "notes": "Completed! Using WILMA-BAMBAM.md in repo",
+      "updated": "2026-02-02T09:27:00"
+    },
+    {
+      "id": "task-004",
+      "title": "Build Dino task manager integration",
+      "description": "Connect Dino's tasks.json to Mission Control HTML",
+      "status": "todo",
+      "status_class": "medium",
+      "status_text": "TODO",
+      "priority": "medium",
+      "priority_icon": "\ud83d\udccb",
+      "owner": "Wilma",
+      "notes": "",
+      "updated": "2026-02-02T13:07:00"
+    }
+  ],
+  "dino_summary": {
+    "total": 4,
+    "todo": 1,
+    "in_progress": 1,
+    "blocked": 1,
+    "done": 1
+  },
+  "last_updated": "2026-02-02T12:54:22.634844-05:00"
 }

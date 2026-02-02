@@ -333,6 +333,17 @@
                 </div>
             </div>
             
+            <!-- Dino Tasks (dynamic from JSON) -->
+            <div class="card priority">
+                <h2>🦕 Dino Tasks</h2>
+                <div id="dino-summary" style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-secondary);">
+                    Loading...
+                </div>
+                <ul class="task-list" id="dino-tasks">
+                    <li><span class="status medium">Loading...</span></li>
+                </ul>
+            </div>
+            
             <!-- Theme Park Intel -->
             <div class="card neutral">
                 <h2>🎢 Theme Park Intel</h2>
@@ -476,6 +487,27 @@
                         <li>
                             <span class="status ${item.status_class}">${item.status_text}</span>
                             <strong>${item.title}</strong> — ${item.description}
+                        </li>
+                    `).join('');
+                }
+                
+                // Dino Tasks
+                const dinoSummaryEl = document.getElementById('dino-summary');
+                const dinoTasksEl = document.getElementById('dino-tasks');
+                if (data.dino_summary) {
+                    const s = data.dino_summary;
+                    dinoSummaryEl.innerHTML = `${s.in_progress} in progress · ${s.blocked} blocked · ${s.todo} todo · ${s.done} done`;
+                }
+                if (data.dino_tasks && data.dino_tasks.length > 0) {
+                    // Show non-done tasks first, then recent done
+                    const activeTasks = data.dino_tasks.filter(t => t.status !== 'done');
+                    const doneTasks = data.dino_tasks.filter(t => t.status === 'done').slice(-2);
+                    const tasksToShow = [...activeTasks, ...doneTasks];
+                    
+                    dinoTasksEl.innerHTML = tasksToShow.map(task => `
+                        <li>
+                            <span class="status ${task.status_class}">${task.status_text}</span>
+                            <span><strong>${task.id}</strong> ${task.title} <small style="color: var(--text-secondary);">(${task.owner})</small></span>
                         </li>
                     `).join('');
                 }
