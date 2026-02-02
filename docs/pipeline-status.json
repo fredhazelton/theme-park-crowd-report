@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "55/1160 (5%)",
+  "etl_progress": "1/1160 (0%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "12:22:04",
+    "last_fetch": "12:27:08",
     "samples": [
       {
         "name": "Tron",
@@ -21,11 +21,11 @@
       },
       {
         "name": "Its a Small World",
-        "wait": "15"
+        "wait": "25"
       },
       {
         "name": "Haunted Mansion",
-        "wait": "80"
+        "wait": "75"
       },
       {
         "name": "Jungle Cruise",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-02T12:25:01.522905-05:00"
+  "last_updated": "2026-02-02T12:30:01.405041-05:00"
 }
