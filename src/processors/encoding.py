@@ -134,11 +134,15 @@ def _label_encode_column(
     Args:
         series: Categorical series to encode
         mapping: Optional pre-existing mapping (for inference)
-        handle_unknown: How to handle unknown values ("error", "ignore", or "encode")
+        handle_unknown: How to handle unknown values ("error", "ignore", "encode", or "use_default"
+            — use_default maps unknown to all-9s code with same digit count as max(existing), e.g. max 6529 → 9999).
     
     Returns:
         Tuple of (encoded_series, mapping_dict)
     """
+    # Reserved key for unknown values (e.g. future PRESIDENTS_DAY_2026, WINTER_2028 not in training)
+    UNKNOWN_KEY = "__UNKNOWN__"
+
     # Convert to string and handle nulls
     series_str = series.astype(str)
     series_str = series_str.replace("nan", None)
@@ -150,6 +154,19 @@ def _label_encode_column(
         unique_vals = sorted([v for v in unique_vals if v is not None])
         mapping = {val: idx for idx, val in enumerate(unique_vals)}
     
+    # Ensure __UNKNOWN__ has a code for use_default (inference with future categories).
+    # Use all-9s with same number of digits as max(existing codes) so unknowns are easy to spot (e.g. 6529 → 9999).
+    if handle_unknown == "use_default" and UNKNOWN_KEY not in mapping:
+        max_id = max(mapping.values()) if mapping else -1
+        if max_id < 0:
+            default_code = 9
+        else:
+            n_digits = len(str(max_id))
+            default_code = int("9" * n_digits)
+            if default_code <= max_id or default_code in mapping.values():
+                default_code = max_id + 1  # avoid collision if max is already all 9s
+        mapping[UNKNOWN_KEY] = default_code
+
     # Apply mapping
     def map_value(val):
         if pd.isna(val) or val is None:
@@ -161,6 +178,8 @@ def _label_encode_column(
             raise ValueError(f"Unknown value '{val_str}' not in mapping")
         elif handle_unknown == "ignore":
             return None
+        elif handle_unknown == "use_default":
+            return mapping[UNKNOWN_KEY]
         else:  # encode (assign new ID)
             max_id = max(mapping.values()) if mapping else -1
             mapping[val_str] = max_id + 1
@@ -295,7 +314,7 @@ def encode_features(
         columns: List of columns to encode (default: DEFAULT_CATEGORICAL_COLUMNS)
         mappings: Pre-existing mappings (for inference)
         save_mappings: If True, save mappings to state/encoding_mappings.json
-        handle_unknown: How to handle unknown values ("error", "ignore", or "encode")
+        handle_unknown: How to handle unknown values ("error", "ignore", "encode", or "use_default")
         logger: Optional logger
     
     Returns:

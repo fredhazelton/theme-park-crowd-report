@@ -580,19 +580,21 @@ def generate_forecast_for_entity_date(
                 logger=logger,
             )
             
-            # Encode features
+            # Encode features (use_default so future holiday/season codes not in training map to __UNKNOWN__)
             if encoding_mappings:
                 df_encoded, _ = encode_features(
                     df_features,
                     output_base,
                     strategy=encoding_mappings.get("strategy", "label"),
                     mappings=encoding_mappings,
+                    handle_unknown="use_default",
                 )
             else:
                 df_encoded, _ = encode_features(
                     df_features,
                     output_base,
                     strategy="label",
+                    handle_unknown="use_default",
                 )
             
             # Predict ACTUAL
