@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "22:53:33",
+    "last_fetch": "22:58:37",
     "samples": [
       {
         "name": "Tron",
@@ -26,16 +26,8 @@
       {
         "name": "Its a Small World",
         "wait": "5"
-      },
-      {
-        "name": "Haunted Mansion",
-        "wait": "20"
-      },
-      {
-        "name": "Peter Pan",
-        "wait": "10"
       }
     ]
   },
-  "last_updated": "2026-02-01T22:55:02.030552-05:00"
+  "last_updated": "2026-02-01T23:00:01.860860-05:00"
 }
