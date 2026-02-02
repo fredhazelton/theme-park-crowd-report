@@ -97,14 +97,14 @@
       "id": "task-002",
       "title": "Mac Mini streaming setup",
       "description": "Set up Streamlabs for Twitch + YouTube cross-platform streaming",
-      "status": "blocked",
-      "status_class": "high",
-      "status_text": "BLOCKED",
+      "status": "in_progress",
+      "status_class": "critical",
+      "status_text": "IN PROGRESS",
       "priority": "high",
       "priority_icon": "\u26a1",
       "owner": "Fred",
-      "notes": "Blocked until Mac Mini arrives Feb 4",
-      "updated": "2026-02-02T12:51:00"
+      "notes": "Mac Mini arriving TODAY! Time to set up streaming!",
+      "updated": "2026-02-02T13:11:00"
     },
     {
       "id": "task-003",
@@ -136,9 +136,9 @@
   "dino_summary": {
     "total": 4,
     "todo": 0,
-    "in_progress": 1,
-    "blocked": 1,
+    "in_progress": 2,
+    "blocked": 0,
     "done": 2
   },
-  "last_updated": "2026-02-02T13:02:30.911732-05:00"
+  "last_updated": "2026-02-02T13:02:58.067348-05:00"
 }
