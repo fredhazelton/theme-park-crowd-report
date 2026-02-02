@@ -34,7 +34,7 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 ### 3.1 Daily pipeline (cron, 6:00 AM Eastern)
 
 - **What:** One cron job runs `scripts/run_daily_pipeline.sh`.
-- **Order:** ETL (incremental) → Dimension fetches → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI.
+- **Order:** S3 sync (wait_times + fastpass_times to `output_base/raw`) → ETL (incremental, sync-only: reads from `raw/` only) → Dimension fetches → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI.
 - **Runs as:** fred (your crontab).
 - **Log:** `output_base/logs/daily_pipeline_YYYY-MM-DD.log`
 - **Lock:** `state/daily_pipeline.lock` — only one run at a time. If the previous run is still in progress (e.g. still training), the next 6 AM run skips cleanly (exit 0) so it doesn’t kill or conflict with the other run.
@@ -65,6 +65,7 @@ All under **output_base** unless noted.
 | `output_base/models/` | Per-entity XGBoost (or mean) models |
 | `output_base/curves/forecast/` | Forecast curves (actual/posted predicted) |
 | `output_base/state/` | entity_index.sqlite, pipeline_status.json, daily_pipeline.lock (one run at a time), encoding_mappings.json, etc. |
+| `output_base/raw/` | Synced S3 data: `raw/export/wait_times/`, `raw/export/fastpass_times/` (ETL reads from here only; sync-only, no S3 streaming). |
 | `output_base/reports/` | wait_time_db_report.md, etc. |
 
 ---
@@ -95,6 +96,8 @@ cd /home/fred/Desktop/theme-park-crowd-report
 # Or in background with log:
 nohup ./scripts/run_daily_pipeline.sh >> "output_base/logs/daily_pipeline_$(date +%Y-%m-%d).log" 2>&1 &
 ```
+
+**S3 sync:** The pipeline runs `scripts/sync_s3_data.sh` before ETL to sync `wait_times` and `fastpass_times` from S3 into `output_base/raw/`. ETL is sync-only and always reads from `output_base/raw/` (no S3 streaming). Use `--skip-sync` only if you have already synced; ETL will still read from `raw/`.
 
 **Dropbox:** If `output_base` is under Dropbox, the pipeline force-quits Dropbox before starting (to avoid file locks / partial reads). It runs `dropbox stop` (or `pkill -TERM` if no CLI), waits up to 15s for exit, then proceeds. Dropbox stays stopped until you start it again (or next login if it auto-starts). Use `--skip-dropbox-check` to skip stopping Dropbox (e.g. if output is not on Dropbox).
 

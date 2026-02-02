@@ -337,29 +337,37 @@ Shared functions sourced by other bash scripts:
 
 ### `run_daily_pipeline.sh` (Linux)
 
-Master script that runs the full pipeline in order: ETL → Dimension fetches → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI. Use for a single daily run (e.g. from cron at 6:00 AM).
+Master script that runs the full pipeline in order: **S3 sync** (wait_times + fastpass_times to `output_base/raw`) → ETL (sync-only: reads from `raw/` only) → Dimension fetches → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI. Use for a single daily run (e.g. from cron at 6:00 AM).
 
 ```bash
 ./scripts/run_daily_pipeline.sh
 ./scripts/run_daily_pipeline.sh --no-stop-on-error   # continue on step failure
 ./scripts/run_daily_pipeline.sh --skip-etl --skip-training
+./scripts/run_daily_pipeline.sh --skip-sync   # skip S3 sync (use existing raw/ or S3 streaming)
 ```
 
-Options: `--output-base PATH`, `--no-stop-on-error`, `--skip-etl`, `--skip-dimensions`, `--skip-aggregates`, `--skip-report`, `--skip-training`, `--skip-forecast`, `--skip-wti`. See [LINUX_CRON_SETUP.md](../LINUX_CRON_SETUP.md) and `install_cron.sh --daily-master`.
+Options: `--output-base PATH`, `--no-stop-on-error`, `--skip-sync`, `--skip-etl`, `--skip-dimensions`, `--skip-aggregates`, `--skip-report`, `--skip-training`, `--skip-forecast`, `--skip-wti`. See [LINUX_CRON_SETUP.md](../LINUX_CRON_SETUP.md) and `install_cron.sh --daily-master`.
+
+### `sync_s3_data.sh` (Linux)
+
+Syncs TouringPlans S3 `export/wait_times/` and `export/fastpass_times/` to `output_base/raw/export/...`. Run before ETL so the pipeline reads from local files (reliable, resumable). Used automatically by `run_daily_pipeline.sh`; can also run manually or on a separate schedule (e.g. 5:30 AM).
+
+```bash
+./scripts/sync_s3_data.sh
+./scripts/sync_s3_data.sh --output-base /path/to/output
+```
 
 ### `run_etl.sh`
 
-Main ETL script wrapper. Equivalent to running `python src/get_tp_wait_time_data_from_s3.py`.
+Main ETL script wrapper. ETL is **sync-only**: it requires `--local-source` (e.g. `output_base/raw`) and reads only from local files. Run `sync_s3_data.sh` first.
 
 ```bash
-# Standard run
-./scripts/run_etl.sh
-
-# Custom output path
-./scripts/run_etl.sh --output-base /path/to/output
+# After syncing (required)
+./scripts/sync_s3_data.sh --output-base /path/to/output
+./scripts/run_etl.sh --output-base /path/to/output --local-source /path/to/output/raw
 
 # Full rebuild
-./scripts/run_etl.sh --full-rebuild
+./scripts/run_etl.sh --output-base /path/to/output --local-source /path/to/output/raw --full-rebuild
 ```
 
 ### `run_dimension_fetches.sh`

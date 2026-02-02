@@ -63,7 +63,7 @@ When installed with `install_cron.sh --daily-master`, one cron job runs at **6:0
 
 **Script:** `scripts/run_daily_pipeline.sh`
 
-**Order:** ETL (incremental) → Dimension fetches → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI
+**Order:** S3 sync (wait_times + fastpass_times to `output_base/raw`) → ETL (incremental, sync-only: reads from `raw/` only) → Dimension fetches → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI
 
 **Log:** `logs/daily_pipeline_YYYY-MM-DD.log` (same day’s runs append)
 

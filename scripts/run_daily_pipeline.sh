@@ -31,6 +31,7 @@ SKIP_TRAINING=false
 SKIP_FORECAST=false
 SKIP_WTI=false
 SKIP_DROPBOX_CHECK=false
+SKIP_SYNC=false
 PARK=""
 
 while [[ $# -gt 0 ]]; do
@@ -75,6 +76,10 @@ while [[ $# -gt 0 ]]; do
             SKIP_DROPBOX_CHECK=true
             shift
             ;;
+        --skip-sync)
+            SKIP_SYNC=true
+            shift
+            ;;
         --park)
             PARK="$2"
             shift 2
@@ -95,6 +100,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-forecast        Skip forecast generation"
             echo "  --skip-wti             Skip WTI calculation"
             echo "  --skip-dropbox-check   Do not force-quit Dropbox (use if output_base is not on Dropbox)"
+            echo "  --skip-sync             Skip S3 sync (use existing local raw data)"
             echo "  --park PARK            Run training, forecast, and WTI for one park only (e.g. MK, EP, AK, BB)"
             exit 0
             ;;
@@ -182,12 +188,24 @@ run_step_optional() {
 
 FAILED_ANY=false
 
-# 1. ETL (incremental)
+# 0. S3 sync (before ETL) - syncs wait_times and fastpass_times to output_base/raw for reliable local reads
+if ! $SKIP_SYNC && ! $SKIP_ETL; then
+    if run_step "S3 sync" "$SCRIPT_DIR/sync_s3_data.sh" --output-base "$OUTPUT_BASE"; then
+        :
+    else
+        FAILED_ANY=true
+        $STOP_ON_ERROR && exit 1
+    fi
+elif $SKIP_SYNC; then
+    log_info "=== S3 sync (skipped) ==="
+fi
+
+# 1. ETL (incremental) — reads from output_base/raw only (sync-only; no S3 streaming)
 if $SKIP_ETL; then
     log_info "=== ETL (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step etl done 2>/dev/null || true
 else
-    if run_step "ETL (incremental)" "$SCRIPT_DIR/run_etl.sh" --output-base "$OUTPUT_BASE"; then
+    if run_step "ETL (incremental)" "$SCRIPT_DIR/run_etl.sh" --output-base "$OUTPUT_BASE" --local-source "$OUTPUT_BASE/raw"; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step etl done 2>/dev/null || true
     else
         FAILED_ANY=true

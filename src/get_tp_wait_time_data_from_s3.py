@@ -45,7 +45,6 @@ MODULES USED
 from __future__ import annotations
 
 import argparse
-import io
 import json
 import logging
 import os
@@ -58,10 +57,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Tuple, Dict, Set, Optional
 
-import boto3
 import pandas as pd
-from botocore.exceptions import ClientError, ResponseStreamingError
-from botocore.config import Config
 from zoneinfo import ZoneInfo
 
 # ----- Ensure we can import from src/ when run from project root -----
@@ -275,32 +271,30 @@ def _record_failure(failed_files: Dict[str, dict], key: str, last_modified: date
 # S3 HELPERS (Read-Only)
 # =============================================================================
 
-def list_s3_csvs(s3, bucket: str, prefix: str) -> List[Tuple[str, datetime]]:
-    """List all CSV keys under prefix with their LastModified. Returns (key, last_modified)."""
+def list_local_csvs(local_source_root: Path, props: List[str]) -> List[Tuple[str, datetime]]:
+    """
+    List all CSV files under local_source_root that mirror S3 export/wait_times and export/fastpass_times.
+    Returns (key, mtime) where key matches S3 key format (e.g. export/wait_times/wdw/file.csv).
+    """
     keys: List[Tuple[str, datetime]] = []
-    token = None
-    while True:
-        kwargs = {"Bucket": bucket, "Prefix": prefix}
-        if token:
-            kwargs["ContinuationToken"] = token
-        resp = s3.list_objects_v2(**kwargs)
-        for obj in resp.get("Contents", []):
-            k = obj["Key"]
-            if k.lower().endswith(".csv"):
-                lm = obj.get("LastModified", datetime.now())
-                keys.append((k, lm))
-        if resp.get("IsTruncated"):
-            token = resp.get("NextContinuationToken")
-        else:
-            break
+    root = local_source_root.resolve()
+    for subdir, key_prefix in [("wait_times", "export/wait_times"), ("fastpass_times", "export/fastpass_times")]:
+        for prop in props:
+            dir_path = root / "export" / subdir / prop
+            if not dir_path.is_dir():
+                continue
+            for path in dir_path.rglob("*.csv"):
+                if not path.is_file():
+                    continue
+                try:
+                    rel = path.relative_to(root)
+                    key = rel.as_posix()
+                    mtime = datetime.fromtimestamp(path.stat().st_mtime, tz=ZoneInfo("UTC"))
+                    keys.append((key, mtime))
+                except ValueError:
+                    continue
     keys.sort(key=lambda x: x[0])
     return keys
-
-
-def s3_text_stream(s3, bucket: str, key: str):
-    """Open S3 object as text stream (UTF-8, errors=replace)."""
-    obj = s3.get_object(Bucket=bucket, Key=key)
-    return io.TextIOWrapper(obj["Body"], encoding="utf-8", errors="replace", newline="")
 
 
 # =============================================================================
@@ -511,6 +505,7 @@ def parse_args():
     ap = argparse.ArgumentParser(description="Wait Time FACT TABLE builder")
     ap.add_argument("--props", default=",".join(DEFAULT_PROPS), help="Comma-separated properties (wdw,dlr,...)")
     ap.add_argument("--output-base", type=str, default=str(get_output_base()), help="Output base directory (from config/config.json or default)")
+    ap.add_argument("--local-source", type=str, required=True, help="Local directory under which export/wait_times and export/fastpass_times exist (required; run sync_s3_data.sh first)")
     ap.add_argument("--chunksize", type=int, default=CHUNKSIZE)
     ap.add_argument("--sample-k", type=int, default=SAMPLE_K)
     ap.add_argument("--full-rebuild", action="store_true", help="Process all files, ignore processed state")
@@ -623,31 +618,21 @@ def process_file(
     seen: int,
     sample_k: int,
     entity_index_db: Optional[Path] = None,
+    local_source_root: Optional[Path] = None,
 ) -> Tuple[int, int]:
-    """Process one S3 file. Returns (rows_written, rows_seen). Raises on failure."""
+    """Process one local file (sync-only). Returns (rows_written, rows_seen). Raises on failure."""
     rows_written = 0
     rows_seen = 0
+    if local_source_root is None:
+        raise ValueError("local_source_root is required (sync-only mode)")
+    local_path = local_source_root / key
+    if not local_path.exists():
+        raise FileNotFoundError(f"Local file not found: {local_path}")
 
     try:
         if file_type == "Standby":
             logger.info(f"Processing Standby file: {key}")
-            max_retries = 3
-            reader = None
-            for attempt in range(max_retries):
-                try:
-                    stream = s3_text_stream(s3, S3_BUCKET, key)
-                    reader = pd.read_csv(stream, chunksize=chunksize, low_memory=False)
-                    break
-                except (ResponseStreamingError, ConnectionError, IOError) as e:
-                    if attempt < max_retries - 1:
-                        wait = 2 ** attempt
-                        logger.warning(f"Connection error reading {key} (attempt {attempt+1}/{max_retries}): {e}. Retrying in {wait}s...")
-                        time.sleep(wait)
-                    else:
-                        logger.error(f"Failed to read {key} after {max_retries} attempts: {e}")
-                        raise
-            if reader is None:
-                raise Exception(f"Failed to create reader for {key}")
+            reader = pd.read_csv(local_path, chunksize=chunksize, low_memory=False)
 
             for chunk_idx, chunk in enumerate(reader):
                 df = parse_standby_chunk(chunk)
@@ -672,7 +657,7 @@ def process_file(
 
         elif file_type in ("New Fastpass", "Old Fastpass"):
             logger.info(f"Processing {file_type} file: {key}")
-            for chunk_idx, out in enumerate(parse_fastpass_stream(s3, S3_BUCKET, key, chunksize, file_type=file_type)):
+            for chunk_idx, out in enumerate(parse_fastpass_stream(s3, S3_BUCKET, key, chunksize, file_type=file_type, local_path=str(local_path))):
                 if out.empty:
                     continue
                 before = len(out)
@@ -731,6 +716,7 @@ def main() -> None:
     logger.info(f"Output base: {output_base}")
     logger.info(f"Properties: {', '.join(props)}")
     logger.info(f"Full rebuild: {args.full_rebuild}")
+    logger.info(f"Local source: {args.local_source} (sync-only; no S3 streaming)")
     logger.info("=" * 70)
 
     # ----- STEP 1b: Merge yesterday's queue-times from staging into fact_tables -----
@@ -750,17 +736,12 @@ def main() -> None:
     if failed_files:
         logger.info(f"Loaded {len(failed_files)} failed-files entries (skip if old + >={FAILED_SKIP_THRESHOLD} failures)")
 
-    # ----- STEP 3: S3 client with retries -----
-    try:
-        config = Config(
-            retries={"max_attempts": 5, "mode": "adaptive"},
-            read_timeout=300,
-            connect_timeout=60,
-        )
-        s3 = boto3.client("s3", config=config)
-        logger.info("S3 client initialized with retry configuration")
-    except Exception as e:
-        logger.error(f"Failed to initialize S3 client: {e}")
+    # ----- STEP 3: No S3 client (sync-only; all reads from local_source) -----
+    s3 = None
+    local_source_root = Path(args.local_source).resolve()
+    if not local_source_root.is_dir():
+        logger.error(f"Local source directory does not exist: {local_source_root}")
+        logger.error("Run sync_s3_data.sh first to sync wait_times and fastpass_times to output_base/raw")
         sys.exit(1)
 
     local_sample = dirs["samples"] / LOCAL_SAMPLE_NAME
@@ -790,21 +771,8 @@ def main() -> None:
     file_type_stats = {"Standby": 0, "New Fastpass": 0, "Old Fastpass": 0, "Unknown": 0}
 
     try:
-        # ----- STEP 6: List all S3 CSVs (standby + fastpass) -----
-        all_keys: List[Tuple[str, datetime]] = []
-        for prop in props:
-            standby_prefix = S3_STANDBY_PREFIX_FMT.format(prop=prop)
-            priority_prefix = S3_PRIORITY_PREFIX_FMT.format(prop=prop)
-            try:
-                skeys = list_s3_csvs(s3, S3_BUCKET, standby_prefix)
-                pkeys = list_s3_csvs(s3, S3_BUCKET, priority_prefix)
-                logger.info(f"{prop}: standby={len(skeys)} priority={len(pkeys)}")
-                all_keys.extend(skeys)
-                all_keys.extend(pkeys)
-            except Exception as e:
-                logger.error(f"Error listing files for {prop}: {e}")
-                continue
-
+        # ----- STEP 6: List all CSVs from local directory (sync-only) -----
+        all_keys: List[Tuple[str, datetime]] = list_local_csvs(local_source_root, props)
         total = len(all_keys)
         logger.info(f"Total files found: {total}")
 
@@ -872,6 +840,7 @@ def main() -> None:
                     seen=seen,
                     sample_k=args.sample_k,
                     entity_index_db=entity_index_db,
+                    local_source_root=local_source_root,
                 )
                 kept_rows += rows_written
                 seen += rows_seen
@@ -879,14 +848,6 @@ def main() -> None:
                 new_files_processed += 1
                 failed_files.pop(key, None)
 
-            except ClientError as e:
-                logger.warning(f"Skipping {key}: {e}")
-                _record_failure(failed_files, key, last_modified)
-                continue
-            except ResponseStreamingError as e:
-                logger.error(f"Connection error processing {key}: {e}")
-                _record_failure(failed_files, key, last_modified)
-                continue
             except Exception as e:
                 logger.error(f"Error processing {key}: {e}", exc_info=True)
                 _record_failure(failed_files, key, last_modified)

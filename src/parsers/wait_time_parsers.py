@@ -297,18 +297,19 @@ def parse_fastpass_chunk(chunk: pd.DataFrame, is_new_format: bool) -> pd.DataFra
     return _format_priority(df, is_old_format=not is_new_format)
 
 
-def parse_fastpass_stream(s3, bucket: str, key: str, chunksize: int = 250_000, file_type: str = None, max_retries: int = 3) -> Iterable[pd.DataFrame]:
+def parse_fastpass_stream(s3, bucket: str, key: str, chunksize: int = 250_000, file_type: str = None, max_retries: int = 3, local_path: str = None) -> Iterable[pd.DataFrame]:
     """
     Stream and parse fastpass file, auto-detecting new vs old format.
     
     Args:
-        s3: S3 client
-        bucket: S3 bucket name
-        key: S3 key
+        s3: S3 client (ignored when local_path is set)
+        bucket: S3 bucket name (ignored when local_path is set)
+        key: S3 key (ignored when local_path is set)
         chunksize: Chunk size for reading
         file_type: Optional file type ("New Fastpass" or "Old Fastpass"). 
                    If None, auto-detects from headers.
         max_retries: Maximum number of retry attempts for connection errors
+        local_path: If set, read from this local file path instead of S3.
     
     Yields DataFrames of parsed chunks.
     
@@ -322,7 +323,11 @@ def parse_fastpass_stream(s3, bucket: str, key: str, chunksize: int = 250_000, f
     else:
         # Fallback: probe first 8KB to detect format
         try:
-            probe = s3.get_object(Bucket=bucket, Key=key, Range="bytes=0-8192")["Body"].read()
+            if local_path:
+                with open(local_path, "rb") as f:
+                    probe = f.read(8192)
+            else:
+                probe = s3.get_object(Bucket=bucket, Key=key, Range="bytes=0-8192")["Body"].read()
             head = pd.read_csv(io.BytesIO(probe), nrows=1)
             headered = set(c.upper().strip() for c in head.columns)
             is_new_format = set(PRIO_COLS).issubset(headered)
@@ -331,9 +336,13 @@ def parse_fastpass_stream(s3, bucket: str, key: str, chunksize: int = 250_000, f
 
     # Stream the file with retry logic
     for attempt in range(max_retries):
+        stream = None
         try:
-            obj = s3.get_object(Bucket=bucket, Key=key)
-            stream = io.TextIOWrapper(obj["Body"], encoding="utf-8", errors="replace", newline="")
+            if local_path:
+                stream = open(local_path, "r", encoding="utf-8", errors="replace", newline="")
+            else:
+                obj = s3.get_object(Bucket=bucket, Key=key)
+                stream = io.TextIOWrapper(obj["Body"], encoding="utf-8", errors="replace", newline="")
             
             if is_new_format:
                 # New format: read with headers
@@ -371,3 +380,9 @@ def parse_fastpass_stream(s3, bucket: str, key: str, chunksize: int = 250_000, f
             # Non-retryable error
             logging.error(f"Error reading {key}: {e}")
             raise
+        finally:
+            if local_path and stream is not None:
+                try:
+                    stream.close()
+                except Exception:
+                    pass
