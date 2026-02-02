@@ -9,15 +9,11 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "11:46:39",
+    "last_fetch": "11:51:42",
     "samples": [
       {
         "name": "Tron",
         "wait": "5"
-      },
-      {
-        "name": "MK11527",
-        "wait": "105"
       },
       {
         "name": "Speedway",
@@ -34,8 +30,12 @@
       {
         "name": "Jungle Cruise",
         "wait": "10"
+      },
+      {
+        "name": "Peter Pan",
+        "wait": "30"
       }
     ]
   },
-  "last_updated": "2026-02-02T11:50:01.848265-05:00"
+  "last_updated": "2026-02-02T11:55:01.738803-05:00"
 }
