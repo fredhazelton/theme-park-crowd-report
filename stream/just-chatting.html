@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HazeyData — Just Chatting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: transparent;
+            width: 1920px;
+            height: 1080px;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* For preview */
+        body.preview-mode {
+            background: #0a1628;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(74,144,164,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,144,164,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.015) 0px,
+                rgba(0,0,0,0.015) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        @keyframes borderGlow {
+            0%, 100% { 
+                box-shadow: 0 0 10px rgba(74, 144, 164, 0.3),
+                            inset 0 0 10px rgba(74, 144, 164, 0.05);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(74, 144, 164, 0.5),
+                            inset 0 0 15px rgba(74, 144, 164, 0.1);
+            }
+        }
+        
+        @keyframes travelingLight {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(0, 255, 136, 0.8); }
+            50% { opacity: 0.6; text-shadow: 0 0 15px rgba(0, 255, 136, 0.4); }
+        }
+        
+        .overlay-element {
+            position: absolute;
+            background: rgba(10, 22, 40, 0.92);
+            border: 1px solid rgba(74, 144, 164, 0.5);
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 100;
+        }
+        
+        /* Simplified top bar */
+        .top-bar {
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-radius: 4px;
+            animation: borderGlow 6s ease-in-out infinite;
+        }
+        
+        .logo {
+            font-size: 16px;
+            color: #4a90a4;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 30px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .status-item { display: flex; align-items: center; gap: 8px; }
+        .status-label { color: #4a90a4; font-size: 10px; }
+        .live-indicator { color: #00ff88; animation: livePulse 2s ease-in-out infinite; }
+        
+        /* Larger camera for chatting */
+        .camera-frame {
+            bottom: 20px;
+            right: 20px;
+            width: 640px;
+            height: 360px;
+            border-radius: 8px;
+            overflow: visible;
+            background: transparent;
+            border: none;
+            position: absolute;
+        }
+        
+        .camera-border-glow {
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 10px;
+            background: linear-gradient(
+                90deg,
+                rgba(74, 144, 164, 0.1) 0%,
+                rgba(74, 144, 164, 0.6) 25%,
+                rgba(107, 181, 201, 0.8) 50%,
+                rgba(74, 144, 164, 0.6) 75%,
+                rgba(74, 144, 164, 0.1) 100%
+            );
+            background-size: 400% 100%;
+            animation: travelingLight 8s linear infinite;
+            z-index: -1;
+        }
+        
+        .camera-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 22, 40, 0.95);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .camera-header {
+            background: rgba(74, 144, 164, 0.25);
+            padding: 8px 15px;
+            font-size: 12px;
+            color: #4a90a4;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(74, 144, 164, 0.3);
+        }
+        
+        .rec-indicator {
+            color: #ff4444;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+        
+        .camera-content {
+            flex: 1;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(74,144,164,0.3);
+            font-size: 14px;
+        }
+        
+        /* Chat - larger and more prominent */
+        .chat-container {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 400px;
+            bottom: 400px;
+            background: rgba(10, 22, 40, 0.85);
+            border: 1px solid rgba(74, 144, 164, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            animation: borderGlow 8s ease-in-out infinite;
+        }
+        
+        .chat-header {
+            background: rgba(74, 144, 164, 0.2);
+            padding: 10px 15px;
+            font-size: 12px;
+            color: #4a90a4;
+            border-bottom: 1px solid rgba(74, 144, 164, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .chat-content {
+            height: calc(100% - 40px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(74, 144, 164, 0.4);
+            font-size: 12px;
+        }
+        
+        /* Lower third */
+        .lower-third {
+            bottom: 20px;
+            left: 20px;
+            padding: 15px 25px;
+            border-radius: 4px;
+            border-left: 3px solid #4a90a4;
+            animation: borderGlow 5s ease-in-out infinite;
+        }
+        
+        .lower-third .tagline {
+            font-size: 10px;
+            color: #4a90a4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 6px;
+        }
+        
+        .lower-third .title {
+            font-size: 20px;
+            color: #fff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="preview-mode">
+    <div class="scanlines"></div>
+    
+    <!-- TOP BAR (simplified) -->
+    <div class="overlay-element top-bar">
+        <div class="logo">HAZEYDATA.AI</div>
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">STATUS:</span>
+                <span class="live-indicator">● LIVE</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">VIEWERS:</span>
+                <span id="viewer-count">1,247</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CHAT (larger) -->
+    <div class="chat-container">
+        <div class="chat-header">CHAT_FEED</div>
+        <div class="chat-content">// TWITCH CHAT</div>
+    </div>
+    
+    <!-- WEBCAM (larger) -->
+    <div class="camera-frame">
+        <div class="camera-border-glow"></div>
+        <div class="camera-inner">
+            <div class="camera-header">
+                <span>CAM-01 // JUST CHATTING</span>
+                <span class="rec-indicator">● REC</span>
+            </div>
+            <div class="camera-content">WEBCAM SOURCE</div>
+        </div>
+    </div>
+    
+    <!-- LOWER THIRD -->
+    <div class="overlay-element lower-third">
+        <div class="tagline">// Just Chatting</div>
+        <div class="title">Let's Talk Theme Parks! 🎢</div>
+    </div>
+</body>
+</html>

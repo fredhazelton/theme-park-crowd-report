@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HazeyData Stream Overlay — Production</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: transparent;
+            width: 1920px;
+            height: 1080px;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* ============================================
+           ANIMATION KEYFRAMES
+           ============================================ */
+        
+        /* Smooth breathing glow for borders */
+        @keyframes borderGlow {
+            0%, 100% { 
+                box-shadow: 0 0 10px rgba(74, 144, 164, 0.3),
+                            inset 0 0 10px rgba(74, 144, 164, 0.05);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(74, 144, 164, 0.5),
+                            inset 0 0 15px rgba(74, 144, 164, 0.1);
+            }
+        }
+        
+        /* Rotating gradient for webcam border */
+        @keyframes borderRotate {
+            0% { --angle: 0deg; }
+            100% { --angle: 360deg; }
+        }
+        
+        /* Smooth live indicator pulse */
+        @keyframes livePulse {
+            0%, 100% { 
+                opacity: 1; 
+                text-shadow: 0 0 8px rgba(0, 255, 136, 0.8);
+            }
+            50% { 
+                opacity: 0.6; 
+                text-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            }
+        }
+        
+        /* Subtle shimmer for goal bar */
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        /* Gentle pulse for data values */
+        @keyframes dataPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        
+        /* Traveling light effect */
+        @keyframes travelingLight {
+            0% { 
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        /* Subtle scale pulse for viewer count */
+        @keyframes viewerPulse {
+            0%, 100% { 
+                transform: scale(1);
+                filter: drop-shadow(0 0 4px rgba(74, 144, 164, 0.3));
+            }
+            50% { 
+                transform: scale(1.02);
+                filter: drop-shadow(0 0 8px rgba(74, 144, 164, 0.5));
+            }
+        }
+        
+        /* ============================================
+           OVERLAY ELEMENTS
+           ============================================ */
+        .overlay-element {
+            position: absolute;
+            background: rgba(10, 22, 40, 0.92);
+            border: 1px solid rgba(74, 144, 164, 0.5);
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 100;
+        }
+        
+        /* Grid overlay effect - subtle */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(74,144,164,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,144,164,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* ============================================
+           TOP BAR
+           ============================================ */
+        .top-bar {
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-radius: 4px;
+            animation: borderGlow 6s ease-in-out infinite;
+        }
+        .logo {
+            font-size: 16px;
+            color: #4a90a4;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        .status-bar {
+            display: flex;
+            gap: 30px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+        }
+        .status-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .status-label { 
+            color: #4a90a4; 
+            font-size: 10px; 
+        }
+        .live-indicator { 
+            color: #00ff88; 
+            animation: livePulse 2s ease-in-out infinite;
+        }
+        .viewer-count-wrapper {
+            animation: viewerPulse 4s ease-in-out infinite;
+            display: inline-block;
+        }
+        
+        /* ============================================
+           WEBCAM FRAME — With animated border
+           ============================================ */
+        .camera-frame {
+            bottom: 70px;
+            right: 20px;
+            width: 320px;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 4px;
+            overflow: visible;
+            background: transparent;
+            border: none;
+            position: relative;
+        }
+        
+        /* Animated border wrapper */
+        .camera-border-glow {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 6px;
+            background: linear-gradient(
+                90deg,
+                rgba(74, 144, 164, 0.1) 0%,
+                rgba(74, 144, 164, 0.6) 25%,
+                rgba(107, 181, 201, 0.8) 50%,
+                rgba(74, 144, 164, 0.6) 75%,
+                rgba(74, 144, 164, 0.1) 100%
+            );
+            background-size: 400% 100%;
+            animation: travelingLight 8s linear infinite;
+            z-index: -1;
+        }
+        
+        .camera-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 22, 40, 0.95);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .camera-header {
+            background: rgba(74, 144, 164, 0.25);
+            padding: 6px 12px;
+            font-size: 10px;
+            color: #4a90a4;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(74, 144, 164, 0.3);
+        }
+        .rec-indicator {
+            color: #ff4444;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+        
+        /* TRANSPARENT webcam area for OBS chroma/source */
+        .camera-content {
+            flex: 1;
+            background: transparent;
+            /* Add class .show-placeholder to see placeholder in preview */
+        }
+        .camera-content.show-placeholder {
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(74,144,164,0.5);
+            font-size: 12px;
+        }
+        
+        /* ============================================
+           LOWER THIRD — Breathing glow
+           ============================================ */
+        .lower-third {
+            bottom: 15px;
+            left: 20px;
+            padding: 15px 25px;
+            border-radius: 4px;
+            border-left: 3px solid #4a90a4;
+            animation: borderGlow 5s ease-in-out infinite;
+            background: linear-gradient(
+                90deg,
+                rgba(10, 22, 40, 0.95) 0%,
+                rgba(10, 22, 40, 0.9) 100%
+            );
+        }
+        .lower-third .tagline {
+            font-size: 10px;
+            color: #4a90a4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 6px;
+        }
+        .lower-third .title {
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        /* ============================================
+           GOAL TRACKER — Shimmer effect
+           ============================================ */
+        .goal-tracker {
+            top: 80px;
+            right: 20px;
+            width: 320px;
+            padding: 15px;
+            border-radius: 4px;
+            animation: borderGlow 7s ease-in-out infinite;
+        }
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #4a90a4;
+            margin-bottom: 10px;
+        }
+        .goal-bar {
+            height: 6px;
+            background: rgba(74,144,164,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        .goal-fill {
+            height: 100%;
+            width: 67%;
+            background: linear-gradient(90deg, #4a90a4, #6bb5c9);
+            border-radius: 3px;
+            position: relative;
+            transition: width 0.5s ease-out;
+        }
+        /* Shimmer overlay */
+        .goal-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        .goal-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-top: 8px;
+            color: rgba(255,255,255,0.7);
+        }
+        .recent-follower {
+            font-size: 10px;
+            color: #4a90a4;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(74, 144, 164, 0.2);
+        }
+        .recent-follower .label {
+            opacity: 0.7;
+        }
+        .recent-follower .name {
+            color: #6bb5c9;
+            font-weight: 600;
+        }
+        
+        /* ============================================
+           AD/INFO ROTATOR — 30s cycle
+           ============================================ */
+        .ad-rotator {
+            top: 200px;
+            right: 20px;
+            width: 320px;
+            padding: 12px 15px;
+            border-radius: 4px;
+            animation: borderGlow 6s ease-in-out infinite;
+            animation-delay: -2s; /* Offset glow from neighbors */
+        }
+        .ad-rotator .rotator-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: #4a90a4;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .ad-rotator .rotator-header .icon {
+            font-size: 14px;
+        }
+        .ad-rotator .rotator-content {
+            font-size: 12px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.4;
+            min-height: 36px;
+            transition: opacity 0.5s ease;
+        }
+        .ad-rotator .rotator-content.fade-out {
+            opacity: 0;
+        }
+        .ad-rotator .rotator-progress {
+            margin-top: 10px;
+            height: 2px;
+            background: rgba(74, 144, 164, 0.2);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+        .ad-rotator .rotator-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90a4, #6bb5c9);
+            width: 0%;
+            animation: rotatorProgress 30s linear infinite;
+        }
+        @keyframes rotatorProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        /* ============================================
+           TWITCH CHAT EMBED AREA
+           ============================================ */
+        .chat-container {
+            position: absolute;
+            top: 320px;
+            right: 20px;
+            width: 320px;
+            bottom: 270px; /* Dynamic height - stops above camera */
+            background: rgba(10, 22, 40, 0.85);
+            border: 1px solid rgba(74, 144, 164, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            z-index: 100;
+            font-family: 'JetBrains Mono', monospace;
+            animation: borderGlow 8s ease-in-out infinite;
+            animation-delay: -4s; /* Offset glow from neighbors */
+        }
+        .chat-header {
+            background: rgba(74, 144, 164, 0.2);
+            padding: 8px 12px;
+            font-size: 10px;
+            color: #4a90a4;
+            font-family: 'JetBrains Mono', monospace;
+            border-bottom: 1px solid rgba(74, 144, 164, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .chat-content {
+            height: calc(100% - 32px);
+            overflow: hidden;
+        }
+        .chat-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .chat-placeholder {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(74, 144, 164, 0.4);
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            gap: 8px;
+        }
+        .chat-placeholder .chat-demo {
+            width: 90%;
+            text-align: left;
+            font-size: 10px;
+        }
+        .chat-placeholder .chat-demo .msg {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(74, 144, 164, 0.1);
+        }
+        .chat-placeholder .chat-demo .user {
+            color: #6bb5c9;
+        }
+        .chat-placeholder .chat-demo .text {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* ============================================
+           SCANLINES — Very subtle
+           ============================================ */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.015) 0px,
+                rgba(0,0,0,0.015) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        /* ============================================
+           UTILITY CLASSES
+           ============================================ */
+        
+        /* Hide chat container if not using */
+        .chat-container.hidden { display: none; }
+        
+        /* For preview mode - adds background and enables proper viewing */
+        body.preview-mode {
+            background: #0a1628;
+        }
+        
+        /* Enable scrolling in preview to see full overlay */
+        html.preview-scroll {
+            overflow: auto;
+            height: auto;
+        }
+        
+        html.preview-scroll body {
+            overflow: visible;
+            position: relative;
+        }
+        
+        /* Scale to fit viewport in preview mode using zoom (more reliable) */
+        body.preview-mode.fit-viewport {
+            zoom: var(--preview-zoom, 1);
+        }
+        
+        /* Fallback for Firefox (doesn't support zoom) */
+        @supports not (zoom: 1) {
+            body.preview-mode.fit-viewport {
+                transform: scale(var(--preview-scale, 1));
+                transform-origin: top left;
+            }
+        }
+        
+        /* Data update flash effect */
+        .data-updated {
+            animation: dataFlash 0.3s ease-out;
+        }
+        @keyframes dataFlash {
+            0% { color: #6bb5c9; }
+            100% { color: inherit; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ALERT CONTROL PANEL (Preview Only)
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert-panel {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(10, 22, 40, 0.95);
+            border: 1px solid rgba(74, 144, 164, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 500;
+            width: 180px;
+            animation: borderGlow 6s ease-in-out infinite;
+            overflow: hidden; /* Prevent overflow */
+        }
+        
+        .alert-panel input[type="range"] {
+            width: 100%;
+            max-width: 100px;
+        }
+        
+        .alert-panel h3 {
+            font-size: 10px;
+            color: #4a90a4;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(74, 144, 164, 0.3);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .alert-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: rgba(74, 144, 164, 0.1);
+            border: 1px solid rgba(74, 144, 164, 0.3);
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .alert-btn:hover {
+            background: rgba(74, 144, 164, 0.3);
+            border-color: #4a90a4;
+            transform: translateX(3px);
+            box-shadow: 0 0 15px rgba(74, 144, 164, 0.3);
+        }
+        
+        .alert-btn:active {
+            transform: translateX(1px);
+        }
+        
+        .alert-btn.red {
+            border-color: rgba(166, 0, 56, 0.4);
+            background: rgba(166, 0, 56, 0.1);
+        }
+        
+        .alert-btn.red:hover {
+            background: rgba(166, 0, 56, 0.3);
+            border-color: #A60038;
+            box-shadow: 0 0 15px rgba(166, 0, 56, 0.3);
+        }
+        
+        .alert-btn .icon {
+            font-size: 14px;
+        }
+        
+        .alert-panel .divider {
+            height: 1px;
+            background: rgba(74, 144, 164, 0.2);
+            margin: 12px 0;
+        }
+
+        /* Hide alert panel in production mode */
+        body:not(.preview-mode) .alert-panel { display: none; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ALERT CONTAINER (where alerts appear)
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert-container {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 900;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ALERT BASE STYLES
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .alert.active {
+            opacity: 1;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           1. NEW FOLLOWER ALERT — Data Packet Arrival
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert-follower {
+            width: 300px;
+            background: rgba(10, 22, 40, 0.95);
+            border: 2px solid #4a90a4;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(74, 144, 164, 0.4);
+        }
+
+        .alert-follower.active {
+            animation: followerEnter 4s ease-out forwards;
+        }
+
+        @keyframes followerEnter {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-30px) scale(0.95); }
+            5% { opacity: 1; transform: translateX(-50%) translateY(-30px) scale(0.95); }
+            15% { transform: translateX(-50%) translateY(0) scale(1); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.98); }
+        }
+
+        .follower-header {
+            background: linear-gradient(90deg, #4a90a4, rgba(74, 144, 164, 0.3));
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #0a1628;
+            font-weight: 600;
+        }
+
+        .follower-header .pulse {
+            width: 8px;
+            height: 8px;
+            background: #0a1628;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .follower-body {
+            padding: 18px;
+            text-align: center;
+        }
+
+        .follower-body .label {
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .follower-body .username {
+            color: #6bb5c9;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 10px 0;
+            text-shadow: 0 0 25px rgba(107, 181, 201, 0.6);
+            animation: dataPulse 2s ease-in-out infinite;
+        }
+
+        .follower-body .action {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+        }
+
+        .follower-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #6bb5c9, transparent);
+            animation: scanDown 0.5s ease-out;
+        }
+
+        @keyframes scanDown {
+            from { top: 0; opacity: 1; }
+            to { top: 100%; opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           2. SUBSCRIPTION ALERT — System Upgrade
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert-sub {
+            width: 320px;
+            background: rgba(10, 22, 40, 0.95);
+            border: 2px solid #A60038;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(166, 0, 56, 0.4);
+        }
+
+        .alert-sub.active {
+            animation: subEnter 4s ease-out forwards;
+        }
+
+        @keyframes subEnter {
+            0% { opacity: 0; transform: translateX(-50%) scale(0.8); }
+            8% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+            15% { transform: translateX(-50%) scale(1); }
+            85% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .sub-tier-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #A60038, #ff1a5c, #A60038);
+            background-size: 200% 100%;
+            animation: shimmer 2s linear infinite;
+        }
+
+        .sub-body {
+            padding: 18px;
+            text-align: center;
+        }
+
+        .sub-tier-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #A60038, #ff1a5c);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 15px rgba(166, 0, 56, 0.4);
+        }
+
+        .sub-username {
+            color: #ff1a5c;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: 0 0 25px rgba(255, 26, 92, 0.5);
+        }
+
+        .sub-message {
+            color: rgba(255,255,255,0.9);
+            font-size: 11px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(166, 0, 56, 0.15);
+            border-left: 2px solid #A60038;
+            font-style: italic;
+        }
+
+        .sub-months {
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            margin-top: 10px;
+        }
+
+        .sub-months span {
+            color: #4a90a4;
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           3. GIFTED SUB ALERT — Gift Transfer
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert-gift {
+            width: 320px;
+            background: rgba(10, 22, 40, 0.95);
+            border: 2px solid #4a90a4;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(74, 144, 164, 0.3), 0 0 30px rgba(166, 0, 56, 0.2);
+        }
+
+        .alert-gift.active {
+            animation: giftEnter 4s ease-out forwards;
+        }
+
+        @keyframes giftEnter {
+            0% { opacity: 0; transform: translateX(-50%) translateX(-30px); }
+            10% { opacity: 1; transform: translateX(-50%) translateX(5px); }
+            15% { transform: translateX(-50%) translateX(0); }
+            85% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(-50%) translateX(30px); }
+        }
+
+        .gift-header {
+            background: linear-gradient(135deg, #4a90a4 0%, #A60038 100%);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gift-header .type {
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .gift-header .count {
+            background: white;
+            color: #0a1628;
+            padding: 4px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .gift-body {
+            padding: 18px;
+            text-align: center;
+        }
+
+        .gift-from {
+            color: #6bb5c9;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(107, 181, 201, 0.5);
+        }
+
+        .gift-arrow {
+            color: rgba(255,255,255,0.4);
+            font-size: 1.5rem;
+            margin: 8px 0;
+            animation: arrowBounce 0.5s ease-in-out infinite;
+        }
+
+        @keyframes arrowBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(3px); }
+        }
+
+        .gift-to {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+        }
+
+        .gift-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .gift-particles::before,
+        .gift-particles::after {
+            content: '◆';
+            position: absolute;
+            color: #4a90a4;
+            opacity: 0.3;
+            font-size: 10px;
+            animation: floatUp 2s ease-out infinite;
+        }
+
+        .gift-particles::before {
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .gift-particles::after {
+            left: 80%;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes floatUp {
+            0% { bottom: 0; opacity: 0.6; }
+            100% { bottom: 100%; opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           4. RAID ALERT — Incoming Data Stream
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert-raid {
+            width: 340px;
+            background: rgba(10, 22, 40, 0.95);
+            border: 2px solid #A60038;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(166, 0, 56, 0.5);
+        }
+
+        .alert-raid.active {
+            animation: raidEnter 4.5s ease-out forwards;
+        }
+
+        @keyframes raidEnter {
+            0% { opacity: 0; transform: translateX(-50%) scale(1.1); filter: brightness(2); }
+            5% { opacity: 1; }
+            10% { transform: translateX(-50%) scale(1); filter: brightness(1); }
+            15% { filter: brightness(1.3); }
+            20% { filter: brightness(1); }
+            85% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .raid-terminal {
+            background: #000;
+            padding: 10px 14px;
+            font-size: 10px;
+            color: #ff1a5c;
+            border-bottom: 1px solid #A60038;
+        }
+
+        .raid-terminal .blink {
+            animation: terminalBlink 0.5s infinite;
+        }
+
+        @keyframes terminalBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .raid-body {
+            padding: 18px;
+            text-align: center;
+        }
+
+        .raid-label {
+            color: #A60038;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(166, 0, 56, 0.5);
+        }
+
+        .raid-channel {
+            color: #ff1a5c;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-shadow: 0 0 30px rgba(255, 26, 92, 0.6);
+        }
+
+        .raid-count {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .raid-count .number {
+            color: #6bb5c9;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(107, 181, 201, 0.5);
+        }
+
+        .raid-count .label {
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            text-align: left;
+            line-height: 1.3;
+        }
+
+        .raid-progress {
+            margin-top: 15px;
+            height: 4px;
+            background: rgba(166, 0, 56, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .raid-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #A60038, #ff1a5c);
+            width: 0;
+            animation: raidFill 1s ease-out 0.3s forwards;
+            box-shadow: 0 0 10px #ff1a5c;
+        }
+
+        @keyframes raidFill {
+            to { width: 100%; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           5. BITS/CHEER ALERT — Data Transfer
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert-bits {
+            width: 300px;
+            background: rgba(10, 22, 40, 0.95);
+            border: 2px solid #4a90a4;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(74, 144, 164, 0.4);
+        }
+
+        .alert-bits.active {
+            animation: bitsEnter 4s ease-out forwards;
+        }
+
+        @keyframes bitsEnter {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            10% { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+            15% { transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+        }
+
+        .bits-header {
+            background: linear-gradient(90deg, #4a90a4, #6bb5c9);
+            color: #0a1628;
+            padding: 10px 14px;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bits-header .icon {
+            font-size: 14px;
+        }
+
+        .bits-body {
+            padding: 18px;
+            text-align: center;
+        }
+
+        .bits-username {
+            color: #6bb5c9;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .bits-amount {
+            margin: 15px 0;
+        }
+
+        .bits-amount .value {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 0 25px rgba(74, 144, 164, 0.6);
+        }
+
+        .bits-amount .unit {
+            color: #4a90a4;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .bits-bar {
+            height: 6px;
+            background: rgba(74, 144, 164, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .bits-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90a4, #6bb5c9);
+            width: 0;
+            animation: bitsFill 0.8s ease-out 0.2s forwards;
+            box-shadow: 0 0 10px #4a90a4;
+        }
+
+        @keyframes bitsFill {
+            to { width: 75%; }
+        }
+
+        .bits-message {
+            color: rgba(255,255,255,0.9);
+            font-size: 11px;
+            padding: 10px;
+            background: rgba(74, 144, 164, 0.1);
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           6. DONATION ALERT — Priority Transfer
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .alert-donation {
+            width: 320px;
+            background: rgba(10, 22, 40, 0.95);
+            border: 2px solid #A60038;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 40px rgba(166, 0, 56, 0.5);
+        }
+
+        .alert-donation.active {
+            animation: donationEnter 4s ease-out forwards;
+        }
+
+        @keyframes donationEnter {
+            0% { opacity: 0; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); transform: translateX(-50%); }
+            20% { opacity: 1; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+            85% { opacity: 1; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+            100% { opacity: 0; clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%); }
+        }
+
+        .donation-priority {
+            background: linear-gradient(90deg, #A60038, #ff1a5c, #A60038);
+            background-size: 200% 100%;
+            animation: shimmer 2s linear infinite;
+            color: white;
+            padding: 8px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .donation-body {
+            padding: 22px 18px;
+            text-align: center;
+        }
+
+        .donation-amount {
+            color: #ff1a5c;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-shadow: 0 0 35px rgba(255, 26, 92, 0.6);
+            margin-bottom: 8px;
+        }
+
+        .donation-amount::before {
+            content: '$';
+            font-size: 1.6rem;
+            vertical-align: top;
+            margin-right: 2px;
+        }
+
+        .donation-from {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            margin-bottom: 14px;
+        }
+
+        .donation-from span {
+            color: #6bb5c9;
+            font-weight: 600;
+        }
+
+        .donation-message {
+            color: rgba(255,255,255,0.9);
+            font-size: 12px;
+            padding: 14px;
+            background: rgba(166, 0, 56, 0.15);
+            border-left: 3px solid #A60038;
+            text-align: left;
+            font-style: italic;
+        }
+
+        .donation-glow {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(166, 0, 56, 0.3), transparent);
+            animation: donationSweep 1.5s ease-in-out 0.3s;
+        }
+
+        @keyframes donationSweep {
+            to { left: 150%; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RECENT EVENT (Production Element)
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .recent-event {
+            position: fixed;
+            bottom: 15px;
+            right: 360px;
+            background: rgba(10, 22, 40, 0.92);
+            border: 1px solid rgba(74, 144, 164, 0.4);
+            border-radius: 4px;
+            padding: 10px 15px;
+            font-size: 11px;
+            z-index: 100;
+            font-family: 'JetBrains Mono', monospace;
+            animation: borderGlow 6s ease-in-out infinite;
+        }
+        
+        .recent-event .event-label {
+            color: #4a90a4;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        
+        .recent-event .event-text {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .recent-event .event-text span {
+            color: #6bb5c9;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="preview-mode">
+    <div class="scanlines"></div>
+    
+    <!-- ============================================
+         ALERT CONTROL PANEL (Preview Only)
+         ============================================ -->
+    <div class="alert-panel" id="alertPanel">
+        <h3>🔔 Test Alerts</h3>
+        
+        <button class="alert-btn" onclick="triggerAlert('follower')">
+            <span class="icon">👤</span> Follower
+        </button>
+        
+        <button class="alert-btn red" onclick="triggerAlert('sub')">
+            <span class="icon">⭐</span> Subscribe
+        </button>
+        
+        <button class="alert-btn" onclick="triggerAlert('gift')">
+            <span class="icon">🎁</span> Gift Sub
+        </button>
+        
+        <button class="alert-btn red" onclick="triggerAlert('raid')">
+            <span class="icon">🚨</span> Raid
+        </button>
+        
+        <button class="alert-btn" onclick="triggerAlert('bits')">
+            <span class="icon">💎</span> Bits
+        </button>
+        
+        <button class="alert-btn red" onclick="triggerAlert('donation')">
+            <span class="icon">💰</span> Donation
+        </button>
+        
+        <div class="divider"></div>
+        
+        <button class="alert-btn" onclick="triggerAll()" style="background: rgba(74,144,164,0.2);">
+            <span class="icon">▶</span> All (Cascade)
+        </button>
+        
+        <div class="divider"></div>
+        
+        <div style="display: flex; align-items: center; gap: 6px; padding: 5px 0;">
+            <span style="font-size: 10px; color: #4a90a4;">🔊</span>
+            <input type="range" id="volumeSlider" min="0" max="100" value="70" 
+                   style="flex: 1; width: 80px; max-width: 100px; accent-color: #4a90a4; height: 4px;"
+                   oninput="AudioEngine.setVolume(this.value / 100)">
+        </div>
+        
+        <button class="alert-btn" id="muteBtn" onclick="AudioEngine.toggleMute()">
+            <span class="icon" id="muteIcon">🔊</span> <span id="muteText">Sound ON</span>
+        </button>
+        
+        <button class="alert-btn" onclick="AudioEngine.toggleSoundMode()" title="Toggle between Amused (bubbly) and Synth (procedural) sounds">
+            <span class="icon" id="soundModeIcon">🫧</span> <span id="soundModeText">Amused</span>
+        </button>
+        
+        <div class="divider"></div>
+        
+        <button class="alert-btn" id="scaleBtn" onclick="toggleScale()" title="Scale to fit your screen">
+            <span class="icon">🔍</span> <span id="scaleText">Fit</span>
+        </button>
+    </div>
+    
+    <!-- ============================================
+         ALERT CONTAINER
+         ============================================ -->
+    <div class="alert-container">
+        <!-- Follower Alert -->
+        <div class="alert alert-follower" id="alert-follower">
+            <div class="follower-scanline"></div>
+            <div class="follower-header">
+                <span class="pulse"></span>
+                NEW_CONNECTION_ESTABLISHED
+            </div>
+            <div class="follower-body">
+                <div class="label">New Follower</div>
+                <div class="username">DataWizard_42</div>
+                <div class="action">joined the network</div>
+            </div>
+        </div>
+        
+        <!-- Subscription Alert -->
+        <div class="alert alert-sub" id="alert-sub">
+            <div class="sub-tier-bar"></div>
+            <div class="sub-body">
+                <div class="sub-tier-badge">TIER 3 — PRIORITY ACCESS</div>
+                <div class="sub-username">StreamSupporter</div>
+                <div class="sub-message">"Love the data vibes! Keep it up!"</div>
+                <div class="sub-months">Subscribed for <span>6 months</span></div>
+            </div>
+        </div>
+        
+        <!-- Gift Sub Alert -->
+        <div class="alert alert-gift" id="alert-gift">
+            <div class="gift-particles"></div>
+            <div class="gift-header">
+                <span class="type">GIFT_TRANSFER</span>
+                <span class="count">×5</span>
+            </div>
+            <div class="gift-body">
+                <div class="gift-from">GenerousUser</div>
+                <div class="gift-arrow">↓</div>
+                <div class="gift-to">gifted 5 subs to the community!</div>
+            </div>
+        </div>
+        
+        <!-- Raid Alert -->
+        <div class="alert alert-raid" id="alert-raid">
+            <div class="raid-terminal">
+                <span class="blink">▌</span> INCOMING_DATA_STREAM detected...
+            </div>
+            <div class="raid-body">
+                <div class="raid-label">⚠ RAID INCOMING</div>
+                <div class="raid-channel">TechStreamer99</div>
+                <div class="raid-count">
+                    <span class="number">247</span>
+                    <span class="label">VIEWERS<br>INCOMING</span>
+                </div>
+                <div class="raid-progress">
+                    <div class="raid-progress-fill"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bits Alert -->
+        <div class="alert alert-bits" id="alert-bits">
+            <div class="bits-header">
+                <span class="icon">◇</span>
+                DATA_TRANSFER_RECEIVED
+            </div>
+            <div class="bits-body">
+                <div class="bits-username">CheerMaster</div>
+                <div class="bits-amount">
+                    <span class="value">500</span>
+                    <span class="unit">BITS</span>
+                </div>
+                <div class="bits-bar">
+                    <div class="bits-bar-fill"></div>
+                </div>
+                <div class="bits-message">"Great stream! Here's some bits!"</div>
+            </div>
+        </div>
+        
+        <!-- Donation Alert -->
+        <div class="alert alert-donation" id="alert-donation">
+            <div class="donation-glow"></div>
+            <div class="donation-priority">◆ PRIORITY_TRANSFER ◆</div>
+            <div class="donation-body">
+                <div class="donation-amount">25.00</div>
+                <div class="donation-from">from <span>BigSupporter</span></div>
+                <div class="donation-message">"Keep making awesome content! You deserve it!"</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============================================
+         OVERLAY ELEMENTS
+         ============================================ -->
+    
+    <!-- TOP BAR -->
+    <div class="overlay-element top-bar">
+        <div class="logo">HAZEYDATA.AI</div>
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">STATUS:</span>
+                <span class="live-indicator">● LIVE</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">VIEWERS:</span>
+                <span class="viewer-count-wrapper">
+                    <span id="viewer-count">1,247</span>
+                </span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">UPTIME:</span>
+                <span id="uptime">02:34:17</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FOLLOWER GOAL TRACKER -->
+    <div class="overlay-element goal-tracker">
+        <div class="goal-header">
+            <span>FOLLOWER_GOAL</span>
+            <span id="follower-percentage">67%</span>
+        </div>
+        <div class="goal-bar">
+            <div class="goal-fill" id="follower-goal-fill" style="width: 67%;"></div>
+        </div>
+        <div class="goal-stats">
+            <span><span id="follower-count">672</span> / <span id="follower-goal">1000</span></span>
+            <span id="followers-today">+23 today</span>
+        </div>
+        <div class="recent-follower">
+            <span class="label">LATEST:</span>
+            <span class="name" id="recent-follower">DataDragon_42</span>
+        </div>
+    </div>
+    
+    <!-- AD/INFO ROTATOR -->
+    <div class="overlay-element ad-rotator">
+        <div class="rotator-header">
+            <span class="icon" id="rotator-icon">📢</span>
+            <span id="rotator-label">INFO</span>
+        </div>
+        <div class="rotator-content" id="rotator-content">
+            Follow <span style="color: #6bb5c9;">@hazeydata</span> on Twitter for theme park data insights!
+        </div>
+        <div class="rotator-progress">
+            <div class="rotator-progress-fill" id="rotator-progress"></div>
+        </div>
+    </div>
+    
+    <!-- TWITCH CHAT CONTAINER -->
+    <div class="chat-container">
+        <div class="chat-header">CHAT_FEED</div>
+        <div class="chat-content" id="twitch-chat">
+            <div class="chat-placeholder">
+                <div>// TWITCH CHAT</div>
+                <div class="chat-demo">
+                    <div class="msg"><span class="user">DataFan99:</span> <span class="text">Love the crowd predictions!</span></div>
+                    <div class="msg"><span class="user">ThemeParkPro:</span> <span class="text">What's the wait for Space Mountain?</span></div>
+                    <div class="msg"><span class="user">HazeViewer:</span> <span class="text">This data viz is 🔥</span></div>
+                    <div class="msg"><span class="user">CoasterKing:</span> <span class="text">Best stream for park planning</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- WEBCAM FRAME -->
+    <div class="overlay-element camera-frame">
+        <div class="camera-border-glow"></div>
+        <div class="camera-inner">
+            <div class="camera-header">
+                <span>CAM-01 // PRIMARY</span>
+                <span class="rec-indicator">● REC</span>
+            </div>
+            <div class="camera-content show-placeholder">
+                WEBCAM SOURCE
+            </div>
+        </div>
+    </div>
+    
+    <!-- LOWER THIRD -->
+    <div class="overlay-element lower-third">
+        <div class="tagline">// Clear the Haze</div>
+        <div class="title" id="stream-title">Theme Park Data Deep Dive</div>
+    </div>
+    
+    <!-- RECENT EVENT -->
+    <div class="recent-event">
+        <div class="event-label">Latest Event</div>
+        <div class="event-text" id="recent-event-text"><span>DataWizard_42</span> followed</div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // HAZEYDATA AUDIO ENGINE — Procedural Tech Sounds
+        // ═══════════════════════════════════════════════════════════════
+        
+        const AudioEngine = {
+            ctx: null,
+            masterGain: null,
+            volume: 0.7,
+            muted: false,
+            useAmused: true, // 🫧 Default to Amused bubbly sounds!
+            audioCache: {},
+            
+            // Amused sound file mapping
+            amusedFiles: {
+                follower: './audio/amused-follower.mp3',
+                sub: './audio/amused-subscription.mp3',
+                gift: './audio/amused-gift.mp3',
+                raid: './audio/amused-raid.mp3',
+                bits: './audio/amused-bits.mp3',
+                donation: './audio/amused-donation.mp3'
+            },
+            
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.masterGain = this.ctx.createGain();
+                    this.masterGain.gain.value = this.volume;
+                    this.masterGain.connect(this.ctx.destination);
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+                return this.ctx;
+            },
+            
+            setVolume(vol) {
+                this.volume = vol;
+                if (this.masterGain && !this.muted) {
+                    this.masterGain.gain.value = vol;
+                }
+            },
+            
+            toggleMute() {
+                this.muted = !this.muted;
+                if (this.masterGain) {
+                    this.masterGain.gain.value = this.muted ? 0 : this.volume;
+                }
+                document.getElementById('muteIcon').textContent = this.muted ? '🔇' : '🔊';
+                document.getElementById('muteText').textContent = this.muted ? 'Sound OFF' : 'Sound ON';
+            },
+            
+            toggleSoundMode() {
+                this.useAmused = !this.useAmused;
+                document.getElementById('soundModeIcon').textContent = this.useAmused ? '🫧' : '🎛️';
+                document.getElementById('soundModeText').textContent = this.useAmused ? 'Amused' : 'Synth';
+            },
+            
+            // Play Amused MP3 file
+            async playAmusedFile(type) {
+                this.init();
+                const url = this.amusedFiles[type];
+                if (!url) return;
+                
+                try {
+                    // Use cached buffer or fetch new
+                    if (!this.audioCache[type]) {
+                        const response = await fetch(url);
+                        const arrayBuffer = await response.arrayBuffer();
+                        this.audioCache[type] = await this.ctx.decodeAudioData(arrayBuffer);
+                    }
+                    
+                    const source = this.ctx.createBufferSource();
+                    source.buffer = this.audioCache[type];
+                    source.connect(this.masterGain);
+                    source.start(0);
+                } catch (e) {
+                    console.warn('Amused sound failed, falling back to synth:', e);
+                    this.playSynth(type);
+                }
+            },
+            
+            // Get output node (master gain for volume control)
+            get output() {
+                this.init();
+                return this.masterGain;
+            },
+            
+            // Helper: Create gain envelope
+            envelope(gain, attack, decay, sustain, release, duration) {
+                const now = this.ctx.currentTime;
+                gain.setValueAtTime(0, now);
+                gain.linearRampToValueAtTime(1, now + attack);
+                gain.linearRampToValueAtTime(sustain, now + attack + decay);
+                gain.setValueAtTime(sustain, now + duration - release);
+                gain.linearRampToValueAtTime(0, now + duration);
+            },
+            
+            // 👤 FOLLOWER — Soft ping + data chirp
+            playFollower() {
+                const ctx = this.init();
+                const now = ctx.currentTime;
+                
+                // Soft ping (high frequency sine)
+                const ping = ctx.createOscillator();
+                const pingGain = ctx.createGain();
+                ping.type = 'sine';
+                ping.frequency.setValueAtTime(1200, now);
+                ping.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+                pingGain.gain.setValueAtTime(0.3, now);
+                pingGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                ping.connect(pingGain).connect(this.masterGain);
+                ping.start(now);
+                ping.stop(now + 0.4);
+                
+                // Data chirp (quick frequency sweep)
+                const chirp = ctx.createOscillator();
+                const chirpGain = ctx.createGain();
+                chirp.type = 'square';
+                chirp.frequency.setValueAtTime(400, now + 0.1);
+                chirp.frequency.exponentialRampToValueAtTime(1600, now + 0.2);
+                chirpGain.gain.setValueAtTime(0.08, now + 0.1);
+                chirpGain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                chirp.connect(chirpGain).connect(this.masterGain);
+                chirp.start(now + 0.1);
+                chirp.stop(now + 0.25);
+                
+                // Second ping (confirmation)
+                const ping2 = ctx.createOscillator();
+                const ping2Gain = ctx.createGain();
+                ping2.type = 'sine';
+                ping2.frequency.value = 1000;
+                ping2Gain.gain.setValueAtTime(0.25, now + 0.25);
+                ping2Gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                ping2.connect(ping2Gain).connect(this.masterGain);
+                ping2.start(now + 0.25);
+                ping2.stop(now + 0.6);
+            },
+            
+            // ⭐ SUBSCRIPTION — System upgrade chime + bass drop
+            playSub() {
+                const ctx = this.init();
+                const now = ctx.currentTime;
+                
+                // Rising chime sequence (A, C#, E, A)
+                const notes = [440, 554, 659, 880];
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.2, now + i * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.4);
+                    osc.connect(gain).connect(this.masterGain);
+                    osc.start(now + i * 0.12);
+                    osc.stop(now + i * 0.12 + 0.4);
+                });
+                
+                // Bass drop
+                const bass = ctx.createOscillator();
+                const bassGain = ctx.createGain();
+                bass.type = 'sine';
+                bass.frequency.setValueAtTime(200, now + 0.5);
+                bass.frequency.exponentialRampToValueAtTime(60, now + 1.0);
+                bassGain.gain.setValueAtTime(0.4, now + 0.5);
+                bassGain.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
+                bass.connect(bassGain).connect(this.masterGain);
+                bass.start(now + 0.5);
+                bass.stop(now + 1.2);
+                
+                // Sparkle overtones
+                for (let i = 0; i < 3; i++) {
+                    const sparkle = ctx.createOscillator();
+                    const sparkleGain = ctx.createGain();
+                    sparkle.type = 'sine';
+                    sparkle.frequency.value = 1760 + i * 400;
+                    sparkleGain.gain.setValueAtTime(0.05, now + 0.6 + i * 0.08);
+                    sparkleGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9 + i * 0.08);
+                    sparkle.connect(sparkleGain).connect(this.masterGain);
+                    sparkle.start(now + 0.6 + i * 0.08);
+                    sparkle.stop(now + 1.0 + i * 0.08);
+                }
+            },
+            
+            // 🎁 GIFT SUB — Packet transfer swoosh + sparkle
+            playGift() {
+                const ctx = this.init();
+                const now = ctx.currentTime;
+                
+                // Swoosh (noise + filter sweep)
+                const bufferSize = ctx.sampleRate * 0.5;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+                
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(200, now);
+                filter.frequency.exponentialRampToValueAtTime(4000, now + 0.2);
+                filter.frequency.exponentialRampToValueAtTime(800, now + 0.4);
+                filter.Q.value = 5;
+                
+                const noiseGain = ctx.createGain();
+                noiseGain.gain.setValueAtTime(0.15, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                
+                noise.connect(filter).connect(noiseGain).connect(this.masterGain);
+                noise.start(now);
+                noise.stop(now + 0.5);
+                
+                // Sparkle cascade
+                for (let i = 0; i < 5; i++) {
+                    const sparkle = ctx.createOscillator();
+                    const sparkleGain = ctx.createGain();
+                    sparkle.type = 'sine';
+                    sparkle.frequency.value = 1200 + i * 200 + Math.random() * 100;
+                    sparkleGain.gain.setValueAtTime(0.1, now + 0.15 + i * 0.06);
+                    sparkleGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4 + i * 0.06);
+                    sparkle.connect(sparkleGain).connect(this.masterGain);
+                    sparkle.start(now + 0.15 + i * 0.06);
+                    sparkle.stop(now + 0.5 + i * 0.06);
+                }
+                
+                // Confirmation tone
+                const confirm = ctx.createOscillator();
+                const confirmGain = ctx.createGain();
+                confirm.type = 'triangle';
+                confirm.frequency.value = 880;
+                confirmGain.gain.setValueAtTime(0.15, now + 0.5);
+                confirmGain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                confirm.connect(confirmGain).connect(this.masterGain);
+                confirm.start(now + 0.5);
+                confirm.stop(now + 0.8);
+            },
+            
+            // 🚨 RAID — Alarm sequence + dramatic buildup
+            playRaid() {
+                const ctx = this.init();
+                const now = ctx.currentTime;
+                
+                // Alert beeps (ascending urgency)
+                for (let i = 0; i < 4; i++) {
+                    const beep = ctx.createOscillator();
+                    const beepGain = ctx.createGain();
+                    beep.type = 'square';
+                    beep.frequency.value = 600 + i * 100;
+                    beepGain.gain.setValueAtTime(0.1, now + i * 0.12);
+                    beepGain.gain.setValueAtTime(0, now + i * 0.12 + 0.08);
+                    beep.connect(beepGain).connect(this.masterGain);
+                    beep.start(now + i * 0.12);
+                    beep.stop(now + i * 0.12 + 0.1);
+                }
+                
+                // Rising tension (frequency sweep)
+                const sweep = ctx.createOscillator();
+                const sweepGain = ctx.createGain();
+                sweep.type = 'sawtooth';
+                sweep.frequency.setValueAtTime(100, now + 0.5);
+                sweep.frequency.exponentialRampToValueAtTime(800, now + 1.2);
+                sweepGain.gain.setValueAtTime(0.08, now + 0.5);
+                sweepGain.gain.linearRampToValueAtTime(0.2, now + 1.0);
+                sweepGain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
+                sweep.connect(sweepGain).connect(this.masterGain);
+                sweep.start(now + 0.5);
+                sweep.stop(now + 1.5);
+                
+                // Impact hit
+                const impact = ctx.createOscillator();
+                const impactGain = ctx.createGain();
+                impact.type = 'sine';
+                impact.frequency.setValueAtTime(150, now + 1.2);
+                impact.frequency.exponentialRampToValueAtTime(40, now + 1.6);
+                impactGain.gain.setValueAtTime(0.5, now + 1.2);
+                impactGain.gain.exponentialRampToValueAtTime(0.01, now + 1.8);
+                impact.connect(impactGain).connect(this.masterGain);
+                impact.start(now + 1.2);
+                impact.stop(now + 1.8);
+                
+                // Final chord (power chord feel)
+                [110, 165, 220].forEach(freq => {
+                    const chord = ctx.createOscillator();
+                    const chordGain = ctx.createGain();
+                    chord.type = 'sawtooth';
+                    chord.frequency.value = freq;
+                    chordGain.gain.setValueAtTime(0.12, now + 1.3);
+                    chordGain.gain.exponentialRampToValueAtTime(0.01, now + 2.0);
+                    chord.connect(chordGain).connect(this.masterGain);
+                    chord.start(now + 1.3);
+                    chord.stop(now + 2.0);
+                });
+            },
+            
+            // 💎 BITS — Digital coin cascade + success tone
+            playBits() {
+                const ctx = this.init();
+                const now = ctx.currentTime;
+                
+                // Coin cascade (multiple quick high pings)
+                for (let i = 0; i < 6; i++) {
+                    const coin = ctx.createOscillator();
+                    const coinGain = ctx.createGain();
+                    coin.type = 'sine';
+                    coin.frequency.setValueAtTime(2000 + Math.random() * 500, now + i * 0.08);
+                    coin.frequency.exponentialRampToValueAtTime(1200 + Math.random() * 300, now + i * 0.08 + 0.1);
+                    coinGain.gain.setValueAtTime(0.12, now + i * 0.08);
+                    coinGain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.08 + 0.15);
+                    coin.connect(coinGain).connect(this.masterGain);
+                    coin.start(now + i * 0.08);
+                    coin.stop(now + i * 0.08 + 0.2);
+                }
+                
+                // Digital processing sound
+                const digital = ctx.createOscillator();
+                const digitalGain = ctx.createGain();
+                digital.type = 'square';
+                digital.frequency.setValueAtTime(800, now + 0.3);
+                digital.frequency.setValueAtTime(1200, now + 0.35);
+                digital.frequency.setValueAtTime(600, now + 0.4);
+                digital.frequency.setValueAtTime(1000, now + 0.45);
+                digitalGain.gain.setValueAtTime(0.06, now + 0.3);
+                digitalGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                digital.connect(digitalGain).connect(this.masterGain);
+                digital.start(now + 0.3);
+                digital.stop(now + 0.55);
+                
+                // Success tone (major third interval)
+                const success1 = ctx.createOscillator();
+                const success1Gain = ctx.createGain();
+                success1.type = 'sine';
+                success1.frequency.value = 523; // C5
+                success1Gain.gain.setValueAtTime(0.2, now + 0.6);
+                success1Gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+                success1.connect(success1Gain).connect(this.masterGain);
+                success1.start(now + 0.6);
+                success1.stop(now + 1.0);
+                
+                const success2 = ctx.createOscillator();
+                const success2Gain = ctx.createGain();
+                success2.type = 'sine';
+                success2.frequency.value = 659; // E5
+                success2Gain.gain.setValueAtTime(0.2, now + 0.7);
+                success2Gain.gain.exponentialRampToValueAtTime(0.01, now + 1.1);
+                success2.connect(success2Gain).connect(this.masterGain);
+                success2.start(now + 0.7);
+                success2.stop(now + 1.1);
+            },
+            
+            // 💰 DONATION — Elegant chime + confirmation beep  
+            playDonation() {
+                const ctx = this.init();
+                const now = ctx.currentTime;
+                
+                // Elegant bell chime (rich harmonics)
+                const fundamentals = [523, 659, 784, 1047]; // C major chord rising
+                fundamentals.forEach((freq, i) => {
+                    // Fundamental
+                    const bell = ctx.createOscillator();
+                    const bellGain = ctx.createGain();
+                    bell.type = 'sine';
+                    bell.frequency.value = freq;
+                    bellGain.gain.setValueAtTime(0.15, now + i * 0.1);
+                    bellGain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.8);
+                    bell.connect(bellGain).connect(this.masterGain);
+                    bell.start(now + i * 0.1);
+                    bell.stop(now + i * 0.1 + 0.9);
+                    
+                    // Harmonic overtone
+                    const harmonic = ctx.createOscillator();
+                    const harmGain = ctx.createGain();
+                    harmonic.type = 'sine';
+                    harmonic.frequency.value = freq * 2.5;
+                    harmGain.gain.setValueAtTime(0.04, now + i * 0.1);
+                    harmGain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.4);
+                    harmonic.connect(harmGain).connect(this.masterGain);
+                    harmonic.start(now + i * 0.1);
+                    harmonic.stop(now + i * 0.1 + 0.5);
+                });
+                
+                // Shimmer (very high frequency sparkle)
+                for (let i = 0; i < 4; i++) {
+                    const shimmer = ctx.createOscillator();
+                    const shimGain = ctx.createGain();
+                    shimmer.type = 'sine';
+                    shimmer.frequency.value = 3000 + i * 500;
+                    shimGain.gain.setValueAtTime(0.03, now + 0.5 + i * 0.05);
+                    shimGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8 + i * 0.05);
+                    shimmer.connect(shimGain).connect(this.masterGain);
+                    shimmer.start(now + 0.5 + i * 0.05);
+                    shimmer.stop(now + 0.9 + i * 0.05);
+                }
+                
+                // Confirmation beep (double tap)
+                [0.9, 1.05].forEach(t => {
+                    const beep = ctx.createOscillator();
+                    const beepGain = ctx.createGain();
+                    beep.type = 'sine';
+                    beep.frequency.value = 880;
+                    beepGain.gain.setValueAtTime(0.15, now + t);
+                    beepGain.gain.exponentialRampToValueAtTime(0.01, now + t + 0.1);
+                    beep.connect(beepGain).connect(this.masterGain);
+                    beep.start(now + t);
+                    beep.stop(now + t + 0.15);
+                });
+            },
+            
+            // Play synth sound by type
+            playSynth(type) {
+                const sounds = {
+                    follower: () => this.playFollower(),
+                    sub: () => this.playSub(),
+                    gift: () => this.playGift(),
+                    raid: () => this.playRaid(),
+                    bits: () => this.playBits(),
+                    donation: () => this.playDonation()
+                };
+                if (sounds[type]) sounds[type]();
+            },
+            
+            // Main play method - routes to Amused or Synth
+            play(type) {
+                if (this.useAmused) {
+                    this.playAmusedFile(type);
+                } else {
+                    this.playSynth(type);
+                }
+            }
+        };
+
+        function triggerAlert(type) {
+            const alert = document.getElementById(`alert-${type}`);
+            
+            // Reset animation
+            alert.classList.remove('active');
+            void alert.offsetWidth; // Force reflow
+            
+            // 🔊 Play alert sound
+            AudioEngine.play(type);
+            
+            // Trigger animation
+            alert.classList.add('active');
+            
+            // Update recent event
+            updateRecentEvent(type);
+            
+            // Update goal tracker for follower
+            if (type === 'follower') {
+                updateFollowerGoal();
+            }
+            
+            // Remove class after animation completes
+            setTimeout(() => {
+                alert.classList.remove('active');
+            }, 4500);
+        }
+
+        function triggerAll() {
+            const types = ['follower', 'sub', 'gift', 'raid', 'bits', 'donation'];
+            types.forEach((type, i) => {
+                setTimeout(() => triggerAlert(type), i * 4500);
+            });
+        }
+        
+        function updateRecentEvent(type) {
+            const eventText = document.getElementById('recent-event-text');
+            const events = {
+                follower: '<span>DataWizard_42</span> followed',
+                sub: '<span>StreamSupporter</span> subscribed (Tier 3)',
+                gift: '<span>GenerousUser</span> gifted 5 subs',
+                raid: '<span>TechStreamer99</span> raided with 247',
+                bits: '<span>CheerMaster</span> cheered 500 bits',
+                donation: '<span>BigSupporter</span> donated $25.00'
+            };
+            if (eventText && events[type]) {
+                eventText.innerHTML = events[type];
+            }
+        }
+        
+        function updateFollowerGoal() {
+            const countEl = document.getElementById('follower-count');
+            const percentEl = document.getElementById('follower-percentage');
+            const fillEl = document.getElementById('follower-goal-fill');
+            const recentEl = document.getElementById('recent-follower');
+            const todayEl = document.getElementById('followers-today');
+            
+            // Increment follower count
+            let count = parseInt(countEl.textContent) + 1;
+            countEl.textContent = count;
+            
+            // Update percentage
+            let percent = Math.round((count / 1000) * 100);
+            percentEl.textContent = percent + '%';
+            fillEl.style.width = percent + '%';
+            
+            // Update recent follower
+            recentEl.textContent = 'DataWizard_42';
+            
+            // Update today count
+            let today = parseInt(todayEl.textContent.replace(/[^0-9]/g, '')) + 1;
+            todayEl.textContent = '+' + today + ' today';
+            
+            // Flash effect
+            countEl.classList.add('data-updated');
+            setTimeout(() => countEl.classList.remove('data-updated'), 300);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // AD/INFO ROTATOR — 30 second cycle
+        // ═══════════════════════════════════════════════════════════════
+        
+        const RotatorConfig = {
+            interval: 30000, // 30 seconds
+            items: [
+                // === LIVE DATA (examples - would be dynamic in production) ===
+                { icon: '🎢', label: 'LIVE WAIT', text: '<span style="color: #6bb5c9;">Space Mountain</span> @ Magic Kingdom: <span style="color: #ff1a5c; font-weight: bold;">45 min</span> (↓10 from peak)' },
+                { icon: '📊', label: 'CROWD LVL', text: 'Magic Kingdom right now: <span style="color: #6bb5c9; font-weight: bold;">6/10</span> — Moderate crowds, good touring day!' },
+                { icon: '⏱️', label: 'FRESH DATA', text: '<span style="color: #6bb5c9;">Hagrid\'s</span> @ IOA just dropped to <span style="color: #00ff88; font-weight: bold;">55 min</span> — GO NOW!' },
+                { icon: '🌡️', label: 'FORECAST', text: 'Tomorrow\'s MK prediction: <span style="color: #ff1a5c;">8/10</span> — expect higher waits after 11am' },
+                
+                // === CALLS TO ACTION ===
+                { icon: '📢', label: 'FOLLOW', text: 'Follow <span style="color: #6bb5c9;">@hazeydata</span> on Twitter for real-time park alerts!' },
+                { icon: '🔔', label: 'NOTIFY', text: 'Hit <span style="color: #6bb5c9;">Follow</span> to get notified when we go live!' },
+                { icon: '🌐', label: 'WEBSITE', text: 'Get daily forecasts at <span style="color: #6bb5c9;">hazeydata.ai</span> — it\'s free!' },
+                { icon: '☕', label: 'SUPPORT', text: 'Enjoying the data? <span style="color: #6bb5c9;">Subscribe</span> to support the channel!' },
+                
+                // === FUN FACTS ===
+                { icon: '🤖', label: 'AI FACT', text: 'Our ML model trained on <span style="color: #6bb5c9;">5+ years</span> of historical wait time data!' },
+                { icon: '🎯', label: 'TIP', text: 'Type <span style="color: #6bb5c9;">!crowds [park]</span> in chat for instant crowd levels!' },
+                { icon: '📈', label: 'STAT', text: 'We track <span style="color: #6bb5c9;">100+ attractions</span> across WDW, Universal, & more!' },
+                { icon: '💡', label: 'PRO TIP', text: 'Rope drop + late evening = lowest waits. The data proves it!' }
+            ],
+            currentIndex: 0
+        };
+        
+        function initRotator() {
+            const iconEl = document.getElementById('rotator-icon');
+            const labelEl = document.getElementById('rotator-label');
+            const contentEl = document.getElementById('rotator-content');
+            const progressEl = document.getElementById('rotator-progress');
+            
+            function showItem(index) {
+                const item = RotatorConfig.items[index];
+                
+                // Fade out
+                contentEl.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    // Update content
+                    iconEl.textContent = item.icon;
+                    labelEl.textContent = item.label;
+                    contentEl.innerHTML = item.text;
+                    
+                    // Fade in
+                    contentEl.classList.remove('fade-out');
+                    
+                    // Reset progress bar animation
+                    progressEl.style.animation = 'none';
+                    progressEl.offsetHeight; // Force reflow
+                    progressEl.style.animation = 'rotatorProgress 30s linear';
+                }, 500);
+            }
+            
+            // Initial display
+            showItem(0);
+            
+            // Rotate every 30 seconds
+            setInterval(() => {
+                RotatorConfig.currentIndex = (RotatorConfig.currentIndex + 1) % RotatorConfig.items.length;
+                showItem(RotatorConfig.currentIndex);
+            }, RotatorConfig.interval);
+        }
+        
+        // Start rotator when page loads
+        document.addEventListener('DOMContentLoaded', initRotator);
+        
+        // ═══════════════════════════════════════════════════════════════
+        // PREVIEW SCALING — Fit to viewport
+        // ═══════════════════════════════════════════════════════════════
+        
+        function fitToViewport() {
+            const targetWidth = 1920;
+            const targetHeight = 1080;
+            const scaleX = window.innerWidth / targetWidth;
+            const scaleY = window.innerHeight / targetHeight;
+            const scale = Math.min(scaleX, scaleY, 1); // Don't scale up, only down
+            
+            // Use zoom (better for layout) with transform fallback
+            document.body.style.setProperty('--preview-zoom', scale);
+            document.body.style.setProperty('--preview-scale', scale);
+            document.body.style.zoom = scale;
+            document.body.classList.add('fit-viewport');
+            document.documentElement.classList.remove('preview-scroll');
+            
+            // Update button text
+            const btn = document.getElementById('scaleBtn');
+            if (btn) {
+                btn.querySelector('#scaleText').textContent = `${Math.round(scale * 100)}%`;
+            }
+        }
+        
+        function enableScroll() {
+            document.body.style.zoom = 1;
+            document.body.style.transform = 'none';
+            document.body.classList.remove('fit-viewport');
+            document.documentElement.classList.add('preview-scroll');
+            const btn = document.getElementById('scaleBtn');
+            if (btn) {
+                btn.querySelector('#scaleText').textContent = 'Scroll';
+            }
+        }
+        
+        let scaleMode = 0; // 0 = fit, 1 = scroll, 2 = 100%
+        function toggleScale() {
+            scaleMode = (scaleMode + 1) % 3;
+            if (scaleMode === 0) {
+                fitToViewport();
+            } else if (scaleMode === 1) {
+                enableScroll();
+            } else {
+                // 100% - no scaling, no scroll class
+                document.body.style.zoom = 1;
+                document.body.style.transform = 'none';
+                document.body.classList.remove('fit-viewport');
+                document.documentElement.classList.remove('preview-scroll');
+                const btn = document.getElementById('scaleBtn');
+                if (btn) btn.querySelector('#scaleText').textContent = '100%';
+            }
+        }
+        
+        // Auto-fit on load if viewport is smaller than canvas
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth < 1920 || window.innerHeight < 1080) {
+                // Default to scroll mode for reliability
+                enableScroll();
+                scaleMode = 1;
+            }
+        });
+        
+        // Re-fit on resize if in fit mode
+        window.addEventListener('resize', () => {
+            if (scaleMode === 0) {
+                fitToViewport();
+            }
+        });
+    </script>
+</body>
+</html>

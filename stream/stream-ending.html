@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HazeyData — Thanks for Watching!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #0a1628 0%, #0d1f3c 50%, #0a1628 100%);
+            width: 1920px;
+            height: 1080px;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(74,144,164,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,144,164,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.02) 0px,
+                rgba(0,0,0,0.02) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .content {
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 48px;
+            color: #4a90a4;
+            letter-spacing: 6px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 30px rgba(74, 144, 164, 0.4);
+        }
+        
+        .thanks {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 64px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        .thanks .heart {
+            color: #A60038;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+        }
+        
+        .subtext {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+        }
+        
+        .cta-box {
+            background: rgba(10, 22, 40, 0.8);
+            border: 1px solid rgba(74, 144, 164, 0.4);
+            border-radius: 8px;
+            padding: 30px 50px;
+            margin-bottom: 50px;
+            display: inline-block;
+        }
+        
+        .cta-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            color: #4a90a4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+        
+        .cta-text {
+            font-size: 24px;
+            color: #fff;
+        }
+        
+        .cta-text span {
+            color: #6bb5c9;
+            font-weight: 600;
+        }
+        
+        .social-bar {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        
+        .social-item {
+            text-align: center;
+        }
+        
+        .social-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .social-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        
+        .social-handle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            color: #6bb5c9;
+        }
+        
+        /* Raid target section */
+        .raid-section {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .raid-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: #A60038;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .raid-target {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            color: #ff1a5c;
+            text-shadow: 0 0 20px rgba(166, 0, 56, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <div class="content">
+        <div class="logo">HAZEYDATA.AI</div>
+        <div class="thanks">THANKS FOR WATCHING <span class="heart">❤</span></div>
+        <div class="subtext">// Stream Complete</div>
+        
+        <div class="cta-box">
+            <div class="cta-title">Don't Miss the Next Stream</div>
+            <div class="cta-text">Hit <span>Follow</span> and turn on <span>Notifications</span>!</div>
+        </div>
+        
+        <div class="social-bar">
+            <div class="social-item">
+                <div class="social-icon">🐦</div>
+                <div class="social-label">Twitter</div>
+                <div class="social-handle">@hazeydata</div>
+            </div>
+            <div class="social-item">
+                <div class="social-icon">🌐</div>
+                <div class="social-label">Website</div>
+                <div class="social-handle">hazeydata.ai</div>
+            </div>
+            <div class="social-item">
+                <div class="social-icon">💜</div>
+                <div class="social-label">Twitch</div>
+                <div class="social-handle">twitch.tv/hazeydata</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Raid target (hidden by default, enable via URL param ?raid=channelname) -->
+    <div class="raid-section" id="raidSection" style="display: none;">
+        <div class="raid-label">⚡ Raiding</div>
+        <div class="raid-target" id="raidTarget"></div>
+    </div>
+    
+    <script>
+        // Check for raid target in URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('raid')) {
+            document.getElementById('raidSection').style.display = 'block';
+            document.getElementById('raidTarget').textContent = params.get('raid');
+        }
+    </script>
+</body>
+</html>

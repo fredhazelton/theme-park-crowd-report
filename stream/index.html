@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HazeyData Stream Assets</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a1628;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #4a90a4;
+            font-size: 28px;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 40px;
+        }
+        .scene-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+        }
+        .scene-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(74, 144, 164, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.2s;
+        }
+        .scene-card:hover {
+            background: rgba(74, 144, 164, 0.1);
+            border-color: #4a90a4;
+            transform: translateY(-2px);
+        }
+        .scene-emoji {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .scene-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a90a4;
+        }
+        .scene-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.5;
+        }
+        .scene-url {
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 10px;
+            word-break: break-all;
+        }
+        .section-title {
+            color: #4a90a4;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(74, 144, 164, 0.3);
+        }
+        .note {
+            background: rgba(166, 0, 56, 0.1);
+            border-left: 3px solid #A60038;
+            padding: 15px 20px;
+            margin-top: 40px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+<body>
+    <h1>🎬 HAZEYDATA STREAM ASSETS</h1>
+    <p class="subtitle">Browser sources for Streamlabs/OBS</p>
+    
+    <h2 class="section-title">Scenes</h2>
+    <div class="scene-grid">
+        <a href="main-dashboard.html" class="scene-card">
+            <div class="scene-emoji">📊</div>
+            <div class="scene-name">Main Dashboard</div>
+            <div class="scene-desc">Primary streaming view with all overlay elements, alerts, chat, and data rotator.</div>
+            <div class="scene-url">main-dashboard.html</div>
+        </a>
+        
+        <a href="development.html" class="scene-card">
+            <div class="scene-emoji">💻</div>
+            <div class="scene-name">Development</div>
+            <div class="scene-desc">Coding/tech work mode. Shows Cursor, Wilma, and other development tools.</div>
+            <div class="scene-url">development.html</div>
+        </a>
+        
+        <a href="just-chatting.html" class="scene-card">
+            <div class="scene-emoji">💬</div>
+            <div class="scene-name">Just Chatting</div>
+            <div class="scene-desc">Casual chat mode with larger camera and prominent chat display.</div>
+            <div class="scene-url">just-chatting.html</div>
+        </a>
+        
+        <a href="starting-soon.html" class="scene-card">
+            <div class="scene-emoji">⏳</div>
+            <div class="scene-name">Starting Soon</div>
+            <div class="scene-desc">Pre-stream countdown with branding. Use ?minutes=5 for custom countdown.</div>
+            <div class="scene-url">starting-soon.html</div>
+        </a>
+        
+        <a href="be-right-back.html" class="scene-card">
+            <div class="scene-emoji">☕</div>
+            <div class="scene-name">Be Right Back</div>
+            <div class="scene-desc">Break screen. Use ?minutes=5 for optional countdown timer.</div>
+            <div class="scene-url">be-right-back.html</div>
+        </a>
+        
+        <a href="stream-ending.html" class="scene-card">
+            <div class="scene-emoji">👋</div>
+            <div class="scene-name">Stream Ending</div>
+            <div class="scene-desc">Sign-off screen with social links. Use ?raid=channelname to show raid target.</div>
+            <div class="scene-url">stream-ending.html</div>
+        </a>
+    </div>
+    
+    <div class="note">
+        <strong>📋 Streamlabs Setup:</strong><br>
+        Add as Browser Source → 1920x1080 → Use these URLs:<br><br>
+        <code>https://hazeydata.github.io/theme-park-crowd-report/stream/[scene].html</code>
+    </div>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HazeyData — Starting Soon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #0a1628 0%, #0d1f3c 50%, #0a1628 100%);
+            width: 1920px;
+            height: 1080px;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(74,144,164,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,144,164,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        /* Scanlines */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.02) 0px,
+                rgba(0,0,0,0.02) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .content {
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 64px;
+            color: #4a90a4;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 40px rgba(74, 144, 164, 0.5);
+        }
+        
+        .tagline {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 60px;
+        }
+        
+        .status {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 32px;
+            color: #fff;
+            margin-bottom: 30px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .countdown {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 120px;
+            font-weight: 700;
+            color: #4a90a4;
+            text-shadow: 0 0 60px rgba(74, 144, 164, 0.6);
+            margin-bottom: 40px;
+        }
+        
+        .social-bar {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 60px;
+        }
+        
+        .social-item {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .social-item span {
+            color: #6bb5c9;
+        }
+        
+        /* Corner decorations */
+        .corner {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(74, 144, 164, 0.3);
+        }
+        .corner.tl { top: 40px; left: 40px; border-right: none; border-bottom: none; }
+        .corner.tr { top: 40px; right: 40px; border-left: none; border-bottom: none; }
+        .corner.bl { bottom: 40px; left: 40px; border-right: none; border-top: none; }
+        .corner.br { bottom: 40px; right: 40px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+    
+    <div class="content">
+        <div class="logo">HAZEYDATA.AI</div>
+        <div class="tagline">// Clear the Haze</div>
+        <div class="status">STREAM STARTING SOON</div>
+        <div class="countdown" id="countdown">05:00</div>
+        <div class="social-bar">
+            <div class="social-item">🐦 <span>@hazeydata</span></div>
+            <div class="social-item">🌐 <span>hazeydata.ai</span></div>
+            <div class="social-item">💜 <span>twitch.tv/hazeydata</span></div>
+        </div>
+    </div>
+    
+    <script>
+        // Countdown timer (default 5 minutes)
+        let totalSeconds = 5 * 60;
+        
+        function updateCountdown() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            document.getElementById('countdown').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (totalSeconds > 0) {
+                totalSeconds--;
+                setTimeout(updateCountdown, 1000);
+            }
+        }
+        
+        // Check URL params for custom countdown
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('minutes')) {
+            totalSeconds = parseInt(params.get('minutes')) * 60;
+        }
+        
+        updateCountdown();
+    </script>
+</body>
+</html>
