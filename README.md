@@ -1,6 +1,6 @@
 # Theme Park Wait Time Data Pipeline
 
-A Python ETL pipeline that processes theme park wait time data from AWS S3, transforming it into clean CSV fact tables organized by park and date.
+A Python ETL pipeline that processes theme park wait time data from vatious sources, transforming it into clean CSV fact tables organized by park and date.
 
 ## What This Does
 
