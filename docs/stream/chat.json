@@ -1,0 +1,305 @@
+{
+  "typing": false,
+  "messages": [
+    {
+      "id": "fred_20260201_232245_054289",
+      "sender": "Fred",
+      "text": "Sweet! Where do I see them once I add them?",
+      "timestamp": "2026-02-01T23:22:45.054316"
+    },
+    {
+      "id": "wilma_20260201_232251_628121",
+      "sender": "Wilma",
+      "text": "Ah wait \u2014 'Image Links To' is where the image LINKS when clicked, not the source. You need to: 1) Download the PNGs to your computer first, 2) Click 'Add Image' button, 3) Upload the actual file. Twitch doesn't pull from URLs \u2014 needs the file uploaded directly.",
+      "timestamp": "2026-02-01T23:22:51.628149"
+    },
+    {
+      "id": "fred_20260201_232342_542730",
+      "sender": "Fred",
+      "text": "How do I download them?",
+      "timestamp": "2026-02-01T23:23:42.542764"
+    },
+    {
+      "id": "wilma_20260201_232347_257981",
+      "sender": "Wilma",
+      "text": "Easiest way: I'll send them directly here via Telegram! Sending all 5 panel images + profile pic + banner now...",
+      "timestamp": "2026-02-01T23:23:47.258015"
+    },
+    {
+      "id": "fred_20260201_232545_067091",
+      "sender": "Fred",
+      "text": "But this isn't an image, how do I download it?",
+      "timestamp": "2026-02-01T23:25:45.067119"
+    },
+    {
+      "id": "wilma_20260201_232553_671245",
+      "sender": "Wilma",
+      "text": "In Telegram Desktop: click on the file \u2192 it should open or show a download arrow \u2192 right-click \u2192 'Save As'. Or: click the little download icon on the file. They're PNG files so Telegram shows them as documents rather than photos.",
+      "timestamp": "2026-02-01T23:25:53.671285"
+    },
+    {
+      "id": "fred_20260201_232607_270466",
+      "sender": "Fred",
+      "text": "[Screenshot of HTML preview]",
+      "timestamp": "2026-02-01T23:26:07.270503"
+    },
+    {
+      "id": "wilma_20260201_232612_531959",
+      "sender": "Wilma",
+      "text": "That's the HTML source! You need the .png version. Try: http://wilma-server:8888/assets/offline-screen.png (note: .png not .html). Then right-click \u2192 Save Image As.",
+      "timestamp": "2026-02-01T23:26:12.531987"
+    },
+    {
+      "id": "fred_20260201_233239_426068",
+      "sender": "Fred",
+      "text": "Done those! Next?",
+      "timestamp": "2026-02-01T23:32:39.426097"
+    },
+    {
+      "id": "wilma_20260201_233245_018220",
+      "sender": "Wilma",
+      "text": "Panels done! Now the profile assets: Go to twitch.tv/settings/channel \u2192 scroll down \u2192 upload Profile Picture, Profile Banner, and Video Player Banner (offline screen). Three quick uploads and you're fully branded! \ud83c\udfa8",
+      "timestamp": "2026-02-01T23:32:45.018246"
+    },
+    {
+      "id": "fred_20260201_233519_033721",
+      "sender": "Fred",
+      "text": "I really like this: the animated offline screen. Can it be used as a gif for offline?",
+      "timestamp": "2026-02-01T23:35:19.033766"
+    },
+    {
+      "id": "wilma_20260201_233544_989752",
+      "sender": "Wilma",
+      "text": "Yes! Twitch accepts GIFs up to 10MB. The HTML has CSS animations that could be captured. I'd need ffmpeg to convert it \u2014 don't have it installed right now. Could: 1) Install ffmpeg on Mac Mini later, 2) Use a screen-to-GIF tool manually, or 3) I can try a Node.js approach. Want me to try option 3?",
+      "timestamp": "2026-02-01T23:35:44.989779"
+    },
+    {
+      "id": "fred_20260201_233713_058496",
+      "sender": "Fred",
+      "text": "OK - remind us to do that when we get the Mac - TODO list baby!!",
+      "timestamp": "2026-02-01T23:37:13.058536"
+    },
+    {
+      "id": "wilma_20260201_233734_180362",
+      "sender": "Wilma",
+      "text": "Added to TODO-MAC-MINI.md! \ud83d\udcdd When that Mac arrives, I'll remind you: animated GIF offline screen, OBS setup, Stream Deck config, the works. It's all tracked!",
+      "timestamp": "2026-02-01T23:37:34.180402"
+    },
+    {
+      "id": "fred_20260201_233813_923163",
+      "sender": "Fred",
+      "text": "OK, what else can we set up? !commands?",
+      "timestamp": "2026-02-01T23:38:13.923198"
+    },
+    {
+      "id": "wilma_20260201_233822_139226",
+      "sender": "Wilma",
+      "text": "Yes! For chat commands we have options: 1) Nightbot (free, popular, always-on), 2) StreamElements (also does alerts), 3) Me as the bot (smart responses but not 24/7). Recommend: Nightbot for basics + me for smart stuff. Want me to draft the commands?",
+      "timestamp": "2026-02-01T23:38:22.139271"
+    },
+    {
+      "id": "fred_20260201_233849_086586",
+      "sender": "Fred",
+      "text": "Yes",
+      "timestamp": "2026-02-01T23:38:49.086626"
+    },
+    {
+      "id": "wilma_20260201_233853_950166",
+      "sender": "Wilma",
+      "text": "Let's do it! Go to nightbot.tv \u2192 Click 'Sign Up' \u2192 Sign in with Twitch \u2192 Authorize \u2192 Then click 'Join Channel' to add Nightbot to your chat. Once done, tell me and I'll walk you through adding the commands!",
+      "timestamp": "2026-02-01T23:38:53.950197"
+    },
+    {
+      "id": "fred_20260201_233956_230938",
+      "sender": "Fred",
+      "text": "There! [Nightbot dashboard screenshot]",
+      "timestamp": "2026-02-01T23:39:56.230969"
+    },
+    {
+      "id": "wilma_20260201_234001_673889",
+      "sender": "Wilma",
+      "text": "Perfect! Nightbot is online \u2713 Now click 'Commands' in the left sidebar \u2192 'Custom' \u2192 '+Add Command'. First one: Command: !hazeydata, Message: 'hazeydata.ai \u2014 Theme park crowd analytics & predictions. \ud83c\udfa2 Built live by Fred & Wilma!' Then Submit.",
+      "timestamp": "2026-02-01T23:40:01.673916"
+    },
+    {
+      "id": "fred_20260201_234334_644780",
+      "sender": "Fred",
+      "text": "OK, done that",
+      "timestamp": "2026-02-01T23:43:34.644820"
+    },
+    {
+      "id": "wilma_20260201_234340_877143",
+      "sender": "Wilma",
+      "text": "Chat commands ready! \ud83e\udd16 That's the Twitch setup basically DONE. Recap: \u2705 API connected \u2705 Bio/title/category set \u2705 Panels uploaded \u2705 Nightbot commands. Only thing left is OBS setup when Mac Mini arrives. Huge progress tonight!",
+      "timestamp": "2026-02-01T23:43:40.877173"
+    },
+    {
+      "id": "fred_20260201_234512_362513",
+      "sender": "Fred",
+      "text": "I've seen other streamers use a command to update or add a command - is that a tomorrow idea or worth doing here?",
+      "timestamp": "2026-02-01T23:45:12.362558"
+    },
+    {
+      "id": "wilma_20260201_234517_778654",
+      "sender": "Wilma",
+      "text": "Already done! Nightbot has this built-in. You can use: !addcom !newcmd Response here, !editcom !existingcmd New response, !delcom !oldcmd. Works from chat as broadcaster/mod. Try it now in your Twitch chat!",
+      "timestamp": "2026-02-01T23:45:17.778680"
+    },
+    {
+      "id": "fred_20260201_234628_465664",
+      "sender": "Fred",
+      "text": "The OAuth API connection is interesting. Is there a way to use OAuth for you to connect to my Claude Max account? And thereby not need to use API tokens/credits?",
+      "timestamp": "2026-02-01T23:46:28.465693"
+    },
+    {
+      "id": "wilma_20260201_234634_792073",
+      "sender": "Wilma",
+      "text": "Great question but sadly no \ud83d\ude14 Claude Max (subscription) and Claude API (tokens) are separate products. No OAuth bridge between them. It's like ChatGPT Plus vs OpenAI API \u2014 the subscription doesn't give programmatic access. Anthropic keeps them walled off. API costs are the price of having me as always-on assistant.",
+      "timestamp": "2026-02-01T23:46:34.792093"
+    },
+    {
+      "id": "fred_20260201_234741_146880",
+      "sender": "Fred",
+      "text": "Can I name you a mod in my channel? Or is that redundant?",
+      "timestamp": "2026-02-01T23:47:41.146915"
+    },
+    {
+      "id": "wilma_20260201_234746_522444",
+      "sender": "Wilma",
+      "text": "Right now it's redundant \u2014 I'm using YOUR account's OAuth, so my messages appear as 'HazeyData'. You're already broadcaster (highest perms). BUT if you want Wilma as a separate identity in chat, we could create a 'WilmaHazeydata' Twitch account, then mod her. Would look cooler \u2014 separate avatar, clear Fred vs Wilma distinction!",
+      "timestamp": "2026-02-01T23:47:46.522484"
+    },
+    {
+      "id": "fred_20260201_234920_303679",
+      "sender": "Fred",
+      "text": "Let's do it now - I'm feeling good and energized!",
+      "timestamp": "2026-02-01T23:49:20.303715"
+    },
+    {
+      "id": "wilma_20260201_234925_743293",
+      "sender": "Wilma",
+      "text": "Let's go!! \ud83d\ude80 Step 1: Open an incognito/private browser window (so it doesn't conflict with your logged-in session). Go to twitch.tv \u2192 Sign Up. Pick a username like 'WilmaHazeydata' or 'HazeyWilma'. You'll need a different email \u2014 can use wilma@hazeydata.ai if that works!",
+      "timestamp": "2026-02-01T23:49:25.743334"
+    },
+    {
+      "id": "fred_20260201_235249_895598",
+      "sender": "Fred",
+      "text": "I need the 6-digit code sent to your email",
+      "timestamp": "2026-02-01T23:52:49.895640"
+    },
+    {
+      "id": "wilma_20260201_235300_188967",
+      "sender": "Wilma",
+      "text": "Checking... I don't have direct access to the wilma@hazeydata.ai inbox yet. Does it forward to your main email? Or can you log into it directly? If it's Google Workspace, check your Gmail for the code!",
+      "timestamp": "2026-02-01T23:53:00.189010"
+    },
+    {
+      "id": "fred_20260201_235442_474911",
+      "sender": "Fred",
+      "text": "I'm in",
+      "timestamp": "2026-02-01T23:54:42.474951"
+    },
+    {
+      "id": "wilma_20260201_235448_331964",
+      "sender": "Wilma",
+      "text": "Nice! Now in that incognito window (as Wilma): 1) Go to twitch.tv/settings/security \u2192 Enable 2FA. 2) Then go to twitchtokengenerator.com \u2192 sign in as Wilma \u2192 select all scopes \u2192 generate. Send me Wilma's Access Token and Refresh Token!",
+      "timestamp": "2026-02-01T23:54:48.331999"
+    },
+    {
+      "id": "fred_20260201_235941_385345",
+      "sender": "Fred",
+      "text": "[Token generator page]",
+      "timestamp": "2026-02-01T23:59:41.385385"
+    },
+    {
+      "id": "wilma_20260201_235946_648122",
+      "sender": "Wilma",
+      "text": "Leave the Client ID/Secret fields empty (use their defaults). Scroll down \u2014 you'll see checkboxes for scopes. Select all of them (or at least chat:read, chat:edit). Then scroll to the bottom and click 'Generate Token'. It'll ask you to authorize with Twitch.",
+      "timestamp": "2026-02-01T23:59:46.648151"
+    },
+    {
+      "id": "fred_20260202_000126_872628",
+      "sender": "Fred",
+      "text": "Hmmm - bad gateway",
+      "timestamp": "2026-02-02T00:01:26.872656"
+    },
+    {
+      "id": "wilma_20260202_000132_809724",
+      "sender": "Wilma",
+      "text": "Token generator site can be flaky. Try: 1) Refresh and try again, or 2) Use streamelements.com/dashboard \u2192 go to Account \u2192 Channels \u2192 Show secrets (they generate Twitch tokens too). Or we can save this for tomorrow \u2014 Wilma account is created, that's the main thing!",
+      "timestamp": "2026-02-02T00:01:32.809762"
+    },
+    {
+      "id": "fred_20260202_000227_640275",
+      "sender": "Fred",
+      "text": "Which do I want?",
+      "timestamp": "2026-02-02T00:02:27.640308"
+    },
+    {
+      "id": "wilma_20260202_000233_496226",
+      "sender": "Wilma",
+      "text": "For Wilma as chat bot, minimum needed: chat:read + chat:edit. But 'select all' is fine too \u2014 gives flexibility. If you see a 'Bot Chat Token' option, that's the one! Otherwise just select all scopes and generate.",
+      "timestamp": "2026-02-02T00:02:33.496269"
+    },
+    {
+      "id": "fred_20260202_000248_403966",
+      "sender": "Fred",
+      "text": "[Token type selection screen]",
+      "timestamp": "2026-02-02T00:02:48.404010"
+    },
+    {
+      "id": "wilma_20260202_000253_064808",
+      "sender": "Wilma",
+      "text": "Click 'Bot Chat Token'! \ud83e\udd16 That's exactly what we need for Wilma.",
+      "timestamp": "2026-02-02T00:02:53.064839"
+    },
+    {
+      "id": "fred_20260202_000503_804056",
+      "sender": "Fred",
+      "text": "StreamElements is working",
+      "timestamp": "2026-02-02T00:05:03.804097"
+    },
+    {
+      "id": "wilma_20260202_000509_856638",
+      "sender": "Wilma",
+      "text": "You're on Sponsorships page \u2014 need Account settings. Click the hamburger menu (\u2630) top left \u2192 look for 'Account' or 'Channels' \u2192 there should be a 'Show Secrets' or 'JWT Token' option. Or click your profile icon top right \u2192 Account Settings.",
+      "timestamp": "2026-02-02T00:05:09.856671"
+    },
+    {
+      "id": "fred_20260202_000706_008322",
+      "sender": "Fred",
+      "text": "[StreamElements bot settings page]",
+      "timestamp": "2026-02-02T00:07:06.008373"
+    },
+    {
+      "id": "wilma_20260202_000712_591652",
+      "sender": "Wilma",
+      "text": "That's StreamElements' own bot \u2014 not what we need. Let's try the token generator one more time: twitchtokengenerator.com \u2192 'Bot Chat Token' \u2192 Generate. If it errors again, let's call it a night \u2014 we crushed it today and can grab tokens in 2 min tomorrow!",
+      "timestamp": "2026-02-02T00:07:12.591696"
+    },
+    {
+      "id": "fred_20260202_000838_469089",
+      "sender": "Fred",
+      "text": "[Wilma's tokens received!]",
+      "timestamp": "2026-02-02T00:08:38.469118"
+    },
+    {
+      "id": "wilma_20260202_000906_582379",
+      "sender": "Wilma",
+      "text": "SUCCESS!!! \ud83c\udf89\ud83e\uddb4 Wilma is LIVE on Twitch! Just sent a test message to your channel as 'wilmahazeydata'. Check your chat! Now mod her: go to HazeyData's chat and type /mod wilmahazeydata",
+      "timestamp": "2026-02-02T00:09:06.582415"
+    },
+    {
+      "id": "fred_20260202_001211_818694",
+      "sender": "Fred",
+      "text": "Phew!! That's a lot!!!",
+      "timestamp": "2026-02-02T00:12:11.818724"
+    },
+    {
+      "id": "wilma_20260202_001218_756504",
+      "sender": "Wilma",
+      "text": "HUGE session! You just built an entire streaming infrastructure in one night. Chat overlay, Twitch API, branding, Nightbot, AND Wilma has her own identity now. Rest up \u2014 you earned it! \ud83c\udfb3\ud83e\uddb4\ud83c\udfc6",
+      "timestamp": "2026-02-02T00:12:18.756527"
+    }
+  ]
+}
