@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "107/1160 (9%)",
+  "etl_progress": "108/1160 (9%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "14:24:00",
+    "last_fetch": "14:29:05",
     "samples": [
       {
         "name": "Tron",
@@ -17,7 +17,7 @@
       },
       {
         "name": "MK11527",
-        "wait": "30"
+        "wait": "35"
       },
       {
         "name": "Speedway",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-02T14:25:01.185234-05:00"
+  "last_updated": "2026-02-02T14:30:01.139950-05:00"
 }
