@@ -9,11 +9,15 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "14:13:53",
+    "last_fetch": "14:18:56",
     "samples": [
       {
         "name": "Tron",
         "wait": "5"
+      },
+      {
+        "name": "MK11527",
+        "wait": "30"
       },
       {
         "name": "Speedway",
@@ -25,17 +29,13 @@
       },
       {
         "name": "Haunted Mansion",
-        "wait": "65"
+        "wait": "60"
       },
       {
         "name": "Jungle Cruise",
         "wait": "10"
-      },
-      {
-        "name": "Peter Pan",
-        "wait": "30"
       }
     ]
   },
-  "last_updated": "2026-02-02T14:15:01.390501-05:00"
+  "last_updated": "2026-02-02T14:20:01.331911-05:00"
 }
