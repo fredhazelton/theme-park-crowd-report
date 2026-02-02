@@ -1,0 +1,29 @@
+# queue-times-loop-wilma.service - Systemd service for Wilma's Queue-Times fetcher
+#
+# Production queue-times fetcher running as wilma user with venv.
+
+[Unit]
+Description=Theme Park Queue-Times.com Wait Time Fetcher (Wilma Production)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=wilma
+Group=wilma
+
+WorkingDirectory=/home/wilma/theme-park-crowd-report
+
+# Use the venv Python directly
+ExecStart=/bin/bash -c 'source /home/wilma/theme-park-crowd-report/.venv/bin/activate && ./scripts/run_queue_times_loop.sh --interval 300'
+
+Restart=on-failure
+RestartSec=60
+
+Environment="PATH=/home/wilma/theme-park-crowd-report/.venv/bin:/home/wilma/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

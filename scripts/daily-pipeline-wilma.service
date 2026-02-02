@@ -1,0 +1,26 @@
+[Unit]
+Description=Theme Park Daily Pipeline (Wilma Production) - One-shot ETL run
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=wilma
+Group=wilma
+RemainAfterExit=yes
+
+WorkingDirectory=/home/wilma/theme-park-crowd-report
+
+# Use venv and run pipeline (skip training for now)
+ExecStart=/bin/bash -c 'source /home/wilma/theme-park-crowd-report/.venv/bin/activate && ./scripts/run_daily_pipeline.sh --skip-dropbox-check --skip-training --skip-forecast --skip-wti'
+
+# No timeout - let it run as long as needed
+TimeoutStartSec=infinity
+
+Environment="PATH=/home/wilma/theme-park-crowd-report/.venv/bin:/home/wilma/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+StandardOutput=append:/home/wilma/hazeydata/pipeline/logs/daily_pipeline_service.log
+StandardError=append:/home/wilma/hazeydata/pipeline/logs/daily_pipeline_service.log
+
+[Install]
+WantedBy=multi-user.target
