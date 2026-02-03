@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "21:59:06",
+    "last_fetch": "22:04:10",
     "samples": [
       {
         "name": "Tron",
@@ -29,7 +29,7 @@
       },
       {
         "name": "Haunted Mansion",
-        "wait": "20"
+        "wait": "25"
       },
       {
         "name": "Peter Pan",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-02T22:00:01.713350-05:00"
+  "last_updated": "2026-02-02T22:05:01.499044-05:00"
 }
