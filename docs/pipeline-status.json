@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "266/1160 (23%)",
+  "etl_progress": "No log",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,33 +9,8 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "23:50:13",
-    "samples": [
-      {
-        "name": "MK11527",
-        "wait": "20"
-      },
-      {
-        "name": "Speedway",
-        "wait": "5"
-      },
-      {
-        "name": "Its a Small World",
-        "wait": "15"
-      },
-      {
-        "name": "Haunted Mansion",
-        "wait": "5"
-      },
-      {
-        "name": "Peter Pan",
-        "wait": "5"
-      },
-      {
-        "name": "Pirates",
-        "wait": "5"
-      }
-    ]
+    "last_fetch": "--",
+    "samples": []
   },
-  "last_updated": "2026-02-02T23:55:01.755894-05:00"
+  "last_updated": "2026-02-03T00:00:01.599279-05:00"
 }
