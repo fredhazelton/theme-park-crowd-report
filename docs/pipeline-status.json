@@ -9,10 +9,22 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "14:06:17",
+    "last_fetch": "14:11:20",
     "samples": [
       {
+        "name": "Tron",
+        "wait": "5"
+      },
+      {
+        "name": "MK11527",
+        "wait": "65"
+      },
+      {
         "name": "Speedway",
+        "wait": "15"
+      },
+      {
+        "name": "7 Dwarfs",
         "wait": "15"
       },
       {
@@ -22,20 +34,8 @@
       {
         "name": "Tiana's",
         "wait": "10"
-      },
-      {
-        "name": "MK127",
-        "wait": "45"
-      },
-      {
-        "name": "MK136",
-        "wait": "55"
-      },
-      {
-        "name": "MK6699",
-        "wait": "45"
       }
     ]
   },
-  "last_updated": "2026-02-03T14:10:01.608541-05:00"
+  "last_updated": "2026-02-03T14:15:01.865953-05:00"
 }
