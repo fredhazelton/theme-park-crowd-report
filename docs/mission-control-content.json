@@ -1,88 +1,79 @@
 {
   "todays_focus": [
     {
-      "status_class": "critical",
-      "status_text": "ACTIVE",
-      "task": "🎬 Stream Setup — Mac Mini ready, overlays tested!"
-    },
-    {
-      "status_class": "good",
-      "status_text": "RUNNING",
-      "task": "🔄 Pipeline — ETL processing historical data"
+      "status_class": "medium",
+      "status_text": "\u23f3 When Fre",
+      "task": "Test First Stream \u2014 All components ready!"
     },
     {
       "status_class": "medium",
-      "status_text": "TOMORROW",
-      "task": "💰 Wilma Autonomy Pilot begins ($500/mo budget)"
+      "status_text": "\ud83c\udf89 1 day",
+      "task": "Autonomy Pilot Tomorrow \u2014 $500/mo budget starts Feb 4"
     },
     {
       "status_class": "good",
-      "status_text": "READY",
-      "task": "🎙️ Test first stream — all overlays aligned!"
+      "status_text": "ACTIVE",
+      "task": "Pipeline running \u2014 ETL processing historical S3 data"
+    },
+    {
+      "status_class": "good",
+      "status_text": "DONE",
+      "task": "Overlays aligned \u2014 Both chats tested, services running"
     }
   ],
   "key_dates": [
     {
-      "emoji": "💰",
-      "event": "Wilma Autonomy Pilot begins ($500/mo)",
-      "date": "Feb 4",
-      "days_out": 1,
-      "urgency": "imminent"
-    },
-    {
-      "emoji": "👤",
+      "emoji": "\ud83d\udc64",
       "event": "John visits",
       "date": "Feb 7",
       "days_out": 4,
       "urgency": ""
     },
     {
-      "emoji": "⚠️",
+      "emoji": "\u26a0\ufe0f",
       "event": "GPT-4o retires",
       "date": "Feb 13",
       "days_out": 10,
-      "urgency": ""
-    },
-    {
-      "emoji": "🦕",
-      "event": "DinoLand closed — Day 2 of Tropical Americas construction",
-      "date": "Yesterday",
-      "days_out": -1,
       "urgency": ""
     }
   ],
   "active_projects": [
     {
-      "status_class": "critical",
-      "status_text": "ACTIVE",
-      "title": "🎬 Twitch/YouTube Stream",
-      "description": "Mac Mini ✅ | Overlays ✅ | Both chats ✅ — Ready for first stream!"
+      "status_class": "medium",
+      "status_text": "READY!",
+      "title": "Twitch/YouTube Stream",
+      "description": "All systems go! Just need Fred to hit \"Go Live\""
     },
     {
-      "status_class": "good",
+      "status_class": "critical",
       "status_text": "RUNNING",
-      "title": "📈 Theme Park Crowd Report",
-      "description": "Pipeline healthy, ETL processing S3 historical data"
+      "title": "Theme Park Crowd Report",
+      "description": "Pipeline processing S3 historical data"
     },
     {
       "status_class": "low",
       "status_text": "LIVE",
-      "title": "🌐 hazeydata.ai Website",
-      "description": "Live! Blog and content updates pending"
+      "title": "hazeydata.ai Website",
+      "description": "Live! Needs blog content"
     }
   ],
   "theme_park_intel": [
-    "❄️ Water features FROZE at WDW & Universal — rare cold continues",
-    "🦕 Donald's Dino Institute patch already removed from Tusker House jacket",
-    "🎢 Fyre Drill (Epic Universe) refurb extended another week",
-    "🎬 Disney CEO successor could be named THIS WEEK",
-    "🏠 Spider-Man Tower of Terror construction begins at Hong Kong Disney"
-  ],
-  "ai_intel": [
-    "🎬 Disney + OpenAI: Sora clips with 250+ characters coming to Disney+",
-    "⚠️ X/Grok deepfake crisis — millions of images, moderation failing",
-    "🦊 Firefox: Users can now disable ALL AI features",
-    "📅 GPT-4o retires Feb 13 (only 0.1% still using)"
+    {
+      "title": "Water features literally FROZE",
+      "detail": ""
+    },
+    {
+      "title": "Donald's Dino Institute patch ALREADY REMOVED",
+      "detail": ""
+    },
+    {
+      "title": "Fyre Drill",
+      "detail": ""
+    },
+    {
+      "title": "Spider-Man Tower of Terror",
+      "detail": ""
+    }
   ],
   "dino_tasks": [
     {
@@ -91,11 +82,11 @@
       "description": "First-time load of all historical wait time data",
       "status": "in_progress",
       "status_class": "critical",
-      "status_text": "RUNNING",
+      "status_text": "IN PROGRESS",
       "priority": "high",
-      "priority_icon": "⚡",
+      "priority_icon": "\u26a1",
       "owner": "Wilma",
-      "notes": "Pipeline watchdog active, auto-restarts if stalled",
+      "notes": "Pipeline watchdog active, auto-restarts if stalled. Processing S3 data.",
       "updated": "2026-02-03T04:00:00"
     },
     {
@@ -103,12 +94,12 @@
       "title": "Mac Mini streaming setup",
       "description": "Set up Streamlabs for Twitch + YouTube cross-platform streaming",
       "status": "in_progress",
-      "status_class": "good",
-      "status_text": "ALMOST DONE",
+      "status_class": "critical",
+      "status_text": "IN PROGRESS",
       "priority": "high",
-      "priority_icon": "⚡",
+      "priority_icon": "\u26a1",
       "owner": "Fred",
-      "notes": "Mac Mini running! Overlays tested. Both chat services running.",
+      "notes": "Mac Mini running! All overlays tested and aligned. Both chat services active.",
       "updated": "2026-02-03T04:00:00"
     },
     {
@@ -117,22 +108,22 @@
       "description": "Private test stream with all overlays, camera, mic",
       "status": "todo",
       "status_class": "medium",
-      "status_text": "READY",
+      "status_text": "TODO",
       "priority": "high",
-      "priority_icon": "⚡",
+      "priority_icon": "\u26a1",
       "owner": "Fred",
-      "notes": "All components ready — just need Fred to hit Go!",
+      "notes": "All components ready \u2014 just need Fred to hit Go!",
       "updated": "2026-02-03T04:00:00"
     },
     {
       "id": "task-005",
-      "title": "Replace Twitter with X branding",
-      "description": "Update icons and text from Twitter to X",
+      "title": "Replace \"Twitter\" icons and text with \"X\" icons and text",
+      "description": "We need to be on-brand for X",
       "status": "todo",
-      "status_class": "low",
-      "status_text": "LOW",
+      "status_class": "medium",
+      "status_text": "TODO",
       "priority": "low",
-      "priority_icon": "📝",
+      "priority_icon": "\ud83d\udcdd",
       "owner": "Fred",
       "notes": "",
       "updated": "2026-02-02T13:14:00"
@@ -145,12 +136,72 @@
     "blocked": 0,
     "done": 0
   },
-  "services_status": {
-    "pipeline": "✅ Running",
-    "chat_server": "✅ Running (3h+)",
-    "twitch_chat": "✅ Running (1h+)",
-    "watchdog": "✅ Healthy"
-  },
-  "last_updated": "2026-02-03T04:00:00-05:00",
-  "overnight_surprise": true
+  "last_updated": "2026-02-03T10:51:07.298517-05:00",
+  "quick_links": [
+    {
+      "category": "Stream Overlays",
+      "links": [
+        {
+          "name": "Live Scene",
+          "url": "http://wilma-server:8888/main-dashboard.html",
+          "icon": "\ud83c\udfac"
+        },
+        {
+          "name": "Just Chatting",
+          "url": "http://wilma-server:8888/just-chatting.html",
+          "icon": "\ud83d\udcac"
+        },
+        {
+          "name": "Starting Soon",
+          "url": "http://wilma-server:8888/starting-soon.html",
+          "icon": "\u23f3"
+        },
+        {
+          "name": "Be Right Back",
+          "url": "http://wilma-server:8888/be-right-back.html",
+          "icon": "\u2615"
+        },
+        {
+          "name": "Stream Ending",
+          "url": "http://wilma-server:8888/stream-ending.html",
+          "icon": "\ud83d\udc4b"
+        }
+      ]
+    },
+    {
+      "category": "Chat Overlays",
+      "links": [
+        {
+          "name": "Fred & Wilma Chat",
+          "url": "http://wilma-server:8888/chat-overlay.html",
+          "icon": "\ud83c\udfb3\ud83e\uddb4"
+        },
+        {
+          "name": "Twitch Chat",
+          "url": "http://wilma-server:8888/twitch-chat-overlay.html",
+          "icon": "\ud83d\udcfa"
+        }
+      ]
+    },
+    {
+      "category": "Assets & Tools",
+      "links": [
+        {
+          "name": "Pebbles Alerts",
+          "url": "http://wilma-server:8888/alerts-preview.html",
+          "icon": "\ud83c\udf89"
+        },
+        {
+          "name": "Dashboard",
+          "url": "http://wilma-server:8888/dashboard.html",
+          "icon": "\ud83d\udcca"
+        },
+        {
+          "name": "Filter Panel Mockup",
+          "url": "http://wilma-server:8888/filter-panel-mockup.html",
+          "icon": "\ud83c\udf9b\ufe0f"
+        }
+      ]
+    }
+  ]
 }
