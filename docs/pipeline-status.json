@@ -1,5 +1,5 @@
 {
-  "current_step": "IDLE",
+  "current_step": "FORECAST",
   "etl_progress": "1160/1160 (100%) [2026-02-02]",
   "steps": {
     "etl": "pending",
@@ -9,8 +9,33 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "08:32:09",
-    "samples": []
+    "last_fetch": "08:37:12",
+    "samples": [
+      {
+        "name": "Tron",
+        "wait": "5"
+      },
+      {
+        "name": "Its a Small World",
+        "wait": "5"
+      },
+      {
+        "name": "Haunted Mansion",
+        "wait": "10"
+      },
+      {
+        "name": "Peter Pan",
+        "wait": "5"
+      },
+      {
+        "name": "MK142",
+        "wait": "20"
+      },
+      {
+        "name": "MK126",
+        "wait": "5"
+      }
+    ]
   },
-  "last_updated": "2026-02-03T08:35:01.831664-05:00"
+  "last_updated": "2026-02-03T08:40:01.703845-05:00"
 }
