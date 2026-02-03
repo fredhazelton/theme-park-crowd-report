@@ -9,11 +9,15 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "09:02:28",
+    "last_fetch": "09:07:32",
     "samples": [
       {
         "name": "Tron",
         "wait": "5"
+      },
+      {
+        "name": "MK11527",
+        "wait": "35"
       },
       {
         "name": "Its a Small World",
@@ -28,14 +32,10 @@
         "wait": "5"
       },
       {
-        "name": "MK127",
-        "wait": "5"
-      },
-      {
-        "name": "MK142",
-        "wait": "35"
+        "name": "Pirates",
+        "wait": "15"
       }
     ]
   },
-  "last_updated": "2026-02-03T09:05:02.034272-05:00"
+  "last_updated": "2026-02-03T09:10:01.962529-05:00"
 }
