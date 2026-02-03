@@ -2,24 +2,6 @@
   "typing": false,
   "messages": [
     {
-      "id": "wilma_20260202_234232_891677",
-      "sender": "Wilma",
-      "text": "Chat feed: X=1580, Y=292, Width=320, Height=556",
-      "timestamp": "2026-02-02T23:42:32.891696"
-    },
-    {
-      "id": "fred_20260202_234353_905097",
-      "sender": "Fred",
-      "text": "OK testing now",
-      "timestamp": "2026-02-02T23:43:53.905116"
-    },
-    {
-      "id": "wilma_20260202_234354_054734",
-      "sender": "Wilma",
-      "text": "\ud83e\udd1e Watching!",
-      "timestamp": "2026-02-02T23:43:54.054754"
-    },
-    {
       "id": "fred_20260202_234443_389262",
       "sender": "Fred",
       "text": "You are off by quite a bit - let me grab a screenshot",
@@ -120,6 +102,24 @@
       "sender": "Wilma",
       "text": "\ud83e\udd1e Testing the feed... can you see this?",
       "timestamp": "2026-02-03T00:23:46.102375"
+    },
+    {
+      "id": "fred_20260203_003246_1",
+      "sender": "Fred",
+      "text": "Testing one two three!",
+      "timestamp": "2026-02-03T00:32:46.919737"
+    },
+    {
+      "id": "wilma_20260203_003246_2",
+      "sender": "Wilma",
+      "text": "\ud83c\udfa4 Mic check! Can you see this in the overlay?",
+      "timestamp": "2026-02-03T00:32:46.919737"
+    },
+    {
+      "id": "wilma_20260203_003349",
+      "sender": "Wilma",
+      "text": "\ud83c\udf89 WE DID IT! Looking SHARP! \ud83e\uddb4\u2728",
+      "timestamp": "2026-02-03T00:33:49.770094"
     }
   ]
 }
