@@ -325,6 +325,7 @@
             top: 77px;
             right: 20px;
             width: 320px;
+            height: 95px;  /* Explicit height to prevent expansion */
             padding: 15px;
             border-radius: 4px;
             animation: borderGlow 7s ease-in-out infinite;
@@ -397,6 +398,7 @@
             top: 187px;
             right: 20px;
             width: 320px;
+            height: 90px;  /* Explicit height to prevent expansion */
             padding: 12px 15px;
             border-radius: 4px;
             animation: borderGlow 6s ease-in-out infinite;
@@ -448,10 +450,10 @@
            ============================================ */
         .chat-container {
             position: absolute;
-            top: 292px;
+            top: 307px;  /* Moved down 15px for gap above */
             right: 20px;
             width: 320px;
-            bottom: 232px; /* Dynamic height - stops 15px above camera */
+            bottom: 247px; /* Adjusted - chat is now 526px tall */
             background: rgba(10, 22, 40, 0.85);
             border: 1px solid rgba(74, 144, 164, 0.3);
             border-radius: 4px;

@@ -40,21 +40,21 @@
       "emoji": "\ud83d\udcb0",
       "event": "Wilma Autonomy Pilot begins ($500/mo)",
       "date": "Feb 4",
-      "days_out": 2,
-      "urgency": "soon"
+      "days_out": 1,
+      "urgency": "imminent"
     },
     {
       "emoji": "\ud83d\udc64",
       "event": "John visits",
       "date": "Feb 7",
-      "days_out": 5,
+      "days_out": 4,
       "urgency": ""
     },
     {
       "emoji": "\u26a0\ufe0f",
       "event": "GPT-4o retires",
       "date": "Feb 13",
-      "days_out": 11,
+      "days_out": 10,
       "urgency": ""
     }
   ],
@@ -131,14 +131,27 @@
       "owner": "Wilma",
       "notes": "Dino tasks now display on Mission Control! Auto-refreshes every 60 seconds.",
       "updated": "2026-02-02T13:09:00"
+    },
+    {
+      "id": "task-005",
+      "title": "Replace \"Twitter\" icons and text with \"X\" icons and text",
+      "description": "We need to be on-brand for X",
+      "status": "todo",
+      "status_class": "medium",
+      "status_text": "TODO",
+      "priority": "low",
+      "priority_icon": "\ud83d\udcdd",
+      "owner": "Fred",
+      "notes": "",
+      "updated": "2026-02-02T13:14:00"
     }
   ],
   "dino_summary": {
-    "total": 4,
-    "todo": 0,
+    "total": 5,
+    "todo": 1,
     "in_progress": 2,
     "blocked": 0,
     "done": 2
   },
-  "last_updated": "2026-02-02T13:02:58.067348-05:00"
+  "last_updated": "2026-02-03T00:05:01.554171-05:00"
 }
