@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "264/1160 (23%)",
+  "etl_progress": "265/1160 (23%)",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "23:09:49",
+    "last_fetch": "23:14:52",
     "samples": [
       {
         "name": "MK11527",
@@ -29,7 +29,7 @@
       },
       {
         "name": "Peter Pan",
-        "wait": "10"
+        "wait": "5"
       },
       {
         "name": "Pirates",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-02T23:10:01.149929-05:00"
+  "last_updated": "2026-02-02T23:15:02.044480-05:00"
 }
