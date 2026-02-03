@@ -1,6 +1,6 @@
 {
   "current_step": "AGGREGATES",
-  "etl_progress": "Processing...",
+  "etl_progress": "1160/1160 (100%) [2026-02-02]",
   "steps": {
     "etl": "done",
     "dimensions": "done",
@@ -9,8 +9,8 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "06:05:27",
+    "last_fetch": "06:10:30",
     "samples": []
   },
-  "last_updated": "2026-02-03T06:10:01.823419-05:00"
+  "last_updated": "2026-02-03T06:15:01.753821-05:00"
 }
