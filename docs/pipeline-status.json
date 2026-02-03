@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "22:44:35",
+    "last_fetch": "22:49:37",
     "samples": [
       {
         "name": "MK11527",
@@ -28,14 +28,14 @@
         "wait": "5"
       },
       {
-        "name": "Pirates",
-        "wait": "5"
+        "name": "Peter Pan",
+        "wait": "10"
       },
       {
-        "name": "Space Mountain",
-        "wait": "13"
+        "name": "Pirates",
+        "wait": "5"
       }
     ]
   },
-  "last_updated": "2026-02-02T22:45:02.010101-05:00"
+  "last_updated": "2026-02-02T22:50:01.872160-05:00"
 }
