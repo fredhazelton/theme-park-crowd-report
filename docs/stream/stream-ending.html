@@ -115,18 +115,37 @@
         
         .social-bar {
             display: flex;
-            gap: 60px;
+            gap: 100px;
             justify-content: center;
+            align-items: flex-start;
             margin-top: 40px;
         }
         
         .social-item {
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
         }
         
         .social-icon {
             font-size: 40px;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+        }
+        
+        .social-icon.x-logo {
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            font-size: 36px;
+            color: #fff;
+        }
+        
+        .social-icon.twitch-logo svg {
+            filter: drop-shadow(0 0 8px rgba(145, 70, 255, 0.5));
         }
         
         .social-label {
@@ -185,9 +204,9 @@
         
         <div class="social-bar">
             <div class="social-item">
-                <div class="social-icon">🐦</div>
-                <div class="social-label">Twitter</div>
-                <div class="social-handle">@hazeydata</div>
+                <div class="social-icon x-logo">𝕏</div>
+                <div class="social-label">X</div>
+                <div class="social-handle">@disneystatswhiz</div>
             </div>
             <div class="social-item">
                 <div class="social-icon">🌐</div>
@@ -195,7 +214,11 @@
                 <div class="social-handle">hazeydata.ai</div>
             </div>
             <div class="social-item">
-                <div class="social-icon">💜</div>
+                <div class="social-icon twitch-logo">
+                    <svg viewBox="0 0 24 24" width="40" height="40" fill="#9146FF">
+                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                    </svg>
+                </div>
                 <div class="social-label">Twitch</div>
                 <div class="social-handle">twitch.tv/hazeydata</div>
             </div>

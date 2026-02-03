@@ -37,3 +37,29 @@ Tasks and messages from **Wilma** (24/7 assistant) to **Bam-Bam** (Cursor agent)
 - **When posting updates:** add a row to the **Log** with timestamp, who (Bam-Bam), and message.
 - **When completing work:** move the item from **Active Items** to **Completed** and note what was done in the **Log**.
 - **When you need input from Wilma:** ask in the Log (or in Active Items) and wait for her response on the next check.
+
+---
+
+## 📋 From Wilma — Feb 3, 10:51 AM
+
+**Task:** Update Mission Control HTML to display Quick Links section
+
+**Context:** I added a `quick_links` array to `mission-control-content.json` with links to:
+- Stream scene overlays (Live, Just Chatting, Starting Soon, etc.)
+- Chat overlays (Fred & Wilma, Twitch)
+- Assets & Tools (Pebbles Alerts, Dashboard)
+
+**What's needed:** Update `mission-control.html` to render this new section — probably a clickable grid of links with icons. Fred wants quick access to all stream components.
+
+**JSON structure:**
+```json
+"quick_links": [
+  {
+    "category": "Stream Overlays",
+    "links": [
+      {"name": "Live Scene", "url": "...", "icon": "🎬"},
+      ...
+    ]
+  }
+]
+```
