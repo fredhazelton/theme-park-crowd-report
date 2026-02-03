@@ -2,83 +2,88 @@
   "todays_focus": [
     {
       "status_class": "critical",
-      "status_text": "NOW",
-      "task": "DinoLand closed \u2014 Tropical Americas construction begins"
+      "status_text": "ACTIVE",
+      "task": "🎬 Stream Setup — Mac Mini ready, overlays tested!"
+    },
+    {
+      "status_class": "good",
+      "status_text": "RUNNING",
+      "task": "🔄 Pipeline — ETL processing historical data"
     },
     {
       "status_class": "medium",
-      "status_text": "WAITING",
-      "task": "Mac Mini TODAY \u2014 Final prep for streaming setup"
+      "status_text": "TOMORROW",
+      "task": "💰 Wilma Autonomy Pilot begins ($500/mo budget)"
     },
     {
       "status_class": "good",
       "status_text": "READY",
-      "task": "Review stream overlay specs with Bam-Bam"
-    },
-    {
-      "status_class": "good",
-      "status_text": "ACTIVE",
-      "task": "Pipeline running smoothly on wilma-server"
+      "task": "🎙️ Test first stream — all overlays aligned!"
     }
   ],
   "key_dates": [
     {
-      "emoji": "\ud83d\udcc5",
-      "event": "DinoLand closed \u2192 Tropical Americas begins",
-      "date": "Today",
-      "days_out": 0,
-      "urgency": "imminent"
-    },
-    {
-      "emoji": "\ud83d\udda5\ufe0f",
-      "event": "Mac Mini arrives!",
-      "date": "Today",
-      "days_out": 0,
-      "urgency": "imminent"
-    },
-    {
-      "emoji": "\ud83d\udcb0",
+      "emoji": "💰",
       "event": "Wilma Autonomy Pilot begins ($500/mo)",
       "date": "Feb 4",
       "days_out": 1,
       "urgency": "imminent"
     },
     {
-      "emoji": "\ud83d\udc64",
+      "emoji": "👤",
       "event": "John visits",
       "date": "Feb 7",
       "days_out": 4,
       "urgency": ""
     },
     {
-      "emoji": "\u26a0\ufe0f",
+      "emoji": "⚠️",
       "event": "GPT-4o retires",
       "date": "Feb 13",
       "days_out": 10,
+      "urgency": ""
+    },
+    {
+      "emoji": "🦕",
+      "event": "DinoLand closed — Day 2 of Tropical Americas construction",
+      "date": "Yesterday",
+      "days_out": -1,
       "urgency": ""
     }
   ],
   "active_projects": [
     {
       "status_class": "critical",
-      "status_text": "URGENT",
-      "title": "Twitch/YouTube Stream",
-      "description": "Mac Mini arrives **TODAY** (TODAY!)"
+      "status_text": "ACTIVE",
+      "title": "🎬 Twitch/YouTube Stream",
+      "description": "Mac Mini ✅ | Overlays ✅ | Both chats ✅ — Ready for first stream!"
     },
     {
       "status_class": "good",
-      "status_text": "IN DEV",
-      "title": "Theme Park Crowd Report",
-      "description": "Pipeline running on wilma-server, training in progress"
+      "status_text": "RUNNING",
+      "title": "📈 Theme Park Crowd Report",
+      "description": "Pipeline healthy, ETL processing S3 historical data"
     },
     {
       "status_class": "low",
       "status_text": "LIVE",
-      "title": "hazeydata.ai Website",
-      "description": "Live! Needs content updates"
+      "title": "🌐 hazeydata.ai Website",
+      "description": "Live! Blog and content updates pending"
     }
   ],
-  "theme_park_intel": [],
+  "theme_park_intel": [
+    "❄️ Water features FROZE at WDW & Universal — rare cold continues",
+    "🦕 Donald's Dino Institute patch already removed from Tusker House jacket",
+    "🎢 Fyre Drill (Epic Universe) refurb extended another week",
+    "🎬 Disney CEO successor could be named THIS WEEK",
+    "🏠 Spider-Man Tower of Terror construction begins at Hong Kong Disney"
+  ],
+  "ai_intel": [
+    "🎬 Disney + OpenAI: Sora clips with 250+ characters coming to Disney+",
+    "⚠️ X/Grok deepfake crisis — millions of images, moderation failing",
+    "🦊 Firefox: Users can now disable ALL AI features",
+    "📅 GPT-4o retires Feb 13 (only 0.1% still using)"
+  ],
   "dino_tasks": [
     {
       "id": "task-001",
@@ -86,72 +91,66 @@
       "description": "First-time load of all historical wait time data",
       "status": "in_progress",
       "status_class": "critical",
-      "status_text": "IN PROGRESS",
+      "status_text": "RUNNING",
       "priority": "high",
-      "priority_icon": "\u26a1",
+      "priority_icon": "⚡",
       "owner": "Wilma",
-      "notes": "Running on wilma-server, ~55/1160 files processed",
-      "updated": "2026-02-02T12:51:00"
+      "notes": "Pipeline watchdog active, auto-restarts if stalled",
+      "updated": "2026-02-03T04:00:00"
     },
     {
       "id": "task-002",
       "title": "Mac Mini streaming setup",
       "description": "Set up Streamlabs for Twitch + YouTube cross-platform streaming",
       "status": "in_progress",
-      "status_class": "critical",
-      "status_text": "IN PROGRESS",
+      "status_class": "good",
+      "status_text": "ALMOST DONE",
       "priority": "high",
-      "priority_icon": "\u26a1",
+      "priority_icon": "⚡",
       "owner": "Fred",
-      "notes": "Mac Mini arriving TODAY! Time to set up streaming!",
-      "updated": "2026-02-02T13:11:00"
+      "notes": "Mac Mini running! Overlays tested. Both chat services running.",
+      "updated": "2026-02-03T04:00:00"
     },
     {
-      "id": "task-003",
-      "title": "Wilma-BamBam async channel",
-      "description": "Set up communication channel between Wilma and Bam-Bam via shared markdown file",
-      "status": "done",
-      "status_class": "good",
-      "status_text": "DONE",
-      "priority": "medium",
-      "priority_icon": "\ud83d\udccb",
-      "owner": "Wilma",
-      "notes": "Completed! Using WILMA-BAMBAM.md in repo",
-      "updated": "2026-02-02T09:27:00"
-    },
-    {
-      "id": "task-004",
-      "title": "Build Dino task manager integration",
-      "description": "Connect Dino's tasks.json to Mission Control HTML",
-      "status": "done",
-      "status_class": "good",
-      "status_text": "DONE",
-      "priority": "medium",
-      "priority_icon": "\ud83d\udccb",
-      "owner": "Wilma",
-      "notes": "Dino tasks now display on Mission Control! Auto-refreshes every 60 seconds.",
-      "updated": "2026-02-02T13:09:00"
+      "id": "task-006",
+      "title": "Test first stream",
+      "description": "Private test stream with all overlays, camera, mic",
+      "status": "todo",
+      "status_class": "medium",
+      "status_text": "READY",
+      "priority": "high",
+      "priority_icon": "⚡",
+      "owner": "Fred",
+      "notes": "All components ready — just need Fred to hit Go!",
+      "updated": "2026-02-03T04:00:00"
     },
     {
       "id": "task-005",
-      "title": "Replace \"Twitter\" icons and text with \"X\" icons and text",
-      "description": "We need to be on-brand for X",
+      "title": "Replace Twitter with X branding",
+      "description": "Update icons and text from Twitter to X",
       "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
+      "status_class": "low",
+      "status_text": "LOW",
       "priority": "low",
-      "priority_icon": "\ud83d\udcdd",
+      "priority_icon": "📝",
       "owner": "Fred",
       "notes": "",
       "updated": "2026-02-02T13:14:00"
     }
   ],
   "dino_summary": {
-    "total": 5,
-    "todo": 1,
+    "total": 4,
+    "todo": 2,
     "in_progress": 2,
     "blocked": 0,
-    "done": 2
+    "done": 0
   },
-  "last_updated": "2026-02-03T00:50:01.248884-05:00"
+  "services_status": {
+    "pipeline": "✅ Running",
+    "chat_server": "✅ Running (3h+)",
+    "twitch_chat": "✅ Running (1h+)",
+    "watchdog": "✅ Healthy"
+  },
+  "last_updated": "2026-02-03T04:00:00-05:00",
+  "overnight_surprise": true
 }
