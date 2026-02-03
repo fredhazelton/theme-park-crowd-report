@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HazeyData Stream Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --navy: #0a1628;
+            --navy-light: rgba(10, 22, 40, 0.95);
+            --navy-card: rgba(15, 30, 50, 0.9);
+            --cyan: #4a90a4;
+            --cyan-dim: rgba(74, 144, 164, 0.4);
+            --text-primary: #e9f4ff;
+            --text-secondary: rgba(233, 244, 255, 0.6);
+            --red: #A60038;
+            --green: #5ab4cc;
+            --orange: #5ab4cc;
+            --purple: #4a90a4;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a1628;
+            color: var(--text-primary);
+            width: 1540px;
+            height: 890px;
+            overflow: hidden;
+            padding: 10px;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 12px;
+            height: 100%;
+        }
+        
+        /* Sidebar - Filters */
+        .sidebar {
+            background: var(--navy-card);
+            border: 1px solid var(--cyan-dim);
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .filter-section { display: flex; flex-direction: column; gap: 4px; }
+        .filter-label { 
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px; 
+            color: var(--cyan); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .filter-select {
+            background: rgba(74, 144, 164, 0.1);
+            border: 1px solid var(--cyan-dim);
+            color: var(--text-primary);
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .filter-select:focus { outline: none; border-color: var(--cyan); }
+        
+        .date-presets { display: flex; gap: 4px; }
+        .date-preset {
+            flex: 1;
+            padding: 4px;
+            background: rgba(74, 144, 164, 0.1);
+            border: 1px solid var(--cyan-dim);
+            color: var(--text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .date-preset.active {
+            background: var(--cyan);
+            color: var(--navy);
+            border-color: var(--cyan);
+        }
+        
+        .filter-divider {
+            height: 1px;
+            background: var(--cyan-dim);
+            margin: 4px 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* KPI Row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        .kpi-card {
+            background: var(--navy-card);
+            border: 1px solid var(--cyan-dim);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        .kpi-label { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-value { font-size: 24px; font-weight: 700; color: var(--cyan); margin: 4px 0; }
+        .kpi-value.red { color: var(--red); }
+        .kpi-value.green { color: var(--green); }
+        .kpi-value.orange { color: var(--orange); }
+        .kpi-value.purple { color: var(--purple); }
+        .kpi-subtext { font-size: 9px; color: var(--text-secondary); }
+        
+        /* Charts */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+            flex: 1;
+        }
+        .charts-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            flex: 1;
+        }
+        .chart-panel {
+            background: var(--navy-card);
+            border: 1px solid var(--cyan-dim);
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-header { margin-bottom: 8px; }
+        .chart-title { 
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px; 
+            color: var(--cyan); 
+        }
+        .chart-subtitle { font-size: 9px; color: var(--text-secondary); }
+        .chart-container { flex: 1; position: relative; min-height: 150px; }
+        
+        /* Top Waits List */
+        .top-list { flex: 1; overflow-y: auto; }
+        .top-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(74,144,164,0.1);
+            font-size: 10px;
+        }
+        .top-item .rank { color: var(--cyan); width: 20px; }
+        .top-item .name { flex: 1; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .top-item .wait { color: var(--orange); font-weight: 600; }
+        
+        .loading { color: var(--text-secondary); font-size: 11px; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="filter-section">
+                <label class="filter-label">Park</label>
+                <select class="filter-select" id="park-filter">
+                    <option value="all">All WDW Parks</option>
+                    <option value="mk" selected>Magic Kingdom</option>
+                    <option value="ep">EPCOT</option>
+                    <option value="hs">Hollywood Studios</option>
+                    <option value="ak">Animal Kingdom</option>
+                </select>
+            </div>
+            
+            <div class="filter-section">
+                <label class="filter-label">Attraction</label>
+                <select class="filter-select" id="attraction-filter">
+                    <option value="all">All Attractions</option>
+                </select>
+            </div>
+            
+            <div class="filter-divider"></div>
+            
+            <div class="filter-section">
+                <label class="filter-label">Date Range</label>
+                <div class="date-presets">
+                    <button class="date-preset" data-range="7">7D</button>
+                    <button class="date-preset active" data-range="30">30D</button>
+                    <button class="date-preset" data-range="90">90D</button>
+                    <button class="date-preset" data-range="365">1Y</button>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <label class="filter-label">Wait Type</label>
+                <select class="filter-select" id="wait-type-filter">
+                    <option value="posted">Posted Wait</option>
+                    <option value="actual">Actual Wait</option>
+                </select>
+            </div>
+            
+            <div class="filter-divider"></div>
+            
+            <div class="filter-section">
+                <label class="filter-label">Data</label>
+                <div id="data-info" style="font-size: 9px; color: var(--text-secondary);">Loading...</div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg Wait</div>
+                    <div class="kpi-value" id="kpi-avg">--</div>
+                    <div class="kpi-subtext">minutes</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Peak</div>
+                    <div class="kpi-value red" id="kpi-max">--</div>
+                    <div class="kpi-subtext">max posted</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Min</div>
+                    <div class="kpi-value green" id="kpi-min">--</div>
+                    <div class="kpi-subtext">min posted</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Data Points</div>
+                    <div class="kpi-value orange" id="kpi-readings">--</div>
+                    <div class="kpi-subtext">readings</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Days</div>
+                    <div class="kpi-value purple" id="kpi-days">--</div>
+                    <div class="kpi-subtext">in range</div>
+                </div>
+            </div>
+            
+            <div class="charts-row">
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <div class="chart-title">Wait Times Over Time</div>
+                        <div class="chart-subtitle" id="chart1-subtitle">Daily averages</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="timeSeriesChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <div class="chart-title">Top 10 Longest Waits</div>
+                        <div class="chart-subtitle">Average posted wait</div>
+                    </div>
+                    <div class="top-list" id="top-waits-list">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="charts-row-2">
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <div class="chart-title">Wait by Park</div>
+                        <div class="chart-subtitle">Average wait times</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="parkCompareChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <div class="chart-title">Day of Week</div>
+                        <div class="chart-subtitle">Weekly pattern</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weekdayChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Data and charts will load from stream-data.json
+        let dashboardData = null;
+        let charts = {};
+        
+        async function loadData() {
+            try {
+                const response = await fetch('./stream-data.json');
+                dashboardData = await response.json();
+                document.getElementById('data-info').innerHTML = 
+                    'Generated: ' + new Date(dashboardData.generated).toLocaleDateString() + '<br>' +
+                    'Files: ' + dashboardData.files.toLocaleString() + '<br>' +
+                    'Range: ' + dashboardData.date_range;
+                populateAttractions();
+                updateDashboard();
+            } catch (e) {
+                document.getElementById('data-info').textContent = 'Error loading data';
+                console.error(e);
+            }
+        }
+        
+        function populateAttractions() {
+            const select = document.getElementById('attraction-filter');
+            const park = document.getElementById('park-filter').value;
+            select.innerHTML = '<option value="all">All Attractions</option>';
+            
+            let attractions = new Set();
+            Object.keys(dashboardData.by_attraction).forEach(name => {
+                const attr = dashboardData.by_attraction[name];
+                if (park === 'all' || attr.park_code === park) {
+                    attractions.add(name);
+                }
+            });
+            
+            Array.from(attractions).sort().forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                select.appendChild(opt);
+            });
+        }
+        
+        function updateDashboard() {
+            const park = document.getElementById('park-filter').value;
+            const attraction = document.getElementById('attraction-filter').value;
+            
+            // Filter data
+            let filtered = [];
+            if (attraction !== 'all') {
+                const attr = dashboardData.by_attraction[attraction];
+                if (attr) filtered = attr.daily_avg || [];
+            } else if (park !== 'all') {
+                const parkData = dashboardData.by_park[park];
+                if (parkData) filtered = parkData.daily_avg || [];
+            } else {
+                filtered = dashboardData.overall?.daily_avg || [];
+            }
+            
+            // Update KPIs
+            if (filtered.length > 0) {
+                const waits = filtered.map(d => d.avg_wait).filter(w => w > 0);
+                const avg = waits.reduce((a,b) => a+b, 0) / waits.length;
+                document.getElementById('kpi-avg').textContent = Math.round(avg);
+                document.getElementById('kpi-max').textContent = Math.round(Math.max(...waits));
+                document.getElementById('kpi-min').textContent = Math.round(Math.min(...waits));
+                document.getElementById('kpi-readings').textContent = waits.length.toLocaleString();
+                document.getElementById('kpi-days').textContent = filtered.length;
+            }
+            
+            // Update time series chart
+            updateTimeSeriesChart(filtered);
+            updateTopWaitsList(park);
+            updateParkCompareChart();
+            updateWeekdayChart(park);
+        }
+        
+        function updateTimeSeriesChart(data) {
+            const ctx = document.getElementById('timeSeriesChart').getContext('2d');
+            if (charts.timeSeries) charts.timeSeries.destroy();
+            
+            charts.timeSeries = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.date),
+                    datasets: [{
+                        label: 'Avg Wait',
+                        data: data.map(d => d.avg_wait),
+                        borderColor: '#4a90a4',
+                        backgroundColor: 'rgba(74, 144, 164, 0.3)',
+                        fill: 'origin',
+                        tension: 0.3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: true, grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } },
+                        y: { display: true, grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } }
+                    }
+                }
+            });
+        }
+        
+        function updateTopWaitsList(park) {
+            const list = document.getElementById('top-waits-list');
+            let items = Object.entries(dashboardData.by_attraction)
+                .filter(([name, data]) => park === 'all' || data.park_code === park)
+                .map(([name, data]) => ({ name, avg: data.avg_wait || 0 }))
+                .sort((a, b) => b.avg - a.avg)
+                .slice(0, 10);
+            
+            list.innerHTML = items.map((item, i) => 
+                '<div class="top-item"><span class="rank">' + (i+1) + '</span><span class="name">' + item.name + '</span><span class="wait">' + Math.round(item.avg) + 'm</span></div>'
+            ).join('');
+        }
+        
+        function updateParkCompareChart() {
+            const ctx = document.getElementById('parkCompareChart').getContext('2d');
+            if (charts.parkCompare) charts.parkCompare.destroy();
+            
+            const parks = ['mk', 'ep', 'hs', 'ak'];
+            const labels = ['Magic Kingdom', 'EPCOT', 'Hollywood Studios', 'Animal Kingdom'];
+            const data = parks.map(p => dashboardData.by_park[p]?.avg_wait || 0);
+            
+            charts.parkCompare = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: data, backgroundColor: ['#4a90a4', '#5ab4cc', '#3d7a8a', '#6bc5d9'] }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#6a7a8a', font: { size: 8 } } },
+                        y: { grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } }
+                    }
+                }
+            });
+        }
+        
+        function updateWeekdayChart(park) {
+            const ctx = document.getElementById('weekdayChart').getContext('2d');
+            if (charts.weekday) charts.weekday.destroy();
+            
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let weekdayData = dashboardData.overall?.by_weekday || Array(7).fill(0);
+            
+            charts.weekday = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dayNames,
+                    datasets: [{ data: weekdayData, backgroundColor: '#4a90a4' }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#6a7a8a', font: { size: 9 } } },
+                        y: { grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } }
+                    }
+                }
+            });
+        }
+        
+        // Event listeners
+        document.getElementById('park-filter').addEventListener('change', () => { populateAttractions(); updateDashboard(); });
+        document.getElementById('attraction-filter').addEventListener('change', updateDashboard);
+        document.querySelectorAll('.date-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateDashboard();
+            });
+        });
+        
+        // Load on start
+        loadData();
+    </script>
+</body>
+</html>
