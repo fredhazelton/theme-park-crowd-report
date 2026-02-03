@@ -1,6 +1,6 @@
 {
-  "current_step": "FORECAST",
-  "etl_progress": "1160/1160 (100%) [2026-02-02]",
+  "current_step": "ETL",
+  "etl_progress": "Processing...",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "09:12:35",
+    "last_fetch": "09:17:38",
     "samples": [
       {
         "name": "Tron",
@@ -17,7 +17,7 @@
       },
       {
         "name": "MK11527",
-        "wait": "35"
+        "wait": "45"
       },
       {
         "name": "Its a Small World",
@@ -28,14 +28,14 @@
         "wait": "5"
       },
       {
-        "name": "Peter Pan",
-        "wait": "5"
+        "name": "Jungle Cruise",
+        "wait": "10"
       },
       {
-        "name": "Pirates",
-        "wait": "15"
+        "name": "Peter Pan",
+        "wait": "5"
       }
     ]
   },
-  "last_updated": "2026-02-03T09:15:02.027005-05:00"
+  "last_updated": "2026-02-03T09:20:01.270966-05:00"
 }
