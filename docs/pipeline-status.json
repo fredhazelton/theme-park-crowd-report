@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "17:03:25",
+    "last_fetch": "17:08:29",
     "samples": [
       {
         "name": "Tron",
@@ -17,7 +17,7 @@
       },
       {
         "name": "Speedway",
-        "wait": "20"
+        "wait": "25"
       },
       {
         "name": "Its a Small World",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-03T17:05:01.314842-05:00"
+  "last_updated": "2026-02-03T17:10:01.225105-05:00"
 }
