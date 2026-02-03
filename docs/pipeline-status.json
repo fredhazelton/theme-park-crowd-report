@@ -9,15 +9,23 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "14:01:13",
+    "last_fetch": "14:06:17",
     "samples": [
       {
         "name": "Speedway",
         "wait": "15"
       },
       {
+        "name": "Space Mountain",
+        "wait": "50"
+      },
+      {
         "name": "Tiana's",
         "wait": "10"
+      },
+      {
+        "name": "MK127",
+        "wait": "45"
       },
       {
         "name": "MK136",
@@ -25,17 +33,9 @@
       },
       {
         "name": "MK6699",
-        "wait": "40"
-      },
-      {
-        "name": "Tron",
-        "wait": "5"
-      },
-      {
-        "name": "MK11527",
-        "wait": "70"
+        "wait": "45"
       }
     ]
   },
-  "last_updated": "2026-02-03T14:05:01.753559-05:00"
+  "last_updated": "2026-02-03T14:10:01.608541-05:00"
 }
