@@ -174,25 +174,43 @@
             position: absolute;
         }
         
-        /* Animated border wrapper */
+        /* Animated border wrapper - EDGE ONLY glow */
         .camera-border-glow {
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
             border-radius: 6px;
+            background: transparent;
+            z-index: -1;
+        }
+        
+        /* Traveling light on edges only */
+        .camera-border-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 6px;
+            padding: 2px;
             background: linear-gradient(
                 90deg,
-                rgba(74, 144, 164, 0.02) 0%,
-                rgba(74, 144, 164, 0.06) 25%,
-                rgba(107, 181, 201, 0.10) 50%,
-                rgba(74, 144, 164, 0.06) 75%,
-                rgba(74, 144, 164, 0.02) 100%
+                rgba(74, 144, 164, 0.1) 0%,
+                rgba(74, 144, 164, 0.6) 25%,
+                rgba(107, 181, 201, 0.8) 50%,
+                rgba(74, 144, 164, 0.6) 75%,
+                rgba(74, 144, 164, 0.1) 100%
             );
             background-size: 400% 100%;
             animation: travelingLight 8s linear infinite;
-            z-index: -1;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
         }
         
         .camera-inner {
