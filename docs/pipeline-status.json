@@ -1,6 +1,6 @@
 {
   "current_step": "ETL",
-  "etl_progress": "No log",
+  "etl_progress": "582/1160 (50%) [service]",
   "steps": {
     "etl": "pending",
     "dimensions": "pending",
@@ -12,5 +12,5 @@
     "last_fetch": "--",
     "samples": []
   },
-  "last_updated": "2026-02-03T02:40:01.694841-05:00"
+  "last_updated": "2026-02-03T02:40:36.512350-05:00"
 }
