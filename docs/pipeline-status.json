@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "14:11:20",
+    "last_fetch": "14:16:29",
     "samples": [
       {
         "name": "Tron",
@@ -24,18 +24,18 @@
         "wait": "15"
       },
       {
-        "name": "7 Dwarfs",
-        "wait": "15"
+        "name": "Its a Small World",
+        "wait": "10"
       },
       {
-        "name": "Space Mountain",
-        "wait": "50"
+        "name": "Haunted Mansion",
+        "wait": "45"
       },
       {
-        "name": "Tiana's",
+        "name": "Jungle Cruise",
         "wait": "10"
       }
     ]
   },
-  "last_updated": "2026-02-03T14:15:01.865953-05:00"
+  "last_updated": "2026-02-03T14:20:01.748014-05:00"
 }
