@@ -1,16 +1,16 @@
 {
-  "current_step": "AGGREGATES",
+  "current_step": "TRAINING",
   "etl_progress": "1160/1160 (100%) [2026-02-02]",
   "steps": {
     "etl": "done",
     "dimensions": "done",
-    "aggregates": "pending",
-    "report": "pending"
+    "aggregates": "done",
+    "report": "done"
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "06:50:53",
+    "last_fetch": "06:55:57",
     "samples": []
   },
-  "last_updated": "2026-02-03T06:55:01.743739-05:00"
+  "last_updated": "2026-02-03T07:00:01.770938-05:00"
 }
