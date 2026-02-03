@@ -2,124 +2,40 @@
   "typing": false,
   "messages": [
     {
-      "id": "fred_20260202_234443_389262",
+      "id": "fred_1",
       "sender": "Fred",
-      "text": "You are off by quite a bit - let me grab a screenshot",
-      "timestamp": "2026-02-02T23:44:43.389299"
+      "text": "Testing the overlay alignment!",
+      "timestamp": "2026-02-03T00:40:49.289206"
     },
     {
-      "id": "wilma_20260202_234443_562333",
+      "id": "wilma_1",
       "sender": "Wilma",
-      "text": "Send it over - I'll recalculate! \ud83d\udcd0",
-      "timestamp": "2026-02-02T23:44:43.562361"
+      "text": "Looking good! Chat feed is LIVE \ud83e\uddb4",
+      "timestamp": "2026-02-03T00:40:49.289206"
     },
     {
-      "id": "fred_20260202_234505_839095",
+      "id": "fred_2",
       "sender": "Fred",
-      "text": "\ud83d\udcf8",
-      "timestamp": "2026-02-02T23:45:05.839115"
+      "text": "Can you see the bottom border now?",
+      "timestamp": "2026-02-03T00:40:49.289206"
     },
     {
-      "id": "fred_20260202_234730_389084",
-      "sender": "Fred",
-      "text": "Still way off - I'll try manually",
-      "timestamp": "2026-02-02T23:47:30.389108"
-    },
-    {
-      "id": "fred_20260202_234952_229332",
-      "sender": "Fred",
-      "text": "The real issue is the two chat boxes are not the same size - can you make them match?",
-      "timestamp": "2026-02-02T23:49:52.229372"
-    },
-    {
-      "id": "wilma_20260202_235004_861746",
+      "id": "wilma_2",
       "sender": "Wilma",
-      "text": "Done! F&W chat is now 320\u00d7556 - matches chat_feed exactly!",
-      "timestamp": "2026-02-02T23:50:04.861776"
+      "text": "Made it 2px thick and brighter! \u2728",
+      "timestamp": "2026-02-03T00:40:49.289206"
     },
     {
-      "id": "fred_20260202_235217_223889",
-      "sender": "Fred",
-      "text": "That cannot be right",
-      "timestamp": "2026-02-02T23:52:17.223923"
-    },
-    {
-      "id": "wilma_20260202_235230_852360",
-      "sender": "Wilma",
-      "text": "Fixed! Changed from 100vh to explicit 556px. Refresh again!",
-      "timestamp": "2026-02-02T23:52:30.852397"
-    },
-    {
-      "id": "fred_20260202_235319_015160",
-      "sender": "Fred",
-      "text": "We need to dig into Pebbles specs and find the exact size and position of the overlay components",
-      "timestamp": "2026-02-02T23:53:19.015187"
-    },
-    {
-      "id": "wilma_20260202_235325_771154",
-      "sender": "Wilma",
-      "text": "Found Pebbles' spec! Chat was originally 320\u00d7300 at top:300, right:20",
-      "timestamp": "2026-02-02T23:53:25.771173"
-    },
-    {
-      "id": "fred_20260202_235453_163310",
-      "sender": "Fred",
-      "text": "Update F&W to match current",
-      "timestamp": "2026-02-02T23:54:53.163347"
-    },
-    {
-      "id": "wilma_20260202_235514_264336",
-      "sender": "Wilma",
-      "text": "F&W chat HTML is 320\u00d7556. Streamlabs source should match!",
-      "timestamp": "2026-02-02T23:55:14.264376"
-    },
-    {
-      "id": "fred_20260202_235750_575668",
-      "sender": "Fred",
-      "text": "Arg! Spacing is messed up again!",
-      "timestamp": "2026-02-02T23:57:50.575689"
-    },
-    {
-      "id": "wilma_20260202_235820_291696",
-      "sender": "Wilma",
-      "text": "Try refreshing the MAIN OVERLAY source too - might be cached!",
-      "timestamp": "2026-02-02T23:58:20.291717"
-    },
-    {
-      "id": "fred_20260203_000048_939737",
-      "sender": "Fred",
-      "text": "Please recalculate specs for 4 padded boxes on right side with even spacing",
-      "timestamp": "2026-02-03T00:00:48.939763"
-    },
-    {
-      "id": "wilma_20260203_000054_027573",
-      "sender": "Wilma",
-      "text": "Calculating fresh layout with 15px gaps...",
-      "timestamp": "2026-02-03T00:00:54.027598"
-    },
-    {
-      "id": "wilma_20260203_002346_102375",
-      "sender": "Wilma",
-      "text": "\ud83e\udd1e Testing the feed... can you see this?",
-      "timestamp": "2026-02-03T00:23:46.102375"
-    },
-    {
-      "id": "fred_20260203_003246_1",
+      "id": "fred_20260203_004240",
       "sender": "Fred",
       "text": "Testing one two three!",
-      "timestamp": "2026-02-03T00:32:46.919737"
+      "timestamp": "2026-02-03T00:42:40.268325"
     },
     {
-      "id": "wilma_20260203_003246_2",
+      "id": "wilma_20260203_004240",
       "sender": "Wilma",
-      "text": "\ud83c\udfa4 Mic check! Can you see this in the overlay?",
-      "timestamp": "2026-02-03T00:32:46.919737"
-    },
-    {
-      "id": "wilma_20260203_003349",
-      "sender": "Wilma",
-      "text": "\ud83c\udf89 WE DID IT! Looking SHARP! \ud83e\uddb4\u2728",
-      "timestamp": "2026-02-03T00:33:49.770094"
+      "text": "\ud83c\udfa4 Reading you loud and clear! Is the border showing now?",
+      "timestamp": "2026-02-03T00:42:40.268325"
     }
   ]
 }
