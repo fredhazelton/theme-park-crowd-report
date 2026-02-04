@@ -145,8 +145,8 @@
       "links": [
         {
           "icon": "🎧",
-          "name": "EPCOT Tomorrow Loop",
-          "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/audio/epcot-tomorrow-loop.mp3"
+          "name": "Stream Background Music",
+          "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/audio/stream-background-music.mp3"
         }
       ]
     },
@@ -177,9 +177,14 @@
           "icon": "💻",
           "name": "GitHub Repo",
           "url": "https://github.com/hazeydata/theme-park-crowd-report"
+        },
+        {
+          "icon": "⏰",
+          "name": "CronMagic",
+          "url": "https://hazeydata.github.io/theme-park-crowd-report/cronmagic/"
         }
       ]
     }
   ],
-  "last_updated": "2026-02-04T18:10:00.000000-05:00"
+  "last_updated": "2026-02-04T18:18:00.000000-05:00"
 }
