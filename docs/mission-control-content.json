@@ -139,5 +139,47 @@
     "blocked": 0,
     "done": 0
   },
-  "last_updated": "2026-02-04T10:20:01.306991-05:00"
+  "quick_links": [
+    {
+      "category": "🎵 Stream Audio",
+      "links": [
+        {
+          "icon": "🎧",
+          "name": "EPCOT Tomorrow Loop",
+          "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/audio/epcot-tomorrow-loop.mp3"
+        }
+      ]
+    },
+    {
+      "category": "📊 Dashboards",
+      "links": [
+        {
+          "icon": "📈",
+          "name": "Stream Dashboard",
+          "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/main-dashboard.html"
+        },
+        {
+          "icon": "🎬",
+          "name": "Stream Overlays",
+          "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/index.html"
+        }
+      ]
+    },
+    {
+      "category": "🔧 Tools",
+      "links": [
+        {
+          "icon": "🌐",
+          "name": "hazeydata.ai",
+          "url": "https://hazeydata.ai"
+        },
+        {
+          "icon": "💻",
+          "name": "GitHub Repo",
+          "url": "https://github.com/hazeydata/theme-park-crowd-report"
+        }
+      ]
+    }
+  ],
+  "last_updated": "2026-02-04T18:10:00.000000-05:00"
 }
