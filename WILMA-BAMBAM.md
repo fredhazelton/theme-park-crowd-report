@@ -176,3 +176,51 @@ Rinse and repeat until happy with the design!
 - **Stream:** Wilma deploys to wilma-server (production)
 
 ---
+
+---
+
+## 🔤 Entity Code → Name Mapping
+
+### The Data Structure
+File: `/hazeydata/pipeline/dimension_tables/dimentity.csv`
+
+| Column | Example | Description |
+|--------|---------|-------------|
+| `code` | MK136 | Entity code (used in API) |
+| `name` | Space Mountain | Full attraction name |
+| `short_name` | Space Mtn | Abbreviated name |
+
+### Quick Lookup (JavaScript)
+
+```javascript
+// Fetch entity metadata once at startup
+let entityMap = {};
+
+async function loadEntityMap(parkCode) {
+    const res = await fetch(`http://wilma-server:8051/api/entities/${parkCode}`);
+    const data = await res.json();
+    data.entities.forEach(e => {
+        entityMap[e.entity_code] = e.entity_name;
+    });
+}
+
+// Then use it anywhere:
+const displayName = entityMap['MK136'] || 'Unknown';
+```
+
+### Direct CSV Access (if API isn't returning names)
+The dimension table is at:
+```
+http://wilma-server:8051/api/entities/{park}
+```
+
+**Note:** If the API shows codes instead of names, that's a known issue (Wilma has it on the fix list). 
+
+**Workaround:** The `dimentity.csv` file has the mapping. Columns:
+- `code` → entity code
+- `name` → full name
+- `short_name` → abbreviated
+
+Bam-Bam can fetch this CSV directly or Wilma can fix the API endpoint to return proper names.
+
+---
