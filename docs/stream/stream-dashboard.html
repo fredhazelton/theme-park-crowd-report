@@ -29,7 +29,8 @@
             color: var(--text-primary);
             width: 1540px;
             height: 890px;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             padding: 10px;
         }
         
@@ -38,6 +39,8 @@
             grid-template-columns: 180px 1fr;
             gap: 12px;
             height: 100%;
+            position: relative;
+            overflow: visible;
         }
         
         /* Sidebar - Filters */
@@ -49,6 +52,9 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            overflow: visible;
+            position: relative;
+            z-index: 10;
         }
         
         .filter-section { display: flex; flex-direction: column; gap: 4px; }
@@ -67,8 +73,16 @@
             border-radius: 4px;
             font-size: 11px;
             cursor: pointer;
+            position: relative;
+            z-index: 20;
         }
         .filter-select:focus { outline: none; border-color: var(--cyan); }
+        
+        /* Ensure select dropdowns can overflow */
+        .filter-section {
+            position: relative;
+            z-index: 15;
+        }
         
         .date-presets { display: flex; gap: 4px; flex-wrap: wrap; }
         .date-preset {
@@ -232,11 +246,7 @@
                 <label class="filter-label">Property</label>
                 <select class="filter-select" id="property-filter">
                     <option value="all">All Properties</option>
-                    <option value="wdw" selected>Disney World</option>
-                    <option value="dlr">Disneyland Resort</option>
-                    <option value="uor">Universal Orlando</option>
-                    <option value="ush">Universal Hollywood</option>
-                    <option value="tdr">Tokyo Disneyland Resort</option>
+                    <!-- Populated from API -->
                 </select>
             </div>
             
@@ -244,10 +254,7 @@
                 <label class="filter-label">Park</label>
                 <select class="filter-select" id="park-filter">
                     <option value="all">All Parks</option>
-                    <option value="mk" selected>Magic Kingdom</option>
-                    <option value="ep">EPCOT</option>
-                    <option value="hs">Hollywood Studios</option>
-                    <option value="ak">Animal Kingdom</option>
+                    <!-- Populated from API -->
                 </select>
             </div>
             
@@ -375,6 +382,12 @@
         // API configuration
         const API_BASE = 'http://wilma-server:8051/api';
         
+        // Log API base for debugging
+        console.log('API Base URL:', API_BASE);
+        
+        // Log API base for debugging
+        console.log('API Base URL:', API_BASE);
+        
         let dashboardData = null;
         let charts = {};
         
@@ -443,26 +456,48 @@
             
             try {
                 // Use the park code directly - API will map it to pipeline codes internally
-                const response = await fetch(`${API_BASE}/entities/${park}`);
+                const url = `${API_BASE}/entities/${park}`;
+                console.log('Fetching attractions from:', url);
+                const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error('Failed to fetch entities');
+                    throw new Error(`Failed to fetch entities: ${response.status} ${response.statusText}`);
                 }
                 
                 const result = await response.json();
+                console.log('Entities API response:', result);
                 const entities = result.entities || [];
                 
+                if (entities.length === 0) {
+                    console.warn('No entities returned from API for park:', park);
+                    throw new Error('No entities in response');
+                }
+                
+                // Debug: Log first few entities to see what we're getting
+                console.log('First 3 entities from API:', entities.slice(0, 3));
+                
                 // Populate dropdown with entities from entity table
+                // Always use entity_name for display (full name), entity_code for value
                 entities.forEach(entity => {
                     const opt = document.createElement('option');
-                    opt.value = entity.entity_name || entity.entity_code;
-                    opt.textContent = entity.entity_name || entity.entity_code;
+                    // Use entity_name for display, entity_code as the value
+                    const displayName = entity.entity_name || entity.name || entity.entity_code;
+                    opt.value = entity.entity_code; // Store code as value for filtering
+                    opt.textContent = displayName; // Display full name
                     opt.dataset.entityCode = entity.entity_code; // Store entity_code for filtering
                     select.appendChild(opt);
+                    
+                    // Log if we're falling back to code
+                    if (!entity.entity_name && !entity.name) {
+                        console.warn(`Entity ${entity.entity_code} has no name field, using code as display`);
+                    }
                 });
+                
+                console.log(`Populated ${entities.length} attractions for park ${park}`);
             } catch (e) {
                 console.error('Error loading attractions:', e);
                 // Fallback: try to use wait_times data if available
                 if (dashboardData && dashboardData.wait_times) {
+                    console.log('Using fallback: wait_times data');
                     const attractions = new Set();
                     dashboardData.wait_times.forEach(w => {
                         if (w.entity_name) {
@@ -476,6 +511,8 @@
                         opt.textContent = name;
                         select.appendChild(opt);
                     });
+                } else {
+                    console.warn('No fallback data available for attractions');
                 }
             }
         }
@@ -603,67 +640,149 @@
             });
         }
         
-        // Property to Parks mapping
-        const PROPERTY_PARKS = {
-            'wdw': [
-                { code: 'mk', name: 'Magic Kingdom' },
-                { code: 'ep', name: 'EPCOT' },
-                { code: 'hs', name: 'Hollywood Studios' },
-                { code: 'ak', name: 'Animal Kingdom' }
-            ],
-            'dlr': [
-                { code: 'dl', name: 'Disneyland' },
-                { code: 'ca', name: 'California Adventure' }
-            ],
-            'uor': [
-                { code: 'ioa', name: 'Islands of Adventure' },
-                { code: 'usf', name: 'Universal Studios Florida' },
-                { code: 'eu', name: 'Epic Universe' }
-            ],
-            'ush': [
-                { code: 'ush', name: 'Universal Studios Hollywood' }
-            ],
-            'tdr': [
-                { code: 'tdl', name: 'Tokyo Disneyland' },
-                { code: 'tds', name: 'Tokyo DisneySea' }
-            ]
-        };
+        async function loadProperties() {
+            const select = document.getElementById('property-filter');
+            const currentProperty = select.value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/properties`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch properties');
+                }
+                
+                const result = await response.json();
+                const properties = result.properties || [];
+                
+                // Clear and repopulate
+                select.innerHTML = '<option value="all">All Properties</option>';
+                properties.forEach(prop => {
+                    const opt = document.createElement('option');
+                    opt.value = prop.code;
+                    opt.textContent = prop.name;
+                    select.appendChild(opt);
+                });
+                
+                // Restore selection if still valid
+                if (currentProperty && Array.from(select.options).some(opt => opt.value === currentProperty)) {
+                    select.value = currentProperty;
+                } else if (properties.length > 0) {
+                    select.selectedIndex = 1; // Select first property
+                }
+            } catch (e) {
+                console.error('Error loading properties:', e);
+                // Fallback to hardcoded list
+                const fallbackProperties = [
+                    { code: 'wdw', name: 'Disney World' },
+                    { code: 'dlr', name: 'Disneyland Resort' },
+                    { code: 'uor', name: 'Universal Orlando' },
+                    { code: 'ush', name: 'Universal Hollywood' },
+                    { code: 'tdr', name: 'Tokyo Disneyland Resort' }
+                ];
+                select.innerHTML = '<option value="all">All Properties</option>';
+                fallbackProperties.forEach(prop => {
+                    const opt = document.createElement('option');
+                    opt.value = prop.code;
+                    opt.textContent = prop.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
         
-        function updateParkFilter() {
+        async function updateParkFilter() {
             const property = document.getElementById('property-filter').value;
             const parkSelect = document.getElementById('park-filter');
             const currentPark = parkSelect.value;
             
             parkSelect.innerHTML = '<option value="all">All Parks</option>';
             
-            if (property === 'all') {
-                // Show all parks from all properties
-                Object.values(PROPERTY_PARKS).flat().forEach(park => {
-                    const opt = document.createElement('option');
-                    opt.value = park.code;
-                    opt.textContent = park.name;
-                    parkSelect.appendChild(opt);
-                });
-            } else {
-                // Show parks for selected property only
-                PROPERTY_PARKS[property]?.forEach(park => {
-                    const opt = document.createElement('option');
-                    opt.value = park.code;
-                    opt.textContent = park.name;
-                    parkSelect.appendChild(opt);
-                });
-            }
-            
-            // If current park is not in the filtered list, reset to first park or "all"
-            if (currentPark && Array.from(parkSelect.options).some(opt => opt.value === currentPark)) {
-                parkSelect.value = currentPark;
-            } else {
-                // Reset to first available option (either "all" or first park)
-                if (parkSelect.options.length > 1) {
-                    parkSelect.selectedIndex = 1; // Select first park
-                } else {
-                    parkSelect.value = 'all';
+            try {
+                // Fetch parks from API, optionally filtered by property
+                const url = property === 'all' 
+                    ? `${API_BASE}/parks`
+                    : `${API_BASE}/parks?property=${property}`;
+                
+                console.log('Fetching parks from:', url);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch parks: ${response.status} ${response.statusText}`);
                 }
+                
+                const result = await response.json();
+                console.log('Parks API response:', result);
+                const parks = result.parks || [];
+                
+                if (parks.length === 0) {
+                    console.warn('No parks returned from API, using fallback');
+                    throw new Error('No parks in response');
+                }
+                
+                parks.forEach(park => {
+                    const opt = document.createElement('option');
+                    opt.value = park.code;
+                    opt.textContent = park.name;
+                    parkSelect.appendChild(opt);
+                });
+                
+                // If current park is not in the filtered list, reset to first park or "all"
+                if (currentPark && Array.from(parkSelect.options).some(opt => opt.value === currentPark)) {
+                    parkSelect.value = currentPark;
+                } else {
+                    // Reset to first available option (either "all" or first park)
+                    if (parkSelect.options.length > 1) {
+                        parkSelect.selectedIndex = 1; // Select first park
+                    } else {
+                        parkSelect.value = 'all';
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading parks:', e);
+                // Fallback to hardcoded parks based on property
+                const fallbackParks = {
+                    'all': [
+                        { code: 'mk', name: 'Magic Kingdom' },
+                        { code: 'ep', name: 'EPCOT' },
+                        { code: 'hs', name: 'Hollywood Studios' },
+                        { code: 'ak', name: 'Animal Kingdom' },
+                        { code: 'dl', name: 'Disneyland' },
+                        { code: 'ca', name: 'California Adventure' },
+                        { code: 'ioa', name: 'Islands of Adventure' },
+                        { code: 'usf', name: 'Universal Studios Florida' },
+                        { code: 'eu', name: 'Epic Universe' },
+                        { code: 'ush', name: 'Universal Studios Hollywood' },
+                        { code: 'tdl', name: 'Tokyo Disneyland' },
+                        { code: 'tds', name: 'Tokyo DisneySea' }
+                    ],
+                    'wdw': [
+                        { code: 'mk', name: 'Magic Kingdom' },
+                        { code: 'ep', name: 'EPCOT' },
+                        { code: 'hs', name: 'Hollywood Studios' },
+                        { code: 'ak', name: 'Animal Kingdom' }
+                    ],
+                    'dlr': [
+                        { code: 'dl', name: 'Disneyland' },
+                        { code: 'ca', name: 'California Adventure' }
+                    ],
+                    'uor': [
+                        { code: 'ioa', name: 'Islands of Adventure' },
+                        { code: 'usf', name: 'Universal Studios Florida' },
+                        { code: 'eu', name: 'Epic Universe' }
+                    ],
+                    'ush': [
+                        { code: 'ush', name: 'Universal Studios Hollywood' }
+                    ],
+                    'tdr': [
+                        { code: 'tdl', name: 'Tokyo Disneyland' },
+                        { code: 'tds', name: 'Tokyo DisneySea' }
+                    ]
+                };
+                
+                const parksToShow = fallbackParks[property] || fallbackParks['all'];
+                parksToShow.forEach(park => {
+                    const opt = document.createElement('option');
+                    opt.value = park.code;
+                    opt.textContent = park.name;
+                    parkSelect.appendChild(opt);
+                });
             }
             
             // Clear attractions when park filter changes (will be repopulated by event listener)
@@ -671,10 +790,10 @@
         
         // Event listeners
         document.getElementById('property-filter').addEventListener('change', async () => {
-            updateParkFilter(); // This will update park options and reset park selection
+            await updateParkFilter(); // This will update park options and reset park selection
             updateKPIDisplay();
             await loadData(); // Load data for the newly selected park
-            populateAttractions(); // Populate attractions for the selected park
+            await populateAttractions(); // Populate attractions for the selected park
         });
         
         function updateKPIDisplay() {
@@ -700,7 +819,7 @@
         document.getElementById('park-filter').addEventListener('change', async () => { 
             updateKPIDisplay();
             await loadData(); // Load data for the selected park
-            populateAttractions(); // Populate attractions filtered by the selected park
+            await populateAttractions(); // Populate attractions filtered by the selected park
         });
         
         document.getElementById('attraction-filter').addEventListener('change', () => {
@@ -822,11 +941,13 @@
         });
         
         // Initialize on start
-        updateParkFilter();
-        updateKPIDisplay();
-        loadData().then(() => {
-            populateAttractions();
-        });
+        (async function init() {
+            await loadProperties();
+            await updateParkFilter();
+            updateKPIDisplay();
+            await loadData();
+            await populateAttractions();
+        })();
     </script>
 </body>
 </html>

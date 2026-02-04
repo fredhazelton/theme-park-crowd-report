@@ -351,6 +351,141 @@ def get_crowd_level(park_code: str):
     })
 
 
+@app.route("/api/properties", methods=["GET"])
+def get_properties():
+    """Get all properties from entity metadata."""
+    output_base = get_output_base_path()
+    entities_df = load_entity_metadata(output_base)
+    
+    if entities_df is None or entities_df.empty:
+        return jsonify({"properties": []})
+    
+    # Get unique properties
+    if "property_code" in entities_df.columns:
+        properties = entities_df["property_code"].dropna().unique().tolist()
+        # Map to display names
+        property_names = {
+            "wdw": "Disney World",
+            "dlr": "Disneyland Resort",
+            "uor": "Universal Orlando",
+            "ush": "Universal Hollywood",
+            "tdr": "Tokyo Disneyland Resort"
+        }
+        results = [
+            {"code": prop, "name": property_names.get(prop, prop.upper())}
+            for prop in sorted(properties) if prop
+        ]
+    else:
+        # Fallback: return all known properties
+        results = [
+            {"code": "wdw", "name": "Disney World"},
+            {"code": "dlr", "name": "Disneyland Resort"},
+            {"code": "uor", "name": "Universal Orlando"},
+            {"code": "ush", "name": "Universal Hollywood"},
+            {"code": "tdr", "name": "Tokyo Disneyland Resort"}
+        ]
+    
+    return jsonify({"properties": results})
+
+
+@app.route("/api/parks", methods=["GET"])
+def get_parks():
+    """Get all parks, optionally filtered by property."""
+    property_code = request.args.get("property", None)
+    output_base = get_output_base_path()
+    entities_df = load_entity_metadata(output_base)
+    
+    if entities_df is None or entities_df.empty:
+        return jsonify({"parks": []})
+    
+    # Filter by property if provided
+    if property_code and "property_code" in entities_df.columns:
+        filtered_df = entities_df[entities_df["property_code"].str.lower() == property_code.lower()].copy()
+    else:
+        filtered_df = entities_df.copy()
+    
+    # Get unique parks with their properties
+    if "park_code" in filtered_df.columns:
+        park_data = filtered_df.groupby("park_code").agg({
+            "property_code": "first" if "property_code" in filtered_df.columns else lambda x: None
+        }).reset_index()
+        
+        # Map park codes to names
+        park_names = {
+            "MK": "Magic Kingdom", "EP": "EPCOT", "HS": "Hollywood Studios", "AK": "Animal Kingdom",
+            "DL": "Disneyland", "CA": "California Adventure",
+            "IA": "Islands of Adventure", "UF": "Universal Studios Florida", "EU": "Epic Universe",
+            "USH": "Universal Studios Hollywood",
+            "TDL": "Tokyo Disneyland", "TDS": "Tokyo DisneySea"
+        }
+        
+        # Map pipeline park codes to dashboard codes
+        # Entity table uses uppercase (MK, EP, USH, etc.), convert to lowercase first
+        pipeline_to_dashboard = {
+            "mk": "mk", "ep": "ep", "hs": "hs", "ak": "ak",
+            "dl": "dl", "ca": "ca",
+            "ia": "ioa", "uf": "usf", "eu": "eu",
+            "uh": "ush", "ush": "ush",  # Handle both "uh" (pipeline) and "USH" (entity table)
+            "tdl": "tdl", "tds": "tds"
+        }
+        
+        results = []
+        for _, row in park_data.iterrows():
+            park_code = str(row["park_code"]).upper()
+            park_code_lower = park_code.lower()
+            
+            # Convert pipeline code to dashboard code
+            dashboard_code = pipeline_to_dashboard.get(park_code_lower, park_code_lower)
+            
+            results.append({
+                "code": dashboard_code,
+                "name": park_names.get(park_code, park_code),
+                "property_code": str(row.get("property_code", "")).lower() if pd.notna(row.get("property_code")) else None
+            })
+        
+        # Sort by name
+        results.sort(key=lambda x: x["name"])
+    else:
+        results = []
+    
+    return jsonify({"parks": results})
+
+
+@app.route("/api/debug/entity-table", methods=["GET"])
+def debug_entity_table():
+    """Debug endpoint to inspect entity table structure."""
+    output_base = get_output_base_path()
+    entities_df = load_entity_metadata(output_base)
+    
+    if entities_df is None or entities_df.empty:
+        return jsonify({"error": "Entity table not found or empty"})
+    
+    # Find columns
+    code_col = None
+    for col in ["entity_code", "code", "attraction_code"]:
+        if col in entities_df.columns:
+            code_col = col
+            break
+    
+    name_col = None
+    for col in ["entity_name", "name", "short_name"]:
+        if col in entities_df.columns:
+            name_col = col
+            break
+    
+    # Sample data
+    sample = entities_df.head(5)
+    
+    return jsonify({
+        "columns": list(entities_df.columns),
+        "row_count": len(entities_df),
+        "code_column": code_col,
+        "name_column": name_col,
+        "sample_data": sample.to_dict(orient="records") if not sample.empty else [],
+        "name_column_sample": sample[name_col].tolist() if name_col and name_col in sample.columns else "N/A"
+    })
+
+
 @app.route("/api/entities/<park_code>", methods=["GET"])
 def get_entities(park_code: str):
     """Get all entities/attractions for a park from entity metadata."""
@@ -361,27 +496,135 @@ def get_entities(park_code: str):
     if entities_df is None or entities_df.empty:
         return jsonify({"entities": []})
     
+    # Find the code column (handle variations: entity_code, code, attraction_code)
+    code_col = None
+    for col in ["entity_code", "code", "attraction_code"]:
+        if col in entities_df.columns:
+            code_col = col
+            break
+    
+    if not code_col:
+        logger.warning("No entity code column found in dimentity.csv")
+        return jsonify({"entities": []})
+    
+    # Find the name column (handle variations: entity_name, name, short_name)
+    name_col = None
+    for col in ["entity_name", "name", "short_name"]:
+        if col in entities_df.columns:
+            name_col = col
+            break
+    
+    # If still not found, try case-insensitive search
+    if not name_col:
+        for col in entities_df.columns:
+            col_lower = col.lower()
+            if col_lower in ["entity_name", "name", "short_name", "attraction_name", "ride_name"]:
+                name_col = col
+                break
+    
+    logger.info(f"Entity table has {len(entities_df)} rows, columns: {list(entities_df.columns)}")
+    logger.info(f"Using code column: '{code_col}', name column: '{name_col}'")
+    
+    # Create a lookup dictionary: entity_code -> entity_name
+    # This ensures we can always find the name for any code
+    code_to_name = {}
+    if name_col:
+        for _, row in entities_df.iterrows():
+            try:
+                code = str(row[code_col]).upper().strip()
+                name_val = row.get(name_col)
+                if pd.notna(name_val):
+                    name_str = str(name_val).strip()
+                    if name_str:  # Only store if not empty
+                        code_to_name[code] = name_str
+            except Exception as e:
+                logger.warning(f"Error processing row: {e}")
+                continue
+    
+    logger.info(f"Created lookup dictionary with {len(code_to_name)} entity codes -> names")
+    
+    # If no names found, try to find ANY column that might have names
+    if len(code_to_name) == 0:
+        logger.warning(f"No names found in column '{name_col}'. Available columns: {list(entities_df.columns)}")
+        # Try all string columns that aren't code-related
+        for col in entities_df.columns:
+            col_lower = col.lower()
+            if (col_lower not in [code_col.lower(), 'park_code', 'property_code', 'park', 'property'] 
+                and 'code' not in col_lower 
+                and col_lower not in ['id', 'index', 'opened_on', 'extinct_on', 'extinct', 'opened']):
+                # Check if this column has non-empty string values
+                non_empty = entities_df[col].dropna()
+                non_empty_str = non_empty[non_empty.astype(str).str.strip() != '']
+                if len(non_empty_str) > 0:
+                    logger.info(f"Trying column '{col}' as name column (has {len(non_empty_str)} non-empty values)")
+                    name_col = col
+                    # Rebuild lookup with this column
+                    for _, row in entities_df.iterrows():
+                        try:
+                            code = str(row[code_col]).upper().strip()
+                            name_val = row.get(name_col)
+                            if pd.notna(name_val):
+                                name_str = str(name_val).strip()
+                                if name_str:
+                                    code_to_name[code] = name_str
+                        except Exception:
+                            continue
+                    if len(code_to_name) > 0:
+                        logger.info(f"Successfully created lookup using column '{col}' with {len(code_to_name)} entries")
+                        break
+        
+        # If still no names, log sample data
+        if len(code_to_name) == 0 and len(entities_df) > 0:
+            sample_row = entities_df.iloc[0]
+            logger.warning(f"Still no names found. Sample row: {dict(sample_row)}")
+    
     # Filter entities by park
     if "park_code" in entities_df.columns:
         park_entities = entities_df[entities_df["park_code"].str.upper() == pipeline_park.upper()].copy()
     else:
         # Fallback: derive from entity_code prefix
         park_prefix = pipeline_park.upper()
-        park_entities = entities_df[entities_df["entity_code"].str.startswith(park_prefix)].copy()
+        park_entities = entities_df[entities_df[code_col].astype(str).str.upper().str.strip().str.startswith(park_prefix)].copy()
     
     if park_entities.empty:
         return jsonify({"entities": []})
     
-    # Prepare results
+    # Prepare results using the lookup dictionary
     results = []
+    missing_names = []
+    
     for _, row in park_entities.iterrows():
-        entity_code = str(row["entity_code"])
-        entity_name = str(row["entity_name"]) if "entity_name" in row and pd.notna(row["entity_name"]) else entity_code
+        entity_code = str(row[code_col]).upper().strip()
+        
+        # Look up the name from our dictionary
+        entity_name = code_to_name.get(entity_code, None)
+        
+        # If not found in lookup, try to get it directly from the row
+        if not entity_name and name_col and name_col in row:
+            name_val = row.get(name_col)
+            if pd.notna(name_val):
+                name_str = str(name_val).strip()
+                if name_str:
+                    entity_name = name_str
+                    # Also add to lookup for future use
+                    code_to_name[entity_code] = name_str
+        
+        # Final fallback: use code as name
+        if not entity_name:
+            entity_name = entity_code
+            missing_names.append(entity_code)
         
         results.append({
             "entity_code": entity_code,
             "entity_name": entity_name,
         })
+        
+        # Log first few for debugging
+        if len(results) <= 3:
+            logger.info(f"Entity {len(results)}: code={entity_code}, name={entity_name}")
+    
+    if missing_names:
+        logger.warning(f"{len(missing_names)} entities have no name (using code as name): {missing_names[:10]}")
     
     # Sort by entity name
     results.sort(key=lambda x: x["entity_name"])

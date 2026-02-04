@@ -34,6 +34,10 @@ Dashboard available at **http://localhost:8052**
 - `GET /api/forecast/<park_code>?days=7` - Get 7-day forecast
 - `GET /api/tip/<park_code>` - Get pro tip
 - `GET /api/stats/<park_code>` - Get comprehensive stats
+- `GET /api/entities/<park_code>` - Get all entities/attractions for a park
+- `GET /api/properties` - Get all properties
+- `GET /api/parks?property=<code>` - Get parks (optionally filtered by property)
+- `GET /api/debug/entity-table` - Debug endpoint to inspect entity table structure
 
 ## Park Codes
 
@@ -80,3 +84,9 @@ Dashboard automatically refreshes every 5 minutes to match queue-times interval.
 ### Park code errors
 - Dashboard uses `ioa`/`usf`, pipeline uses `ia`/`uf`
 - API handles mapping automatically
+
+### Entity names not displaying
+- Attraction dropdown shows entity codes (e.g., "IA01") instead of names (e.g., "The Incredible Hulk Coaster")
+- Debug endpoint: `GET /api/debug/entity-table` to inspect entity table structure
+- Check API server logs for column detection messages
+- See WILMA-BAMBAM.md for full details and debugging steps
