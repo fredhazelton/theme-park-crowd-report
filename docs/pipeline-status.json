@@ -9,33 +9,33 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "10:24:44",
+    "last_fetch": "10:29:48",
     "samples": [
       {
-        "name": "Tron",
+        "name": "MK45",
         "wait": "5"
       },
       {
-        "name": "MK11527",
-        "wait": "80"
+        "name": "MK191",
+        "wait": "85"
       },
       {
-        "name": "Speedway",
+        "name": "MK44",
         "wait": "5"
       },
       {
-        "name": "Its a Small World",
+        "name": "MK43",
         "wait": "20"
       },
       {
-        "name": "Jungle Cruise",
+        "name": "MK40",
         "wait": "10"
       },
       {
-        "name": "Peter Pan",
+        "name": "MK39",
         "wait": "30"
       }
     ]
   },
-  "last_updated": "2026-02-04T10:25:01.700145-05:00"
+  "last_updated": "2026-02-04T10:30:01.588563-05:00"
 }
