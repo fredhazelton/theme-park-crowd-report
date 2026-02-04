@@ -88,6 +88,9 @@ def load_wti_data(output_base: Path) -> Optional[pd.DataFrame]:
         if "park_date" in df.columns:
             df["park_date"] = pd.to_datetime(df["park_date"]).dt.date
         
+        # Rename columns to match API expectations
+        if "code" in df.columns and "entity_code" not in df.columns:
+            df = df.rename(columns={"code": "entity_code"})
         return df
     except Exception as e:
         logger.error(f"Error loading WTI data: {e}")
@@ -151,6 +154,9 @@ def load_entity_metadata(output_base: Path) -> Optional[pd.DataFrame]:
     
     try:
         df = pd.read_csv(dim_path, low_memory=False)
+        # Rename columns to match API expectations
+        if "code" in df.columns and "entity_code" not in df.columns:
+            df = df.rename(columns={"code": "entity_code"})
         return df
     except Exception as e:
         logger.error(f"Error loading entity metadata: {e}")
@@ -376,7 +382,7 @@ def get_entities(park_code: str):
     results = []
     for _, row in park_entities.iterrows():
         entity_code = str(row["entity_code"])
-        entity_name = str(row["entity_name"]) if "entity_name" in row and pd.notna(row["entity_name"]) else entity_code
+        entity_name = str(row["name"]) if "name" in row and pd.notna(row["name"]) else entity_code
         
         results.append({
             "entity_code": entity_code,
