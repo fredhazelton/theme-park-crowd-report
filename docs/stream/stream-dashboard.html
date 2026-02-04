@@ -70,9 +70,10 @@
         }
         .filter-select:focus { outline: none; border-color: var(--cyan); }
         
-        .date-presets { display: flex; gap: 4px; }
+        .date-presets { display: flex; gap: 4px; flex-wrap: wrap; }
         .date-preset {
             flex: 1;
+            min-width: calc(25% - 3px);
             padding: 4px;
             background: rgba(74, 144, 164, 0.1);
             border: 1px solid var(--cyan-dim);
@@ -85,6 +86,57 @@
             background: var(--cyan);
             color: var(--navy);
             border-color: var(--cyan);
+        }
+        .date-presets-row-2 {
+            margin-top: 4px;
+        }
+        .date-calendar-wrapper {
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .date-calendar-arrow {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            background: rgba(74, 144, 164, 0.1);
+            border: 1px solid var(--cyan-dim);
+            color: var(--text-primary);
+            font-size: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .date-calendar-arrow:hover {
+            background: rgba(74, 144, 164, 0.2);
+            border-color: var(--cyan);
+        }
+        .date-calendar-arrow:active {
+            background: var(--cyan);
+            color: var(--navy);
+        }
+        .date-calendar-input {
+            flex: 1;
+            padding: 4px 8px;
+            background: rgba(74, 144, 164, 0.1);
+            border: 1px solid var(--cyan-dim);
+            color: var(--text-primary);
+            font-size: 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .date-calendar-input:focus {
+            outline: none;
+            border-color: var(--cyan);
+        }
+        .date-calendar-input::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0.8);
         }
         
         .filter-divider {
@@ -115,10 +167,16 @@
         }
         .kpi-label { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
         .kpi-value { font-size: 24px; font-weight: 700; color: var(--cyan); margin: 4px 0; }
-        .kpi-value.red { color: var(--red); }
+        .kpi-value.red { color: var(--cyan); }
         .kpi-value.green { color: var(--green); }
         .kpi-value.orange { color: var(--orange); }
         .kpi-value.purple { color: var(--purple); }
+        .kpi-value.wti { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: var(--red); 
+            margin: 4px 0; 
+        }
         .kpi-subtext { font-size: 9px; color: var(--text-secondary); }
         
         /* Charts */
@@ -171,9 +229,21 @@
     <div class="dashboard">
         <aside class="sidebar">
             <div class="filter-section">
+                <label class="filter-label">Property</label>
+                <select class="filter-select" id="property-filter">
+                    <option value="all">All Properties</option>
+                    <option value="wdw" selected>Disney World</option>
+                    <option value="dlr">Disneyland Resort</option>
+                    <option value="uor">Universal Orlando</option>
+                    <option value="ush">Universal Hollywood</option>
+                    <option value="tdr">Tokyo Disneyland Resort</option>
+                </select>
+            </div>
+            
+            <div class="filter-section">
                 <label class="filter-label">Park</label>
                 <select class="filter-select" id="park-filter">
-                    <option value="all">All WDW Parks</option>
+                    <option value="all">All Parks</option>
                     <option value="mk" selected>Magic Kingdom</option>
                     <option value="ep">EPCOT</option>
                     <option value="hs">Hollywood Studios</option>
@@ -194,17 +264,27 @@
                 <label class="filter-label">Date Range</label>
                 <div class="date-presets">
                     <button class="date-preset" data-range="7">7D</button>
-                    <button class="date-preset active" data-range="30">30D</button>
+                    <button class="date-preset" data-range="30">30D</button>
                     <button class="date-preset" data-range="90">90D</button>
                     <button class="date-preset" data-range="365">1Y</button>
+                </div>
+                <div class="date-presets date-presets-row-2">
+                    <button class="date-preset" data-range="yesterday">Yesterday</button>
+                    <button class="date-preset active" data-range="today">Today</button>
+                    <button class="date-preset" data-range="tomorrow">Tomorrow</button>
+                </div>
+                <div class="date-calendar-wrapper">
+                    <button class="date-calendar-arrow" id="date-arrow-left" title="Previous day">←</button>
+                    <input type="date" class="date-calendar-input" id="date-calendar-picker" />
+                    <button class="date-calendar-arrow" id="date-arrow-right" title="Next day">→</button>
                 </div>
             </div>
             
             <div class="filter-section">
                 <label class="filter-label">Wait Type</label>
                 <select class="filter-select" id="wait-type-filter">
+                    <option value="actual" selected>Actual Wait</option>
                     <option value="posted">Posted Wait</option>
-                    <option value="actual">Actual Wait</option>
                 </select>
             </div>
             
@@ -218,20 +298,20 @@
         
         <main class="main-content">
             <div class="kpi-row">
-                <div class="kpi-card">
-                    <div class="kpi-label">Avg Wait</div>
+                <div class="kpi-card" id="kpi-avg-card">
+                    <div class="kpi-label" id="kpi-avg-label">Avg Wait</div>
                     <div class="kpi-value" id="kpi-avg">--</div>
-                    <div class="kpi-subtext">minutes</div>
+                    <div class="kpi-subtext" id="kpi-avg-subtext">minutes</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-label">Peak</div>
                     <div class="kpi-value red" id="kpi-max">--</div>
-                    <div class="kpi-subtext">max posted</div>
+                    <div class="kpi-subtext">max actual</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-label">Min</div>
                     <div class="kpi-value green" id="kpi-min">--</div>
-                    <div class="kpi-subtext">min posted</div>
+                    <div class="kpi-subtext">min actual</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-label">Data Points</div>
@@ -292,92 +372,133 @@
     </div>
     
     <script>
-        // Data and charts will load from stream-data.json
+        // API configuration
+        const API_BASE = window.location.hostname === 'wilma-server' 
+            ? 'http://wilma-server:8051/api'
+            : 'http://localhost:8051/api';
+        
         let dashboardData = null;
         let charts = {};
         
         async function loadData() {
             try {
-                const response = await fetch('./stream-data.json');
-                dashboardData = await response.json();
+                const park = document.getElementById('park-filter').value;
+                const parkCode = park === 'mk' ? 'mk' : park === 'ep' ? 'ep' : park === 'hs' ? 'hs' : park === 'ak' ? 'ak' : 'mk';
+                
+                // Fetch data from API
+                const [statsRes, waitTimesRes] = await Promise.all([
+                    fetch(`${API_BASE}/stats/${parkCode}`).catch(() => null),
+                    fetch(`${API_BASE}/wait-times/${parkCode}?limit=20`).catch(() => null)
+                ]);
+                
+                if (!statsRes || !waitTimesRes) {
+                    throw new Error('API not available. Make sure the API is running on port 8051.');
+                }
+                
+                const stats = await statsRes.json();
+                const waitTimes = await waitTimesRes.json();
+                
+                // Transform API data to dashboard format
+                const waits = waitTimes.wait_times || [];
+                const waitValues = waits.map(w => w.wait_minutes).filter(w => w != null && w > 0);
+                
+                // Update KPIs
+                if (waitValues.length > 0) {
+                    const avg = waitValues.reduce((a, b) => a + b, 0) / waitValues.length;
+                    document.getElementById('kpi-avg').textContent = Math.round(avg);
+                    document.getElementById('kpi-max').textContent = Math.round(Math.max(...waitValues));
+                    document.getElementById('kpi-min').textContent = Math.round(Math.min(...waitValues));
+                    document.getElementById('kpi-readings').textContent = waitValues.length.toLocaleString();
+                    document.getElementById('kpi-days').textContent = '--';
+                }
+                
+                // Update data info
                 document.getElementById('data-info').innerHTML = 
-                    'Generated: ' + new Date(dashboardData.generated).toLocaleDateString() + '<br>' +
-                    'Files: ' + dashboardData.files.toLocaleString() + '<br>' +
-                    'Range: ' + dashboardData.date_range;
-                populateAttractions();
-                updateDashboard();
+                    'Generated: ' + new Date().toLocaleDateString() + '<br>' +
+                    'Files: ' + (waitValues.length || 0) + '<br>' +
+                    'Range: Live data';
+                
+                // Update top waits list
+                updateTopWaitsListFromAPI(waits);
+                
+                // Store data for charts
+                dashboardData = {
+                    wait_times: waits,
+                    stats: stats
+                };
+                
             } catch (e) {
-                document.getElementById('data-info').textContent = 'Error loading data';
+                document.getElementById('data-info').textContent = 'Error loading data: ' + e.message;
                 console.error(e);
             }
         }
         
-        function populateAttractions() {
+        async function populateAttractions() {
             const select = document.getElementById('attraction-filter');
             const park = document.getElementById('park-filter').value;
             select.innerHTML = '<option value="all">All Attractions</option>';
             
-            let attractions = new Set();
-            Object.keys(dashboardData.by_attraction).forEach(name => {
-                const attr = dashboardData.by_attraction[name];
-                if (park === 'all' || attr.park_code === park) {
-                    attractions.add(name);
-                }
-            });
+            // Only populate if a specific park is selected (not "all")
+            if (park === 'all') {
+                return;
+            }
             
-            Array.from(attractions).sort().forEach(name => {
-                const opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name;
-                select.appendChild(opt);
-            });
+            try {
+                // Use the park code directly - API will map it to pipeline codes internally
+                const response = await fetch(`${API_BASE}/entities/${park}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch entities');
+                }
+                
+                const result = await response.json();
+                const entities = result.entities || [];
+                
+                // Populate dropdown with entities from entity table
+                entities.forEach(entity => {
+                    const opt = document.createElement('option');
+                    opt.value = entity.entity_name || entity.entity_code;
+                    opt.textContent = entity.entity_name || entity.entity_code;
+                    opt.dataset.entityCode = entity.entity_code; // Store entity_code for filtering
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Error loading attractions:', e);
+                // Fallback: try to use wait_times data if available
+                if (dashboardData && dashboardData.wait_times) {
+                    const attractions = new Set();
+                    dashboardData.wait_times.forEach(w => {
+                        if (w.entity_name) {
+                            attractions.add(w.entity_name);
+                        }
+                    });
+                    
+                    Array.from(attractions).sort().forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.textContent = name;
+                        select.appendChild(opt);
+                    });
+                }
+            }
         }
         
-        function updateDashboard() {
-            const park = document.getElementById('park-filter').value;
-            const attraction = document.getElementById('attraction-filter').value;
-            
-            // Filter data
-            let filtered = [];
-            if (attraction !== 'all') {
-                const attr = dashboardData.by_attraction[attraction];
-                if (attr) filtered = attr.daily_avg || [];
-            } else if (park !== 'all') {
-                const parkData = dashboardData.by_park[park];
-                if (parkData) filtered = parkData.daily_avg || [];
-            } else {
-                filtered = dashboardData.overall?.daily_avg || [];
-            }
-            
-            // Update KPIs
-            if (filtered.length > 0) {
-                const waits = filtered.map(d => d.avg_wait).filter(w => w > 0);
-                const avg = waits.reduce((a,b) => a+b, 0) / waits.length;
-                document.getElementById('kpi-avg').textContent = Math.round(avg);
-                document.getElementById('kpi-max').textContent = Math.round(Math.max(...waits));
-                document.getElementById('kpi-min').textContent = Math.round(Math.min(...waits));
-                document.getElementById('kpi-readings').textContent = waits.length.toLocaleString();
-                document.getElementById('kpi-days').textContent = filtered.length;
-            }
-            
-            // Update time series chart
-            updateTimeSeriesChart(filtered);
-            updateTopWaitsList(park);
-            updateParkCompareChart();
-            updateWeekdayChart(park);
+        async function updateDashboard() {
+            await loadData();
         }
         
         function updateTimeSeriesChart(data) {
+            // TODO: Implement time series chart with historical data
             const ctx = document.getElementById('timeSeriesChart').getContext('2d');
             if (charts.timeSeries) charts.timeSeries.destroy();
             
+            // Placeholder chart for now
             charts.timeSeries = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: data.map(d => d.date),
+                    labels: [],
                     datasets: [{
                         label: 'Avg Wait',
-                        data: data.map(d => d.avg_wait),
+                        data: [],
                         borderColor: '#4a90a4',
                         backgroundColor: 'rgba(74, 144, 164, 0.3)',
                         fill: 'origin',
@@ -397,32 +518,54 @@
             });
         }
         
-        function updateTopWaitsList(park) {
+        function updateTopWaitsListFromAPI(waits) {
             const list = document.getElementById('top-waits-list');
-            let items = Object.entries(dashboardData.by_attraction)
-                .filter(([name, data]) => park === 'all' || data.park_code === park)
-                .map(([name, data]) => ({ name, avg: data.avg_wait || 0 }))
-                .sort((a, b) => b.avg - a.avg)
+            if (!waits || waits.length === 0) {
+                list.innerHTML = '<div class="loading">No data available</div>';
+                return;
+            }
+            
+            const sorted = waits
+                .filter(w => w.wait_minutes != null && w.wait_minutes > 0)
+                .sort((a, b) => (b.wait_minutes || 0) - (a.wait_minutes || 0))
                 .slice(0, 10);
             
-            list.innerHTML = items.map((item, i) => 
-                '<div class="top-item"><span class="rank">' + (i+1) + '</span><span class="name">' + item.name + '</span><span class="wait">' + Math.round(item.avg) + 'm</span></div>'
+            list.innerHTML = sorted.map((item, i) => 
+                '<div class="top-item"><span class="rank">' + (i+1) + '</span><span class="name">' + (item.entity_name || item.entity_code) + '</span><span class="wait">' + Math.round(item.wait_minutes) + 'm</span></div>'
             ).join('');
         }
         
-        function updateParkCompareChart() {
+        function updateTopWaitsList(park) {
+            if (dashboardData && dashboardData.wait_times) {
+                updateTopWaitsListFromAPI(dashboardData.wait_times);
+            }
+        }
+        
+        async function updateParkCompareChart() {
             const ctx = document.getElementById('parkCompareChart').getContext('2d');
             if (charts.parkCompare) charts.parkCompare.destroy();
             
             const parks = ['mk', 'ep', 'hs', 'ak'];
             const labels = ['Magic Kingdom', 'EPCOT', 'Hollywood Studios', 'Animal Kingdom'];
-            const data = parks.map(p => dashboardData.by_park[p]?.avg_wait || 0);
+            
+            // Fetch stats for each park
+            const parkData = await Promise.all(
+                parks.map(async (p) => {
+                    try {
+                        const res = await fetch(`${API_BASE}/stats/${p}`);
+                        const data = await res.json();
+                        return data.avg_wait || 0;
+                    } catch {
+                        return 0;
+                    }
+                })
+            );
             
             charts.parkCompare = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [{ data: data, backgroundColor: ['#4a90a4', '#5ab4cc', '#3d7a8a', '#6bc5d9'] }]
+                    datasets: [{ data: parkData, backgroundColor: ['#4a90a4', '#5ab4cc', '#3d7a8a', '#6bc5d9'] }]
                 },
                 options: {
                     responsive: true,
@@ -437,11 +580,12 @@
         }
         
         function updateWeekdayChart(park) {
+            // TODO: Implement weekday chart with historical data
             const ctx = document.getElementById('weekdayChart').getContext('2d');
             if (charts.weekday) charts.weekday.destroy();
             
             const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            let weekdayData = dashboardData.overall?.by_weekday || Array(7).fill(0);
+            let weekdayData = Array(7).fill(0);
             
             charts.weekday = new Chart(ctx, {
                 type: 'bar',
@@ -461,19 +605,230 @@
             });
         }
         
+        // Property to Parks mapping
+        const PROPERTY_PARKS = {
+            'wdw': [
+                { code: 'mk', name: 'Magic Kingdom' },
+                { code: 'ep', name: 'EPCOT' },
+                { code: 'hs', name: 'Hollywood Studios' },
+                { code: 'ak', name: 'Animal Kingdom' }
+            ],
+            'dlr': [
+                { code: 'dl', name: 'Disneyland' },
+                { code: 'ca', name: 'California Adventure' }
+            ],
+            'uor': [
+                { code: 'ioa', name: 'Islands of Adventure' },
+                { code: 'usf', name: 'Universal Studios Florida' },
+                { code: 'eu', name: 'Epic Universe' }
+            ],
+            'ush': [
+                { code: 'ush', name: 'Universal Studios Hollywood' }
+            ],
+            'tdr': [
+                { code: 'tdl', name: 'Tokyo Disneyland' },
+                { code: 'tds', name: 'Tokyo DisneySea' }
+            ]
+        };
+        
+        function updateParkFilter() {
+            const property = document.getElementById('property-filter').value;
+            const parkSelect = document.getElementById('park-filter');
+            const currentPark = parkSelect.value;
+            
+            parkSelect.innerHTML = '<option value="all">All Parks</option>';
+            
+            if (property === 'all') {
+                // Show all parks from all properties
+                Object.values(PROPERTY_PARKS).flat().forEach(park => {
+                    const opt = document.createElement('option');
+                    opt.value = park.code;
+                    opt.textContent = park.name;
+                    parkSelect.appendChild(opt);
+                });
+            } else {
+                // Show parks for selected property only
+                PROPERTY_PARKS[property]?.forEach(park => {
+                    const opt = document.createElement('option');
+                    opt.value = park.code;
+                    opt.textContent = park.name;
+                    parkSelect.appendChild(opt);
+                });
+            }
+            
+            // If current park is not in the filtered list, reset to first park or "all"
+            if (currentPark && Array.from(parkSelect.options).some(opt => opt.value === currentPark)) {
+                parkSelect.value = currentPark;
+            } else {
+                // Reset to first available option (either "all" or first park)
+                if (parkSelect.options.length > 1) {
+                    parkSelect.selectedIndex = 1; // Select first park
+                } else {
+                    parkSelect.value = 'all';
+                }
+            }
+            
+            // Clear attractions when park filter changes (will be repopulated by event listener)
+        }
+        
         // Event listeners
-        document.getElementById('park-filter').addEventListener('change', () => { populateAttractions(); updateDashboard(); });
-        document.getElementById('attraction-filter').addEventListener('change', updateDashboard);
+        document.getElementById('property-filter').addEventListener('change', async () => {
+            updateParkFilter(); // This will update park options and reset park selection
+            updateKPIDisplay();
+            await loadData(); // Load data for the newly selected park
+            populateAttractions(); // Populate attractions for the selected park
+        });
+        
+        function updateKPIDisplay() {
+            const park = document.getElementById('park-filter').value;
+            const isParkSelected = park !== 'all';
+            const avgLabel = document.getElementById('kpi-avg-label');
+            const avgValue = document.getElementById('kpi-avg');
+            const avgSubtext = document.getElementById('kpi-avg-subtext');
+            
+            if (isParkSelected) {
+                // Show Wait Time Index - label stays normal, only value color changes
+                avgLabel.textContent = 'Wait Time Index';
+                avgValue.classList.add('wti');
+                avgSubtext.textContent = 'minutes';
+            } else {
+                // Show regular Avg Wait styling
+                avgLabel.textContent = 'Avg Wait';
+                avgValue.classList.remove('wti');
+                avgSubtext.textContent = 'minutes';
+            }
+        }
+        
+        document.getElementById('park-filter').addEventListener('change', async () => { 
+            updateKPIDisplay();
+            await loadData(); // Load data for the selected park
+            populateAttractions(); // Populate attractions filtered by the selected park
+        });
+        
+        document.getElementById('attraction-filter').addEventListener('change', () => {
+            // Filter top waits by attraction if needed
+            if (dashboardData && dashboardData.wait_times) {
+                const attraction = document.getElementById('attraction-filter').value;
+                if (attraction === 'all') {
+                    updateTopWaitsListFromAPI(dashboardData.wait_times);
+                } else {
+                    const filtered = dashboardData.wait_times.filter(w => 
+                        (w.entity_name || w.entity_code) === attraction
+                    );
+                    updateTopWaitsListFromAPI(filtered);
+                }
+            }
+        });
+        
+        function clearAllDateSelections() {
+            // Clear all date preset buttons
+            document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+            // Clear calendar input
+            document.getElementById('date-calendar-picker').value = '';
+        }
+        
+        function updateDatePickerFromPreset(range) {
+            const dateInput = document.getElementById('date-calendar-picker');
+            const today = new Date();
+            let targetDate = new Date(today);
+            
+            switch(range) {
+                case 'yesterday':
+                    targetDate.setDate(today.getDate() - 1);
+                    break;
+                case 'today':
+                    targetDate = new Date(today);
+                    break;
+                case 'tomorrow':
+                    targetDate.setDate(today.getDate() + 1);
+                    break;
+                default:
+                    return; // Don't update for range buttons (7D, 30D, etc.)
+            }
+            
+            // Format as YYYY-MM-DD
+            const year = targetDate.getFullYear();
+            const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+            const day = String(targetDate.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            
+            dateInput.value = formattedDate;
+        }
+        
         document.querySelectorAll('.date-preset').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                updateDashboard();
+                const range = btn.dataset.range;
+                const isRangeButton = ['7', '30', '90', '365'].includes(range);
+                
+                // If clicking an already active button, deselect it (allowing "none")
+                if (btn.classList.contains('active')) {
+                    btn.classList.remove('active');
+                    // If it was a Yesterday/Today/Tomorrow button, clear the date picker
+                    if (!isRangeButton) {
+                        document.getElementById('date-calendar-picker').value = '';
+                    }
+                } else {
+                    // Remove active from ALL date preset buttons (both rows)
+                    clearAllDateSelections();
+                    // Activate clicked button
+                    btn.classList.add('active');
+                    
+                    // Update date picker only for Yesterday/Today/Tomorrow buttons
+                    if (!isRangeButton && ['yesterday', 'today', 'tomorrow'].includes(range)) {
+                        updateDatePickerFromPreset(range);
+                    }
+                }
+                
+                // TODO: Implement date range filtering
             });
         });
         
-        // Load on start
-        loadData();
+        function adjustCalendarDate(days) {
+            const dateInput = document.getElementById('date-calendar-picker');
+            // If no date is set, default to today
+            let currentDate = dateInput.value ? new Date(dateInput.value + 'T00:00:00') : new Date();
+            currentDate.setDate(currentDate.getDate() + days);
+            
+            // Format as YYYY-MM-DD
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            
+            dateInput.value = formattedDate;
+            
+            // Clear preset buttons when calendar date changes (but keep the date picker value)
+            document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+            
+            // Trigger change event to update filters
+            dateInput.dispatchEvent(new Event('change'));
+        }
+        
+        // Left arrow - go back one day
+        document.getElementById('date-arrow-left').addEventListener('click', () => {
+            adjustCalendarDate(-1);
+        });
+        
+        // Right arrow - go forward one day
+        document.getElementById('date-arrow-right').addEventListener('click', () => {
+            adjustCalendarDate(1);
+        });
+        
+        // Calendar picker - when a date is manually selected, clear preset buttons
+        document.getElementById('date-calendar-picker').addEventListener('change', (e) => {
+            if (e.target.value) {
+                // Clear all preset buttons when calendar date is manually selected
+                document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+                // TODO: Implement date filtering for selected calendar date
+            }
+        });
+        
+        // Initialize on start
+        updateParkFilter();
+        updateKPIDisplay();
+        loadData().then(() => {
+            populateAttractions();
+        });
     </script>
 </body>
 </html>

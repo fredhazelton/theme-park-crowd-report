@@ -1,0 +1,29 @@
+# dashboard-api-wilma.service - Systemd service for Wilma's Dashboard API
+#
+# Dashboard API server for stream dashboard (serves data from pipeline)
+
+[Unit]
+Description=Theme Park Dashboard API (Wilma Production)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=wilma
+Group=wilma
+
+WorkingDirectory=/home/wilma/theme-park-crowd-report
+
+# Use the venv Python directly
+ExecStart=/bin/bash -c 'source /home/wilma/theme-park-crowd-report/.venv/bin/activate && python dashboard/api.py'
+
+Restart=on-failure
+RestartSec=60
+
+Environment="PATH=/home/wilma/theme-park-crowd-report/.venv/bin:/home/wilma/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
