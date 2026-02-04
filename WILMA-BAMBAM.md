@@ -119,3 +119,27 @@ const API_BASE = 'http://wilma-server:8051/api';
 No changes needed — previews will show real data automatically!
 
 ---
+
+---
+
+## 🎨 Dashboard Dev Workflow
+
+### When Designing (Dev Mode)
+1. **Bam-Bam edits:** `docs/stream/stream-dashboard.html` in Cursor
+2. **Save the file**
+3. **Fred views in Safari:** `file:///Users/fredhazelton/theme-park-crowd-report/docs/stream/stream-dashboard.html`
+4. **Refresh browser** to see changes with real data
+
+Rinse and repeat until happy with the design!
+
+### When Ready to Stream (Deploy Mode)
+1. **Push to GitHub:** `git push`
+2. **Tell Wilma:** "deploy dashboard"
+3. **Wilma pulls + copies** to streaming server
+4. **Streamlabs** uses `http://wilma-server:8888/stream-dashboard.html`
+
+**Summary:**
+- **Dev:** Local file in Safari (fast iteration)
+- **Stream:** Wilma deploys to wilma-server (production)
+
+---
