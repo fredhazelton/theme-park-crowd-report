@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "20:40:46",
+    "last_fetch": "20:45:49",
     "samples": [
       {
         "name": "Tron",
@@ -29,7 +29,7 @@
       },
       {
         "name": "Peter Pan",
-        "wait": "10"
+        "wait": "5"
       },
       {
         "name": "Space Mountain",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-03T20:45:01.886210-05:00"
+  "last_updated": "2026-02-03T20:50:01.644247-05:00"
 }
