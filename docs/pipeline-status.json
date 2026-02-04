@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "20:30:40",
+    "last_fetch": "20:35:43",
     "samples": [
       {
         "name": "Tron",
@@ -17,7 +17,7 @@
       },
       {
         "name": "MK11527",
-        "wait": "55"
+        "wait": "60"
       },
       {
         "name": "Speedway",
@@ -32,10 +32,10 @@
         "wait": "20"
       },
       {
-        "name": "Pirates",
+        "name": "Space Mountain",
         "wait": "20"
       }
     ]
   },
-  "last_updated": "2026-02-03T20:35:01.279824-05:00"
+  "last_updated": "2026-02-03T20:40:02.045815-05:00"
 }
