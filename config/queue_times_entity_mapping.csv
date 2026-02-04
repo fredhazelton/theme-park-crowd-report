@@ -1,43 +1,27 @@
 entity_code,park_code,queue_times_id,queue_times_name,touringplans_name,match_score
-AK03,ak,6364,Le Petit Train,Camp Minnie-Mickey Greeting Trails,0.62
-AK10760,ak,10760,Tonnerre 2 Zeus,,0.0
-AK109,ak,8211,Panoramix Play Area,Pandora Rangers,0.53
-AK11770,ak,11770,Toutatis,,0.0
-AK11774,ak,11774,Sanglier d'Or playground,,0.0
-AK11775,ak,11775,Chez Gyrofolix,,0.0
-AK124,ak,5656,Les Chaudrons,Beats and Strings,0.53
-AK13074,ak,13074,La tour de Numérobis,,0.0
-AK13874,ak,13874,Epidemaïs Croisières,,0.0
-AK14606,ak,14606,Les jardins merveilleux du Père Noël,,0.0
-AK14936,ak,14936,Cétautomatix,,0.0
-AK27,ak,6457,Attention Menhir !,Affection Section,0.51
-AK31,ak,8216,L'Aventure Astérix,Adventurer's Celebration Gathering,0.68
-AK5642,ak,5642,Pégase Express,,0.0
-AK5643,ak,5643,Discobélix,,0.0
-AK5645,ak,5645,Les Chaises Volantes,,0.0
-AK5649,ak,5649,OzIris,,0.0
-AK5650,ak,5650,La Trace du Hourra,,0.0
-AK5651,ak,5651,Goudurix,,0.0
-AK5652,ak,5652,Les Espions de César,,0.0
-AK5654,ak,5654,La Rivière d'Elis,,0.0
-AK5657,ak,5657,L'Oxygénarium,,0.0
-AK5659,ak,5659,L'Hydre de Lerne,,0.0
-AK5660,ak,5660,Le Vol d'Icare,,0.0
-AK6102,ak,6102,Le Cheval de Troie,,0.0
-AK6363,ak,6363,Hydrolix,,0.0
-AK76,ak,5646,La Galère,Island Groove,0.55
-AK81,ak,6153,SOS Tournevis,Story Dancers,0.54
-AK8184,ak,8184,Le Carrousel de César,,0.0
-AK8189,ak,8189,La Petite Tempête,,0.0
-AK8190,ak,8190,Les Petits Drakkars,,0.0
-AK8200,ak,8200,Les Petites Chaises Volantes,,0.0
-AK8201,ak,8201,L'Escadrille des As,,0.0
-AK8203,ak,8203,Les Petits Chars tamponneurs,,0.0
-AK8205,ak,8205,Etamine,,0.0
-AK8206,ak,8206,Enigmatix,,0.0
-AK8207,ak,8207,Aérodynamix,,0.0
-AK8208,ak,8208,Lavomatix,,0.0
-AK8212,ak,8212,Petit Chêne Play Area,,0.0
+AK04,ak,657,Festival of the Lion King,Festival of the Lion King,1.0
+AK07,ak,113,Kilimanjaro Safaris,Kilimanjaro Safaris,1.0
+AK08,ak,651,Gorilla Falls Exploration Trail,Gorilla Falls Exploration Trail,1.0
+AK09,ak,13806,Conservation Station,Conservation Station,1.0
+AK10,ak,655,Wildlife Express Train,Wildlife Express Train: Africa Station,0.73
+AK11,ak,110,Expedition Everest - Legend of the Forbidden Mountain,Expedition Everest - Legend of the Forbidden Mountain,1.0
+AK11,ak,14533,Expedition Everest - Legend of the Forbidden Mountain Single Rider,Expedition Everest - Legend of the Forbidden Mountain,0.88
+AK112,ak,6680,The Animation Experience at Conservation Station,The Animation Experience at Conservation Station,1.0
+AK116,ak,10921,Feathered Friends in Flight!,Feathered Friends In Flight!,1.0
+AK123,ak,14943,Zootopia: Better Zoogether! - NEW!,Zootopia: Better Zoogether,0.87
+AK14,ak,112,Kali River Rapids,Kali River Rapids,1.0
+AK18,ak,111,DINOSAUR,DINOSAUR,1.0
+AK22,ak,10920,Finding Nemo: The Big Blue... and Beyond!,Finding Nemo: The Big Blue... and Beyond!,1.0
+AK27,ak,13807,Affection Section,Affection Section,1.0
+AK39,ak,13811,Discovery Island Trails,Discovery Island Trails,1.0
+AK42,ak,12451,Meet Moana at Character Landing,Discovery Island Character Landing,0.71
+AK44,ak,13812,The Oasis Exhibits,Oasis Exhibits,1.0
+AK45,ak,13809,Dino-Sue,Dino-Sue,1.0
+AK55,ak,13751,Tree of Life,Tree of Life Waypoint: In front of Tree of Life,0.73
+AK78,ak,116,Meet Favorite Disney Pals at Adventurers Outpost,Meet Favorite Disney Pals at Adventurers Outpost,1.0
+AK79,ak,13808,Wilderness Explorers,Wilderness Explorers,1.0
+AK85,ak,4438,Na'vi River Journey,Na'vi River Journey,1.0
+AK86,ak,4439,Avatar Flight of Passage,Avatar Flight of Passage,1.0
 CA01,ca,294,Turtle Talk with Crush,Turtle Talk with Crush,1.0
 CA03,ca,291,"Monsters, Inc. Mike & Sulley to the Rescue!","Monsters, Inc. Mike & Sulley to the Rescue!",1.0
 CA09,ca,312,Soarin' Around the World,Soarin' Around the World,1.0
@@ -123,80 +107,61 @@ DL54,dl,306,The Many Adventures of Winnie the Pooh,The Many Adventures of Winnie
 DL62,dl,691,Main Street Vehicles,Main Street Vehicles,1.0
 DL66,dl,687,Sleeping Beauty Castle Walkthrough,Sleeping Beauty Castle Walkthrough,1.0
 DL67,dl,695,The Disney Gallery,Disney Gallery,1.0
-EP1174,ep,1174,For the First Time in Forever: A Frozen Sing-Along Celebration,,0.0
-EP123,ep,123,The Twilight Zone Tower of Terror™,,0.0
-EP130,ep,117,Toy Story Mania!,Festival of Holidays: Helga in Germany,0.54
-EP156,ep,12425,Meet Edna Mode at the Edna Mode Experience,Meet Anna and Elsa at Royal Sommerhus,0.51
-EP177,ep,5477,Alien Swirling Saucers,Epcot Living Statues,0.61
-EP185,ep,1176,Beauty and the Beast – Live on Stage,Beauty and the Beast Sing-Along,0.71
-EP20,ep,119,Rock 'n' Roller Coaster Starring Aerosmith,Gran Fiesta Tour Starring The Three Caballeros,0.54
-EP213,ep,12430,Meet Ariel at Walt Disney Presents,Meet a Favorite Pal at Disney and Pixar Short Film Festival,0.56
-EP224,ep,10902,Millennium Falcon: Smugglers Run Single Rider,Soarin' Around the World Single Rider,0.52
-EP224,ep,14531,Star Wars: Rise of the Resistance Single Rider,Soarin' Around the World Single Rider,0.59
-EP224,ep,10901,Rock 'n' Roller Coaster Starring Aerosmith Single Rider,Soarin' Around the World Single Rider,0.52
-EP227,ep,6361,Mickey & Minnie's Runaway Railway,Get Lightning Lane Return Time for Meet Beloved Disney Pals at Mickey & Friends,0.52
-EP228,ep,120,Star Tours – The Adventures Continue,Remy's Ratatouille Adventure Single Rider,0.56
-EP24,ep,14859,The Little Mermaid – A Musical Adventure – New!,The American Adventure,0.52
-EP37,ep,5145,Walt Disney Presents,Meet Disney Pals at Epcot,0.58
-EP37,ep,6704,Meet Disney Stars at Red Carpet Dreams,Meet Disney Pals at Epcot,0.67
-EP39,ep,5476,Slinky Dog Dash,The Living Seas,0.54
-EP6368,ep,6368,Millennium Falcon: Smugglers Run,,0.0
-EP6369,ep,6369,Star Wars: Rise of the Resistance,,0.0
-EP6702,ep,6702,Indiana Jones™ Epic Stunt Spectacular!,,0.0
-EP6703,ep,6703,Meet Olaf at Celebrity Spotlight,,0.0
-EP7333,ep,7333,Vacation Fun - An Original Animated Short with Mickey & Minnie,,0.0
-HS104,hs,111,DINOSAUR,Alien Swirling Saucers,0.57
-HS10920,hs,10920,Finding Nemo: The Big Blue... and Beyond!,,0.0
-HS10921,hs,10921,Feathered Friends in Flight!,,0.0
-HS110,hs,110,Expedition Everest - Legend of the Forbidden Mountain,,0.0
-HS112,hs,112,Kali River Rapids,,0.0
-HS113,hs,113,Kilimanjaro Safaris,,0.0
-HS127,hs,13807,Affection Section,Vacation Fun - An Original Animated Short with Mickey & Minnie,0.55
-HS128,hs,13811,Discovery Island Trails,The Disney Society Orchestra and Friends,0.51
-HS13808,hs,13808,Wilderness Explorers,,0.0
-HS13809,hs,13809,Dino-Sue,,0.0
-HS13812,hs,13812,The Oasis Exhibits,,0.0
-HS14943,hs,14943,Zootopia: Better Zoogether! - NEW!,,0.0
-HS150,hs,14533,Expedition Everest - Legend of the Forbidden Mountain Single Rider,Star Wars: Rise of the Resistance Single Rider,0.52
-HS17,hs,13751,Tree of Life,Streets of America,0.6
-HS4438,hs,4438,Na'vi River Journey,,0.0
-HS4439,hs,4439,Avatar Flight of Passage,,0.0
-HS46,hs,13806,Conservation Station,Tinseltown Talent Show,0.52
-HS63,hs,12451,Meet Moana at Character Landing,Character Greetings Around Hollywood Studios,0.52
-HS651,hs,651,Gorilla Falls Exploration Trail,,0.0
-HS655,hs,655,Wildlife Express Train,,0.0
-HS657,hs,657,Festival of the Lion King,,0.0
-HS6680,hs,6680,The Animation Experience at Conservation Station,,0.0
-HS95,hs,116,Meet Favorite Disney Pals at Adventurers Outpost,Meet Disney Stars at Red Carpet Dreams,0.51
-IA08,ia,5990,E.T. Adventure™,Jurassic Park River Adventure,0.67
-IA12,ia,14950,Grave of Flesh,Pteranodon Flyers,0.52
-IA12107,ia,12107,Illumination's Villain-Con Minion Blast,,0.0
-IA12186,ia,12186,Illumination Theater,,0.0
-IA14937,ia,14937,Terrifier,,0.0
-IA14938,ia,14938,WWE Presents: The Horrors of the Wyatt Sicks,,0.0
-IA14939,ia,14939,Dolls: Let’s Play Dead,,0.0
-IA14945,ia,14945,JASON UN1V3RSE,,0.0
-IA14947,ia,14947,Fallout,,0.0
-IA14948,ia,14948,El Artista: A Spanish Haunting,,0.0
-IA14949,ia,14949,Gálkn: Monsters of the North,,0.0
-IA14951,ia,14951,Hatchet and Chains: Demon Bounty Hunters,,0.0
-IA16,ia,6014,Harry Potter and the Escape from Gringotts™,Harry Potter and the Forbidden Journey,0.52
-IA21,ia,13100,Ollivanders™ Experience in Diagon Alley™,Ollivanders Experience in Hogsmeade,0.75
-IA49,ia,13605,Trolls Trollercoaster,Triceratops Encounter,0.52
-IA52,ia,6005,The Simpsons Ride™,The Incredible Hulk Coaster Single Rider Line,0.52
-IA53,ia,14517,MEN IN BLACK™ Alien Attack!™ Single Rider,Doctor Doom's Fearfall Single Rider Line,0.53
-IA55,ia,13849,Hogwarts™ Express - First Train,Hogwarts Express - Hogsmeade Station,0.72
-IA55,ia,6016,Hogwarts™ Express - King's Cross Station,Hogwarts Express - Hogsmeade Station,0.77
-IA5984,ia,5984,Despicable Me Minion Mayhem™,,0.0
-IA5993,ia,5993,Hollywood Rip Ride Rockit™,,0.0
-IA5995,ia,5995,Kang & Kodos' Twirl 'n' Hurl,,0.0
-IA5996,ia,5996,MEN IN BLACK™ Alien Attack!™,,0.0
-IA6000,ia,6000,Revenge of the Mummy™,,0.0
-IA6006,ia,6006,TRANSFORMERS™: The Ride-3D,,0.0
-IA6018,ia,6018,Race Through New York Starring Jimmy Fallon™,,0.0
-IA6038,ia,6038,Fast & Furious - Supercharged™,,0.0
-IA62,ia,13110,Revenge of the Mummy™ Single Rider,Skull Island: Reign of Kong Single Rider,0.71
-IA64,ia,14946,Five Nights At Freddy’s,The Nighttime Lights at Hogwarts Castle,0.55
+EP02,ep,159,Spaceship Earth,Spaceship Earth,1.0
+EP04,ep,153,The Seas with Nemo & Friends,The Seas with Nemo & Friends,1.0
+EP05,ep,152,Turtle Talk With Crush,Turtle Talk with Crush,1.0
+EP07,ep,156,Living with the Land,Living with the Land,1.0
+EP09,ep,151,Soarin' Around the World,Soarin' Around the World,1.0
+EP110,ep,13781,Bijutsu-kan Gallery,Bijutsu-kan Gallery,1.0
+EP112,ep,13777,"ImageWorks - The ""What If"" Labs",ImageWorks,0.57
+EP113,ep,13770,Bruce's Shark World,Holidays Around the World,0.51
+EP114,ep,13767,House of the Whispering Willows,House of the Whispering Willows,1.0
+EP116,ep,13774,Advanced Training Lab,Misson: SPACE Advanced Training Lab,0.75
+EP118,ep,13773,American Heritage Gallery,American Heritage Gallery,1.0
+EP118,ep,13780,Mexico Folk Art Gallery,American Heritage Gallery,0.58
+EP119,ep,13775,Project Tomorrow: Inventing the Wonders of the Future,Project Tomorrow,0.52
+EP121,ep,13776,Stave Church Gallery,Stave Church Gallery,1.0
+EP13,ep,155,Journey Into Imagination With Figment,Journey Into Imagination With Figment,1.0
+EP13772,ep,13772,Gallery of Arts and History,,0.0
+EP13778,ep,13778,Kidcot Fun Stops,,0.0
+EP13782,ep,13782,SeaBase Aquarium,,0.0
+EP14,ep,160,Test Track,Test Track presented by General Motors,1.0
+EP14,ep,10900,Test Track Presented by Chevrolet Single Rider,Test Track presented by General Motors,0.67
+EP153,ep,2495,Disney and Pixar Short Film Festival,Disney & Pixar Short Film Festival,0.94
+EP155,ep,2679,Frozen Ever After,Frozen Ever After,1.0
+EP156,ep,6701,Meet Anna and Elsa at Royal Sommerhus,Meet Anna and Elsa at Royal Sommerhus,1.0
+EP186,ep,10914,Remy's Ratatouille Adventure,Remy's Ratatouille Adventure,1.0
+EP191,ep,7323,Awesome Planet,Awesome Planet,1.0
+EP194,ep,12387,"Journey of Water, Inspired by Moana","Journey of Water, Inspired by Moana",1.0
+EP195,ep,829,Canada Far and Wide in Circle-Vision 360,Canada Far and Wide in Circle-Vision 360,1.0
+EP197,ep,10916,Guardians of the Galaxy: Cosmic Rewind,Guardians of the Galaxy: Cosmic Rewind,1.0
+EP20,ep,466,Gran Fiesta Tour Starring The Three Caballeros,Gran Fiesta Tour Starring The Three Caballeros,1.0
+EP202,ep,13779,Palais du Cinéma,Atlas Fusion,0.57
+EP226,ep,13627,Meet Beloved Disney Pals at Mickey & Friends,Meet Beloved Disney Pals at Mickey & Friends,1.0
+EP228,ep,10915,Remy's Ratatouille Adventure Single Rider,Remy's Ratatouille Adventure Single Rider,1.0
+EP26,ep,158,Mission: SPACE,Mission: SPACE Green,0.82
+HS05,hs,6702,Indiana Jones™ Epic Stunt Spectacular!,Indiana Jones Epic Stunt Spectacular!,0.99
+HS100,hs,6703,Meet Olaf at Celebrity Spotlight,Meet Olaf at Celebrity Spotlight,1.0
+HS103,hs,5476,Slinky Dog Dash,Slinky Dog Dash,1.0
+HS104,hs,5477,Alien Swirling Saucers,Alien Swirling Saucers,1.0
+HS111,hs,6361,Mickey & Minnie's Runaway Railway,Mickey & Minnie's Runaway Railway,1.0
+HS112,hs,6368,Millennium Falcon: Smugglers Run,Millennium Falcon: Smugglers Run,1.0
+HS113,hs,6369,Star Wars: Rise of the Resistance,Star Wars: Rise of the Resistance,1.0
+HS119,hs,10902,Millennium Falcon: Smugglers Run Single Rider,Millennium Falcon: Smugglers Run Single Rider Line,0.95
+HS12,hs,119,Rock 'n' Roller Coaster Starring Aerosmith,Rock 'n' Roller Coaster Starring Aerosmith,1.0
+HS12,hs,10901,Rock 'n' Roller Coaster Starring Aerosmith Single Rider,Rock 'n' Roller Coaster Starring Aerosmith,0.86
+HS120,hs,12430,Meet Ariel at Walt Disney Presents,Meet Sulley at Walt Disney Presents,0.87
+HS127,hs,7333,Vacation Fun - An Original Animated Short with Mickey & Minnie,Vacation Fun - An Original Animated Short with Mickey & Minnie,1.0
+HS147,hs,12425,Meet Edna Mode at the Edna Mode Experience,Meet Edna Mode at the Edna Mode Experience,1.0
+HS148,hs,14859,The Little Mermaid – A Musical Adventure – New!,The Little Mermaid - A Musical Adventure,0.89
+HS15,hs,120,Star Tours – The Adventures Continue,Star Tours: The Adventures Continue,0.95
+HS150,hs,14531,Star Wars: Rise of the Resistance Single Rider,Star Wars: Rise of the Resistance Single Rider,1.0
+HS19,hs,1176,Beauty and the Beast – Live on Stage,Beauty and the Beast - Live on Stage,0.97
+HS20,hs,117,Toy Story Mania!,Toy Story Mania!,1.0
+HS22,hs,123,The Twilight Zone Tower of Terror™,The Twilight Zone Tower of Terror,0.98
+HS26,hs,5145,Walt Disney Presents,Walt Disney Presents,1.0
+HS84,hs,1174,For the First Time in Forever: A Frozen Sing-Along Celebration,For the First Time In Forever: A Frozen Sing-Along Celebration,1.0
+HS95,hs,6704,Meet Disney Stars at Red Carpet Dreams,Meet Disney Stars at Red Carpet Dreams,1.0
 MK01,mk,138,Space Mountain,Space Mountain,1.0
 MK02,mk,131,Buzz Lightyear's Space Ranger Spin,Buzz Lightyear's Space Ranger Spin,1.0
 MK03,mk,130,Big Thunder Mountain Railroad,Big Thunder Mountain Railroad,1.0
@@ -238,26 +203,3 @@ MK46,mk,334,Walt Disney's Enchanted Tiki Room,Walt Disney's Enchanted Tiki Room,
 MK49,mk,1181,Walt Disney World Railroad - Fantasyland,Walt Disney World Railroad - Fantasyland,1.0
 MK95,mk,1188,Main Street Vehicles,Main Street Vehicles,1.0
 MK96,mk,146,Meet Mickey at Town Square Theater,Meet Mickey at Town Square Theater,1.0
-UF13,uf,8721,Jurassic World VelociCoaster,Woody Woodpecker's Nuthouse Coaster,0.52
-UF155,uf,6004,The Incredible Hulk Coaster®,Trolls Trollercoaster,0.53
-UF164,uf,5987,The Cat in The Hat™,CineSational: A Symphonic Spectacular,0.52
-UF48,uf,5999,Pteranodon Flyers™,Transformers: The Ride-3D,0.53
-UF5985,uf,5985,The Amazing Adventures of Spider-Man®,,0.0
-UF5986,uf,5986,Caro-Seuss-el™,,0.0
-UF5988,uf,5988,Doctor Doom's Fearfall®,,0.0
-UF5989,uf,5989,Dudley Do-Right's Ripsaw Falls®,,0.0
-UF5991,uf,5991,Flight of the Hippogriff™,,0.0
-UF5994,uf,5994,Jurassic Park River Adventure™,,0.0
-UF5997,uf,5997,"One Fish, Two Fish, Red Fish, Blue Fish™",,0.0
-UF5998,uf,5998,Popeye & Bluto's Bilge-Rat Barges®,,0.0
-UF6001,uf,6001,The High in the Sky Seuss Trolley Train Ride!™,,0.0
-UF6003,uf,6003,Storm Force Accelatron®,,0.0
-UF6008,uf,6008,Camp Jurassic™,,0.0
-UF6011,uf,6011,If I Ran The Zoo™,,0.0
-UF6012,uf,6012,Jurassic Park Discovery Center™,,0.0
-UF6017,uf,6017,Skull Island: Reign of Kong™,,0.0
-UF63,uf,5992,Harry Potter and the Forbidden Journey™,Harry Potter and the Escape from Gringotts,0.63
-UF64,uf,6015,Hogwarts™ Express - Hogsmeade™ Station,Hogwarts Express - King's Cross Station,0.76
-UF66,uf,13098,Ollivanders™ Experience in Hogsmeade™,Ollivanders Experience in Diagon Alley,0.75
-UF6682,uf,6682,Hagrid's Magical Creatures Motorbike Adventure™,,0.0
-UF69,uf,13113,Harry Potter and the Forbidden Journey™ Single Rider,Harry Potter and the Escape from Gringotts Single Rider,0.73
