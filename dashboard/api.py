@@ -672,9 +672,8 @@ def get_wait_times(park_code: str):
     # Get trained entities and filter wait times to only those
     trained_entities = get_trained_entity_codes(output_base)
     
-    # Filter to only trained entities
-    if trained_entities:
-        wait_df = wait_df[wait_df["entity_code"].str.upper().isin(trained_entities)]
+    # Note: Live wait times may use different entity codes than trained models
+    # We show all wait times but entity dropdown is filtered to trained attractions
     
     # Prepare results
     results = []
