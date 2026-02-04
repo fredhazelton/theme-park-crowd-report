@@ -17,7 +17,7 @@ AK39,ak,13811,Discovery Island Trails,Discovery Island Trails,1.0
 AK42,ak,12451,Meet Moana at Character Landing,Discovery Island Character Landing,0.71
 AK44,ak,13812,The Oasis Exhibits,Oasis Exhibits,1.0
 AK45,ak,13809,Dino-Sue,Dino-Sue,1.0
-AK55,ak,13751,Tree of Life,Tree of Life Waypoint: In front of Tree of Life,0.73
+AK13751,ak,13751,Tree of Life,,0.0
 AK78,ak,116,Meet Favorite Disney Pals at Adventurers Outpost,Meet Favorite Disney Pals at Adventurers Outpost,1.0
 AK79,ak,13808,Wilderness Explorers,Wilderness Explorers,1.0
 AK85,ak,4438,Na'vi River Journey,Na'vi River Journey,1.0
@@ -50,7 +50,7 @@ CA39,ca,5557,Pixar Pal-A-Round – Non-Swinging,Pixar Pal-A-Round - Non Swinging
 CA47,ca,13959,The Bakery Tour,The Bakery Tour,1.0
 CA56,ca,301,Silly Symphony Swings,Silly Symphony Swings - Single,0.82
 CA56,ca,10905,Silly Symphony Swings Single Rider,Silly Symphony Swings - Single,0.88
-CA63,ca,14742,World of Color Happiness!,World of Color FASTPASS Kiosk,0.76
+CA14742,ca,14742,World of Color Happiness!,,0.0
 CA67,ca,319,Goofy's Sky School,Goofy's Sky School,1.0
 CA68,ca,316,The Little Mermaid - Ariel's Undersea Adventure,The Little Mermaid ~ Ariel's Undersea Adventure,0.98
 DL01,dl,285,Alice in Wonderland,Alice in Wonderland,1.0
@@ -62,7 +62,7 @@ DL09,dl,303,Casey Jr. Circus Train,Casey Jr. Circus Train,1.0
 DL103,dl,690,Great Moments with Mr. Lincoln,The Disneyland Story presenting Great Moments with Mr. Lincoln,0.82
 DL11,dl,304,Davy Crockett's Explorer Canoes,Davy Crockett's Explorer Canoes,1.0
 DL12,dl,6711,Meet Disney Princesses at Royal Hall,Meet Disney Princesses at Royal Hall,1.0
-DL13,dl,674,Disneyland Railroad,Disneyland Monorail,0.79
+DL674,dl,674,Disneyland Railroad,,0.0
 DL13,dl,274,Disneyland Monorail,Disneyland Monorail,1.0
 DL16,dl,275,Dumbo the Flying Elephant,Dumbo the Flying Elephant,1.0
 DL17,dl,288,Walt Disney's Enchanted Tiki Room,Walt Disney's Enchanted Tiki Room,1.0
@@ -114,11 +114,11 @@ EP07,ep,156,Living with the Land,Living with the Land,1.0
 EP09,ep,151,Soarin' Around the World,Soarin' Around the World,1.0
 EP110,ep,13781,Bijutsu-kan Gallery,Bijutsu-kan Gallery,1.0
 EP112,ep,13777,"ImageWorks - The ""What If"" Labs",ImageWorks,0.57
-EP113,ep,13770,Bruce's Shark World,Holidays Around the World,0.51
+EP13770,ep,13770,Bruce's Shark World,,0.0
 EP114,ep,13767,House of the Whispering Willows,House of the Whispering Willows,1.0
 EP116,ep,13774,Advanced Training Lab,Misson: SPACE Advanced Training Lab,0.75
 EP118,ep,13773,American Heritage Gallery,American Heritage Gallery,1.0
-EP118,ep,13780,Mexico Folk Art Gallery,American Heritage Gallery,0.58
+EP13780,ep,13780,Mexico Folk Art Gallery,,0.0
 EP119,ep,13775,Project Tomorrow: Inventing the Wonders of the Future,Project Tomorrow,0.52
 EP121,ep,13776,Stave Church Gallery,Stave Church Gallery,1.0
 EP13,ep,155,Journey Into Imagination With Figment,Journey Into Imagination With Figment,1.0
@@ -136,7 +136,7 @@ EP194,ep,12387,"Journey of Water, Inspired by Moana","Journey of Water, Inspired
 EP195,ep,829,Canada Far and Wide in Circle-Vision 360,Canada Far and Wide in Circle-Vision 360,1.0
 EP197,ep,10916,Guardians of the Galaxy: Cosmic Rewind,Guardians of the Galaxy: Cosmic Rewind,1.0
 EP20,ep,466,Gran Fiesta Tour Starring The Three Caballeros,Gran Fiesta Tour Starring The Three Caballeros,1.0
-EP202,ep,13779,Palais du Cinéma,Atlas Fusion,0.57
+EP13779,ep,13779,Palais du Cinéma,,0.0
 EP226,ep,13627,Meet Beloved Disney Pals at Mickey & Friends,Meet Beloved Disney Pals at Mickey & Friends,1.0
 EP228,ep,10915,Remy's Ratatouille Adventure Single Rider,Remy's Ratatouille Adventure Single Rider,1.0
 EP26,ep,158,Mission: SPACE,Mission: SPACE Green,0.82
