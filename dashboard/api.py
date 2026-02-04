@@ -295,6 +295,14 @@ def get_daily_wti(wti_df: pd.DataFrame, park_code: str, park_date: date) -> Opti
 # API ENDPOINTS
 # =============================================================================
 
+
+def get_trained_entity_codes(output_base: Path) -> set:
+    """Get set of entity codes that have trained models (met the 500 obs threshold)."""
+    models_dir = output_base / "models"
+    if not models_dir.exists():
+        return set()
+    return set(d.name.upper() for d in models_dir.iterdir() if d.is_dir())
+
 @app.route("/api/health", methods=["GET"])
 def health():
     """Health check endpoint."""
@@ -595,6 +603,14 @@ def get_entities(park_code: str):
     if park_entities.empty:
         return jsonify({"entities": []})
     
+
+    # Filter to only entities with trained models (met 500 obs threshold)
+    trained_entities = get_trained_entity_codes(output_base)
+    if trained_entities:
+        before_count = len(park_entities)
+        park_entities = park_entities[park_entities[code_col].astype(str).str.upper().str.strip().isin(trained_entities)]
+        logger.info(f"Filtered from {before_count} to {len(park_entities)} entities with trained models")
+    
     # Prepare results using the lookup dictionary
     results = []
     missing_names = []
@@ -652,6 +668,13 @@ def get_wait_times(park_code: str):
     
     # Load entity metadata for names
     entities_df = load_entity_metadata(output_base)
+    
+    # Get trained entities and filter wait times to only those
+    trained_entities = get_trained_entity_codes(output_base)
+    
+    # Filter to only trained entities
+    if trained_entities:
+        wait_df = wait_df[wait_df["entity_code"].str.upper().isin(trained_entities)]
     
     # Prepare results
     results = []
