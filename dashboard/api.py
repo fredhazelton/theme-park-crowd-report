@@ -200,8 +200,8 @@ def load_forecast_curves(output_base: Path, park_code: str, park_date: date) -> 
                     entity_name = entity_code
                     if entities_df is not None:
                         entity_row = entities_df[entities_df["entity_code"] == entity_code]
-                        if not entity_row.empty and "entity_name" in entity_row.columns:
-                            entity_name = entity_row.iloc[0]["entity_name"]
+                        if not entity_row.empty and "name" in entity_row.columns:
+                            entity_name = str(entity_row.iloc[0]["name"])
                     
                     curves.append({
                         "entity_code": entity_code,
@@ -663,8 +663,8 @@ def get_wait_times(park_code: str):
         entity_name = entity_code
         if entities_df is not None and not entities_df.empty:
             entity_row = entities_df[entities_df["entity_code"] == entity_code]
-            if not entity_row.empty and "entity_name" in entity_row.columns:
-                entity_name = entity_row.iloc[0]["entity_name"]
+            if not entity_row.empty and "name" in entity_row.columns:
+                entity_name = str(entity_row.iloc[0]["name"])
         
         results.append({
             "entity_code": entity_code,
