@@ -250,22 +250,13 @@
                 </div>
             </div>
             
-            <!-- Quick Links -->
-            <div class="card">
+            <!-- Quick Links (Dynamic from JSON) -->
+            <div class="card full-width" id="quick-links-card">
                 <h2>🔗 Quick Links</h2>
-                <div class="links-grid">
-                    <a href="https://github.com/hazeydata/theme-park-crowd-report" class="link-btn" target="_blank">
-                        🐙 GitHub Repo
-                    </a>
-                    <a href="https://hazeydata.ai" class="link-btn" target="_blank">
-                        🌐 hazeydata.ai
-                    </a>
-                    <a href="https://github.com/hazeydata/theme-park-crowd-report/blob/main/docs/MAC-MINI-SETUP-CHECKLIST.md" class="link-btn" target="_blank">
-                        🖥️ Mac Mini Setup
-                    </a>
-                    <a href="https://www.figma.com/design/JPWe8gZd4VPmAvnK6tLha1/hazeydata.ai" class="link-btn" target="_blank">
-                        🎨 Figma
-                    </a>
+                <div id="quick-links-container">
+                    <div class="links-grid">
+                        <a href="#" class="link-btn">Loading...</a>
+                    </div>
                 </div>
             </div>
             
@@ -516,6 +507,23 @@
                             <span class="status ${task.status_class}">${task.status_text}</span>
                             <span><strong>${task.id}</strong> ${task.title} <small style="color: var(--text-secondary);">(${task.owner})</small></span>
                         </li>
+                    `).join('');
+                }
+                
+                // Quick Links (grouped by category)
+                const quickLinksContainer = document.getElementById('quick-links-container');
+                if (data.quick_links && data.quick_links.length > 0) {
+                    quickLinksContainer.innerHTML = data.quick_links.map(category => `
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">${category.category}</div>
+                            <div class="links-grid" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));">
+                                ${category.links.map(link => `
+                                    <a href="${link.url}" class="link-btn" target="_blank" style="font-size: 0.85rem;">
+                                        ${link.icon} ${link.name}
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>
                     `).join('');
                 }
             } catch (e) {

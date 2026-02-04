@@ -1,54 +1,61 @@
 {
   "todays_focus": [
     {
-      "status_class": "medium",
-      "status_text": "\u23f3 When Fre",
-      "task": "Test First Stream \u2014 All components ready!"
+      "status_class": "good",
+      "status_text": "🎉 TODAY!",
+      "task": "Wilma Autonomy Pilot begins — $500/mo spending authority!"
     },
     {
-      "status_class": "medium",
-      "status_text": "\ud83c\udf89 1 day",
-      "task": "Autonomy Pilot Tomorrow \u2014 $500/mo budget starts Feb 4"
+      "status_class": "critical",
+      "status_text": "🔄 RUNNING",
+      "task": "Forecast generation — 21+ hours in, still crunching predictions"
     },
     {
       "status_class": "good",
-      "status_text": "ACTIVE",
-      "task": "Pipeline running \u2014 ETL processing historical S3 data"
+      "status_text": "✅ DONE",
+      "task": "First streams complete! — Two successful streams yesterday"
     },
     {
-      "status_class": "good",
-      "status_text": "DONE",
-      "task": "Overlays aligned \u2014 Both chats tested, services running"
+      "status_class": "medium",
+      "status_text": "📝 TODO",
+      "task": "Dashboard refinements — Date slicer redesign, entity filtering"
     }
   ],
   "key_dates": [
     {
-      "emoji": "\ud83d\udc64",
-      "event": "John visits",
-      "date": "Feb 7",
-      "days_out": 4,
-      "urgency": ""
+      "emoji": "💰",
+      "event": "Wilma Autonomy Pilot",
+      "date": "TODAY",
+      "days_out": 0,
+      "urgency": "imminent"
     },
     {
-      "emoji": "\u26a0\ufe0f",
+      "emoji": "👤",
+      "event": "John visits",
+      "date": "Feb 7",
+      "days_out": 3,
+      "urgency": "soon"
+    },
+    {
+      "emoji": "⚠️",
       "event": "GPT-4o retires",
       "date": "Feb 13",
-      "days_out": 10,
+      "days_out": 9,
       "urgency": ""
     }
   ],
   "active_projects": [
     {
-      "status_class": "medium",
-      "status_text": "READY!",
-      "title": "Twitch/YouTube Stream",
-      "description": "All systems go! Just need Fred to hit \"Go Live\""
+      "status_class": "good",
+      "status_text": "✅ LIVE",
+      "title": "Twitch/YouTube Streaming",
+      "description": "Infrastructure validated! Two successful streams on Feb 3"
     },
     {
       "status_class": "critical",
-      "status_text": "RUNNING",
-      "title": "Theme Park Crowd Report",
-      "description": "Pipeline processing S3 historical data"
+      "status_text": "🔄 RUNNING",
+      "title": "Theme Park Crowd Report Pipeline",
+      "description": "Forecast generation in progress (21+ hours)"
     },
     {
       "status_class": "low",
@@ -57,97 +64,96 @@
       "description": "Live! Needs blog content"
     }
   ],
-  "theme_park_intel": [
+  "quick_links": [
     {
-      "title": "Water features literally FROZE",
-      "detail": ""
+      "category": "Work",
+      "links": [
+        {"name": "GitHub Repo", "url": "https://github.com/hazeydata/theme-park-crowd-report", "icon": "🐙"},
+        {"name": "hazeydata.ai", "url": "https://hazeydata.ai", "icon": "🌐"},
+        {"name": "Figma", "url": "https://www.figma.com/design/JPWe8gZd4VPmAvnK6tLha1/hazeydata.ai", "icon": "🎨"},
+        {"name": "Cloudflare", "url": "https://dash.cloudflare.com", "icon": "☁️"}
+      ]
     },
     {
-      "title": "Donald's Dino Institute patch ALREADY REMOVED",
-      "detail": ""
+      "category": "Stream Overlays",
+      "links": [
+        {"name": "Live Scene", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/main-dashboard.html", "icon": "🎬"},
+        {"name": "Just Chatting", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/just-chatting-dashboard.html", "icon": "💬"},
+        {"name": "Starting Soon", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/starting-soon.html", "icon": "⏳"},
+        {"name": "BRB Screen", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/brb.html", "icon": "☕"},
+        {"name": "Ending Screen", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/ending.html", "icon": "👋"},
+        {"name": "Offline Screen", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/offline.html", "icon": "📴"}
+      ]
     },
     {
-      "title": "Fyre Drill",
-      "detail": ""
+      "category": "Chat & Alerts",
+      "links": [
+        {"name": "Fred & Wilma Chat", "url": "http://wilma-server:8888/chat-overlay.html", "icon": "🦴"},
+        {"name": "Twitch Chat", "url": "http://wilma-server:8888/twitch-chat-overlay.html", "icon": "💜"},
+        {"name": "Pebbles Alerts", "url": "http://wilma-server:8888/alerts-preview.html", "icon": "🔔"}
+      ]
     },
     {
-      "title": "Spider-Man Tower of Terror",
-      "detail": ""
+      "category": "Dashboards",
+      "links": [
+        {"name": "Stream Dashboard", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/stream-dashboard.html", "icon": "📊"},
+        {"name": "Mission Control", "url": "https://hazeydata.github.io/theme-park-crowd-report/mission-control.html", "icon": "🦴"}
+      ]
     }
   ],
+  "theme_park_intel": [
+    {"title": "Deep Freeze", "detail": "Water features froze at WDW & Universal"},
+    {"title": "DinoLand gone", "detail": "All branding removed, Tropical Americas coming"},
+    {"title": "Fyre Drill", "detail": "Refurb extended another week"},
+    {"title": "Epic Universe", "detail": "Opening May 22, early entry limited attractions"}
+  ],
+  "dino_summary": {
+    "in_progress": 1,
+    "blocked": 0,
+    "todo": 4,
+    "done": 4
+  },
   "dino_tasks": [
     {
       "id": "task-001",
       "title": "Historical pipeline ETL load",
-      "description": "First-time load of all historical wait time data",
       "status": "in_progress",
       "status_class": "critical",
-      "status_text": "IN PROGRESS",
-      "priority": "high",
-      "priority_icon": "\u26a1",
-      "owner": "Wilma",
-      "notes": "Pipeline watchdog active, auto-restarts if stalled. Processing S3 data.",
-      "updated": "2026-02-03T04:00:00"
+      "status_text": "🔄",
+      "owner": "Wilma"
     },
     {
-      "id": "task-002",
-      "title": "Mac Mini streaming setup",
-      "description": "Set up Streamlabs for Twitch + YouTube cross-platform streaming",
-      "status": "in_progress",
-      "status_class": "critical",
-      "status_text": "IN PROGRESS",
-      "priority": "high",
-      "priority_icon": "\u26a1",
-      "owner": "Fred",
-      "notes": "Mac Mini running! All overlays tested and aligned. Both chat services active.",
-      "updated": "2026-02-03T04:00:00"
+      "id": "task-007",
+      "title": "Investigate nonsensical entity values",
+      "status": "todo",
+      "status_class": "medium",
+      "status_text": "📝",
+      "owner": "Bam-Bam"
+    },
+    {
+      "id": "task-008",
+      "title": "Dashboard date range slicer redesign",
+      "status": "todo",
+      "status_class": "medium",
+      "status_text": "📝",
+      "owner": "Bam-Bam"
     },
     {
       "id": "task-006",
       "title": "Test first stream",
-      "description": "Private test stream with all overlays, camera, mic",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
-      "priority": "high",
-      "priority_icon": "\u26a1",
-      "owner": "Fred",
-      "notes": "All components ready \u2014 just need Fred to hit Go!",
-      "updated": "2026-02-03T04:00:00"
+      "status": "done",
+      "status_class": "good",
+      "status_text": "✅",
+      "owner": "Fred"
     },
     {
-      "id": "task-005",
-      "title": "Replace \"Twitter\" icons and text with \"X\" icons and text",
-      "description": "We need to be on-brand for X",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
-      "priority": "low",
-      "priority_icon": "\ud83d\udcdd",
-      "owner": "Fred",
-      "notes": "",
-      "updated": "2026-02-02T13:14:00"
-    },
-    {
-      "id": "task-007",
-      "title": "Investigate nonsensical entity values in pipeline data",
-      "description": "Dashboard showing invalid attraction names like 'HS 6369', waypoints appearing as attractions. Need to check pipeline filtering logic and add exclusions for non-attraction entities.",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
-      "priority": "medium",
-      "priority_icon": "\ud83d\udccb",
-      "owner": "Bam-Bam",
-      "notes": "Noticed during first live stream 2026-02-03",
-      "updated": "2026-02-03T16:36:45.083785"
+      "id": "task-002",
+      "title": "Mac Mini streaming setup",
+      "status": "done",
+      "status_class": "good",
+      "status_text": "✅",
+      "owner": "Fred"
     }
   ],
-  "dino_summary": {
-    "total": 5,
-    "todo": 3,
-    "in_progress": 2,
-    "blocked": 0,
-    "done": 0
-  },
-  "last_updated": "2026-02-03T17:55:01.393420-05:00"
+  "overnight_message": "🌙 Wilma's been busy while you slept! Updated Mission Control with Quick Links, synced Dino tasks, marked your streams as DONE. Pipeline still running strong (21+ hours). Web search API needs config — I've added it to your todos. Today's the day: Autonomy Pilot starts! 🦴"
 }
