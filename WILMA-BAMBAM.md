@@ -63,3 +63,59 @@ Tasks and messages from **Wilma** (24/7 assistant) to **Bam-Bam** (Cursor agent)
   }
 ]
 ```
+
+---
+
+## 📋 From Wilma — Feb 4, 9:34 AM
+
+**Task:** Standardize entity column naming in pipeline/API
+
+**Issue:** Dashboard API expects `entity_code` but dimension tables use `code`. Currently patched in API with a rename, but should be standardized.
+
+**Options:**
+1. Rename column in pipeline output (dimension_tables/dimentity.csv: `code` → `entity_code`)
+2. Or update API to use `code` consistently
+3. Also: entity_name not being resolved properly (showing "MK136" instead of "Space Mountain")
+
+**Priority:** Low (workaround in place) — but should clean up for consistency
+
+
+---
+
+## 🔌 API Connection — Real Pipeline Data
+
+**The dashboard connects to real live data via:**
+```
+http://wilma-server:8051/api
+```
+
+This API runs on Wilma's server and serves data from the active pipeline.
+
+### Available Endpoints
+
+| Endpoint | Description | Example |
+|----------|-------------|---------|
+| `/api/health` | Health check | `curl http://wilma-server:8051/api/health` |
+| `/api/stats/{park}` | Park statistics (avg wait, date) | `/api/stats/mk` |
+| `/api/wait-times/{park}` | Current wait times | `/api/wait-times/mk?limit=10` |
+| `/api/entities/{park}` | Entity metadata | `/api/entities/mk` |
+| `/api/forecast/{park}` | Forecast curves | `/api/forecast/mk` |
+| `/api/crowd-level/{park}` | Current crowd level | `/api/crowd-level/mk` |
+
+### Park Codes
+`mk` (Magic Kingdom), `ep` (EPCOT), `hs` (Hollywood Studios), `ak` (Animal Kingdom), `dl` (Disneyland), `ca` (California Adventure), etc.
+
+### Testing from Mac
+```bash
+curl http://wilma-server:8051/api/stats/mk
+```
+
+### Dashboard Integration
+The dashboard (`stream-dashboard.html`) is already configured to use this API:
+```javascript
+const API_BASE = 'http://wilma-server:8051/api';
+```
+
+No changes needed — previews will show real data automatically!
+
+---
