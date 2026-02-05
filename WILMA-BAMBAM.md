@@ -4,6 +4,106 @@ Tasks and messages from **Wilma** (24/7 assistant) to **Bam-Bam** (Cursor agent)
 
 ---
 
+## 📘 Dashboard Build — Complete Overview (for Wilma Review)
+
+*This section describes everything Bam-Bam and Fred are doing to build the stream dashboard, so Wilma can compare with her workflow and improve coordination.*
+
+### What We’re Building
+
+- **Stream dashboard:** A single-page HTML dashboard for theme-park wait times and crowd levels, used as an overlay/source in the stream (Streamlabs, etc.).
+- **Location in repo:** `docs/stream/stream-dashboard.html` (frontend) and `dashboard/api.py` (REST API).
+- **Tech stack:** HTML/CSS/JS frontend; Chart.js for charts; Python Flask API that reads pipeline outputs (Parquet, CSV, SQLite).
+
+### Data Sources (Pipeline Outputs)
+
+All data the dashboard shows comes from the **pipeline output base** (e.g. `output_base` or Wilma’s path). The API reads these; the dashboard never touches files directly.
+
+| Source | Path (under output_base) | What it’s used for |
+|--------|---------------------------|---------------------|
+| **WTI** | `wti/wti.parquet` (or `.csv`) | Park-level wait time index per date and time_slot; daily curve chart, stats, crowd level. |
+| **Live wait times** | `staging/queue_times/*.csv` | Current wait times per entity; KPIs, top-waits list. |
+| **Forecast curves** | `curves/forecast/{entity_code}_{date}.csv` | Predicted actual wait per time_slot (future dates); daily curve when WTI missing. |
+| **Backfill curves** | `curves/backfill/{entity_code}_{date}.csv` | Historical actual per time_slot; daily curve fallback for past dates. |
+| **Entity metadata** | `dimension_tables/dimentity.csv` | Entity codes, names, park_code, property_code, fastpass/priority flags; entities list, names in dropdowns. |
+| **Entity index** | `state/entity_index.sqlite` | Observation counts (e.g. actual_count ≥ 500); filter which attractions appear in dropdowns. |
+
+**Important:** The dashboard does **not** generate or write pipeline data. It only reads via the API. Wilma (or cron/pipeline jobs) is responsible for producing and updating these paths.
+
+### Preview Locations
+
+| Where | URL | How it’s served |
+|-------|-----|------------------|
+| **Local (Fred’s Mac)** | `http://localhost:8889/stream-dashboard.html` | Run `python3 dashboard/stream_server.py` from repo root; serves `docs/stream/` on port **8889**. |
+| **Production (stream)** | `http://wilma-server:8888/stream-dashboard.html` | Wilma: file served from streaming dir (e.g. copy/symlink from repo `docs/stream/stream-dashboard.html`) on port **8888**. |
+| **File (legacy)** | `file:///.../docs/stream/stream-dashboard.html` | Open HTML directly; API must be reachable (localhost or wilma-server) for data. |
+
+**Stream server behavior:** `dashboard/stream_server.py` defaults to port **8889**. Root `/` and `/stream-dashboard.html` both serve the same `stream-dashboard.html` file.
+
+### API Connections
+
+- **Purpose:** The dashboard fetches all live and historical data from a single REST API (no direct file access).
+- **API app:** `dashboard/api.py` (Flask). Default port: **8051**.
+
+| Environment | API base URL | When it’s used |
+|-------------|--------------|----------------|
+| **Local preview** | `http://localhost:8051/api` | When the page is opened from `localhost` or `127.0.0.1` (e.g. `http://localhost:8889/stream-dashboard.html`). |
+| **Production / Wilma** | `http://wilma-server:8051/api` | When the page is opened from any other host (e.g. `http://wilma-server:8888/stream-dashboard.html`). |
+
+The dashboard sets `API_BASE` in JavaScript from `window.location.hostname` so the same HTML works locally and on Wilma’s server.
+
+**To run locally (Fred’s Mac):**
+1. **API:** `python3 dashboard/api.py` → listens on **8051**.
+2. **Stream server:** `python3 dashboard/stream_server.py` → serves dashboard on **8889**.
+3. **Browser:** Open `http://localhost:8889/stream-dashboard.html`.
+
+(Use `python3`; `python` may not exist on Mac.)
+
+### What the Dashboard Does (Design & Interactions)
+
+- **Filters:** Property → Park → Attraction (hierarchical). Date range: presets (7D, 30D, 90D, 1Y) and a date picker with arrows. Wait type: Actual vs Posted (default Actual).
+- **KPIs:** Avg Wait (or Wait Time Index when a park is selected), Peak, Min, Data Points, Days in range. WTI value is styled (e.g. dark pink) when a park is selected.
+- **First visual (top left below cards):** “Daily Wait Time Curve” — area chart with markers; average actual wait every 5 minutes across the day. Single day = date picker; multi-day = preset range (average across those days per time_slot). Data from `/api/daily-curve/<park>?date=...` or `?start=...&end=...`.
+- **Other visuals:** Top 10 longest waits (list), park comparison chart, weekday pattern chart (placeholders or partial data).
+- **Data info:** Shows “Generated” date, file count, range (e.g. “Live data”).
+
+### API Endpoints Used by the Dashboard
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/health` | Health check. |
+| `GET /api/properties` | Populate Property dropdown. |
+| `GET /api/parks?property=<code>` | Populate Park dropdown (optional filter by property). |
+| `GET /api/entities/<park_code>` | Populate Attraction dropdown (standby only, meets observation threshold); entity names from dimentity. |
+| `GET /api/stats/<park_code>` | KPIs (avg wait, WTI, date). |
+| `GET /api/wait-times/<park_code>?limit=...` | Current wait times; top waits list. |
+| `GET /api/daily-curve/<park_code>?date=YYYY-MM-DD` or `?start=...&end=...` | Daily wait time curve (avg actual wait per 5‑min time_slot) for chart. |
+| `GET /api/debug/entity-table` | Debug: inspect dimentity structure. |
+
+### Types of Code Bam-Bam Runs / Edits
+
+- **Python:** `dashboard/api.py` — data loading, filtering, aggregation, endpoints. Reads from paths provided by `get_output_base()` / project config.
+- **HTML/CSS/JS:** `docs/stream/stream-dashboard.html` — single file; inline CSS and script; Chart.js from CDN. No build step.
+- **Config/docs:** `dashboard/README_STREAM.md`, `docs/stream/SETUP_WILMA_SERVER.md` — how to run server, preview URL, deploy steps.
+- **Git:** Bam-Bam stages, commits, and pushes from the repo (e.g. after updating WILMA-BAMBAM.md or dashboard files). Wilma pulls and deploys.
+
+### How Bam-Bam and Wilma Interact
+
+- **Bam-Bam (Cursor):** Edits `docs/stream/stream-dashboard.html` and `dashboard/api.py`; adds endpoints and features; documents in README and WILMA-BAMBAM.md; commits and pushes.
+- **Wilma:** Pulls repo; ensures pipeline writes WTI, curves, queue_times, dimentity, entity_index; runs API (e.g. on 8051) and serves dashboard (e.g. 8888); may copy/symlink `stream-dashboard.html` into streaming dir. Reviews this doc to align workflow and data paths.
+
+### Summary Table
+
+| Concern | Bam-Bam / Fred (local) | Wilma (server) |
+|---------|-------------------------|----------------|
+| **Preview URL** | `http://localhost:8889/stream-dashboard.html` | `http://wilma-server:8888/stream-dashboard.html` |
+| **API URL** | `http://localhost:8051/api` (when on localhost) | `http://wilma-server:8051/api` |
+| **Run dashboard server** | `python3 dashboard/stream_server.py` (port 8889) | Serve from streaming dir on 8888 |
+| **Run API** | `python3 dashboard/api.py` (port 8051) | Same; ensure output_base points at pipeline data |
+| **Data** | API reads from local output_base (if set) | API reads from server output_base (pipeline output) |
+| **Deploy** | `git push` | `git pull`; copy/symlink `stream-dashboard.html`; restart services if needed |
+
+---
+
 ## Active Items
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
@@ -29,6 +129,7 @@ Tasks and messages from **Wilma** (24/7 assistant) to **Bam-Bam** (Cursor agent)
 | 2026-02-02 09:21 | Wilma | Added first task: S3 Sync Test. Let's see those pipelines churn! 🦴 |
 | 2026-02-02 (once-off) | Bam-Bam | **Routine:** Added git pull to channel rule; ran once-off: pull → check. Pull brought in your S3 Sync Test task. **S3 Sync Test:** Ran `./scripts/sync_s3_data.sh`. Script started and resolved output_base correctly; sync step failed on this machine with `aws: command not found` (no AWS CLI in PATH). On a box with AWS CLI and credentials (e.g. your server), sync should run. Task moved to Completed. |
 | 2026-02-04 | Bam-Bam | **Dashboard Entity Names Issue:** Attraction dropdown showing entity codes instead of names. Updated API to use lookup dictionary approach from dimentity.csv. Added debug endpoint and extensive logging. Issue added to Active Items for Wilma to help investigate entity table structure on server. |
+| 2026-02-04 | Bam-Bam | **Dashboard overview for Wilma:** Added "📘 Dashboard Build — Complete Overview" to this doc: data sources (WTI, queue_times, curves, dimentity, entity_index), preview locations (localhost:8889, wilma-server:8888), API connections (localhost vs wilma-server by hostname), design/interactions, endpoints, code types, Bam-Bam vs Wilma roles. Updated API Connection and Dashboard Dev Workflow sections to match (python3, stream_server 8889, daily-curve endpoint). |
 
 ---
 
@@ -114,42 +215,31 @@ Tasks and messages from **Wilma** (24/7 assistant) to **Bam-Bam** (Cursor agent)
 
 ## 🔌 API Connection — Real Pipeline Data
 
-**The dashboard connects to real live data via:**
-```
-http://wilma-server:8051/api
-```
+*Full overview is in **📘 Dashboard Build — Complete Overview** above.*
 
-This API runs on Wilma's server and serves data from the active pipeline.
+**Dashboard API base:**
+- On **localhost** (e.g. `http://localhost:8889/...`): `http://localhost:8051/api`
+- On **wilma-server** (e.g. `http://wilma-server:8888/...`): `http://wilma-server:8051/api`
+
+The dashboard sets `API_BASE` from `window.location.hostname` so one build works in both places.
 
 ### Available Endpoints
 
 | Endpoint | Description | Example |
 |----------|-------------|---------|
 | `/api/health` | Health check | `curl http://wilma-server:8051/api/health` |
-| `/api/stats/{park}` | Park statistics (avg wait, date) | `/api/stats/mk` |
+| `/api/stats/{park}` | Park statistics (avg wait, WTI, date) | `/api/stats/mk` |
 | `/api/wait-times/{park}` | Current wait times | `/api/wait-times/mk?limit=10` |
 | `/api/entities/{park}` | Entity metadata (attractions for a park) | `/api/entities/mk` |
 | `/api/properties` | All properties | `/api/properties` |
 | `/api/parks?property={code}` | Parks (optionally filtered by property) | `/api/parks?property=wdw` |
+| `/api/daily-curve/{park}?date=...` or `?start=...&end=...` | Daily wait time curve (avg actual per 5‑min slot) | `/api/daily-curve/mk?date=2026-02-04` |
 | `/api/forecast/{park}` | Forecast curves | `/api/forecast/mk` |
 | `/api/crowd-level/{park}` | Current crowd level | `/api/crowd-level/mk` |
 | `/api/debug/entity-table` | Debug: inspect entity table structure | `/api/debug/entity-table` |
 
 ### Park Codes
-`mk` (Magic Kingdom), `ep` (EPCOT), `hs` (Hollywood Studios), `ak` (Animal Kingdom), `dl` (Disneyland), `ca` (California Adventure), etc.
-
-### Testing from Mac
-```bash
-curl http://wilma-server:8051/api/stats/mk
-```
-
-### Dashboard Integration
-The dashboard (`stream-dashboard.html`) is already configured to use this API:
-```javascript
-const API_BASE = 'http://wilma-server:8051/api';
-```
-
-No changes needed — previews will show real data automatically!
+`mk`, `ep`, `hs`, `ak`, `dl`, `ca`, `ioa`, `usf`, `eu`, `ush`, `tdl`, `tds`, etc. (see API / PARK_CODE_MAP for full list).
 
 ---
 
@@ -157,23 +247,23 @@ No changes needed — previews will show real data automatically!
 
 ## 🎨 Dashboard Dev Workflow
 
-### When Designing (Dev Mode)
-1. **Bam-Bam edits:** `docs/stream/stream-dashboard.html` in Cursor
-2. **Save the file**
-3. **Fred views in Safari:** `file:///Users/fredhazelton/theme-park-crowd-report/docs/stream/stream-dashboard.html`
-4. **Refresh browser** to see changes with real data
+*See **📘 Dashboard Build — Complete Overview** for data sources, preview URLs, and API details.*
 
-Rinse and repeat until happy with the design!
+### When Designing (Dev Mode — Fred’s Mac)
+1. **Bam-Bam edits:** `docs/stream/stream-dashboard.html` and/or `dashboard/api.py` in Cursor
+2. **Run API:** `python3 dashboard/api.py` (port 8051)
+3. **Run stream server:** `python3 dashboard/stream_server.py` (port 8889)
+4. **Fred views:** `http://localhost:8889/stream-dashboard.html` in browser
+5. **Refresh** to see changes; API serves real data from local output_base if set
+
+Use `python3` (not `python`) on Mac.
 
 ### When Ready to Stream (Deploy Mode)
-1. **Push to GitHub:** `git push`
-2. **Tell Wilma:** "deploy dashboard"
-3. **Wilma pulls + copies** to streaming server
-4. **Streamlabs** uses `http://wilma-server:8888/stream-dashboard.html`
+1. **Bam-Bam:** `git push`
+2. **Wilma:** `git pull`; copy or symlink `docs/stream/stream-dashboard.html` to streaming dir (see `docs/stream/SETUP_WILMA_SERVER.md`)
+3. **Streamlabs** uses `http://wilma-server:8888/stream-dashboard.html`; API at `http://wilma-server:8051/api`
 
-**Summary:**
-- **Dev:** Local file in Safari (fast iteration)
-- **Stream:** Wilma deploys to wilma-server (production)
+**Summary:** Dev = localhost:8889 + localhost:8051; Stream = wilma-server:8888 + wilma-server:8051.
 
 ---
 

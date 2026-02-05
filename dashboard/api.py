@@ -301,8 +301,17 @@ def get_trained_entity_codes(output_base: Path) -> set:
     """Get set of entity codes that have trained models (met the 500 obs threshold)."""
     models_dir = output_base / "models"
     if not models_dir.exists():
+        logger.debug(f"Models directory not found: {models_dir}")
         return set()
-    return set(d.name.upper() for d in models_dir.iterdir() if d.is_dir())
+    
+    trained = set()
+    for d in models_dir.iterdir():
+        if d.is_dir():
+            entity_code = d.name.upper()
+            trained.add(entity_code)
+    
+    logger.debug(f"Found {len(trained)} entities with model directories in {models_dir}")
+    return trained
 
 @app.route("/api/health", methods=["GET"])
 def health():
@@ -606,12 +615,71 @@ def get_entities(park_code: str):
     if park_entities.empty:
         return jsonify({"entities": []})
     
+    # Filter to only standby attractions (exclude priority queues/fastpass booths)
+    # Check for fastpass_booth or is_fastpass_booth column
+    fastpass_col = None
+    for col in ["fastpass_booth", "is_fastpass_booth", "priority_available"]:
+        if col in park_entities.columns:
+            fastpass_col = col
+            break
+    
+    if fastpass_col:
+        before_fastpass_count = len(park_entities)
+        # Filter to only entities where fastpass_booth is False (standby only)
+        # Handle various boolean representations (True/False, 1/0, "true"/"false", etc.)
+        # Create a mask for standby queues (fastpass_booth = False)
+        if park_entities[fastpass_col].dtype == 'bool':
+            # Already boolean - direct comparison
+            standby_mask = park_entities[fastpass_col] == False
+        else:
+            # Convert to boolean: False if the value represents False/0/None
+            # True values: True, 1, "true", "1", "yes", "t"
+            # False values: False, 0, None, "false", "0", "no", "f", empty string
+            col_series = park_entities[fastpass_col]
+            standby_mask = ~col_series.astype(str).str.lower().isin(['true', '1', 'yes', 't'])
+            # Also handle NaN/None as False (standby)
+            standby_mask = standby_mask | col_series.isna()
+        
+        # Filter: keep only standby queues (fastpass_booth = False)
+        park_entities = park_entities[standby_mask].copy()
+        logger.info(f"Filtered from {before_fastpass_count} to {len(park_entities)} standby attractions (excluded priority queues)")
+    else:
+        logger.debug("No fastpass_booth/priority_available column found - showing all entities")
+    
+    if park_entities.empty:
+        return jsonify({"entities": []})
+    
     # Filter to only entities with trained models (met 500 obs threshold)
     trained_entities = get_trained_entity_codes(output_base)
+    logger.info(f"Found {len(trained_entities)} entities with trained models")
+    
     if trained_entities:
         before_count = len(park_entities)
+        # Get list of entity codes from park_entities for comparison
+        park_entity_codes = set(park_entities[code_col].astype(str).str.upper().str.strip())
+        logger.info(f"Park has {len(park_entity_codes)} entities before filtering")
+        logger.info(f"Trained entities sample: {list(trained_entities)[:5]}")
+        logger.info(f"Park entity codes sample: {list(park_entity_codes)[:5]}")
+        
+        # Filter to only entities that have trained models
         park_entities = park_entities[park_entities[code_col].astype(str).str.upper().str.strip().isin(trained_entities)]
         logger.info(f"Filtered from {before_count} to {len(park_entities)} entities with trained models")
+        
+        if park_entities.empty:
+            logger.warning(f"No park entities matched trained models. This might mean:")
+            logger.warning(f"  - Models directory structure is different than expected")
+            logger.warning(f"  - Entity codes in models don't match entity codes in dimentity")
+            logger.warning(f"  - No models have been trained yet for this park")
+            # Don't return empty - let's show what we have without the filter as a fallback
+            logger.info("Falling back to showing all entities for this park (no model filter)")
+            # Re-filter by park only (undo the trained filter)
+            if "park_code" in entities_df.columns:
+                park_entities = entities_df[entities_df["park_code"].str.upper() == pipeline_park.upper()].copy()
+            else:
+                park_prefix = pipeline_park.upper()
+                park_entities = entities_df[entities_df[code_col].astype(str).str.upper().str.strip().str.startswith(park_prefix)].copy()
+    else:
+        logger.warning("No trained entities found. Showing all entities for this park (models directory may not exist or be empty)")
     
     if park_entities.empty:
         return jsonify({"entities": []})
@@ -704,6 +772,117 @@ def get_wait_times(park_code: str):
     results.sort(key=lambda x: x["wait_minutes"] if x["wait_minutes"] is not None else 0, reverse=True)
     
     return jsonify({"wait_times": results[:limit]})
+
+
+def _build_daily_curve_from_wti(
+    wti_df: pd.DataFrame, pipeline_park: str, start_date: date, end_date: date
+) -> list[dict]:
+    """Build daily wait time curve: average actual wait per 5-min time_slot across selected dates."""
+    if wti_df is None or wti_df.empty or "time_slot" not in wti_df.columns:
+        return []
+    mask = (
+        (wti_df["park_code"] == pipeline_park)
+        & (wti_df["park_date"] >= start_date)
+        & (wti_df["park_date"] <= end_date)
+    )
+    subset = wti_df.loc[mask]
+    if subset.empty:
+        return []
+    # Group by time_slot, mean wti (exclude nulls)
+    agg = subset.groupby("time_slot", as_index=False)["wti"].mean()
+    agg = agg.sort_values("time_slot")
+    return [{"time_slot": str(row["time_slot"]), "avg_wait": round(float(row["wti"]), 1)} for _, row in agg.iterrows()]
+
+
+def _build_daily_curve_from_curves(
+    output_base: Path, pipeline_park: str, park_date: date, entities_df: Optional[pd.DataFrame]
+) -> list[dict]:
+    """Build one-day curve from forecast/backfill curves (avg actual per time_slot across entities)."""
+    curves_dir = output_base / "curves" / "forecast"
+    backfill_dir = output_base / "curves" / "backfill"
+    date_str = park_date.strftime("%Y-%m-%d")
+    slot_values: dict[str, list[float]] = {}
+
+    def add_curve(csv_path: Path, actual_col: str) -> None:
+        try:
+            df = pd.read_csv(csv_path)
+            if actual_col not in df.columns or "time_slot" not in df.columns:
+                return
+            for _, row in df.iterrows():
+                val = row.get(actual_col)
+                if pd.notna(val) and val is not None:
+                    ts = str(row["time_slot"])
+                    slot_values.setdefault(ts, []).append(float(val))
+        except Exception as e:
+            logger.debug("Curve read %s: %s", csv_path, e)
+
+    if entities_df is None or entities_df.empty:
+        return []
+    if "park_code" in entities_df.columns:
+        park_entities = entities_df[entities_df["park_code"].str.upper() == pipeline_park.upper()]["entity_code"].tolist()
+    else:
+        park_entities = entities_df[entities_df["entity_code"].str.startswith(pipeline_park.upper())]["entity_code"].tolist()
+
+    for entity_code in park_entities:
+        for base_dir, col in [(curves_dir, "actual_predicted"), (backfill_dir, "actual")]:
+            if not base_dir.exists():
+                continue
+            path = base_dir / f"{entity_code}_{date_str}.csv"
+            if path.exists():
+                add_curve(path, col)
+                break
+
+    if not slot_values:
+        return []
+    slots_sorted = sorted(slot_values.keys())
+    return [
+        {"time_slot": ts, "avg_wait": round(sum(slot_values[ts]) / len(slot_values[ts]), 1)}
+        for ts in slots_sorted
+    ]
+
+
+@app.route("/api/daily-curve/<park_code>", methods=["GET"])
+def get_daily_curve(park_code: str):
+    """
+    Get daily wait time curve: average actual wait every 5 minutes.
+    Single day: date=YYYY-MM-DD. Range: start=YYYY-MM-DD&end=YYYY-MM-DD.
+    Returns list of { time_slot, avg_wait } sorted by time_slot.
+    """
+    pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
+    output_base = get_output_base_path()
+    date_param = request.args.get("date")
+    start_param = request.args.get("start")
+    end_param = request.args.get("end")
+
+    if date_param:
+        try:
+            d = date.fromisoformat(date_param)
+            start_date = end_date = d
+        except ValueError:
+            return jsonify({"error": "Invalid date"}), 400
+    elif start_param and end_param:
+        try:
+            start_date = date.fromisoformat(start_param)
+            end_date = date.fromisoformat(end_param)
+            if start_date > end_date:
+                start_date, end_date = end_date, start_date
+        except ValueError:
+            return jsonify({"error": "Invalid start/end"}), 400
+    else:
+        # Default: today only
+        start_date = end_date = date.today()
+
+    wti_df = load_wti_data(output_base)
+    curve = []
+
+    if wti_df is not None and not wti_df.empty and "time_slot" in wti_df.columns:
+        curve = _build_daily_curve_from_wti(wti_df, pipeline_park, start_date, end_date)
+
+    if not curve and start_date == end_date:
+        entities_df = load_entity_metadata(output_base)
+        curve = _build_daily_curve_from_curves(output_base, pipeline_park, start_date, entities_df)
+
+    return jsonify({"curve": curve, "start_date": start_date.isoformat(), "end_date": end_date.isoformat()})
 
 
 @app.route("/api/forecast/<park_code>", methods=["GET"])
