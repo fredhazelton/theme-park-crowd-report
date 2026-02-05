@@ -10,21 +10,23 @@ The dashboard needs to be accessible at `http://wilma-server:8888/stream-dashboa
 
 ## Steps to Deploy
 
-### 1. Copy Dashboard File
+### 1. Copy or Symlink the Stream Dashboard
 
-Copy the dashboard HTML to the streaming directory:
+Use **stream-dashboard.html** (the stream overlay), not dashboard.html. Copy it to the streaming directory:
 
 ```bash
-cp /home/wilma/theme-park-crowd-report/docs/stream/dashboard.html \
+cp /home/wilma/theme-park-crowd-report/docs/stream/stream-dashboard.html \
    /home/wilma/clawd-anthropic/streaming/stream-dashboard.html
 ```
 
-Or create a symlink (so updates are automatic):
+Or create a symlink so updates are automatic after `git pull`:
 
 ```bash
-ln -s /home/wilma/theme-park-crowd-report/docs/stream/dashboard.html \
-      /home/wilma/clawd-anthropic/streaming/stream-dashboard.html
+ln -sf /home/wilma/theme-park-crowd-report/docs/stream/stream-dashboard.html \
+       /home/wilma/clawd-anthropic/streaming/stream-dashboard.html
 ```
+
+**Deploy latest:** After pulling the repo on Wilma, either copy again (if you use `cp`) or do nothing (if you use the symlink). Then reload http://wilma-server:8888/stream-dashboard.html (hard refresh if needed).
 
 ### 2. Start the API Server
 
@@ -62,7 +64,7 @@ The service file is at `scripts/dashboard-api-wilma.service` if you need to cust
 
 The dashboard will automatically detect it's running on `wilma-server` and use `http://wilma-server:8051/api` for the API base URL.
 
-If you need to change the API URL, edit the `API_BASE` constant in `dashboard.html` (around line 610).
+If you need to change the API URL, edit the `API_BASE` constant in `stream-dashboard.html`.
 
 ## Troubleshooting
 

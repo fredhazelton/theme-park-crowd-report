@@ -37,6 +37,7 @@ Preview at **http://localhost:8889/stream-dashboard.html** (default port 8889; u
 - `GET /api/entities/<park_code>` - Get all entities/attractions for a park
 - `GET /api/properties` - Get all properties
 - `GET /api/parks?property=<code>` - Get parks (optionally filtered by property)
+- `GET /api/daily-curve/<park_code>?date=YYYY-MM-DD` or `?start=...&end=...` - Daily wait time curve: average actual wait every 5 min (time_slot → avg_wait). Single day or range (averaged across days).
 - `GET /api/debug/entity-table` - Debug endpoint to inspect entity table structure
 
 ## Park Codes

@@ -327,8 +327,8 @@
             <div class="charts-row">
                 <div class="chart-panel">
                     <div class="chart-header">
-                        <div class="chart-title">Wait Times Over Time</div>
-                        <div class="chart-subtitle" id="chart1-subtitle">Daily averages</div>
+                        <div class="chart-title">Daily Wait Time Curve</div>
+                        <div class="chart-subtitle" id="chart1-subtitle">Avg actual wait every 5 min</div>
                     </div>
                     <div class="chart-container">
                         <canvas id="timeSeriesChart"></canvas>
@@ -371,13 +371,11 @@
     </div>
     
     <script>
-        // API configuration
-        const API_BASE = 'http://wilma-server:8051/api';
-        
-        // Log API base for debugging
-        console.log('API Base URL:', API_BASE);
-        
-        // Log API base for debugging
+        // API configuration: use localhost when previewing locally, wilma-server when on stream
+        const hostname = typeof window !== 'undefined' && window.location && window.location.hostname;
+        const API_BASE = (hostname === 'localhost' || hostname === '127.0.0.1')
+            ? 'http://localhost:8051/api'
+            : 'http://wilma-server:8051/api';
         console.log('API Base URL:', API_BASE);
         
         let dashboardData = null;
@@ -430,9 +428,14 @@
                     stats: stats
                 };
                 
+                // Load daily wait time curve (area chart)
+                await loadDailyCurve();
+                
             } catch (e) {
                 document.getElementById('data-info').textContent = 'Error loading data: ' + e.message;
                 console.error(e);
+                // Still load daily curve chart (empty or from API if it's reachable)
+                await loadDailyCurve();
             }
         }
         
@@ -513,24 +516,26 @@
             await loadData();
         }
         
-        function updateTimeSeriesChart(data) {
-            // TODO: Implement time series chart with historical data
+        function updateTimeSeriesChart(curveData) {
             const ctx = document.getElementById('timeSeriesChart').getContext('2d');
             if (charts.timeSeries) charts.timeSeries.destroy();
-            
-            // Placeholder chart for now
+            const curve = curveData && curveData.curve ? curveData.curve : [];
+            const labels = curve.map(p => p.time_slot);
+            const values = curve.map(p => p.avg_wait);
             charts.timeSeries = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: [],
+                    labels: labels,
                     datasets: [{
-                        label: 'Avg Wait',
-                        data: [],
+                        label: 'Avg actual wait (min)',
+                        data: values,
                         borderColor: '#4a90a4',
-                        backgroundColor: 'rgba(74, 144, 164, 0.3)',
-                        fill: 'origin',
-                        tension: 0.3,
-                        pointRadius: 0
+                        backgroundColor: 'rgba(74, 144, 164, 0.25)',
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#4a90a4',
+                        pointBorderColor: '#4a90a4'
                     }]
                 },
                 options: {
@@ -538,11 +543,74 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { display: true, grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } },
-                        y: { display: true, grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } }
+                        x: {
+                            display: true,
+                            grid: { color: 'rgba(74,144,164,0.08)' },
+                            ticks: { color: '#6a7a8a', font: { size: 9 }, maxTicksLimit: 20 }
+                        },
+                        y: {
+                            display: true,
+                            grid: { color: 'rgba(74,144,164,0.08)' },
+                            ticks: { color: '#6a7a8a', font: { size: 9 } },
+                            beginAtZero: true
+                        }
                     }
                 }
             });
+            const sub = document.getElementById('chart1-subtitle');
+            if (curveData && curveData.start_date && curveData.end_date) {
+                sub.textContent = curveData.start_date === curveData.end_date
+                    ? 'Avg actual wait every 5 min · ' + curveData.start_date
+                    : 'Avg actual wait every 5 min · ' + curveData.start_date + ' – ' + curveData.end_date;
+            } else {
+                sub.textContent = curve.length ? 'Avg actual wait every 5 min' : 'Select a park and date';
+            }
+        }
+
+        function getDateRangeForCurve() {
+            const dateInput = document.getElementById('date-calendar-picker');
+            const activePreset = document.querySelector('.date-preset.active');
+            const today = new Date();
+            const y = today.getFullYear(), m = String(today.getMonth() + 1).padStart(2, '0'), d = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${y}-${m}-${d}`;
+            if (activePreset) {
+                const n = parseInt(activePreset.dataset.range, 10);
+                if (!isNaN(n) && n >= 1) {
+                    const end = new Date(today);
+                    const start = new Date(today);
+                    start.setDate(start.getDate() - (n - 1));
+                    return {
+                        start: start.toISOString().slice(0, 10),
+                        end: end.toISOString().slice(0, 10)
+                    };
+                }
+            }
+            const pickerVal = dateInput && dateInput.value ? dateInput.value : todayStr;
+            return { date: pickerVal };
+        }
+
+        async function loadDailyCurve() {
+            const park = document.getElementById('park-filter').value;
+            if (park === 'all') {
+                updateTimeSeriesChart({ curve: [] });
+                return;
+            }
+            const range = getDateRangeForCurve();
+            let url = `${API_BASE}/daily-curve/${park}`;
+            if (range.date) {
+                url += '?date=' + encodeURIComponent(range.date);
+            } else {
+                url += '?start=' + encodeURIComponent(range.start) + '&end=' + encodeURIComponent(range.end);
+            }
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Daily curve request failed');
+                const data = await res.json();
+                updateTimeSeriesChart(data);
+            } catch (e) {
+                console.warn('Daily curve load failed:', e);
+                updateTimeSeriesChart({ curve: [] });
+            }
         }
         
         function updateTopWaitsListFromAPI(waits) {
@@ -845,7 +913,7 @@
                     clearAllDateSelections();
                     btn.classList.add('active');
                 }
-                // TODO: Implement date range filtering
+                loadDailyCurve();
             });
         });
         
@@ -868,6 +936,7 @@
             
             // Trigger change event to update filters
             dateInput.dispatchEvent(new Event('change'));
+            loadDailyCurve();
         }
         
         // Left arrow - go back one day
@@ -885,7 +954,7 @@
             if (e.target.value) {
                 // Clear all preset buttons when calendar date is manually selected
                 document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
-                // TODO: Implement date filtering for selected calendar date
+                loadDailyCurve();
             }
         });
         
@@ -895,6 +964,8 @@
             const today = new Date();
             const y = today.getFullYear(), m = String(today.getMonth() + 1).padStart(2, '0'), d = String(today.getDate()).padStart(2, '0');
             document.getElementById('date-calendar-picker').value = `${y}-${m}-${d}`;
+            // Draw daily curve chart (empty) so it's visible before async load
+            updateTimeSeriesChart({ curve: [] });
             await loadProperties();
             await updateParkFilter();
             updateKPIDisplay();
