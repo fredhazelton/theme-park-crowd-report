@@ -99,61 +99,141 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
 
 ---
 
+---
+
+## 🚨 PRIORITY: Dev Mode Pipeline Setup
+
+**Bam-Bam — Fred wants you to implement DEV_MODE today and run the pipeline in dev mode.**
+
+### What We're Building
+
+A development mode for the pipeline that:
+1. Filters to a small subset of entities (37 total)
+2. Writes outputs to a separate dev folder (not production)
+3. Allows full pipeline testing: ETL → dimensions → aggregates → training → forecast
+
+### Step-by-Step Implementation
+
+#### 1. Create Config File
+
+Create `config/dev_config.py` (or add to existing config):
+
+```python
+import os
+
+# Dev mode toggle - set via environment or default True for Bam-Bam
+DEV_MODE = os.environ.get('DEV_MODE', 'true').lower() == 'true'
+
+# Dev subset: 2 standby + 2 priority per park across 10 parks
+DEV_ENTITIES = [
+    # MK - Magic Kingdom
+    'MK01', 'MK02',  # Space Mountain, Buzz Lightyear
+    'MK07', 'MK08',  # Space Mountain LL, Buzz Lightyear LL
+    # EP - Epcot
+    'EP01', 'EP02',  # Innoventions West, Spaceship Earth
+    'EP08', 'EP10',  # Living w/ Land LL, Soarin' LL
+    # HS - Hollywood Studios
+    'HS01', 'HS02',  # American Idol, Fantasmic!
+    'HS06', 'HS09',  # Indiana Jones Stunt LL, Lights Motors Action FP
+    # AK - Animal Kingdom
+    'AK01', 'AK03',  # Tough to Be a Bug, Greeting Trails
+    'AK02', 'AK06',  # Tough Bug LL, Kilimanjaro Safaris LL
+    # DL - Disneyland
+    'DL01', 'DL02',  # Alice in Wonderland, Astro Orbitor
+    'DL04', 'DL06',  # Autopia LL, Big Thunder LL
+    # CA - California Adventure
+    'CA01', 'CA02',  # Turtle Talk, Aladdin Musical
+    'CA07', 'CA10',  # Tower of Terror FP, Soarin' LL
+    # IA - Islands of Adventure
+    'IA01', 'IA02',  # Spider-Man, Caro-Seuss-el
+    # UF - Universal Studios Florida
+    'UF01', 'UF02',  # Disaster!, E.T. Adventure
+    'UF71',          # Diagon Alley (priority)
+    # TDL - Tokyo Disneyland
+    'TDL01', 'TDL02',  # Omnibus, Penny Arcade
+    'TDL13', 'TDL16',  # Big Thunder FP, Splash Mountain FP
+    # TDS - Tokyo DisneySea
+    'TDS01', 'TDS02',  # Fantasmic!, Steps to Shine
+    'TDS11', 'TDS16',  # Tower of Terror FP, Toy Story Mania FP
+]
+
+# Output paths
+def get_output_base():
+    """Return output base path - different for dev vs production."""
+    if DEV_MODE:
+        return '/path/to/repo/pipeline_dev'  # Local dev output
+    else:
+        return '/home/wilma/hazeydata/pipeline'  # Production on wilma-server
+```
+
+#### 2. Add Entity Filter to ETL
+
+In `src/get_tp_wait_time_data_from_s3.py`, add filtering **during row processing** (not after):
+
+```python
+from config.dev_config import DEV_MODE, DEV_ENTITIES
+
+def should_process_entity(entity_code):
+    """Check if entity should be processed in current mode."""
+    if not DEV_MODE:
+        return True  # Production: process everything
+    return entity_code in DEV_ENTITIES
+
+# In your row processing loop:
+if not should_process_entity(row['entity_code']):
+    continue  # Skip non-dev entities early
+```
+
+#### 3. Update Output Paths Throughout Pipeline
+
+Every script that writes output should use `get_output_base()`:
+
+```python
+from config.dev_config import get_output_base
+
+output_base = get_output_base()
+output_path = f"{output_base}/fact_tables/wait_times.parquet"
+```
+
+#### 4. Create Dev Output Directory
+
+```bash
+mkdir -p pipeline_dev/{fact_tables,dimension_tables,staging,models,curves,wti,state,logs}
+```
+
+#### 5. Run Dev Pipeline
+
+```bash
+# Ensure DEV_MODE is on (should be default)
+export DEV_MODE=true
+
+# Run the pipeline
+python src/get_tp_wait_time_data_from_s3.py  # ETL
+python src/build_dimensions.py               # Dimensions
+# ... etc (whatever your pipeline scripts are)
+```
+
+### Testing Checklist
+
+- [ ] Config file created with DEV_ENTITIES list
+- [ ] ETL filters entities during parsing (check logs show ~37 entities)
+- [ ] Outputs go to `pipeline_dev/` not production path
+- [ ] Full pipeline runs end-to-end without errors
+- [ ] Run time is significantly faster than full production run
+
+### When Done
+
+1. Move this task to Completed
+2. Log your results (run time, any issues)
+3. Let Wilma know it's ready
+
+---
+
 ## Active Items
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-- **[Pipeline: Dev Subset Filter]** — **PRIORITY**
-  Add a dev mode that filters to a small representative sample of entities early in the pipeline. This lets us test changes quickly without running the full dataset.
-  
-  **Implementation:**
-  - Add `DEV_MODE = True/False` config (env var or config file)
-  - When `DEV_MODE=True`, filter to this sample at the earliest pipeline stage:
-  
-  ```python
-  DEV_ENTITIES = [
-      # MK - Magic Kingdom
-      'MK01', 'MK02',  # Space Mountain, Buzz Lightyear
-      'MK07', 'MK08',  # Space Mountain LL, Buzz Lightyear LL
-      # EP - Epcot
-      'EP01', 'EP02',  # Innoventions West, Spaceship Earth
-      'EP08', 'EP10',  # Living w/ Land LL, Soarin' LL
-      # HS - Hollywood Studios
-      'HS01', 'HS02',  # American Idol, Fantasmic!
-      'HS06', 'HS09',  # Indiana Jones Stunt LL, Lights Motors Action FP
-      # AK - Animal Kingdom
-      'AK01', 'AK03',  # Tough to Be a Bug, Greeting Trails
-      'AK02', 'AK06',  # Tough Bug LL, Kilimanjaro Safaris LL
-      # DL - Disneyland
-      'DL01', 'DL02',  # Alice in Wonderland, Astro Orbitor
-      'DL04', 'DL06',  # Autopia LL, Big Thunder LL
-      # CA - California Adventure
-      'CA01', 'CA02',  # Turtle Talk, Aladdin Musical
-      'CA07', 'CA10',  # Tower of Terror FP, Soarin' LL
-      # IA - Islands of Adventure
-      'IA01', 'IA02',  # Spider-Man, Caro-Seuss-el
-      # UF - Universal Studios Florida
-      'UF01', 'UF02',  # Disaster!, E.T. Adventure
-      'UF71',          # Diagon Alley (priority)
-      # TDL - Tokyo Disneyland
-      'TDL01', 'TDL02',  # Omnibus, Penny Arcade
-      'TDL13', 'TDL16',  # Big Thunder FP, Splash Mountain FP
-      # TDS - Tokyo DisneySea
-      'TDS01', 'TDS02',  # Fantasmic!, Steps to Shine
-      'TDS11', 'TDS16',  # Tower of Terror FP, Toy Story Mania FP
-  ]
-  # TOTAL: 37 entities
-  ```
-  
-  **Why this sample:** 2 standby + 2 priority per park across 10 parks. Small enough to iterate fast, broad enough to catch issues.
-  
-  **Usage:** Fred and Bam-Bam will always develop/test with `DEV_MODE=True`. Only Wilma runs full production.
-  
-  **Important — DEV_MODE applies to ETL too:**
-  - Filter should apply at ETL stage (during row parsing), not after
-  - This way Bam-Bam can test ETL code changes with real S3 data, but fast
-  - Dev outputs should go to a separate path (e.g., `pipeline/dev/` or `output_base_dev/`) so production data is untouched
-  - Full pipeline is testable: ETL → dimensions → aggregates → training → forecast
+- **[Pipeline: Dev Subset Filter]** — **PRIORITY** — See detailed instructions above ☝️
 
 - **[ETL: Only Process New Files Since Last Run]** — **PRIORITY**
   The S3 ETL (`src/get_tp_wait_time_data_from_s3.py`) currently processes ~36 files every run, but only 5-7 are actually new. The rest are old files (2013-2019) that fail with "No columns to parse" errors. Now that the full historical load is done, we should only pull files modified since the last successful ETL run.
