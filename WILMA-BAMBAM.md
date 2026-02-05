@@ -103,6 +103,17 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+- **[ETL: Only Process New Files Since Last Run]** — **PRIORITY**
+  The S3 ETL (`src/get_tp_wait_time_data_from_s3.py`) currently processes ~36 files every run, but only 5-7 are actually new. The rest are old files (2013-2019) that fail with "No columns to parse" errors. Now that the full historical load is done, we should only pull files modified since the last successful ETL run.
+  
+  **Implementation:**
+  - Track last successful ETL timestamp in `state/etl_last_run.json` (or similar)
+  - Filter S3 file list to only include files with `modified > last_run_time`
+  - Update timestamp after successful run
+  - Should reduce daily processing from 36 files → 5-7 files
+  
+  **Current behavior:** Logs show files like `fp_10_01_2013_06_35.csv` being re-attempted daily and failing.
+
 - **[Dashboard: Entity Names Not Displaying]** The attraction dropdown in the stream dashboard is showing entity codes (e.g., "IA01", "MK09") instead of full attraction names (e.g., "The Incredible Hulk Coaster", "Space Mountain"). The API endpoint `/api/entities/<park_code>` should be looking up names from `dimension_tables/dimentity.csv` using a code-to-name lookup dictionary, but names aren't appearing. Added debug endpoint `/api/debug/entity-table` to inspect the entity table structure. Need to verify: (1) What columns exist in dimentity.csv? (2) Is the name column populated? (3) Is the lookup dictionary being created correctly? Check API server logs and browser console for debugging info.
 
 ---
@@ -129,6 +140,7 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
 | 2026-02-04 | Bam-Bam | **Dashboard overview for Wilma:** Added "📘 Dashboard Build — Complete Overview" to this doc: data sources (WTI, queue_times, curves, dimentity, entity_index), preview locations (localhost:8889, wilma-server:8888), API connections (localhost vs wilma-server by hostname), design/interactions, endpoints, code types, Bam-Bam vs Wilma roles. Updated API Connection and Dashboard Dev Workflow sections to match (python3, stream_server 8889, daily-curve endpoint). |
 | 2026-02-04 | Bam-Bam | **Wilma's URGENT API fix:** Pulled Wilma's changes. Implemented API URL fix: `stream-dashboard.html` now always uses `API_BASE = 'http://wilma-server:8051/api'`. One URL for dev and stream: Fred runs dashboard on his Mac (localhost:8889), data from wilma-server:8051. Task moved to Completed. **What Fred needs to view preview:** (1) Ensure `wilma-server` is reachable from your Mac (hosts file or same network). (2) Run `./scripts/start-stream.sh` from repo root (or `python3 dashboard/stream_server.py`). (3) Open `http://localhost:8889/stream-dashboard.html` in browser. No need to run the API locally — it uses Wilma's server. |
 | 2026-02-05 | Bam-Bam | **Daily Wait Time Curve:** API: added optional `entity_code` for attraction-level curve (from forecast/backfill); case-insensitive park_code in WTI. Frontend: park-day X-axis (06:00–03:00 next day, origin 6 AM); placeholder curve when no server data; sort curve by park-day order. Docs: README_STREAM and WILMA-BAMBAM overview updated (daily curve, entity_code, park-day axis, placeholder). |
+| 2026-02-05 08:17 | Wilma | **ETL Efficiency Task:** Added priority task to only process S3 files since last ETL run. Currently processing 36 files/day when only 5-7 are new. Old 2013-2019 files keep failing with empty data errors. Fred confirmed full historical load is done — incremental mode is the way forward. |
 
 ---
 
