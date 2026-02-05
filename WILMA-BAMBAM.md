@@ -96,7 +96,57 @@ Wilma runs it and reports results.
 - Collect actuals as they come in
 - Join on (entity, date, time_slot) for comparison
 
+**Prediction Drift — Snapshot Approach:**
+Predictions update daily, so which prediction do we compare against?
+
+✅ **Answer: The final prediction (day before)**
+- Tag each prediction with `predicted_on` date
+- When evaluating, compare actuals to most recent prediction before the date
+- Query: `WHERE predicted_on < actual_date ORDER BY predicted_on DESC LIMIT 1`
+- This is the "operational" prediction — what a user would have seen
+
+This matches how professional forecasting is evaluated (e.g., weather forecasts).
+
 **Status:** Backlog — design and implement when ready
+
+---
+
+### Weather Data Integration (Priority: Medium)
+*Add weather as a feature to improve predictions.*
+
+**Data Sources Needed:**
+- **Historical weather** — temperature, precipitation, humidity by park/date
+- **Current weather** — real-time conditions
+- **Forecast weather** — predictions for future dates
+
+**Parks to Cover:**
+- WDW (Orlando, FL)
+- DLR (Anaheim, CA)
+- Universal Orlando
+- Tokyo Disney (Tokyo, JP)
+
+**Potential APIs:**
+- OpenWeatherMap (free tier available)
+- Weather.gov (free, US only)
+- Visual Crossing (historical data)
+- Tomorrow.io
+
+**Features to Extract:**
+- High/low temperature
+- Precipitation probability
+- Rain amount
+- "Bad weather" flag (rain > X, temp extremes)
+- Heat index / feels-like
+
+**Integration Points:**
+- Add to daily ETL: fetch weather for all parks
+- Store in `dimension_tables/weather.csv` or similar
+- Add weather features to training data
+- Include in forecasts
+
+**Hypothesis:** Weather significantly impacts wait times — rain drives people indoors, extreme heat reduces attendance.
+
+**Status:** Backlog — research APIs and implement
 
 ---
 
