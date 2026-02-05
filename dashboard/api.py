@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import logging
+import sqlite3
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -482,7 +483,8 @@ def debug_entity_table():
             break
     
     name_col = None
-    for col in ["entity_name", "name", "short_name"]:
+    # Note: Based on Wilma's fix, the actual column is "name", so check that first
+    for col in ["name", "entity_name", "short_name"]:
         if col in entities_df.columns:
             name_col = col
             break
@@ -521,9 +523,10 @@ def get_entities(park_code: str):
         logger.warning("No entity code column found in dimentity.csv")
         return jsonify({"entities": []})
     
-    # Find the name column (handle variations: entity_name, name, short_name)
+    # Find the name column (handle variations: name, entity_name, short_name)
+    # Note: Based on Wilma's fix, the actual column is "name", so check that first
     name_col = None
-    for col in ["entity_name", "name", "short_name"]:
+    for col in ["name", "entity_name", "short_name"]:
         if col in entities_df.columns:
             name_col = col
             break
@@ -603,13 +606,15 @@ def get_entities(park_code: str):
     if park_entities.empty:
         return jsonify({"entities": []})
     
-
     # Filter to only entities with trained models (met 500 obs threshold)
     trained_entities = get_trained_entity_codes(output_base)
     if trained_entities:
         before_count = len(park_entities)
         park_entities = park_entities[park_entities[code_col].astype(str).str.upper().str.strip().isin(trained_entities)]
         logger.info(f"Filtered from {before_count} to {len(park_entities)} entities with trained models")
+    
+    if park_entities.empty:
+        return jsonify({"entities": []})
     
     # Prepare results using the lookup dictionary
     results = []

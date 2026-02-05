@@ -4,6 +4,33 @@ Standalone utility scripts that can be run independently of the main pipeline.
 
 ## Current Scripts
 
+### Dropbox Scheduler
+
+**`dropbox_scheduler.sh`** - Controls Dropbox start/stop  
+**`install_dropbox_scheduler.sh`** - Install daily job (starts at 4:00 AM, stops at 4:30 AM)  
+**`uninstall_dropbox_scheduler.sh`** - Remove the scheduled job
+
+**Installation:**
+```bash
+./scripts/install_dropbox_scheduler.sh
+```
+
+**Schedule:**
+- Starts Dropbox: Daily at 4:00 AM
+- Stops Dropbox: Daily at 4:30 AM
+
+**Check status:**
+```bash
+launchctl list | grep dropbox
+```
+
+**Uninstall:**
+```bash
+./scripts/uninstall_dropbox_scheduler.sh
+```
+
+---
+
 ### `register_scheduled_tasks.ps1`
 
 Registers the **5 AM**, **6 AM**, and **7 AM Eastern** Windows scheduled tasks.

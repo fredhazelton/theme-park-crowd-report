@@ -1,16 +1,16 @@
 """
 Stream Dashboard Server
 
-Serves the dashboard.html file and API endpoints.
+Serves the stream dashboard and static files from docs/stream.
 
 Usage:
     python dashboard/stream_server.py
-    # Dashboard: http://localhost:8052
+    # Preview: http://localhost:8889/stream-dashboard.html
     # API: http://localhost:8051 (run dashboard/api.py separately)
     
     Or use a single server:
     python dashboard/stream_server.py --combined
-    # Everything on http://localhost:8052
+    # Everything on http://localhost:8889
 """
 
 from __future__ import annotations
@@ -34,8 +34,8 @@ CORS(app)
 
 @app.route("/")
 def index():
-    """Serve dashboard.html."""
-    return send_from_directory(DASHBOARD_DIR, "dashboard.html")
+    """Serve stream-dashboard.html as the default preview."""
+    return send_from_directory(DASHBOARD_DIR, "stream-dashboard.html")
 
 
 @app.route("/<path:path>")
@@ -55,8 +55,8 @@ def main():
     parser.add_argument(
         "--port",
         type=int,
-        default=8052,
-        help="Port to run dashboard on (default: 8052)",
+        default=8889,
+        help="Port to run dashboard on (default: 8889)",
     )
     args = parser.parse_args()
     
@@ -64,12 +64,12 @@ def main():
         # For combined mode, we'd need to restructure the API
         # For now, just serve the dashboard and note that API runs separately
         print(f"Starting dashboard server on http://localhost:{args.port}")
-        print(f"  Dashboard: http://localhost:{args.port}/")
+        print(f"  Preview: http://localhost:{args.port}/stream-dashboard.html")
         print(f"  Note: Combined mode not yet implemented")
         print(f"  Run API separately: python dashboard/api.py")
     else:
         print(f"Starting dashboard server on http://localhost:{args.port}")
-        print(f"  Dashboard: http://localhost:{args.port}/")
+        print(f"  Preview: http://localhost:{args.port}/stream-dashboard.html")
         print(f"  Note: API must be running separately on port 8051")
         print(f"  Run: python dashboard/api.py")
     
