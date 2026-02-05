@@ -187,6 +187,9 @@ This matches how professional forecasting is evaluated (e.g., weather forecasts)
 
 **Challenge:** No single API has all calendars — may need scraping + manual verification for accuracy.
 
+**💰 Revenue Opportunity:**
+This data is valuable beyond theme parks. Companies pay **$10K+/year** for comprehensive school schedule databases — marketing firms, travel companies, retailers all need this. If we build it right, it could be a standalone product for hazeydata.ai.
+
 **Status:** Backlog — research sources and build scraper
 
 ---
