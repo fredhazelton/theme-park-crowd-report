@@ -1,46 +1,76 @@
 {
-  "last_updated": "2026-02-05T04:00:00",
-  "updated_by": "Wilma (overnight task)",
+  "quick_links": [
+    {
+      "category": "🏠 Main",
+      "links": [
+        {"name": "Mission Control", "url": "https://hazeydata.github.io/theme-park-crowd-report/mission-control.html"},
+        {"name": "hazeydata.ai", "url": "https://hazeydata.ai"},
+        {"name": "GitHub Repo", "url": "https://github.com/hazeydata/theme-park-crowd-report"}
+      ]
+    },
+    {
+      "category": "📊 Dashboard",
+      "links": [
+        {"name": "Stream Dashboard", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/main-dashboard.html"},
+        {"name": "API Docs", "url": "http://wilma-server:8051/docs"}
+      ]
+    },
+    {
+      "category": "🛠️ Dev Tools Hub",
+      "links": [
+        {"name": "Tools Hub", "url": "https://tools.hazeydata.ai"},
+        {"name": "CronMagic", "url": "https://cronmagic.hazeydata.ai"},
+        {"name": "CSVStats", "url": "https://csvstats.hazeydata.ai"}
+      ]
+    },
+    {
+      "category": "📺 Streaming",
+      "links": [
+        {"name": "Twitch", "url": "https://twitch.tv/hazeydata"},
+        {"name": "YouTube", "url": "https://youtube.com/@hazeydata"}
+      ]
+    }
+  ],
   "todays_focus": [
     {
-      "status_class": "good",
-      "status_text": "✅ Day 2",
-      "task": "Autonomy Pilot underway — $500/mo budget active"
-    },
-    {
-      "status_class": "critical",
-      "status_text": "⚠️ Check",
-      "task": "Pipeline ETL — No recent activity in logs"
+      "status_class": "medium",
+      "status_text": "\ud83d\udcb0 Running",
+      "task": "Autonomy Pilot Day 2 \u2014 $500/mo budget active"
     },
     {
       "status_class": "medium",
-      "status_text": "📝 Todo",
-      "task": "Dashboard refinements — Date slicer, entity filtering"
+      "status_text": "\ud83d\udd0d Check",
+      "task": "Pipeline ETL \u2014 No recent activity in logs"
     },
     {
       "status_class": "medium",
-      "status_text": "📝 Todo",
-      "task": "Configure Brave API key — Research scans blocked"
+      "status_text": "\ud83d\udcdd Todo",
+      "task": "Dashboard refinements \u2014 Date slicer, entity filtering"
+    },
+    {
+      "status_class": "medium",
+      "status_text": "\ud83d\udcdd Todo",
+      "task": "Configure Brave API key \u2014 Research scans blocked"
     }
   ],
   "key_dates": [
     {
-      "emoji": "👤",
+      "emoji": "\ud83d\udc64",
       "event": "John visits",
       "date": "Feb 7",
       "days_out": 2,
       "urgency": "soon"
     },
     {
-      "emoji": "⚠️",
+      "emoji": "\u26a0\ufe0f",
       "event": "GPT-4o retires",
       "date": "Feb 13",
       "days_out": 8,
       "urgency": ""
     },
     {
-      "emoji": "❤️",
-      "event": "Valentine's Day",
+      "emoji": "\ud83d\udcc5",
+      "event": "Valentine's Day \u2764",
       "date": "Feb 14",
       "days_out": 9,
       "urgency": ""
@@ -48,16 +78,16 @@
   ],
   "active_projects": [
     {
-      "status_class": "good",
+      "status_class": "medium",
       "status_text": "LIVE!",
       "title": "Twitch/YouTube Streaming",
-      "description": "2 successful streams! Infrastructure validated. Ready for more."
+      "description": "Two successful streams! Infrastructure validated."
     },
     {
-      "status_class": "critical",
+      "status_class": "medium",
       "status_text": "CHECK",
       "title": "Theme Park Crowd Report",
-      "description": "Pipeline ETL needs investigation — no recent activity"
+      "description": "Pipeline ETL needs investigation"
     },
     {
       "status_class": "low",
@@ -66,105 +96,80 @@
       "description": "Live! Needs blog content"
     }
   ],
-  "theme_park_intel": [
-    {
-      "emoji": "⚠️",
-      "text": "Research scans blocked — Brave API key not configured"
-    }
-  ],
+  "theme_park_intel": [],
   "dino_tasks": [
     {
       "id": "task-001",
       "title": "Historical pipeline ETL load",
       "description": "First-time load of all historical wait time data",
-      "status": "needs_check",
+      "status": "in_progress",
       "status_class": "critical",
-      "status_text": "CHECK",
+      "status_text": "IN PROGRESS",
       "priority": "high",
-      "priority_icon": "⚡",
+      "priority_icon": "\u26a1",
       "owner": "Wilma",
-      "notes": "No recent log activity. May need restart.",
-      "updated": "2026-02-05T04:00:00"
-    },
-    {
-      "id": "task-009",
-      "title": "Configure Brave API key for web search",
-      "description": "Run clawdbot configure --section web to enable research scans",
-      "status": "todo",
-      "status_class": "critical",
-      "status_text": "BLOCKED",
-      "priority": "high",
-      "priority_icon": "🔑",
-      "owner": "Fred",
-      "notes": "Theme park intel and AI improvement scans depend on this",
-      "updated": "2026-02-05T04:00:00"
-    },
-    {
-      "id": "task-007",
-      "title": "Investigate nonsensical entity values in pipeline data",
-      "description": "Dashboard showing invalid attraction names like 'HS 6369', waypoints appearing as attractions",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
-      "priority": "medium",
-      "priority_icon": "📝",
-      "owner": "Bam-Bam",
-      "notes": "Need to check pipeline filtering logic",
+      "notes": "Forecast generation running 21+ hours. Pipeline healthy.",
       "updated": "2026-02-04T04:00:00"
     },
     {
       "id": "task-005",
-      "title": "Replace Twitter icons/text with X",
-      "description": "Update branding from Twitter to X across site",
+      "title": "Replace \"Twitter\" icons and text with \"X\" icons and text",
+      "description": "We need to be on-brand for X",
       "status": "todo",
-      "status_class": "low",
+      "status_class": "medium",
       "status_text": "TODO",
       "priority": "low",
-      "priority_icon": "📝",
+      "priority_icon": "\ud83d\udcdd",
       "owner": "Fred",
       "notes": "",
       "updated": "2026-02-02T13:14:00"
+    },
+    {
+      "id": "task-007",
+      "title": "Investigate nonsensical entity values in pipeline data",
+      "description": "Dashboard showing invalid attraction names like 'HS 6369', waypoints appearing as attractions. Need to check pipeline filtering logic and add exclusions for non-attraction entities.",
+      "status": "todo",
+      "status_class": "medium",
+      "status_text": "TODO",
+      "priority": "medium",
+      "priority_icon": "\ud83d\udccb",
+      "owner": "Bam-Bam",
+      "notes": "Noticed during first live stream 2026-02-03",
+      "updated": "2026-02-03T16:36:45"
+    },
+    {
+      "id": "task-008",
+      "title": "Dashboard date range slicer redesign",
+      "description": "Row 1: Yesterday | Today | Tomorrow. Row 2: Last 7 Days | 30 Days | 90 Days | Last Year",
+      "status": "todo",
+      "status_class": "medium",
+      "status_text": "TODO",
+      "priority": "medium",
+      "priority_icon": "\ud83d\udccb",
+      "owner": "Bam-Bam",
+      "notes": "Fred's feedback from first stream",
+      "updated": "2026-02-04T04:00:00"
+    },
+    {
+      "id": "task-009",
+      "title": "Configure Brave Search API key",
+      "description": "Wilma's web search is broken - needs Brave API key configured",
+      "status": "todo",
+      "status_class": "medium",
+      "status_text": "TODO",
+      "priority": "medium",
+      "priority_icon": "\ud83d\udccb",
+      "owner": "Fred",
+      "notes": "Run: clawdbot configure --section web",
+      "updated": "2026-02-04T04:00:00"
     }
   ],
-  "quick_links": {
-    "work": [
-      { "emoji": "🐙", "text": "GitHub Repo", "url": "https://github.com/hazeydata/theme-park-crowd-report" },
-      { "emoji": "☁️", "text": "Cloudflare", "url": "https://dash.cloudflare.com" },
-      { "emoji": "🌐", "text": "hazeydata.ai", "url": "https://hazeydata.ai" },
-      { "emoji": "🎨", "text": "Figma", "url": "https://www.figma.com/design/JPWe8gZd4VPmAvnK6tLha1/hazeydata.ai" }
-    ],
-    "stream_overlays": [
-      { "emoji": "🎬", "text": "Live Scene", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/main-dashboard.html" },
-      { "emoji": "💬", "text": "Just Chatting", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/just-chatting-dashboard.html" },
-      { "emoji": "⏳", "text": "Starting Soon", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/starting-soon.html" },
-      { "emoji": "☕", "text": "BRB Screen", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/brb.html" },
-      { "emoji": "👋", "text": "Ending Screen", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/ending.html" }
-    ],
-    "chat_alerts": [
-      { "emoji": "🦴", "text": "Fred & Wilma Chat", "url": "http://wilma-server:8888/chat-overlay.html" },
-      { "emoji": "💜", "text": "Twitch Chat", "url": "http://wilma-server:8888/twitch-chat-overlay.html" },
-      { "emoji": "🔔", "text": "Alerts Preview", "url": "http://wilma-server:8888/alerts-preview.html" }
-    ],
-    "dashboards": [
-      { "emoji": "📊", "text": "Stream Dashboard", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/stream-dashboard.html" },
-      { "emoji": "🦴", "text": "Mission Control", "url": "https://hazeydata.github.io/theme-park-crowd-report/mission-control.html" },
-      { "emoji": "🪄", "text": "CronMagic", "url": "https://hazeydata.github.io/theme-park-crowd-report/cronmagic/" }
-    ]
+  "dino_summary": {
+    "total": 5,
+    "todo": 4,
+    "in_progress": 1,
+    "blocked": 0,
+    "done": 0
   },
-  "system_status": {
-    "wilma_server": {
-      "status": "online",
-      "uptime": "17+ hours",
-      "load": "0.81",
-      "memory_used": "5.0GB / 62GB",
-      "disk_main": "91% (164GB free)",
-      "disk_data": "1% (1.7TB free)"
-    },
-    "services": {
-      "chat_server": "✅ active (8h)",
-      "twitch_chat": "✅ active (17h)",
-      "dashboard_api": "✅ active",
-      "queue_times_fetcher": "✅ active"
-    }
-  }
+  "last_updated": "2026-02-05T07:55:01.892156-05:00"
 }
