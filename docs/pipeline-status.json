@@ -1,15 +1,15 @@
 {
-  "current_step": "AGGREGATES",
+  "current_step": "ETL",
   "etl_progress": "36/36 (100%) [2026-02-05]",
   "steps": {
-    "etl": "done",
-    "dimensions": "done",
+    "etl": "pending",
+    "dimensions": "pending",
     "aggregates": "pending",
     "report": "pending"
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "09:28:18",
+    "last_fetch": "09:33:21",
     "samples": [
       {
         "name": "MK45",
@@ -17,7 +17,7 @@
       },
       {
         "name": "MK191",
-        "wait": "40"
+        "wait": "50"
       },
       {
         "name": "MK44",
@@ -33,9 +33,9 @@
       },
       {
         "name": "MK40",
-        "wait": "5"
+        "wait": "10"
       }
     ]
   },
-  "last_updated": "2026-02-05T09:30:01.235113-05:00"
+  "last_updated": "2026-02-05T09:35:01.432828-05:00"
 }
