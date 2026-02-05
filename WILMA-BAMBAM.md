@@ -103,6 +103,42 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+- **[Pipeline: Dev Subset Filter]** — **PRIORITY**
+  Add a dev mode that filters to a small representative sample of entities early in the pipeline. This lets us test changes quickly without running the full dataset.
+  
+  **Implementation:**
+  - Add `DEV_MODE = True/False` config (env var or config file)
+  - When `DEV_MODE=True`, filter to this sample at the earliest pipeline stage:
+  
+  ```python
+  DEV_ENTITIES = [
+      # WDW - Magic Kingdom
+      'MK01', 'MK07',  # Space Mountain (standby + LL)
+      # WDW - Epcot
+      'EP02', 'EP10',  # Spaceship Earth, Soarin' LL
+      # WDW - Hollywood Studios
+      'HS02', 'HS06',  # Fantasmic!, Indiana Jones LL
+      # WDW - Animal Kingdom
+      'AK01', 'AK06',  # Tough to Be a Bug, Kilimanjaro LL
+      # DLR - Disneyland
+      'DL01', 'DL06',  # Alice, Big Thunder LL
+      # DLR - California Adventure
+      'CA01', 'CA10',  # Turtle Talk, Soarin' LL
+      # Universal - Islands of Adventure
+      'IA01',          # Spider-Man
+      # Universal - Studios Florida
+      'UF02',          # E.T. Adventure
+      # Tokyo Disneyland
+      'TDL01', 'TDL13', # Omnibus, Big Thunder FP
+      # Tokyo DisneySea
+      'TDS01', 'TDS11', # Fantasmic!, Tower of Terror FP
+  ]
+  ```
+  
+  **Why this sample:** 1-2 standby + 1-2 priority entities per park across all major properties. Covers different data patterns without being huge.
+  
+  **Usage:** Fred and Bam-Bam will always develop/test with `DEV_MODE=True`. Only Wilma runs full production.
+
 - **[ETL: Only Process New Files Since Last Run]** — **PRIORITY**
   The S3 ETL (`src/get_tp_wait_time_data_from_s3.py`) currently processes ~36 files every run, but only 5-7 are actually new. The rest are old files (2013-2019) that fail with "No columns to parse" errors. Now that the full historical load is done, we should only pull files modified since the last successful ETL run.
   
@@ -141,6 +177,7 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
 | 2026-02-04 | Bam-Bam | **Wilma's URGENT API fix:** Pulled Wilma's changes. Implemented API URL fix: `stream-dashboard.html` now always uses `API_BASE = 'http://wilma-server:8051/api'`. One URL for dev and stream: Fred runs dashboard on his Mac (localhost:8889), data from wilma-server:8051. Task moved to Completed. **What Fred needs to view preview:** (1) Ensure `wilma-server` is reachable from your Mac (hosts file or same network). (2) Run `./scripts/start-stream.sh` from repo root (or `python3 dashboard/stream_server.py`). (3) Open `http://localhost:8889/stream-dashboard.html` in browser. No need to run the API locally — it uses Wilma's server. |
 | 2026-02-05 | Bam-Bam | **Daily Wait Time Curve:** API: added optional `entity_code` for attraction-level curve (from forecast/backfill); case-insensitive park_code in WTI. Frontend: park-day X-axis (06:00–03:00 next day, origin 6 AM); placeholder curve when no server data; sort curve by park-day order. Docs: README_STREAM and WILMA-BAMBAM overview updated (daily curve, entity_code, park-day axis, placeholder). |
 | 2026-02-05 08:17 | Wilma | **ETL Efficiency Task:** Added priority task to only process S3 files since last ETL run. Currently processing 36 files/day when only 5-7 are new. Old 2013-2019 files keep failing with empty data errors. Fred confirmed full historical load is done — incremental mode is the way forward. |
+| 2026-02-05 09:12 | Wilma | **Dev Subset Filter Task:** Added priority task to create DEV_MODE that filters to ~18 representative entities (1-2 standby + 1-2 priority per park across 10 parks). This lets Fred & Bam-Bam iterate fast without running full pipeline. Also set up remote file access — Bam-Bam can use Cursor's Remote-SSH extension to connect directly to wilma-server and browse pipeline files. |
 
 ---
 
