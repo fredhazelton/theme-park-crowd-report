@@ -150,6 +150,47 @@ This matches how professional forecasting is evaluated (e.g., weather forecasts)
 
 ---
 
+### School Schedule Data (Priority: High)
+*School holidays are major attendance drivers — automate collection.*
+
+**Goal:**
+- Collect school session calendars for US school districts
+- Minimum: Top 100 districts by student population
+- Stretch: All ~13,000 US school districts
+
+**Data Points Needed:**
+- District name and location (state, city)
+- **Student population** (weighting factor for predictions)
+- Session start/end dates
+- Holidays: Spring break, winter break, summer break
+- In-session vs out-of-session flag per date
+
+**Why This Matters:**
+- Spring break = massive WDW crowds
+- Summer = sustained high attendance
+- School in session = lower weekday crowds
+- District size weights the impact (NYC schools out > small rural district)
+
+**Potential Data Sources:**
+- National Center for Education Statistics (NCES) — district demographics
+- Individual district websites (scraping)
+- State education department APIs
+- Third-party aggregators (SchoolDigger, GreatSchools)
+- CalendarLabs / PublicSchoolReview
+
+**Implementation Approach:**
+1. Start with NCES for district list + student counts
+2. Scrape/API top 100 districts for calendars
+3. Build calendar table: `(district_id, date, in_session: bool)`
+4. Aggregate: "What % of US students are on break on date X?"
+5. Add as feature to training
+
+**Challenge:** No single API has all calendars — may need scraping + manual verification for accuracy.
+
+**Status:** Backlog — research sources and build scraper
+
+---
+
 ## 📘 Dashboard Build — Complete Overview (for Wilma Review)
 
 *This section describes everything Bam-Bam and Fred are doing to build the stream dashboard, so Wilma can compare with her workflow and improve coordination.*
