@@ -101,9 +101,6 @@
             color: var(--navy);
             border-color: var(--cyan);
         }
-        .date-presets-row-2 {
-            margin-top: 4px;
-        }
         .date-calendar-wrapper {
             margin-top: 4px;
             display: flex;
@@ -274,11 +271,6 @@
                     <button class="date-preset" data-range="30">30D</button>
                     <button class="date-preset" data-range="90">90D</button>
                     <button class="date-preset" data-range="365">1Y</button>
-                </div>
-                <div class="date-presets date-presets-row-2">
-                    <button class="date-preset" data-range="yesterday">Yesterday</button>
-                    <button class="date-preset active" data-range="today">Today</button>
-                    <button class="date-preset" data-range="tomorrow">Tomorrow</button>
                 </div>
                 <div class="date-calendar-wrapper">
                     <button class="date-calendar-arrow" id="date-arrow-left" title="Previous day">←</button>
@@ -844,58 +836,15 @@
             document.getElementById('date-calendar-picker').value = '';
         }
         
-        function updateDatePickerFromPreset(range) {
-            const dateInput = document.getElementById('date-calendar-picker');
-            const today = new Date();
-            let targetDate = new Date(today);
-            
-            switch(range) {
-                case 'yesterday':
-                    targetDate.setDate(today.getDate() - 1);
-                    break;
-                case 'today':
-                    targetDate = new Date(today);
-                    break;
-                case 'tomorrow':
-                    targetDate.setDate(today.getDate() + 1);
-                    break;
-                default:
-                    return; // Don't update for range buttons (7D, 30D, etc.)
-            }
-            
-            // Format as YYYY-MM-DD
-            const year = targetDate.getFullYear();
-            const month = String(targetDate.getMonth() + 1).padStart(2, '0');
-            const day = String(targetDate.getDate()).padStart(2, '0');
-            const formattedDate = `${year}-${month}-${day}`;
-            
-            dateInput.value = formattedDate;
-        }
-        
         document.querySelectorAll('.date-preset').forEach(btn => {
             btn.addEventListener('click', () => {
-                const range = btn.dataset.range;
-                const isRangeButton = ['7', '30', '90', '365'].includes(range);
-                
                 // If clicking an already active button, deselect it (allowing "none")
                 if (btn.classList.contains('active')) {
                     btn.classList.remove('active');
-                    // If it was a Yesterday/Today/Tomorrow button, clear the date picker
-                    if (!isRangeButton) {
-                        document.getElementById('date-calendar-picker').value = '';
-                    }
                 } else {
-                    // Remove active from ALL date preset buttons (both rows)
                     clearAllDateSelections();
-                    // Activate clicked button
                     btn.classList.add('active');
-                    
-                    // Update date picker only for Yesterday/Today/Tomorrow buttons
-                    if (!isRangeButton && ['yesterday', 'today', 'tomorrow'].includes(range)) {
-                        updateDatePickerFromPreset(range);
-                    }
                 }
-                
                 // TODO: Implement date range filtering
             });
         });
@@ -942,6 +891,10 @@
         
         // Initialize on start
         (async function init() {
+            // Default date picker to today
+            const today = new Date();
+            const y = today.getFullYear(), m = String(today.getMonth() + 1).padStart(2, '0'), d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('date-calendar-picker').value = `${y}-${m}-${d}`;
             await loadProperties();
             await updateParkFilter();
             updateKPIDisplay();

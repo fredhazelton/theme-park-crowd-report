@@ -18,13 +18,13 @@ Runs on **http://localhost:8051**
 python dashboard/stream_server.py
 ```
 
-Dashboard available at **http://localhost:8052**
+Preview at **http://localhost:8889/stream-dashboard.html** (default port 8889; use `--port N` to override).
 
 ## Architecture
 
 - **Backend API** (`dashboard/api.py`): REST API serving data from pipeline
-- **Frontend** (`docs/stream/dashboard.html`): HTML/CSS/JS dashboard
-- **Server** (`dashboard/stream_server.py`): Serves the HTML file
+- **Frontend** (`docs/stream/stream-dashboard.html`): HTML/CSS/JS dashboard
+- **Server** (`dashboard/stream_server.py`): Serves the HTML at http://localhost:8889/stream-dashboard.html
 
 ## API Endpoints
 
