@@ -31,6 +31,24 @@ launchctl list | grep dropbox
 
 ---
 
+### Stream Dashboard — `start-stream.sh`
+
+**`start-stream.sh`** — Starts the local stream dashboard server on Fred's Mac so you can preview the dashboard (and so Streamlabs can use it at localhost:8889).
+
+**Run from repo root:**
+```bash
+./scripts/start-stream.sh
+```
+
+- Serves the dashboard on **http://localhost:8889**
+- Preview URL: **http://localhost:8889/stream-dashboard.html**
+- Data comes from **http://wilma-server:8051/api** (no need to run the API locally)
+- Works when run in the foreground or in the background; stop with Ctrl+C
+
+See **dashboard/README_STREAM.md** for full stream dashboard docs.
+
+---
+
 ### `register_scheduled_tasks.ps1`
 
 Registers the **5 AM**, **6 AM**, and **7 AM Eastern** Windows scheduled tasks.

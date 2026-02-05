@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>HazeyData Stream Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -241,7 +244,7 @@
         <aside class="sidebar">
             <div class="filter-section">
                 <label class="filter-label">Property</label>
-                <select class="filter-select" id="property-filter">
+                <select class="filter-select" id="property-filter" title="Select property → then park → then attraction (hierarchy)">
                     <option value="all">All Properties</option>
                     <!-- Populated from API -->
                 </select>
@@ -513,26 +516,65 @@
             await loadData();
         }
         
+        // Park day: 06:00 (6 AM) to 03:00 next day — X-axis origin is 6 AM, not midnight
+        function parkDaySort(a, b) {
+            const aLate = a < '06:00';
+            const bLate = b < '06:00';
+            if (aLate !== bLate) return aLate ? 1 : -1;
+            return a.localeCompare(b);
+        }
+        function sortCurveByParkDay(curve) {
+            return curve.slice().sort((a, b) => parkDaySort(a.time_slot, b.time_slot));
+        }
+
+        function buildPlaceholderCurve() {
+            // Park day: 06:00 to 23:55, then 00:00 to 02:55 (6 AM to 3 AM next day)
+            const slots = [];
+            const values = [];
+            function addSlots(startH, endH) {
+                for (let h = startH; h <= endH; h++) {
+                    for (let m = 0; m < 60; m += 5) {
+                        const time_slot = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+                        slots.push(time_slot);
+                        const minutesFrom6 = h >= 6 ? (h - 6) * 60 + m : (h + 18) * 60 + m;
+                        const peakMin = 6 * 60;
+                        const wait = Math.round(8 + 22 * Math.exp(-Math.pow((minutesFrom6 - peakMin) / 120, 2)) + (minutesFrom6 / 720) * 4);
+                        values.push(Math.min(55, Math.max(5, wait)));
+                    }
+                }
+            }
+            addSlots(6, 23);
+            addSlots(0, 2);
+            return slots.map((time_slot, i) => ({ time_slot, avg_wait: values[i] }));
+        }
+
         function updateTimeSeriesChart(curveData) {
             const ctx = document.getElementById('timeSeriesChart').getContext('2d');
             if (charts.timeSeries) charts.timeSeries.destroy();
-            const curve = curveData && curveData.curve ? curveData.curve : [];
+            let curve = curveData && curveData.curve ? curveData.curve : [];
+            const isPlaceholder = curve.length === 0;
+            if (isPlaceholder) {
+                curve = buildPlaceholderCurve();
+            } else {
+                curve = sortCurveByParkDay(curve);
+            }
             const labels = curve.map(p => p.time_slot);
             const values = curve.map(p => p.avg_wait);
+            const yMax = values.length ? Math.max(60, Math.ceil(Math.max(...values) / 10) * 10) : 60;
             charts.timeSeries = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Avg actual wait (min)',
+                        label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                         data: values,
-                        borderColor: '#4a90a4',
-                        backgroundColor: 'rgba(74, 144, 164, 0.25)',
+                        borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4',
+                        backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : 'rgba(74, 144, 164, 0.25)',
                         fill: true,
                         tension: 0.2,
-                        pointRadius: 2,
-                        pointBackgroundColor: '#4a90a4',
-                        pointBorderColor: '#4a90a4'
+                        pointRadius: values.length ? 2 : 0,
+                        pointBackgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4',
+                        pointBorderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4'
                     }]
                 },
                 options: {
@@ -547,6 +589,8 @@
                         },
                         y: {
                             display: true,
+                            min: 0,
+                            max: yMax,
                             grid: { color: 'rgba(74,144,164,0.08)' },
                             ticks: { color: '#6a7a8a', font: { size: 9 } },
                             beginAtZero: true
@@ -555,12 +599,15 @@
                 }
             });
             const sub = document.getElementById('chart1-subtitle');
-            if (curveData && curveData.start_date && curveData.end_date) {
-                sub.textContent = curveData.start_date === curveData.end_date
+            const entityLabel = (curveData && curveData.entity_code) ? ' · ' + curveData.entity_code : '';
+            if (isPlaceholder) {
+                sub.textContent = 'Placeholder curve — no server data (pipeline needs WTI or curves/forecast for this park' + (curveData && curveData.entity_code ? ' / ' + curveData.entity_code : '') + ')';
+            } else if (curveData && curveData.start_date && curveData.end_date) {
+                sub.textContent = (curveData.start_date === curveData.end_date
                     ? 'Avg actual wait every 5 min · ' + curveData.start_date
-                    : 'Avg actual wait every 5 min · ' + curveData.start_date + ' – ' + curveData.end_date;
+                    : 'Avg actual wait every 5 min · ' + curveData.start_date + ' – ' + curveData.end_date) + entityLabel;
             } else {
-                sub.textContent = curve.length ? 'Avg actual wait every 5 min' : 'Select a park and date';
+                sub.textContent = 'Avg actual wait every 5 min' + entityLabel;
             }
         }
 
@@ -593,19 +640,26 @@
                 return;
             }
             const range = getDateRangeForCurve();
+            const attraction = document.getElementById('attraction-filter').value;
             let url = `${API_BASE}/daily-curve/${park}`;
             if (range.date) {
                 url += '?date=' + encodeURIComponent(range.date);
             } else {
                 url += '?start=' + encodeURIComponent(range.start) + '&end=' + encodeURIComponent(range.end);
             }
+            if (attraction && attraction !== 'all') {
+                url += '&entity_code=' + encodeURIComponent(attraction);
+            }
             try {
                 const res = await fetch(url);
                 if (!res.ok) throw new Error('Daily curve request failed');
                 const data = await res.json();
+                const curveLen = (data.curve && data.curve.length) || 0;
+                console.log('Daily curve:', url, '→', curveLen, 'points');
+                if (curveLen === 0) console.warn('Daily curve empty — check API has WTI or forecast/backfill curves for this park/date');
                 updateTimeSeriesChart(data);
             } catch (e) {
-                console.warn('Daily curve load failed:', e);
+                console.warn('Daily curve load failed:', e.message || e, '(URL:', url + ')');
                 updateTimeSeriesChart({ curve: [] });
             }
         }

@@ -57,7 +57,7 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
 
 - **Filters:** Property → Park → Attraction (hierarchical). Date range: presets (7D, 30D, 90D, 1Y) and a date picker with arrows. Wait type: Actual vs Posted (default Actual).
 - **KPIs:** Avg Wait (or Wait Time Index when a park is selected), Peak, Min, Data Points, Days in range. WTI value is styled (e.g. dark pink) when a park is selected.
-- **First visual (top left below cards):** “Daily Wait Time Curve” — area chart with markers; average actual wait every 5 minutes across the day. Single day = date picker; multi-day = preset range (average across those days per time_slot). Data from `/api/daily-curve/<park>?date=...` or `?start=...&end=...`.
+- **First visual (top left below cards):** “Daily Wait Time Curve” — area chart with markers; average actual wait every 5 minutes across the day. Park-level from WTI; optional attraction-level when an attraction is selected (`&entity_code=...` from forecast/backfill). X-axis is **park day**: 06:00 (6 AM) to 03:00 next day (origin 6 AM, not midnight). Single day = date picker; multi-day = preset range (average across those days per time_slot). Placeholder curve when API returns no data.
 - **Other visuals:** Top 10 longest waits (list), park comparison chart, weekday pattern chart (placeholders or partial data).
 - **Data info:** Shows “Generated” date, file count, range (e.g. “Live data”).
 
@@ -71,7 +71,7 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
 | `GET /api/entities/<park_code>` | Populate Attraction dropdown (standby only, meets observation threshold); entity names from dimentity. |
 | `GET /api/stats/<park_code>` | KPIs (avg wait, WTI, date). |
 | `GET /api/wait-times/<park_code>?limit=...` | Current wait times; top waits list. |
-| `GET /api/daily-curve/<park_code>?date=YYYY-MM-DD` or `?start=...&end=...` | Daily wait time curve (avg actual wait per 5‑min time_slot) for chart. |
+| `GET /api/daily-curve/<park_code>?date=...` or `?start=...&end=...`; optional `&entity_code=MK02` | Daily wait time curve (avg actual wait per 5‑min time_slot). Park-level from WTI; attraction-level from curves when entity_code set. Chart X-axis: park day 06:00–03:00. |
 | `GET /api/debug/entity-table` | Debug: inspect dimentity structure. |
 
 ### Types of Code Bam-Bam Runs / Edits
@@ -128,6 +128,7 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
 | 2026-02-04 | Bam-Bam | **Dashboard Entity Names Issue:** Attraction dropdown showing entity codes instead of names. Updated API to use lookup dictionary approach from dimentity.csv. Added debug endpoint and extensive logging. Issue added to Active Items for Wilma to help investigate entity table structure on server. |
 | 2026-02-04 | Bam-Bam | **Dashboard overview for Wilma:** Added "📘 Dashboard Build — Complete Overview" to this doc: data sources (WTI, queue_times, curves, dimentity, entity_index), preview locations (localhost:8889, wilma-server:8888), API connections (localhost vs wilma-server by hostname), design/interactions, endpoints, code types, Bam-Bam vs Wilma roles. Updated API Connection and Dashboard Dev Workflow sections to match (python3, stream_server 8889, daily-curve endpoint). |
 | 2026-02-04 | Bam-Bam | **Wilma's URGENT API fix:** Pulled Wilma's changes. Implemented API URL fix: `stream-dashboard.html` now always uses `API_BASE = 'http://wilma-server:8051/api'`. One URL for dev and stream: Fred runs dashboard on his Mac (localhost:8889), data from wilma-server:8051. Task moved to Completed. **What Fred needs to view preview:** (1) Ensure `wilma-server` is reachable from your Mac (hosts file or same network). (2) Run `./scripts/start-stream.sh` from repo root (or `python3 dashboard/stream_server.py`). (3) Open `http://localhost:8889/stream-dashboard.html` in browser. No need to run the API locally — it uses Wilma's server. |
+| 2026-02-05 | Bam-Bam | **Daily Wait Time Curve:** API: added optional `entity_code` for attraction-level curve (from forecast/backfill); case-insensitive park_code in WTI. Frontend: park-day X-axis (06:00–03:00 next day, origin 6 AM); placeholder curve when no server data; sort curve by park-day order. Docs: README_STREAM and WILMA-BAMBAM overview updated (daily curve, entity_code, park-day axis, placeholder). |
 
 ---
 

@@ -780,8 +780,10 @@ def _build_daily_curve_from_wti(
     """Build daily wait time curve: average actual wait per 5-min time_slot across selected dates."""
     if wti_df is None or wti_df.empty or "time_slot" not in wti_df.columns:
         return []
+    # Park code may be stored as "MK" or "mk"; compare case-insensitively
+    park_match = wti_df["park_code"].astype(str).str.upper() == pipeline_park.upper()
     mask = (
-        (wti_df["park_code"] == pipeline_park)
+        park_match
         & (wti_df["park_date"] >= start_date)
         & (wti_df["park_date"] <= end_date)
     )
@@ -841,11 +843,54 @@ def _build_daily_curve_from_curves(
     ]
 
 
+def _build_daily_curve_for_entity(
+    output_base: Path, entity_code: str, start_date: date, end_date: date
+) -> list[dict]:
+    """Build daily wait time curve for a single entity over a date range from forecast/backfill curves.
+    For each time_slot, average wait across all dates in range that have data.
+    """
+    curves_dir = output_base / "curves" / "forecast"
+    backfill_dir = output_base / "curves" / "backfill"
+    entity_upper = entity_code.strip().upper()
+    slot_values: dict[str, list[float]] = {}
+    current = start_date
+    while current <= end_date:
+        date_str = current.strftime("%Y-%m-%d")
+        for base_dir, col in [(curves_dir, "actual_predicted"), (backfill_dir, "actual")]:
+            if not base_dir.exists():
+                continue
+            for code in (entity_code.strip(), entity_upper):
+                path = base_dir / f"{code}_{date_str}.csv"
+                if path.exists():
+                    try:
+                        df = pd.read_csv(path)
+                        if col not in df.columns or "time_slot" not in df.columns:
+                            break
+                        for _, row in df.iterrows():
+                            val = row.get(col)
+                            if pd.notna(val) and val is not None:
+                                ts = str(row["time_slot"])
+                                slot_values.setdefault(ts, []).append(float(val))
+                    except Exception as e:
+                        logger.debug("Curve read %s: %s", path, e)
+                    break
+            break
+        current += timedelta(days=1)
+    if not slot_values:
+        return []
+    slots_sorted = sorted(slot_values.keys())
+    return [
+        {"time_slot": ts, "avg_wait": round(sum(slot_values[ts]) / len(slot_values[ts]), 1)}
+        for ts in slots_sorted
+    ]
+
+
 @app.route("/api/daily-curve/<park_code>", methods=["GET"])
 def get_daily_curve(park_code: str):
     """
     Get daily wait time curve: average actual wait every 5 minutes.
     Single day: date=YYYY-MM-DD. Range: start=YYYY-MM-DD&end=YYYY-MM-DD.
+    Optional: entity_code=MK02 for attraction-level curve (from forecast/backfill curves).
     Returns list of { time_slot, avg_wait } sorted by time_slot.
     """
     pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
@@ -853,6 +898,7 @@ def get_daily_curve(park_code: str):
     date_param = request.args.get("date")
     start_param = request.args.get("start")
     end_param = request.args.get("end")
+    entity_param = request.args.get("entity_code") or request.args.get("entity")
 
     if date_param:
         try:
@@ -872,17 +918,26 @@ def get_daily_curve(park_code: str):
         # Default: today only
         start_date = end_date = date.today()
 
-    wti_df = load_wti_data(output_base)
     curve = []
 
-    if wti_df is not None and not wti_df.empty and "time_slot" in wti_df.columns:
-        curve = _build_daily_curve_from_wti(wti_df, pipeline_park, start_date, end_date)
+    # Attraction-level curve: build from that entity's forecast/backfill curves over the date range
+    if entity_param:
+        curve = _build_daily_curve_for_entity(output_base, entity_param, start_date, end_date)
+    else:
+        # Park-level curve: from WTI or (single-day fallback) from all-entity curves
+        wti_df = load_wti_data(output_base)
+        if wti_df is not None and not wti_df.empty and "time_slot" in wti_df.columns:
+            curve = _build_daily_curve_from_wti(wti_df, pipeline_park, start_date, end_date)
+        if not curve and start_date == end_date:
+            entities_df = load_entity_metadata(output_base)
+            curve = _build_daily_curve_from_curves(output_base, pipeline_park, start_date, entities_df)
 
-    if not curve and start_date == end_date:
-        entities_df = load_entity_metadata(output_base)
-        curve = _build_daily_curve_from_curves(output_base, pipeline_park, start_date, entities_df)
-
-    return jsonify({"curve": curve, "start_date": start_date.isoformat(), "end_date": end_date.isoformat()})
+    return jsonify({
+        "curve": curve,
+        "start_date": start_date.isoformat(),
+        "end_date": end_date.isoformat(),
+        "entity_code": entity_param if entity_param else None,
+    })
 
 
 @app.route("/api/forecast/<park_code>", methods=["GET"])

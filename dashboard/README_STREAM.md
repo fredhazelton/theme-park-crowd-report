@@ -2,23 +2,34 @@
 
 Live data dashboard for theme park crowd levels, wait times, and forecasts.
 
-## Quick Start
+## Quick Start (unified workflow)
 
-### 1. Start the API Server
+**Preview on your Mac:** Run only the dashboard server. Data comes from wilma-server (API runs there).
 
-```bash
-python dashboard/api.py
-```
+### 1. Start the Dashboard Server
 
-Runs on **http://localhost:8051**
-
-### 2. Start the Dashboard Server
+From the repo root:
 
 ```bash
-python dashboard/stream_server.py
+./scripts/start-stream.sh
 ```
 
-Preview at **http://localhost:8889/stream-dashboard.html** (default port 8889; use `--port N` to override).
+Or directly:
+
+```bash
+python3 dashboard/stream_server.py
+```
+
+- Serves on **http://localhost:8889**
+- Preview: **http://localhost:8889/stream-dashboard.html**
+- Use `python3` (not `python`) on Mac. Use `--port N` to override the default port.
+- You can run it in the background (e.g. from your IDE or terminal); it works and keeps serving until you stop it (Ctrl+C or close the terminal).
+
+### 2. Open the Preview
+
+In your browser, go to **http://localhost:8889/stream-dashboard.html**. The dashboard fetches data from **http://wilma-server:8051/api** — your Mac must be able to reach `wilma-server`.
+
+**Note:** You do not run the API locally for preview; the API runs on wilma-server where the pipeline data lives.
 
 ## Architecture
 
@@ -37,7 +48,7 @@ Preview at **http://localhost:8889/stream-dashboard.html** (default port 8889; u
 - `GET /api/entities/<park_code>` - Get all entities/attractions for a park
 - `GET /api/properties` - Get all properties
 - `GET /api/parks?property=<code>` - Get parks (optionally filtered by property)
-- `GET /api/daily-curve/<park_code>?date=YYYY-MM-DD` or `?start=...&end=...` - Daily wait time curve: average actual wait every 5 min (time_slot → avg_wait). Single day or range (averaged across days).
+- `GET /api/daily-curve/<park_code>?date=YYYY-MM-DD` or `?start=...&end=...` - Daily wait time curve: average actual wait every 5 min (time_slot → avg_wait). Single day or range (averaged across days). Optional `&entity_code=MK02` for attraction-level curve (from forecast/backfill curves). Park-level from WTI when no entity_code.
 - `GET /api/debug/entity-table` - Debug endpoint to inspect entity table structure
 
 ## Park Codes
@@ -49,11 +60,18 @@ Preview at **http://localhost:8889/stream-dashboard.html** (default port 8889; u
 - `ioa` - Islands of Adventure
 - `usf` - Universal Studios Florida
 
+## Daily Wait Time Curve (first chart)
+
+- **Data:** Park-level from WTI (`wti/wti.parquet` with `time_slot`); attraction-level when an attraction is selected, from `curves/forecast/` or `curves/backfill/` for that entity over the date range.
+- **X-axis (park day):** 06:00 (6 AM) to 03:00 next day — origin is 6 AM, not midnight. Time slots are sorted in park-day order (06:00–23:55, then 00:00–02:55).
+- **Placeholder:** When the API returns no curve data, a placeholder curve is shown so the chart always renders; subtitle indicates "no server data".
+
 ## Data Sources
 
 - **WTI**: `output_base/wti/wti.parquet`
 - **Live Wait Times**: `output_base/staging/queue_times/`
 - **Forecast Curves**: `output_base/curves/forecast/`
+- **Backfill Curves**: `output_base/curves/backfill/`
 - **Entity Metadata**: `output_base/dimension_tables/dimentity.csv`
 
 ## Storytelling Arc

@@ -151,6 +151,8 @@ DASH_USER=admin DASH_PASSWORD=your-secret python dashboard/app.py
 - **Data:** Reads `output_base/state/pipeline_status.json` (written by daily pipeline and train_batch_entities) and `output_base/state/entity_index.sqlite`; checks queue-times process via `pgrep`
 - See **dashboard/README.md** for details
 
+**Stream dashboard** (wait-time overlay): `./scripts/start-stream.sh` or `python3 dashboard/stream_server.py` → http://localhost:8889/stream-dashboard.html. Data from API (wilma-server:8051). See **dashboard/README_STREAM.md**.
+
 ---
 
 ## 6. Other docs
