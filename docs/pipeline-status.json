@@ -9,8 +9,33 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "08:32:41",
-    "samples": []
+    "last_fetch": "08:37:44",
+    "samples": [
+      {
+        "name": "MK45",
+        "wait": "5"
+      },
+      {
+        "name": "MK43",
+        "wait": "5"
+      },
+      {
+        "name": "MK01",
+        "wait": "10"
+      },
+      {
+        "name": "MK39",
+        "wait": "5"
+      },
+      {
+        "name": "MK34",
+        "wait": "5"
+      },
+      {
+        "name": "MK141",
+        "wait": "40"
+      }
+    ]
   },
-  "last_updated": "2026-02-05T08:35:01.673229-05:00"
+  "last_updated": "2026-02-05T08:40:01.821416-05:00"
 }
