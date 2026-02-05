@@ -108,6 +108,32 @@ The dashboard sets `API_BASE` in JavaScript from `window.location.hostname` so t
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+- **[URGENT - API URL Fix for Unified Workflow]** 
+  
+  **Goal:** ONE URL for everything — dev AND stream both use `http://localhost:8889/stream-dashboard.html`
+  
+  **The Fix:** In `docs/stream/stream-dashboard.html`, change the API_BASE logic so that when on `localhost`, it still uses `wilma-server:8051` for data (not `localhost:8051`).
+  
+  **Current code (around line 383):**
+  ```javascript
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:8051/api'
+      : 'http://wilma-server:8051/api';
+  ```
+  
+  **Change to:**
+  ```javascript
+  // Always use wilma-server for API data (has real pipeline data)
+  const API_BASE = 'http://wilma-server:8051/api';
+  ```
+  
+  **Why:** Fred runs the dashboard locally on his Mac (localhost:8889) for instant Bam-Bam edits, but the data comes from wilma-server where the pipeline runs. This makes ONE URL work for both dev and streaming.
+  
+  **After this change:**
+  - Streamlabs points to `localhost:8889` (Fred's Mac)
+  - Bam-Bam saves file → Fred refreshes → instant update on stream
+  - No more git push/pull cycle during live coding!
+
 - **[Dashboard: Entity Names Not Displaying]** The attraction dropdown in the stream dashboard is showing entity codes (e.g., "IA01", "MK09") instead of full attraction names (e.g., "The Incredible Hulk Coaster", "Space Mountain"). The API endpoint `/api/entities/<park_code>` should be looking up names from `dimension_tables/dimentity.csv` using a code-to-name lookup dictionary, but names aren't appearing. Added debug endpoint `/api/debug/entity-table` to inspect the entity table structure. Need to verify: (1) What columns exist in dimentity.csv? (2) Is the name column populated? (3) Is the lookup dictionary being created correctly? Check API server logs and browser console for debugging info.
 
 ---
