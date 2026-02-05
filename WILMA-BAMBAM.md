@@ -66,6 +66,40 @@ Wilma runs it and reports results.
 
 ---
 
+## 📋 Future Features (Backlog)
+
+### Error Analysis System (Priority: High)
+*Track prediction accuracy across all dimensions.*
+
+**Core Comparisons:**
+- **Actual vs Predicted Actual** (primary metric)
+- **Posted vs Predicted Posted** (secondary/curiosity)
+- **WTI Predicted vs WTI Observed**
+
+**Dimensions to Analyze:**
+- By time of day (5-min slots)
+- By entity
+- By park
+- By day of week
+- By crowd level
+- Over time (trending better/worse?)
+
+**Reports Needed:**
+- Daily accuracy report (automated)
+- MAE, RMSE, MAPE by entity
+- WTI performance: predicted avg vs observed avg
+- Entity-level deep dives
+- Anomaly detection (predictions way off)
+
+**Data Required:**
+- Store predictions at forecast time
+- Collect actuals as they come in
+- Join on (entity, date, time_slot) for comparison
+
+**Status:** Backlog — design and implement when ready
+
+---
+
 ## 📘 Dashboard Build — Complete Overview (for Wilma Review)
 
 *This section describes everything Bam-Bam and Fred are doing to build the stream dashboard, so Wilma can compare with her workflow and improve coordination.*
