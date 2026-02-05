@@ -39,24 +39,19 @@ All data the dashboard shows comes from the **pipeline output base** (e.g. `outp
 
 **Stream server behavior:** `dashboard/stream_server.py` defaults to port **8889**. Root `/` and `/stream-dashboard.html` both serve the same `stream-dashboard.html` file.
 
-### API Connections
+### API Connections (unified workflow)
 
 - **Purpose:** The dashboard fetches all live and historical data from a single REST API (no direct file access).
-- **API app:** `dashboard/api.py` (Flask). Default port: **8051**.
+- **API app:** `dashboard/api.py` (Flask). Runs on **wilma-server** port **8051** (Wilma’s responsibility).
 
-| Environment | API base URL | When it’s used |
-|-------------|--------------|----------------|
-| **Local preview** | `http://localhost:8051/api` | When the page is opened from `localhost` or `127.0.0.1` (e.g. `http://localhost:8889/stream-dashboard.html`). |
-| **Production / Wilma** | `http://wilma-server:8051/api` | When the page is opened from any other host (e.g. `http://wilma-server:8888/stream-dashboard.html`). |
+**Dashboard always uses:** `http://wilma-server:8051/api` — same for dev (Fred’s Mac) and stream. No hostname switch.
 
-The dashboard sets `API_BASE` in JavaScript from `window.location.hostname` so the same HTML works locally and on Wilma’s server.
+**To view preview (Fred’s Mac):**
+1. **Stream server only:** `./scripts/start-stream.sh` or `python3 dashboard/stream_server.py` → serves dashboard on **8889**.
+2. **Browser:** Open `http://localhost:8889/stream-dashboard.html`.
+3. **Data:** Dashboard fetches from wilma-server:8051 — Fred’s Mac must be able to reach `wilma-server` (hosts file or same network).
 
-**To run locally (Fred’s Mac):**
-1. **API:** `python3 dashboard/api.py` → listens on **8051**.
-2. **Stream server:** `python3 dashboard/stream_server.py` → serves dashboard on **8889**.
-3. **Browser:** Open `http://localhost:8889/stream-dashboard.html`.
-
-(Use `python3`; `python` may not exist on Mac.)
+Fred does **not** run the API locally; data comes from Wilma’s server. Use `python3` (not `python`) on Mac.
 
 ### What the Dashboard Does (Design & Interactions)
 
@@ -91,48 +86,22 @@ The dashboard sets `API_BASE` in JavaScript from `window.location.hostname` so t
 - **Bam-Bam (Cursor):** Edits `docs/stream/stream-dashboard.html` and `dashboard/api.py`; adds endpoints and features; documents in README and WILMA-BAMBAM.md; commits and pushes.
 - **Wilma:** Pulls repo; ensures pipeline writes WTI, curves, queue_times, dimentity, entity_index; runs API (e.g. on 8051) and serves dashboard (e.g. 8888); may copy/symlink `stream-dashboard.html` into streaming dir. Reviews this doc to align workflow and data paths.
 
-### Summary Table
+### Summary Table (unified workflow)
 
 | Concern | Bam-Bam / Fred (local) | Wilma (server) |
 |---------|-------------------------|----------------|
-| **Preview URL** | `http://localhost:8889/stream-dashboard.html` | `http://wilma-server:8888/stream-dashboard.html` |
-| **API URL** | `http://localhost:8051/api` (when on localhost) | `http://wilma-server:8051/api` |
-| **Run dashboard server** | `python3 dashboard/stream_server.py` (port 8889) | Serve from streaming dir on 8888 |
-| **Run API** | `python3 dashboard/api.py` (port 8051) | Same; ensure output_base points at pipeline data |
-| **Data** | API reads from local output_base (if set) | API reads from server output_base (pipeline output) |
-| **Deploy** | `git push` | `git pull`; copy/symlink `stream-dashboard.html`; restart services if needed |
+| **Preview URL** | `http://localhost:8889/stream-dashboard.html` (one URL for dev and stream) | Optional: `http://wilma-server:8888/stream-dashboard.html` |
+| **API URL** | Always `http://wilma-server:8051/api` (Fred’s Mac must reach wilma-server) | `http://wilma-server:8051/api` |
+| **Run dashboard server** | `./scripts/start-stream.sh` or `python3 dashboard/stream_server.py` (port 8889) | Optional: serve from streaming dir on 8888 |
+| **Run API** | Not run locally — data from wilma-server | `python3 dashboard/api.py` (port 8051); output_base = pipeline data |
+| **Data** | Fetched from wilma-server:8051 | API reads from server output_base (pipeline output) |
+| **Deploy** | `git push`; Bam-Bam saves → Fred refreshes localhost:8889 for instant preview | `git pull`; keep API and pipeline running; optional copy/symlink for 8888 |
 
 ---
 
 ## Active Items
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
-
-- **[URGENT - API URL Fix for Unified Workflow]** 
-  
-  **Goal:** ONE URL for everything — dev AND stream both use `http://localhost:8889/stream-dashboard.html`
-  
-  **The Fix:** In `docs/stream/stream-dashboard.html`, change the API_BASE logic so that when on `localhost`, it still uses `wilma-server:8051` for data (not `localhost:8051`).
-  
-  **Current code (around line 383):**
-  ```javascript
-  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? 'http://localhost:8051/api'
-      : 'http://wilma-server:8051/api';
-  ```
-  
-  **Change to:**
-  ```javascript
-  // Always use wilma-server for API data (has real pipeline data)
-  const API_BASE = 'http://wilma-server:8051/api';
-  ```
-  
-  **Why:** Fred runs the dashboard locally on his Mac (localhost:8889) for instant Bam-Bam edits, but the data comes from wilma-server where the pipeline runs. This makes ONE URL work for both dev and streaming.
-  
-  **After this change:**
-  - Streamlabs points to `localhost:8889` (Fred's Mac)
-  - Bam-Bam saves file → Fred refreshes → instant update on stream
-  - No more git push/pull cycle during live coding!
 
 - **[Dashboard: Entity Names Not Displaying]** The attraction dropdown in the stream dashboard is showing entity codes (e.g., "IA01", "MK09") instead of full attraction names (e.g., "The Incredible Hulk Coaster", "Space Mountain"). The API endpoint `/api/entities/<park_code>` should be looking up names from `dimension_tables/dimentity.csv` using a code-to-name lookup dictionary, but names aren't appearing. Added debug endpoint `/api/debug/entity-table` to inspect the entity table structure. Need to verify: (1) What columns exist in dimentity.csv? (2) Is the name column populated? (3) Is the lookup dictionary being created correctly? Check API server logs and browser console for debugging info.
 
@@ -141,6 +110,8 @@ The dashboard sets `API_BASE` in JavaScript from `window.location.hostname` so t
 ## Completed
 
 *(Bam-Bam: move items here when done; note what was done in the Log.)*
+
+- **[URGENT - API URL Fix for Unified Workflow]** In `stream-dashboard.html`, API_BASE now always uses `http://wilma-server:8051/api` (no hostname switch). One URL for dev and stream: Fred views `http://localhost:8889/stream-dashboard.html`; data comes from wilma-server. Use `scripts/start-stream.sh` to start the dashboard server.
 
 - **[S3 Sync Test]** Run the new S3 sync-only routine and verify it's working. Let me know the results!
 
@@ -156,6 +127,7 @@ The dashboard sets `API_BASE` in JavaScript from `window.location.hostname` so t
 | 2026-02-02 (once-off) | Bam-Bam | **Routine:** Added git pull to channel rule; ran once-off: pull → check. Pull brought in your S3 Sync Test task. **S3 Sync Test:** Ran `./scripts/sync_s3_data.sh`. Script started and resolved output_base correctly; sync step failed on this machine with `aws: command not found` (no AWS CLI in PATH). On a box with AWS CLI and credentials (e.g. your server), sync should run. Task moved to Completed. |
 | 2026-02-04 | Bam-Bam | **Dashboard Entity Names Issue:** Attraction dropdown showing entity codes instead of names. Updated API to use lookup dictionary approach from dimentity.csv. Added debug endpoint and extensive logging. Issue added to Active Items for Wilma to help investigate entity table structure on server. |
 | 2026-02-04 | Bam-Bam | **Dashboard overview for Wilma:** Added "📘 Dashboard Build — Complete Overview" to this doc: data sources (WTI, queue_times, curves, dimentity, entity_index), preview locations (localhost:8889, wilma-server:8888), API connections (localhost vs wilma-server by hostname), design/interactions, endpoints, code types, Bam-Bam vs Wilma roles. Updated API Connection and Dashboard Dev Workflow sections to match (python3, stream_server 8889, daily-curve endpoint). |
+| 2026-02-04 | Bam-Bam | **Wilma's URGENT API fix:** Pulled Wilma's changes. Implemented API URL fix: `stream-dashboard.html` now always uses `API_BASE = 'http://wilma-server:8051/api'`. One URL for dev and stream: Fred runs dashboard on his Mac (localhost:8889), data from wilma-server:8051. Task moved to Completed. **What Fred needs to view preview:** (1) Ensure `wilma-server` is reachable from your Mac (hosts file or same network). (2) Run `./scripts/start-stream.sh` from repo root (or `python3 dashboard/stream_server.py`). (3) Open `http://localhost:8889/stream-dashboard.html` in browser. No need to run the API locally — it uses Wilma's server. |
 
 ---
 
@@ -243,11 +215,10 @@ The dashboard sets `API_BASE` in JavaScript from `window.location.hostname` so t
 
 *Full overview is in **📘 Dashboard Build — Complete Overview** above.*
 
-**Dashboard API base:**
-- On **localhost** (e.g. `http://localhost:8889/...`): `http://localhost:8051/api`
-- On **wilma-server** (e.g. `http://wilma-server:8888/...`): `http://wilma-server:8051/api`
-
-The dashboard sets `API_BASE` from `window.location.hostname` so one build works in both places.
+**Dashboard API base (unified workflow):**
+- **Always** `http://wilma-server:8051/api` — same for dev (Fred's Mac) and stream.
+- Fred runs only the **dashboard server** on his Mac (port 8889); data comes from wilma-server where the pipeline runs.
+- One URL for everything: `http://localhost:8889/stream-dashboard.html`.
 
 ### Available Endpoints
 
@@ -275,21 +246,25 @@ The dashboard sets `API_BASE` from `window.location.hostname` so one build works
 
 *See **📘 Dashboard Build — Complete Overview** for data sources, preview URLs, and API details.*
 
-### When Designing (Dev Mode — Fred’s Mac)
+### When Designing / Viewing Preview (Fred’s Mac — unified workflow)
 1. **Bam-Bam edits:** `docs/stream/stream-dashboard.html` and/or `dashboard/api.py` in Cursor
-2. **Run API:** `python3 dashboard/api.py` (port 8051)
-3. **Run stream server:** `python3 dashboard/stream_server.py` (port 8889)
-4. **Fred views:** `http://localhost:8889/stream-dashboard.html` in browser
-5. **Refresh** to see changes; API serves real data from local output_base if set
+2. **Fred runs dashboard server only:** `./scripts/start-stream.sh` (or `python3 dashboard/stream_server.py`) from repo root → serves on port **8889**
+3. **Fred views:** `http://localhost:8889/stream-dashboard.html` in browser
+4. **Data:** Dashboard fetches from `http://wilma-server:8051/api` — Fred’s Mac must be able to reach `wilma-server` (hosts file or same network)
+5. **Refresh** after Bam-Bam saves to see changes; no need to run the API locally
 
 Use `python3` (not `python`) on Mac.
 
-### When Ready to Stream (Deploy Mode)
+### When Ready to Stream
+- **Streamlabs** points to `http://localhost:8889/stream-dashboard.html` (Fred’s Mac) — same URL as dev. Bam-Bam saves → Fred refreshes → instant update on stream. No git push/pull cycle during live coding.
+- **Wilma** keeps API running on wilma-server:8051 and pipeline data updated.
+
+### Optional: Deploy to wilma-server (separate stream setup)
 1. **Bam-Bam:** `git push`
 2. **Wilma:** `git pull`; copy or symlink `docs/stream/stream-dashboard.html` to streaming dir (see `docs/stream/SETUP_WILMA_SERVER.md`)
-3. **Streamlabs** uses `http://wilma-server:8888/stream-dashboard.html`; API at `http://wilma-server:8051/api`
+3. **Streamlabs** can alternatively use `http://wilma-server:8888/stream-dashboard.html`; API at `http://wilma-server:8051/api`
 
-**Summary:** Dev = localhost:8889 + localhost:8051; Stream = wilma-server:8888 + wilma-server:8051.
+**Summary:** Unified = one URL (localhost:8889), API always wilma-server:8051.
 
 ---
 

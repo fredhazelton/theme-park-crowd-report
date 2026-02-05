@@ -371,11 +371,8 @@
     </div>
     
     <script>
-        // API configuration: use localhost when previewing locally, wilma-server when on stream
-        const hostname = typeof window !== 'undefined' && window.location && window.location.hostname;
-        const API_BASE = (hostname === 'localhost' || hostname === '127.0.0.1')
-            ? 'http://localhost:8051/api'
-            : 'http://wilma-server:8051/api';
+        // Always use wilma-server for API data (has real pipeline data)
+        const API_BASE = 'http://wilma-server:8051/api';
         console.log('API Base URL:', API_BASE);
         
         let dashboardData = null;
