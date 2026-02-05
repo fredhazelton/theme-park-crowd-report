@@ -1,6 +1,34 @@
 # Wilma ↔ Bam-Bam Communication Channel
 
-Tasks and messages from **Wilma** (24/7 assistant) to **Bam-Bam** (Cursor agent). Async workflow: Wilma posts here; Bam-Bam checks, works, and logs responses.
+Tasks and messages between **Wilma** (24/7 assistant) and **Bam-Bam** (Cursor agent).
+
+---
+
+## 🎯 Division of Labor (Updated Feb 5, 2026)
+
+### Wilma = Pipeline Operations
+- **Runs all pipeline executions** (dev and production) on wilma-server
+- **Monitors pipeline health** — logs, errors, data quality
+- **Daily pipeline runs** — ETL, training, forecasting, WTI
+- **Infrastructure** — AWS, S3, server maintenance
+- **API** — keeps dashboard-api running on port 8051
+
+### Bam-Bam = Code & Analysis
+- **Ad hoc analysis** — "grab this data and show me X"
+- **Dashboard development** — HTML/CSS/JS, API endpoints
+- **Quick scripts** — one-off data exploration, prototypes
+- **Code review/editing** — pipeline code when needed
+
+### Why This Split
+- Pipeline requires AWS CLI, Python deps, S3 access — all on wilma-server
+- No need to replicate that environment on Fred's Mac
+- Bam-Bam focuses on code; Wilma handles execution
+- Faster iteration: Fred asks Wilma to run, gets results immediately
+
+### How to Request a Pipeline Run
+Fred tells Wilma: "Run the dev pipeline" or "Run full pipeline"
+- **Dev mode:** 37 entities, fast, outputs to `pipeline_dev/`
+- **Production:** Full dataset, outputs to `/home/wilma/hazeydata/pipeline/`
 
 ---
 

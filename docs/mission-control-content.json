@@ -1,36 +1,4 @@
 {
-  "quick_links": [
-    {
-      "category": "🏠 Main",
-      "links": [
-        {"name": "Mission Control", "url": "https://hazeydata.github.io/theme-park-crowd-report/mission-control.html"},
-        {"name": "hazeydata.ai", "url": "https://hazeydata.ai"},
-        {"name": "GitHub Repo", "url": "https://github.com/hazeydata/theme-park-crowd-report"}
-      ]
-    },
-    {
-      "category": "📊 Dashboard",
-      "links": [
-        {"name": "Stream Dashboard", "url": "https://hazeydata.github.io/theme-park-crowd-report/stream/main-dashboard.html"},
-        {"name": "API Docs", "url": "http://wilma-server:8051/docs"}
-      ]
-    },
-    {
-      "category": "🛠️ Dev Tools Hub",
-      "links": [
-        {"name": "Tools Hub", "url": "https://tools.hazeydata.ai"},
-        {"name": "CronMagic", "url": "https://cronmagic.hazeydata.ai"},
-        {"name": "CSVStats", "url": "https://csvstats.hazeydata.ai"}
-      ]
-    },
-    {
-      "category": "📺 Streaming",
-      "links": [
-        {"name": "Twitch", "url": "https://twitch.tv/hazeydata"},
-        {"name": "YouTube", "url": "https://youtube.com/@hazeydata"}
-      ]
-    }
-  ],
   "todays_focus": [
     {
       "status_class": "medium",
@@ -171,5 +139,5 @@
     "blocked": 0,
     "done": 0
   },
-  "last_updated": "2026-02-05T07:55:01.892156-05:00"
+  "last_updated": "2026-02-05T09:45:01.389650-05:00"
 }

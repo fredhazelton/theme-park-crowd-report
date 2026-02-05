@@ -420,6 +420,110 @@ def predict_actual_with_posted(
         return None
 
 
+def predict_actual_without_posted(
+    df_features: pd.DataFrame,
+    entity_code: str,
+    output_base: Path,
+    logger: Optional[logging.Logger] = None,
+) -> Optional[float]:
+    """
+    Predict ACTUAL wait time using the without-POSTED model.
+    
+    This is used when no POSTED time is available - predicts ACTUAL
+    from time-based features alone.
+    
+    Args:
+        df_features: DataFrame with features (one row)
+        entity_code: Entity code
+        output_base: Pipeline output base directory
+        logger: Optional logger
+    
+    Returns:
+        Predicted ACTUAL wait time (minutes), or None if model not found
+    """
+    if xgb is None:
+        if logger:
+            logger.error("XGBoost not installed")
+        return None
+    
+    try:
+        # Load model and metadata
+        model, metadata = load_model(
+            entity_code,
+            output_base,
+            model_type="without_posted",
+        )
+        
+        # Check if this is a mean model (for entities with < 1000 observations)
+        if model is None and metadata.get("model_type") == "mean":
+            mean_wait_time = metadata.get("mean_wait_time", 0.0)
+            if logger:
+                logger.debug(f"Using mean model for {entity_code}: {mean_wait_time:.2f} minutes")
+            return max(0.0, float(mean_wait_time))
+        
+        # XGBoost model path
+        if model is None:
+            if logger:
+                logger.debug(f"Model not found for {entity_code} (without-POSTED)")
+            return None
+        
+        # Get feature columns from metadata
+        feature_cols = metadata.get("feature_names", metadata.get("feature_columns", []))
+        if not feature_cols:
+            if logger:
+                logger.warning(f"No feature columns in metadata for {entity_code}")
+            return None
+        
+        df_features = df_features.copy()
+        
+        # Select and prepare features
+        available_features = [col for col in feature_cols if col in df_features.columns]
+        missing_features = [col for col in feature_cols if col not in df_features.columns]
+        
+        if missing_features and logger:
+            logger.debug(f"Missing features for {entity_code}: {missing_features}")
+        
+        if not available_features:
+            if logger:
+                logger.warning(f"No available features for {entity_code}")
+            return None
+        
+        X = df_features[available_features].copy()
+        
+        # Fill missing features with 0
+        for col in feature_cols:
+            if col not in X.columns:
+                X[col] = 0
+        
+        # Reorder to match training order
+        X = X[feature_cols]
+        
+        # Convert boolean to int
+        for col in X.columns:
+            if X[col].dtype == bool:
+                X[col] = X[col].astype(int)
+        
+        # Fill nulls
+        X = X.fillna(0)
+        
+        # Predict
+        prediction = model.predict(X.values)[0]
+        
+        # Ensure non-negative
+        prediction = max(0.0, float(prediction))
+        
+        return prediction
+        
+    except FileNotFoundError:
+        if logger:
+            logger.debug(f"Model not found for {entity_code} (without-POSTED)")
+        return None
+    except Exception as e:
+        if logger:
+            logger.error(f"Error predicting for {entity_code} (without-POSTED): {e}")
+        return None
+
+
 # =============================================================================
 # BACKFILL GENERATION
 # =============================================================================
@@ -616,25 +720,68 @@ def generate_backfill_for_entity_date(
                         "park_date": park_date,
                         "time_slot": time_slot,
                         "actual": imputed_actual,
-                        "source": "imputed",
+                        "source": "imputed_with_posted",
                     })
                 else:
-                    # No model or prediction failed - set to null
+                    # with-POSTED model failed, fall back to without-POSTED
+                    imputed_actual = predict_actual_without_posted(
+                        df_encoded,
+                        entity_code,
+                        output_base,
+                        logger,
+                    )
                     results.append({
                         "entity_code": entity_code,
                         "park_date": park_date,
                         "time_slot": time_slot,
-                        "actual": None,
-                        "source": "imputed",  # Still mark as imputed attempt
+                        "actual": imputed_actual,  # May still be None if no model
+                        "source": "imputed_without_posted" if imputed_actual is not None else "no_model",
                     })
             else:
-                # No POSTED available - set to null
+                # No POSTED available - use without-POSTED model
+                # Build features
+                df_features = build_features_for_time_slot(
+                    entity_code,
+                    park_date,
+                    hour,
+                    minute,
+                    park_code,
+                    park_timezone,
+                    dims,
+                    output_base,
+                    park_hours=hours,
+                    logger=logger,
+                )
+                
+                # Encode features
+                if encoding_mappings:
+                    df_encoded, _ = encode_features(
+                        df_features,
+                        output_base,
+                        strategy=encoding_mappings.get("strategy", "label"),
+                        mappings=encoding_mappings,
+                    )
+                else:
+                    df_encoded, _ = encode_features(
+                        df_features,
+                        output_base,
+                        strategy="label",
+                    )
+                
+                # Predict ACTUAL using without-POSTED model
+                imputed_actual = predict_actual_without_posted(
+                    df_encoded,
+                    entity_code,
+                    output_base,
+                    logger,
+                )
+                
                 results.append({
                     "entity_code": entity_code,
                     "park_date": park_date,
                     "time_slot": time_slot,
-                    "actual": None,
-                    "source": "imputed",  # No data available
+                    "actual": imputed_actual,  # May be None if no model
+                    "source": "imputed_without_posted" if imputed_actual is not None else "no_model",
                 })
     
     if not results:

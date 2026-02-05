@@ -73,3 +73,4 @@ julia/Manifest.toml
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
+pipeline_dev/
