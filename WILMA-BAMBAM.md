@@ -4,31 +4,65 @@ Tasks and messages between **Wilma** (24/7 assistant) and **Bam-Bam** (Cursor ag
 
 ---
 
-## 🎯 Division of Labor (Updated Feb 5, 2026)
+## 🎯 Official Architecture (Feb 5, 2026)
 
-### Wilma = Pipeline Operations
-- **Runs all pipeline executions** (dev and production) on wilma-server
-- **Monitors pipeline health** — logs, errors, data quality
-- **Daily pipeline runs** — ETL, training, forecasting, WTI
-- **Infrastructure** — AWS, S3, server maintenance
-- **API** — keeps dashboard-api running on port 8051
+### Wilma = Pipeline Owner (100%)
+**Source of truth for all data.** Runs everything on wilma-server.
 
-### Bam-Bam = Code & Analysis
-- **Ad hoc analysis** — "grab this data and show me X"
-- **Dashboard development** — HTML/CSS/JS, API endpoints
-- **Quick scripts** — one-off data exploration, prototypes
-- **Code review/editing** — pipeline code when needed
+| Responsibility | Details |
+|----------------|---------|
+| **Production Pipeline** | Daily ETL, training, forecasting, WTI |
+| **Dev Pipeline** | Test runs with subset of entities |
+| **Data Quality** | Monitoring, error handling, validation |
+| **Infrastructure** | AWS, S3, server, cron jobs |
+| **API** | Dashboard API on port 8051 |
 
-### Why This Split
-- Pipeline requires AWS CLI, Python deps, S3 access — all on wilma-server
-- No need to replicate that environment on Fred's Mac
-- Bam-Bam focuses on code; Wilma handles execution
-- Faster iteration: Fred asks Wilma to run, gets results immediately
+### Bam-Bam + Fred = Research & Dashboard
+**Consumers of Wilma's data.** Never run the pipeline directly.
+
+| Responsibility | Details |
+|----------------|---------|
+| **Dashboard Development** | HTML/CSS/JS, Chart.js, UI/UX |
+| **Ad-Hoc Analysis** | "Show me X" — quick data exploration |
+| **API Endpoints** | Add/modify endpoints in `dashboard/api.py` |
+| **Research** | One-off scripts, prototypes |
+
+### Data Flow
+```
+S3 (TouringPlans) 
+    ↓
+Wilma Pipeline (wilma-server)
+    ↓
+Pipeline Output (/home/wilma/hazeydata/pipeline/)
+    ↓
+Dashboard API (wilma-server:8051)
+    ↓
+Dashboard HTML (Bam-Bam's code)
+    ↓
+Stream Overlay (Streamlabs)
+```
+
+### How Bam-Bam Accesses Data
+**Via API only** — no direct file access needed.
+
+| Endpoint | What It Returns |
+|----------|-----------------|
+| `/api/stats/{park}` | KPIs, WTI, averages |
+| `/api/wait-times/{park}` | Current wait times |
+| `/api/daily-curve/{park}` | Wait time curves |
+| `/api/entities/{park}` | Attraction list |
+| `/api/forecast/{park}` | Predicted waits |
+
+**Base URL:** `http://wilma-server:8051/api`
 
 ### How to Request a Pipeline Run
-Fred tells Wilma: "Run the dev pipeline" or "Run full pipeline"
-- **Dev mode:** 37 entities, fast, outputs to `pipeline_dev/`
-- **Production:** Full dataset, outputs to `/home/wilma/hazeydata/pipeline/`
+Fred tells Wilma (via Telegram or here):
+- "Run the dev pipeline" — 37 entities, quick test
+- "Run production pipeline" — full dataset
+- "Train entity X" — specific entity
+- "Generate forecasts for X" — specific forecasts
+
+Wilma runs it and reports results.
 
 ---
 
