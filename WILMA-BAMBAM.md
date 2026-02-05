@@ -148,6 +148,12 @@ Fred does **not** run the API locally; data comes from Wilma’s server. Use `py
   **Why this sample:** 2 standby + 2 priority per park across 10 parks. Small enough to iterate fast, broad enough to catch issues.
   
   **Usage:** Fred and Bam-Bam will always develop/test with `DEV_MODE=True`. Only Wilma runs full production.
+  
+  **Important — DEV_MODE applies to ETL too:**
+  - Filter should apply at ETL stage (during row parsing), not after
+  - This way Bam-Bam can test ETL code changes with real S3 data, but fast
+  - Dev outputs should go to a separate path (e.g., `pipeline/dev/` or `output_base_dev/`) so production data is untouched
+  - Full pipeline is testable: ETL → dimensions → aggregates → training → forecast
 
 - **[ETL: Only Process New Files Since Last Run]** — **PRIORITY**
   The S3 ETL (`src/get_tp_wait_time_data_from_s3.py`) currently processes ~36 files every run, but only 5-7 are actually new. The rest are old files (2013-2019) that fail with "No columns to parse" errors. Now that the full historical load is done, we should only pull files modified since the last successful ETL run.
