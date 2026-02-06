@@ -697,12 +697,14 @@ def generate_backfill_for_entity_date(
                         output_base,
                         strategy=encoding_mappings.get("strategy", "label"),
                         mappings=encoding_mappings,
+                        handle_unknown="use_default",  # Don't fail on new entities
                     )
                 else:
                     df_encoded, _ = encode_features(
                         df_features,
                         output_base,
                         strategy="label",
+                        handle_unknown="use_default",  # Don't fail on new entities
                     )
                 
                 # Predict ACTUAL
@@ -760,12 +762,14 @@ def generate_backfill_for_entity_date(
                         output_base,
                         strategy=encoding_mappings.get("strategy", "label"),
                         mappings=encoding_mappings,
+                        handle_unknown="use_default",  # Don't fail on new entities
                     )
                 else:
                     df_encoded, _ = encode_features(
                         df_features,
                         output_base,
                         strategy="label",
+                        handle_unknown="use_default",  # Don't fail on new entities
                     )
                 
                 # Predict ACTUAL using without-POSTED model
