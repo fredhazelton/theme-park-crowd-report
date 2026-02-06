@@ -775,6 +775,18 @@ def main() -> None:
             sys.exit(1)
         
         all_entities = all_entities_df["entity_code"].tolist()
+        
+        # Filter to only entities with trained models (S3-based entities)
+        # This excludes queue-times-only entities that have no historical model
+        models_dir = base / "models"
+        if models_dir.exists():
+            trained_entities = set(d.name for d in models_dir.iterdir() if d.is_dir())
+            s3_entities = [e for e in all_entities if e in trained_entities]
+            skipped_count = len(all_entities) - len(s3_entities)
+            if skipped_count > 0:
+                logger.info(f"Filtered to S3-based entities only: {len(s3_entities)} entities (skipped {skipped_count} queue-times-only)")
+            all_entities = s3_entities
+        
         if args.park:
             park_upper = args.park.strip().upper()
             all_entities = [e for e in all_entities if e.upper().startswith(park_upper)]
