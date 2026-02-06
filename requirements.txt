@@ -8,6 +8,10 @@ pyarrow>=14.0.0
 # HTTP requests for API access
 requests>=2.31.0
 
+# Dashboard API (stream dashboard)
+flask>=3.0.0
+flask-cors>=4.0.0
+
 # Development tools
 python-dotenv>=1.0.0
 

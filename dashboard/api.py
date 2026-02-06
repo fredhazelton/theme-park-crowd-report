@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sqlite3
 import sys
 from datetime import date, datetime, timedelta
@@ -31,6 +32,13 @@ from flask_cors import CORS
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
+if str(ROOT / "dashboard") not in sys.path:
+    sys.path.insert(0, str(ROOT / "dashboard"))
+
+# Placeholder data for ad hoc visual design testing (real data unchanged)
+PLACEHOLDER_DATA = os.environ.get("PLACEHOLDER_DATA", "").lower() == "true"
+if PLACEHOLDER_DATA:
+    import placeholder_data as _placeholder
 
 from utils.paths import get_output_base
 
@@ -297,6 +305,59 @@ def get_daily_wti(wti_df: pd.DataFrame, park_code: str, park_date: date) -> Opti
 # =============================================================================
 
 
+def _observed_at_to_time_slot(observed_at_str: str) -> Optional[str]:
+    """Derive 5-min time_slot (HH:MM) from observed_at ISO string. Returns None if unparseable."""
+    if not observed_at_str or pd.isna(observed_at_str):
+        return None
+    try:
+        dt = pd.to_datetime(observed_at_str)
+        minute = int(dt.minute)
+        minute_slot = (minute // 5) * 5
+        return f"{dt.hour:02d}:{minute_slot:02d}"
+    except Exception:
+        return None
+
+
+def load_actual_points_for_entity(
+    output_base: Path, pipeline_park: str, entity_code: str, park_date: date
+) -> list[dict]:
+    """Load ACTUAL wait time observations for one entity on one park-date from fact_tables/clean."""
+    ym = park_date.strftime("%Y-%m")
+    date_str = park_date.strftime("%Y-%m-%d")
+    csv_path = output_base / "fact_tables" / "clean" / ym / f"{pipeline_park}_{date_str}.csv"
+    if not csv_path.exists():
+        return []
+    try:
+        df = pd.read_csv(csv_path, low_memory=False)
+    except Exception as e:
+        logger.warning(f"Could not read {csv_path}: {e}")
+        return []
+    if "entity_code" not in df.columns or "wait_time_type" not in df.columns or "wait_time_minutes" not in df.columns:
+        return []
+    entity_upper = (entity_code or "").strip().upper()
+    mask = (
+        (df["entity_code"].astype(str).str.upper().str.strip() == entity_upper)
+        & (df["wait_time_type"].astype(str).str.upper() == "ACTUAL")
+    )
+    subset = df.loc[mask]
+    if subset.empty:
+        return []
+    points = []
+    for _, row in subset.iterrows():
+        ts = _observed_at_to_time_slot(str(row.get("observed_at", "")))
+        if ts is None:
+            continue
+        wait = row.get("wait_time_minutes")
+        if pd.isna(wait):
+            continue
+        try:
+            wait_int = int(float(wait))
+        except (ValueError, TypeError):
+            continue
+        points.append({"time_slot": ts, "wait_time_minutes": wait_int})
+    return points
+
+
 def get_trained_entity_codes(output_base: Path) -> set:
     """Get set of entity codes that have trained models (met the 500 obs threshold)."""
     models_dir = output_base / "models"
@@ -322,6 +383,14 @@ def health():
 @app.route("/api/crowd-level/<park_code>", methods=["GET"])
 def get_crowd_level(park_code: str):
     """Get current crowd level (1-10) for a park."""
+    if PLACEHOLDER_DATA:
+        date_str = request.args.get("date")
+        try:
+            target_date = datetime.strptime(date_str, "%Y-%m-%d").date() if date_str else date.today()
+        except (ValueError, TypeError):
+            target_date = date.today()
+        data = _placeholder.get_placeholder_crowd_level(park_code, target_date)
+        return jsonify(data)
     # Map dashboard park code to pipeline code
     pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
     
@@ -378,6 +447,8 @@ def get_crowd_level(park_code: str):
 @app.route("/api/properties", methods=["GET"])
 def get_properties():
     """Get all properties from entity metadata."""
+    if PLACEHOLDER_DATA:
+        return jsonify({"properties": _placeholder.get_placeholder_properties()})
     output_base = get_output_base_path()
     entities_df = load_entity_metadata(output_base)
     
@@ -415,6 +486,9 @@ def get_properties():
 @app.route("/api/parks", methods=["GET"])
 def get_parks():
     """Get all parks, optionally filtered by property."""
+    if PLACEHOLDER_DATA:
+        property_code = request.args.get("property", None)
+        return jsonify({"parks": _placeholder.get_placeholder_parks(property_code)})
     property_code = request.args.get("property", None)
     output_base = get_output_base_path()
     entities_df = load_entity_metadata(output_base)
@@ -514,6 +588,8 @@ def debug_entity_table():
 @app.route("/api/entities/<park_code>", methods=["GET"])
 def get_entities(park_code: str):
     """Get all entities/attractions for a park from entity metadata."""
+    if PLACEHOLDER_DATA:
+        return jsonify({"entities": _placeholder.get_placeholder_entities(park_code)})
     pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
     output_base = get_output_base_path()
     
@@ -730,6 +806,9 @@ def get_entities(park_code: str):
 @app.route("/api/wait-times/<park_code>", methods=["GET"])
 def get_wait_times(park_code: str):
     """Get top wait times for a park."""
+    if PLACEHOLDER_DATA:
+        limit = int(request.args.get("limit", 5))
+        return jsonify({"wait_times": _placeholder.get_placeholder_wait_times(park_code, limit=limit)})
     limit = int(request.args.get("limit", 5))
     pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
     
@@ -772,6 +851,72 @@ def get_wait_times(park_code: str):
     results.sort(key=lambda x: x["wait_minutes"] if x["wait_minutes"] is not None else 0, reverse=True)
     
     return jsonify({"wait_times": results[:limit]})
+
+
+def _get_sample_entity_with_actuals(output_base: Path) -> Optional[dict]:
+    """Return one (park_code, entity_code, date) that has ACTUAL data, for UI hints. Scans recent fact_tables/clean."""
+    clean_dir = output_base / "fact_tables" / "clean"
+    if not clean_dir.exists():
+        return None
+    month_dirs = sorted(clean_dir.iterdir(), key=lambda p: p.name, reverse=True)
+    for month_dir in month_dirs[:3]:
+        if not month_dir.is_dir() or len(month_dir.name) != 7:
+            continue
+        csvs = sorted(month_dir.glob("*.csv"), key=lambda p: p.name, reverse=True)
+        for csv_path in csvs[:20]:
+            try:
+                name = csv_path.stem
+                if "_" not in name:
+                    continue
+                park_code, date_str = name.split("_", 1)
+                df = pd.read_csv(csv_path, nrows=500, low_memory=False)
+                if "entity_code" not in df.columns or "wait_time_type" not in df.columns:
+                    continue
+                actual = df[df["wait_time_type"].astype(str).str.upper() == "ACTUAL"]
+                if actual.empty:
+                    continue
+                entity_code = str(actual.iloc[0]["entity_code"]).strip()
+                dashboard_park = PARK_CODE_REVERSE.get(park_code.lower(), park_code.lower())
+                return {"park_code": dashboard_park, "entity_code": entity_code, "date": date_str}
+            except Exception:
+                continue
+    return None
+
+
+@app.route("/api/actual-points/<park_code>", methods=["GET"])
+def get_actual_points(park_code: str):
+    """
+    Get raw ACTUAL wait time observations for one entity on one park-date.
+    Query: date=YYYY-MM-DD (required), entity_code=MK01 (required).
+    Returns: { points: [ { time_slot, wait_time_minutes }, ... ] } from fact_tables/clean.
+    """
+    date_str = request.args.get("date")
+    entity_param = request.args.get("entity_code") or request.args.get("entity")
+    if not date_str or not entity_param:
+        return jsonify({"points": []})
+    try:
+        park_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"points": []})
+    if PLACEHOLDER_DATA:
+        return jsonify({"points": []})
+    pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
+    output_base = get_output_base_path()
+    points = load_actual_points_for_entity(output_base, pipeline_park, entity_param, park_date)
+    return jsonify({"points": points})
+
+
+@app.route("/api/sample-actual-points", methods=["GET"])
+def get_sample_actual_points():
+    """
+    Return one (park_code, entity_code, date) that has ACTUAL data in fact_tables/clean.
+    Use as a hint for "pick this park, this attraction, this date" to see actual observed points.
+    """
+    if PLACEHOLDER_DATA:
+        return jsonify({"sample": None})
+    output_base = get_output_base_path()
+    sample = _get_sample_entity_with_actuals(output_base)
+    return jsonify({"sample": sample})
 
 
 def _build_daily_curve_from_wti(
@@ -893,6 +1038,33 @@ def get_daily_curve(park_code: str):
     Optional: entity_code=MK02 for attraction-level curve (from forecast/backfill curves).
     Returns list of { time_slot, avg_wait } sorted by time_slot.
     """
+    if PLACEHOLDER_DATA:
+        date_param = request.args.get("date")
+        start_param = request.args.get("start")
+        end_param = request.args.get("end")
+        entity_param = request.args.get("entity_code") or request.args.get("entity")
+        if date_param:
+            try:
+                start_date = end_date = date.fromisoformat(date_param)
+            except ValueError:
+                return jsonify({"error": "Invalid date"}), 400
+        elif start_param and end_param:
+            try:
+                start_date = date.fromisoformat(start_param)
+                end_date = date.fromisoformat(end_param)
+                if start_date > end_date:
+                    start_date, end_date = end_date, start_date
+            except ValueError:
+                return jsonify({"error": "Invalid start/end"}), 400
+        else:
+            start_date = end_date = date.today()
+        curve = _placeholder.get_placeholder_daily_curve(park_code, start_date, end_date, entity_param)
+        return jsonify({
+            "curve": curve,
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
+            "entity_code": entity_param,
+        })
     pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
     output_base = get_output_base_path()
     date_param = request.args.get("date")
@@ -943,6 +1115,9 @@ def get_daily_curve(park_code: str):
 @app.route("/api/forecast/<park_code>", methods=["GET"])
 def get_forecast(park_code: str):
     """Get 7-day forecast for a park."""
+    if PLACEHOLDER_DATA:
+        days = int(request.args.get("days", 7))
+        return jsonify({"forecast": _placeholder.get_placeholder_forecast(park_code, days=days)})
     days = int(request.args.get("days", 7))
     pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
     
@@ -984,6 +1159,9 @@ def get_forecast(park_code: str):
 @app.route("/api/tip/<park_code>", methods=["GET"])
 def get_tip(park_code: str):
     """Get a pro tip for a park based on forecast data."""
+    if PLACEHOLDER_DATA:
+        tip = _placeholder.get_placeholder_tip(park_code)
+        return jsonify({"tip": tip})
     pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
     output_base = get_output_base_path()
     
@@ -1031,6 +1209,8 @@ def get_tip(park_code: str):
 @app.route("/api/stats/<park_code>", methods=["GET"])
 def get_stats(park_code: str):
     """Get comprehensive stats for a park (for hero card)."""
+    if PLACEHOLDER_DATA:
+        return jsonify(_placeholder.get_placeholder_stats(park_code))
     pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
     output_base = get_output_base_path()
     
@@ -1074,4 +1254,6 @@ def get_stats(park_code: str):
 if __name__ == "__main__":
     logger.info("Starting Dashboard API server...")
     logger.info(f"Output base: {get_output_base_path()}")
+    if PLACEHOLDER_DATA:
+        logger.info("PLACEHOLDER_DATA=true: serving synthetic data for visual design testing")
     app.run(host="0.0.0.0", port=8051, debug=False)

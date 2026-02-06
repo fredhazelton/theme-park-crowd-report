@@ -31,6 +31,43 @@ In your browser, go to **http://localhost:8889/stream-dashboard.html**. The dash
 
 **Note:** You do not run the API locally for preview; the API runs on wilma-server where the pipeline data lives.
 
+### 3. (Optional) Run the API locally
+
+If you run the API on your Mac (e.g. `python3 dashboard/api.py` on port 8051), the dashboard must point at it. In **docs/stream/stream-dashboard.html**, set:
+
+```javascript
+const API_BASE = 'http://localhost:8051/api';
+```
+
+Reload **http://localhost:8889/stream-dashboard.html** so it uses your local API.
+
+## Seeing real data (which date and entity to pick)
+
+If the curve always looks the same (placeholder) no matter what you select:
+
+1. **Check the API host**  
+   The dashboard uses `API_BASE` (see above). If the API runs locally, use `http://localhost:8051/api`. Otherwise it uses `http://wilma-server:8051/api` — your machine must resolve and reach that host.
+
+2. **Get an example that has data**  
+   In your browser (or with curl), open:
+   - **Local API:** `http://localhost:8051/api/sample-actual-points`
+   - **Wilma API:** `http://wilma-server:8051/api/sample-actual-points`  
+   You should see JSON like: `{ "sample": { "park_code": "mk", "entity_code": "MK01", "date": "2026-02-04" } }`.  
+   If you see `"sample": null`, the pipeline has no fact data yet (run the pipeline so `fact_tables/clean` is populated).
+
+3. **Use that example in the dashboard**  
+   - **Property:** leave as-is or pick the one that contains the park (e.g. Disney World for `mk`).  
+   - **Park:** select the `park_code` from the sample (e.g. **Magic Kingdom** for `mk`).  
+   - **Attraction:** in the dropdown, pick the attraction whose **value** is that `entity_code` (e.g. **MK01** — the label may be the attraction name).  
+   - **Date:** set the date picker to the `date` from the sample (e.g. **2026-02-04**).  
+   - Use a **single date** (not 7D/30D) so the chart requests one day and can show actual points.
+
+4. **What you’ll see**  
+   - **Curve (line):** From WTI or forecast/backfill. If the API has no curve for that park/date, the line is the placeholder but the chart still loads.  
+   - **Actual points (dark pink dots):** From `fact_tables/clean` for that entity and date. They appear only when an attraction and a single date are selected and the API has fact data for that combination.
+
+If the API is unreachable, the sidebar will show “Error loading data” and the chart will show the placeholder. Check that the API process is running and that `API_BASE` matches where it’s running.
+
 ## Architecture
 
 - **Backend API** (`dashboard/api.py`): REST API serving data from pipeline
@@ -49,7 +86,15 @@ In your browser, go to **http://localhost:8889/stream-dashboard.html**. The dash
 - `GET /api/properties` - Get all properties
 - `GET /api/parks?property=<code>` - Get parks (optionally filtered by property)
 - `GET /api/daily-curve/<park_code>?date=YYYY-MM-DD` or `?start=...&end=...` - Daily wait time curve: average actual wait every 5 min (time_slot → avg_wait). Single day or range (averaged across days). Optional `&entity_code=MK02` for attraction-level curve (from forecast/backfill curves). Park-level from WTI when no entity_code.
+- `GET /api/actual-points/<park_code>?date=YYYY-MM-DD&entity_code=MK01` - Raw ACTUAL observations for one attraction on one park-date (from fact_tables/clean). Used by the Daily Wait Time Curve when an attraction and single date are selected; points are overlaid in dark pink.
+- `GET /api/sample-actual-points` - Returns one `{ park_code, entity_code, date }` that has ACTUAL data in fact_tables/clean (for “try this park, attraction, date”).
 - `GET /api/debug/entity-table` - Debug endpoint to inspect entity table structure
+
+## Daily curve and actual points
+
+When you select an **attraction** and a **single date**, the Daily Wait Time Curve also fetches raw ACTUAL observations for that entity and day from `fact_tables/clean` and overlays them as dark pink points. The line is the curve (from forecast/backfill or WTI); the points are the observed actual waits.
+
+**Example entity with data:** Call `GET /api/sample-actual-points`. If the pipeline has fact data, the response gives one `park_code`, `entity_code`, and `date` to try (e.g. `mk`, `MK01`, `2026-02-04`). Or run `scripts/find_entities_with_actual.py` to list entities that have ACTUAL data; then pick a park and a date when the pipeline has written fact CSVs for that park (e.g. yesterday after the morning ETL).
 
 ## Park Codes
 

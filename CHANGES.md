@@ -4,6 +4,32 @@ This document tracks significant changes to the Theme Park Wait Time Data Pipeli
 
 ## Recent Changes
 
+### Stream dashboard: Daily curve real data, fallbacks, and API
+
+**Changed** (`docs/stream/stream-dashboard.html`):
+- **Daily Wait Time Curve**: When an attraction and single date are selected, the dashboard fetches `/api/actual-points/<park>?date=...&entity_code=...` and overlays raw ACTUAL observations (dark pink points). If the API returns no curve but has actual points, the main line is now built from those points (no placeholder) so real data is visible.
+- **Property / Attraction fallbacks**: When the API returns empty properties or empty entities (e.g. local API without pipeline data), the dashboard uses hardcoded fallbacks so Property and Attraction dropdowns always have options (e.g. Magic Kingdom → Space Mountain MK01, etc.).
+- **Example hint**: Under the curve subtitle, the dashboard fetches `/api/sample-actual-points` and shows “Example with data: Park X, Attraction Y, Date Z” when the API has fact data.
+- **Chart styling**: Wait Time Index (lollipop) title reverted to cyan; lollipop sticks and X-axis white at 35% opacity; chart titles 22px; subtitles 12px; Y-axis labels hidden on lollipop chart; panel width/auto-width for lollipop improved (3fr max).
+- **Fake curve flag**: `USE_FAKE_CURVE_DATA` (default false) allows one-off use of hardcoded curve + actual points for visual tinkering.
+- **API base**: Commented option to use `http://localhost:8051/api` when running the API locally.
+
+**Changed** (`dashboard/api.py`):
+- **Actual points**: `GET /api/actual-points/<park>?date=YYYY-MM-DD&entity_code=MK01` returns raw ACTUAL observations from `fact_tables/clean` for that entity and date (`points: [{ time_slot, wait_time_minutes }]`).
+- **Sample**: `GET /api/sample-actual-points` returns one `{ park_code, entity_code, date }` that has ACTUAL data for “try this combo” guidance.
+- **Placeholder mode**: `PLACEHOLDER_DATA=true` env serves synthetic data from `dashboard/placeholder_data.py` for design testing; real data paths unchanged.
+
+**Added** (`dashboard/placeholder_data.py`):
+- Synthetic parks, properties, entities, wait times, stats, daily curve, crowd level, forecast, tip for ad hoc visual testing when `PLACEHOLDER_DATA=true`.
+
+**Changed** (`dashboard/README_STREAM.md`):
+- “Seeing real data” section: how to point dashboard at local API, use `/api/sample-actual-points` for an example, and select park/attraction/date. Documented `actual-points` and `sample-actual-points` endpoints.
+
+**Changed** (`requirements.txt`):
+- Added `flask>=3.0.0` and `flask-cors>=4.0.0` for the dashboard API.
+
+**Why**: Stream dashboard can show real daily curve and actual observed points when pipeline data exists; works with local API and fallbacks when data is missing; optional placeholder data for UI testing.
+
 ### Stream dashboard: Wait by Park chart and layout
 
 **Changed** (`docs/stream/stream-dashboard.html`):

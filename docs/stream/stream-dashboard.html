@@ -240,10 +240,11 @@
         .chart-header { margin-bottom: 8px; }
         .chart-title { 
             font-family: 'JetBrains Mono', monospace;
-            font-size: 11px; 
+            font-size: 22px; 
+            font-weight: 600;
             color: var(--cyan); 
         }
-        .chart-subtitle { font-size: 9px; color: var(--text-secondary); }
+        .chart-subtitle { font-size: 12px; color: var(--text-secondary); }
         .chart-container { flex: 1; position: relative; min-height: 150px; }
         
         /* Top Waits List */
@@ -356,6 +357,7 @@
                     <div class="chart-header">
                         <div class="chart-title">Daily Wait Time Curve</div>
                         <div class="chart-subtitle" id="chart1-subtitle">Avg actual wait every 5 min</div>
+                        <div id="curve-example-hint" style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;"></div>
                     </div>
                     <div class="chart-container">
                         <canvas id="timeSeriesChart"></canvas>
@@ -376,7 +378,7 @@
             <div class="charts-row-2">
                 <div class="chart-panel">
                     <div class="chart-header">
-                        <div class="chart-title">Wait by Park</div>
+                        <div class="chart-title">Wait Time Index</div>
                         <div class="chart-subtitle">Average wait times</div>
                     </div>
                     <div class="chart-container">
@@ -398,8 +400,11 @@
     </div>
     
     <script>
-        // Always use wilma-server for API data (has real pipeline data)
-        const API_BASE = 'http://wilma-server:8051/api';
+        // API: use localhost when running API locally (python3 dashboard/api.py); use wilma-server when API runs there
+        // const API_BASE = 'http://wilma-server:8051/api';
+        const API_BASE = 'http://localhost:8051/api';  // uncomment when API runs on this machine
+        // One-off: use hardcoded fake curve + actual points for visual tinkering (set to false to use real API)
+        const USE_FAKE_CURVE_DATA = false;
         console.log('API Base URL:', API_BASE);
         
         let dashboardData = null;
@@ -454,7 +459,8 @@
                 
                 // Load daily wait time curve (area chart)
                 await loadDailyCurve();
-                
+                // Fetch example (park, attraction, date) with real actual data for the curve hint
+                fetchSampleCurveExample();
             } catch (e) {
                 document.getElementById('data-info').textContent = 'Error loading data: ' + e.message;
                 console.error(e);
@@ -463,12 +469,37 @@
             }
         }
         
+        function getFallbackEntitiesForPark(park) {
+            const fallbacks = {
+                mk: [
+                    { entity_code: 'MK01', entity_name: 'Space Mountain' },
+                    { entity_code: 'MK05', entity_name: 'Big Thunder Mountain' },
+                    { entity_code: 'MK23', entity_name: 'Haunted Mansion' },
+                    { entity_code: 'MK96', entity_name: 'Seven Dwarfs Mine Train' },
+                    { entity_code: 'MK191', entity_name: 'TRON Lightcycle / Run' }
+                ],
+                ep: [
+                    { entity_code: 'EP01', entity_name: 'Spaceship Earth' },
+                    { entity_code: 'EP02', entity_name: 'Test Track' },
+                    { entity_code: 'EP08', entity_name: "Soarin'" }
+                ],
+                hs: [
+                    { entity_code: 'HS01', entity_name: 'Tower of Terror' },
+                    { entity_code: 'HS02', entity_name: "Rock 'n' Roller Coaster" }
+                ],
+                ak: [
+                    { entity_code: 'AK01', entity_name: 'Kilimanjaro Safaris' },
+                    { entity_code: 'AK03', entity_name: 'Expedition Everest' }
+                ]
+            };
+            return fallbacks[park] || fallbacks.mk;
+        }
+
         async function populateAttractions() {
             const select = document.getElementById('attraction-filter');
             const park = document.getElementById('park-filter').value;
             select.innerHTML = '<option value="all">All Attractions</option>';
             
-            // Only populate if a specific park is selected (not "all")
             if (park === 'all') {
                 return;
             }
@@ -487,8 +518,8 @@
                 const entities = result.entities || [];
                 
                 if (entities.length === 0) {
-                    console.warn('No entities returned from API for park:', park);
-                    throw new Error('No entities in response');
+                    console.warn('No entities returned from API for park:', park, '- using fallback list');
+                    entities = getFallbackEntitiesForPark(park);
                 }
                 
                 // Debug: Log first few entities to see what we're getting
@@ -514,24 +545,28 @@
                 console.log(`Populated ${entities.length} attractions for park ${park}`);
             } catch (e) {
                 console.error('Error loading attractions:', e);
-                // Fallback: try to use wait_times data if available
-                if (dashboardData && dashboardData.wait_times) {
-                    console.log('Using fallback: wait_times data');
+                if (dashboardData && dashboardData.wait_times && dashboardData.wait_times.length > 0) {
                     const attractions = new Set();
                     dashboardData.wait_times.forEach(w => {
-                        if (w.entity_name) {
-                            attractions.add(w.entity_name);
-                        }
+                        const code = w.entity_code || w.entity_name;
+                        const name = w.entity_name || w.entity_code;
+                        if (code) attractions.add(JSON.stringify({ code, name }));
                     });
-                    
-                    Array.from(attractions).sort().forEach(name => {
+                    Array.from(attractions).sort().forEach(s => {
+                        const { code, name } = JSON.parse(s);
                         const opt = document.createElement('option');
-                        opt.value = name;
+                        opt.value = code;
                         opt.textContent = name;
                         select.appendChild(opt);
                     });
                 } else {
-                    console.warn('No fallback data available for attractions');
+                    const fallback = getFallbackEntitiesForPark(park);
+                    fallback.forEach(entity => {
+                        const opt = document.createElement('option');
+                        opt.value = entity.entity_code;
+                        opt.textContent = entity.entity_name || entity.entity_code;
+                        select.appendChild(opt);
+                    });
                 }
             }
         }
@@ -540,6 +575,33 @@
             await loadData();
         }
         
+        function getFakeCurveData() {
+            const today = new Date().toISOString().slice(0, 10);
+            const curve = buildPlaceholderCurve();
+            const actualPoints = [
+                { time_slot: '09:00', wait_time_minutes: 18 },
+                { time_slot: '09:30', wait_time_minutes: 22 },
+                { time_slot: '10:15', wait_time_minutes: 28 },
+                { time_slot: '11:00', wait_time_minutes: 35 },
+                { time_slot: '12:00', wait_time_minutes: 42 },
+                { time_slot: '12:45', wait_time_minutes: 38 },
+                { time_slot: '13:30', wait_time_minutes: 32 },
+                { time_slot: '14:00', wait_time_minutes: 25 },
+                { time_slot: '15:00', wait_time_minutes: 20 },
+                { time_slot: '16:30', wait_time_minutes: 15 },
+                { time_slot: '17:45', wait_time_minutes: 22 },
+                { time_slot: '19:00', wait_time_minutes: 30 },
+                { time_slot: '20:00', wait_time_minutes: 24 }
+            ];
+            return {
+                curve: curve,
+                actual_points: actualPoints,
+                start_date: today,
+                end_date: today,
+                entity_code: document.getElementById('attraction-filter').value || null
+            };
+        }
+
         // Park day: 06:00 (6 AM) to 03:00 next day — X-axis origin is 6 AM, not midnight
         function parkDaySort(a, b) {
             const aLate = a < '06:00';
@@ -572,34 +634,81 @@
             return slots.map((time_slot, i) => ({ time_slot, avg_wait: values[i] }));
         }
 
+        function buildCurveFromActualPoints(actualPoints) {
+            const pointBySlot = {};
+            actualPoints.forEach(p => {
+                const t = p.time_slot;
+                if (!pointBySlot[t]) pointBySlot[t] = [];
+                pointBySlot[t].push(p.wait_time_minutes);
+            });
+            const slots = Object.keys(pointBySlot).sort((a, b) => parkDaySort(a, b));
+            return slots.map(ts => ({
+                time_slot: ts,
+                avg_wait: pointBySlot[ts].reduce((s, v) => s + v, 0) / pointBySlot[ts].length
+            }));
+        }
+
         function updateTimeSeriesChart(curveData) {
             const ctx = document.getElementById('timeSeriesChart').getContext('2d');
             if (charts.timeSeries) charts.timeSeries.destroy();
             let curve = curveData && curveData.curve ? curveData.curve : [];
-            const isPlaceholder = curve.length === 0;
-            if (isPlaceholder) {
+            const actualPoints = curveData && curveData.actual_points ? curveData.actual_points : [];
+            const apiCurveEmpty = curve.length === 0;
+            const hasActualOnly = apiCurveEmpty && actualPoints.length > 0;
+            const isPlaceholder = apiCurveEmpty && actualPoints.length === 0;
+            if (hasActualOnly) {
+                curve = buildCurveFromActualPoints(actualPoints);
+            } else if (curve.length === 0) {
                 curve = buildPlaceholderCurve();
             } else {
                 curve = sortCurveByParkDay(curve);
             }
             const labels = curve.map(p => p.time_slot);
             const values = curve.map(p => p.avg_wait);
-            const yMax = values.length ? Math.max(60, Math.ceil(Math.max(...values) / 10) * 10) : 60;
+            const pointBySlot = {};
+            actualPoints.forEach(p => {
+                const t = p.time_slot;
+                if (!pointBySlot[t]) pointBySlot[t] = [];
+                pointBySlot[t].push(p.wait_time_minutes);
+            });
+            const actualValues = labels.map(l => {
+                const arr = pointBySlot[l];
+                if (!arr || arr.length === 0) return null;
+                return arr.reduce((a, b) => a + b, 0) / arr.length;
+            });
+            const allValues = [...values.filter(v => v != null), ...actualValues.filter(v => v != null)];
+            const yMax = allValues.length ? Math.max(60, Math.ceil(Math.max(...allValues) / 10) * 10) : 60;
+            const datasets = [{
+                label: hasActualOnly ? 'Actual wait (observed)' : (isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)'),
+                data: values,
+                borderColor: hasActualOnly ? '#A60038' : (isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4'),
+                backgroundColor: hasActualOnly ? 'rgba(166, 0, 56, 0.2)' : (isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : 'rgba(74, 144, 164, 0.25)'),
+                fill: true,
+                tension: 0.2,
+                pointRadius: hasActualOnly ? 5 : (values.length ? 2 : 0),
+                pointBackgroundColor: hasActualOnly ? '#A60038' : (isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4'),
+                pointBorderColor: hasActualOnly ? 'rgba(233, 244, 255, 0.9)' : (isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4')
+            }];
+            if (actualValues.some(v => v != null) && !hasActualOnly) {
+                datasets.push({
+                    label: 'Actual (observed)',
+                    data: actualValues,
+                    borderColor: '#A60038',
+                    backgroundColor: '#A60038',
+                    fill: false,
+                    tension: 0,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#A60038',
+                    pointBorderColor: 'rgba(233, 244, 255, 0.9)',
+                    pointBorderWidth: 1,
+                    order: 0
+                });
+            }
             charts.timeSeries = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
-                        data: values,
-                        borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4',
-                        backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : 'rgba(74, 144, 164, 0.25)',
-                        fill: true,
-                        tension: 0.2,
-                        pointRadius: values.length ? 2 : 0,
-                        pointBackgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4',
-                        pointBorderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4'
-                    }]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
@@ -624,12 +733,18 @@
             });
             const sub = document.getElementById('chart1-subtitle');
             const entityLabel = (curveData && curveData.entity_code) ? ' · ' + curveData.entity_code : '';
-            if (isPlaceholder) {
+            if (hasActualOnly && curveData && curveData.start_date) {
+                sub.textContent = 'Actual observed · ' + actualPoints.length + ' points · ' + curveData.start_date + entityLabel;
+            } else if (isPlaceholder) {
                 sub.textContent = 'Placeholder curve — no server data (pipeline needs WTI or curves/forecast for this park' + (curveData && curveData.entity_code ? ' / ' + curveData.entity_code : '') + ')';
             } else if (curveData && curveData.start_date && curveData.end_date) {
-                sub.textContent = (curveData.start_date === curveData.end_date
+                let text = (curveData.start_date === curveData.end_date
                     ? 'Avg actual wait every 5 min · ' + curveData.start_date
                     : 'Avg actual wait every 5 min · ' + curveData.start_date + ' – ' + curveData.end_date) + entityLabel;
+                if (curveData.actual_points && curveData.actual_points.length > 0) {
+                    text += ' · ' + curveData.actual_points.length + ' actual observed';
+                }
+                sub.textContent = text;
             } else {
                 sub.textContent = 'Avg actual wait every 5 min' + entityLabel;
             }
@@ -657,10 +772,32 @@
             return { date: pickerVal };
         }
 
+        async function fetchSampleCurveExample() {
+            const el = document.getElementById('curve-example-hint');
+            if (!el) return;
+            try {
+                const res = await fetch(`${API_BASE}/sample-actual-points`);
+                if (!res.ok) { el.textContent = ''; return; }
+                const data = await res.json();
+                const s = data.sample;
+                if (s && s.park_code && s.entity_code && s.date) {
+                    el.textContent = 'Example with data: Park ' + s.park_code + ', Attraction ' + s.entity_code + ', Date ' + s.date;
+                } else {
+                    el.textContent = 'No example available — run pipeline to populate fact_tables/clean for actual points.';
+                }
+            } catch (e) {
+                el.textContent = '';
+            }
+        }
+
         async function loadDailyCurve() {
             const park = document.getElementById('park-filter').value;
             if (park === 'all') {
                 updateTimeSeriesChart({ curve: [] });
+                return;
+            }
+            if (USE_FAKE_CURVE_DATA) {
+                updateTimeSeriesChart(getFakeCurveData());
                 return;
             }
             const range = getDateRangeForCurve();
@@ -681,6 +818,23 @@
                 const curveLen = (data.curve && data.curve.length) || 0;
                 console.log('Daily curve:', url, '→', curveLen, 'points');
                 if (curveLen === 0) console.warn('Daily curve empty — check API has WTI or forecast/backfill curves for this park/date');
+                // When an attraction and single date are selected, fetch raw ACTUAL observations for that day
+                if (attraction && attraction !== 'all' && range.date) {
+                    try {
+                        const ptsUrl = `${API_BASE}/actual-points/${park}?date=${encodeURIComponent(range.date)}&entity_code=${encodeURIComponent(attraction)}`;
+                        const ptsRes = await fetch(ptsUrl);
+                        if (ptsRes.ok) {
+                            const ptsData = await ptsRes.json();
+                            data.actual_points = ptsData.points || [];
+                        } else {
+                            data.actual_points = [];
+                        }
+                    } catch (e) {
+                        data.actual_points = [];
+                    }
+                } else {
+                    data.actual_points = [];
+                }
                 updateTimeSeriesChart(data);
             } catch (e) {
                 console.warn('Daily curve load failed:', e.message || e, '(URL:', url + ')');
@@ -768,12 +922,12 @@
             labels = combined.map(c => c.label);
             const sortedData = combined.map(c => c.value);
             
-            const lollipopColor = '#4a90a4';
+            const lollipopColor = '#A60038'; /* WTI / dark pink */
             
             const parkCount = parks.length;
             const maxParksForFullWidth = 12;
-            const maxWaitByParkFr = 2;
-            const totalRowFr = 3;
+            const maxWaitByParkFr = 3;
+            const totalRowFr = 4;
             let waitByParkFr = Math.max(0.5, Math.min(maxWaitByParkFr, maxWaitByParkFr * (parkCount / maxParksForFullWidth)));
             if (parkCount <= 4) {
                 waitByParkFr = Math.max(waitByParkFr, 1.15);
@@ -801,7 +955,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     barThickness: 1,
-                    layout: { padding: { left: 48, right: 12, top: 110, bottom: 12 } },
+                    layout: { padding: { left: 80, right: 24, top: 110, bottom: 12 } },
                     parks: parks,
                     datasets: {
                         bar: { barPercentage: barPercentage }
@@ -814,12 +968,12 @@
                         x: {
                             grid: { display: false },
                             ticks: { display: false },
-                            border: { display: true, width: 2, color: 'rgba(74, 144, 164, 0.8)' }
+                            border: { display: true, width: 2, color: 'rgba(255, 255, 255, 0.35)' }
                         },
                         y: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(74,144,164,0.1)' },
-                            ticks: { color: '#6a7a8a', font: { size: 9 } }
+                            grid: { color: 'rgba(166, 0, 56, 0.1)' },
+                            ticks: { display: false }
                         }
                     }
                 },
@@ -833,7 +987,7 @@
                         const stemBottom = yScale.getPixelForValue(0);
                         const nameGap = 18;
                         const lineHeight = 16;
-                        ctx.strokeStyle = 'rgba(74, 144, 164, 0.5)';
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
                         ctx.lineWidth = 1;
                         ctx.setLineDash([2, 3]);
                         meta.data.forEach((bar, i) => {
@@ -912,9 +1066,16 @@
                 }
                 
                 const result = await response.json();
-                const properties = result.properties || [];
-                
-                // Clear and repopulate
+                let properties = result.properties || [];
+                if (properties.length === 0) {
+                    properties = [
+                        { code: 'wdw', name: 'Disney World' },
+                        { code: 'dlr', name: 'Disneyland Resort' },
+                        { code: 'uor', name: 'Universal Orlando' },
+                        { code: 'ush', name: 'Universal Hollywood' },
+                        { code: 'tdr', name: 'Tokyo Disneyland Resort' }
+                    ];
+                }
                 select.innerHTML = '<option value="all">All Properties</option>';
                 properties.forEach(prop => {
                     const opt = document.createElement('option');
@@ -922,12 +1083,10 @@
                     opt.textContent = prop.name;
                     select.appendChild(opt);
                 });
-                
-                // Restore selection if still valid
                 if (currentProperty && Array.from(select.options).some(opt => opt.value === currentProperty)) {
                     select.value = currentProperty;
                 } else if (properties.length > 0) {
-                    select.selectedIndex = 1; // Select first property
+                    select.selectedIndex = 1;
                 }
             } catch (e) {
                 console.error('Error loading properties:', e);
