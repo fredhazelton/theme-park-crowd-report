@@ -30,7 +30,7 @@
             font-family: 'Inter', sans-serif;
             background: #0a1628;
             color: var(--text-primary);
-            width: 1540px;
+            width: 1772px;
             height: 890px;
             overflow-x: hidden;
             overflow-y: auto;
@@ -159,6 +159,29 @@
             margin: 4px 0;
         }
         
+        .clear-filters-btn {
+            width: 100%;
+            padding: 8px 10px;
+            background: rgba(74, 144, 164, 0.15);
+            border: 1px solid var(--cyan-dim);
+            color: var(--cyan);
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+        .clear-filters-btn:hover {
+            background: rgba(74, 144, 164, 0.25);
+            border-color: var(--cyan);
+        }
+        .clear-filters-btn:active {
+            background: var(--cyan);
+            color: var(--navy);
+        }
+        
         /* Main Content */
         .main-content {
             display: flex;
@@ -202,7 +225,7 @@
         }
         .charts-row-2 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 2fr 1fr;
             gap: 10px;
             flex: 1;
         }
@@ -242,6 +265,7 @@
 <body>
     <div class="dashboard">
         <aside class="sidebar">
+            <button type="button" class="clear-filters-btn" id="clear-all-filters" title="Reset to: All Properties, All Parks, All Attractions, Today, Actual Wait">Clear all filters</button>
             <div class="filter-section">
                 <label class="filter-label">Property</label>
                 <select class="filter-select" id="property-filter" title="Select property → then park → then attraction (hierarchy)">
@@ -691,37 +715,163 @@
             const ctx = document.getElementById('parkCompareChart').getContext('2d');
             if (charts.parkCompare) charts.parkCompare.destroy();
             
-            const parks = ['mk', 'ep', 'hs', 'ak'];
-            const labels = ['Magic Kingdom', 'EPCOT', 'Hollywood Studios', 'Animal Kingdom'];
+            // Use same park list as the filters; filter by selected property when not "all"
+            const property = document.getElementById('property-filter').value;
+            let parks = [];
+            let labels = [];
+            try {
+                const url = property === 'all' ? `${API_BASE}/parks` : `${API_BASE}/parks?property=${encodeURIComponent(property)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(res.statusText);
+                const result = await res.json();
+                const list = (result.parks || []).filter(p => p && (p.code != null || p.park_code != null));
+                parks = list.map(p => (p.code != null ? p.code : p.park_code));
+                labels = list.map(p => (p.name != null ? p.name : (p.park_name || p.code || p.park_code || '')));
+            } catch (e) {
+                console.warn('Wait by Park: could not load parks from API, using fallback', e);
+                parks = [];
+                labels = [];
+            }
+            if (parks.length === 0) {
+                const fallbackByProperty = {
+                    wdw: { parks: ['mk', 'ep', 'hs', 'ak'], labels: ['Magic Kingdom', 'EPCOT', 'Hollywood Studios', 'Animal Kingdom'] },
+                    dlr: { parks: ['dl', 'ca'], labels: ['Disneyland', 'California Adventure'] },
+                    uor: { parks: ['ioa', 'usf', 'eu'], labels: ['Islands of Adventure', 'Universal Studios Florida', 'Epic Universe'] },
+                    ush: { parks: ['ush'], labels: ['Universal Studios Hollywood'] },
+                    tdr: { parks: ['tdl', 'tds'], labels: ['Tokyo Disneyland', 'Tokyo DisneySea'] }
+                };
+                const fallback = fallbackByProperty[property] || {
+                    parks: ['mk', 'ep', 'hs', 'ak', 'dl', 'ca', 'ioa', 'usf', 'eu', 'ush', 'tdl', 'tds'],
+                    labels: ['Magic Kingdom', 'EPCOT', 'Hollywood Studios', 'Animal Kingdom', 'Disneyland', 'California Adventure', 'Islands of Adventure', 'Universal Studios Florida', 'Epic Universe', 'Universal Studios Hollywood', 'Tokyo Disneyland', 'Tokyo DisneySea']
+                };
+                parks = fallback.parks;
+                labels = fallback.labels;
+            }
             
-            // Fetch stats for each park
+            // Fetch stats for each park (real data from pipeline)
             const parkData = await Promise.all(
                 parks.map(async (p) => {
                     try {
                         const res = await fetch(`${API_BASE}/stats/${p}`);
                         const data = await res.json();
-                        return data.avg_wait || 0;
+                        return data.avg_wait != null ? data.avg_wait : 0;
                     } catch {
                         return 0;
                     }
                 })
             );
             
+            // Sort by value ascending (lowest left, highest right)
+            const combined = parks.map((p, i) => ({ park: p, label: labels[i], value: parkData[i] }));
+            combined.sort((a, b) => (Number(a.value) || 0) - (Number(b.value) || 0));
+            parks = combined.map(c => c.park);
+            labels = combined.map(c => c.label);
+            const sortedData = combined.map(c => c.value);
+            
+            const lollipopColor = '#4a90a4';
+            
+            const parkCount = parks.length;
+            const maxParksForFullWidth = 12;
+            const maxWaitByParkFr = 2;
+            const totalRowFr = 3;
+            let waitByParkFr = Math.max(0.5, Math.min(maxWaitByParkFr, maxWaitByParkFr * (parkCount / maxParksForFullWidth)));
+            if (parkCount <= 4) {
+                waitByParkFr = Math.max(waitByParkFr, 1.15);
+            }
+            const dayOfWeekFr = totalRowFr - waitByParkFr;
+            const row2 = document.querySelector('.charts-row-2');
+            if (row2) row2.style.gridTemplateColumns = `${waitByParkFr}fr ${dayOfWeekFr}fr`;
+            
+            const barPctMin = 0.5;
+            const barPctMax = 0.9;
+            const barPercentage = barPctMin + (barPctMax - barPctMin) * (parkCount / maxParksForFullWidth);
+            
             charts.parkCompare = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [{ data: parkData, backgroundColor: ['#4a90a4', '#5ab4cc', '#3d7a8a', '#6bc5d9'] }]
+                    datasets: [{
+                        data: sortedData,
+                        backgroundColor: 'transparent',
+                        borderColor: 'transparent',
+                        borderWidth: 0
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    barThickness: 1,
+                    layout: { padding: { left: 48, right: 12, top: 110, bottom: 12 } },
+                    parks: parks,
+                    datasets: {
+                        bar: { barPercentage: barPercentage }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: '#6a7a8a', font: { size: 8 } } },
-                        y: { grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } }
+                        x: {
+                            grid: { display: false },
+                            ticks: { display: false },
+                            border: { display: true, width: 2, color: 'rgba(74, 144, 164, 0.8)' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(74,144,164,0.1)' },
+                            ticks: { color: '#6a7a8a', font: { size: 9 } }
+                        }
                     }
-                }
+                },
+                plugins: [{
+                    id: 'lollipopStemsHeadsAndLabels',
+                    afterDatasetsDraw(chart) {
+                        const ctx = chart.ctx;
+                        const meta = chart.getDatasetMeta(0);
+                        const yScale = chart.scales.y;
+                        const headRadius = 18;
+                        const stemBottom = yScale.getPixelForValue(0);
+                        const nameGap = 18;
+                        const lineHeight = 16;
+                        ctx.strokeStyle = 'rgba(74, 144, 164, 0.5)';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([2, 3]);
+                        meta.data.forEach((bar, i) => {
+                            const x = bar.x;
+                            const y = bar.y;
+                            ctx.beginPath();
+                            ctx.moveTo(x, stemBottom);
+                            ctx.lineTo(x, y);
+                            ctx.stroke();
+                        });
+                        ctx.setLineDash([]);
+                        meta.data.forEach((bar, i) => {
+                            const x = bar.x;
+                            const y = bar.y;
+                            const value = chart.data.datasets[0].data[i];
+                            const valueText = (value != null && value !== '') ? String(Math.round(Number(value))) : '—';
+                            ctx.fillStyle = lollipopColor;
+                            ctx.beginPath();
+                            ctx.arc(x, y, headRadius, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillStyle = 'rgba(233, 244, 255, 0.95)';
+                            ctx.font = 'bold 16px Inter, sans-serif';
+                            ctx.fillText(valueText, x, y);
+                            const parkName = chart.data.labels[i] || '';
+                            const nameWords = (parkName + '').split(/\s+/).filter(Boolean);
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillStyle = 'rgba(233, 244, 255, 0.9)';
+                            ctx.font = '14px Inter, sans-serif';
+                            const blockBottom = y - headRadius - nameGap;
+                            nameWords.forEach((word, wi) => {
+                                ctx.fillText(word, x, blockBottom - (nameWords.length - 1 - wi) * lineHeight);
+                            });
+                        });
+                    }
+                }]
             });
         }
         
@@ -899,12 +1049,35 @@
             // Clear attractions when park filter changes (will be repopulated by event listener)
         }
         
+        /** Reset all slicers to default: All Properties, All Parks, All Attractions, Date = Today, Wait Type = Actual */
+        async function clearAllFilters() {
+            document.getElementById('property-filter').value = 'all';
+            await updateParkFilter();
+            document.getElementById('park-filter').value = 'all';
+            document.getElementById('attraction-filter').innerHTML = '<option value="all">All Attractions</option>';
+            // Date = today
+            document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+            const today = new Date();
+            const y = today.getFullYear(), m = String(today.getMonth() + 1).padStart(2, '0'), d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('date-calendar-picker').value = `${y}-${m}-${d}`;
+            document.getElementById('wait-type-filter').value = 'actual';
+            updateKPIDisplay();
+            await loadData();
+            await populateAttractions();
+            loadDailyCurve();
+            await updateParkCompareChart();
+            updateWeekdayChart(document.getElementById('park-filter').value);
+        }
+        
         // Event listeners
+        document.getElementById('clear-all-filters').addEventListener('click', () => clearAllFilters());
+        
         document.getElementById('property-filter').addEventListener('change', async () => {
             await updateParkFilter(); // This will update park options and reset park selection
             updateKPIDisplay();
             await loadData(); // Load data for the newly selected park
             await populateAttractions(); // Populate attractions for the selected park
+            await updateParkCompareChart(); // Refresh Wait by Park with parks for selected property; width auto-adjusts
         });
         
         function updateKPIDisplay() {
@@ -1022,6 +1195,8 @@
             updateKPIDisplay();
             await loadData();
             await populateAttractions();
+            await updateParkCompareChart();
+            updateWeekdayChart(document.getElementById('park-filter').value);
         })();
     </script>
 </body>

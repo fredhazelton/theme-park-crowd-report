@@ -10,9 +10,13 @@ get_project_root() {
     echo "$(dirname "$script_dir")"
 }
 
-# Read output_base from config/config.json or return default
+# Read output_base from config/config.json or return default.
+# When DEV_MODE=true (env), use project_root/pipeline_dev for dev pipeline runs.
 get_output_base() {
     local project_root="$1"
+    case "$(echo "$DEV_MODE" | tr '[:upper:]' '[:lower:]')" in
+        true) echo "$project_root/pipeline_dev"; return ;;
+    esac
     local config_file="$project_root/config/config.json"
     local default_base="$HOME/hazeydata/pipeline"
     

@@ -26,6 +26,7 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 - **Current value:**  
   `/home/fred/TouringPlans.com Dropbox/fred hazelton/stats team/pipeline/hazeydata/theme-park-crowd-report`
 - **AWS:** Scripts and cron use `~/.aws/credentials` and `~/.aws/config` (needed for S3 ETL and dimension fetches).
+- **DEV_MODE:** Set `DEV_MODE=true` (env) to use **repo/pipeline_dev** as output base and to filter ETL to 37 dev entities only. See `config/dev_config.py`. Shell (`scripts/common.sh`) and Python (`src/utils/paths.py`) both respect DEV_MODE. Run: `export DEV_MODE=true && ./scripts/run_daily_pipeline.sh` (use `--skip-dropbox-check` if output is not on Dropbox).
 
 ---
 

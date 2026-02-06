@@ -4,6 +4,18 @@ This document tracks significant changes to the Theme Park Wait Time Data Pipeli
 
 ## Recent Changes
 
+### Stream dashboard: Wait by Park chart and layout
+
+**Changed** (`docs/stream/stream-dashboard.html`):
+- **Wait by Park chart**: Lollipop-style chart (dotted stems, value inside dot, park name stacked above). Sorted by value low→high. Park list filtered by Property slicer; when Property = Disney World (wdw), only four WDW parks shown. Fallback when API unreachable is property-aware (wdw → 4 parks, dlr → 2, etc.).
+- **Panel width**: Wait by Park panel width matches Daily Wait Time Curve (2fr) when all parks shown; scales down with park count (min 0.5fr). When 4 or fewer parks, minimum width 1.15fr so 4-park view isn’t cramped.
+- **Bar spacing**: `barPercentage` varies by park count: more gap when fewer parks (e.g. 4), minimum gap when 12 parks.
+- **Labels**: Park names wrapped (one word per line), centered above dot; value in dot; larger fonts (14px park name, 16px bold value) for stream visibility. Top padding and gap tuned so labels aren’t clipped.
+- **Clear all filters**: Button resets Property, Park, Attraction, date to today, Wait type to Actual.
+- **Property change**: Changing Property refreshes Wait by Park (filtered parks) and panel width.
+
+**Why**: Stream-ready overlay with readable Wait by Park; responsive to property selection and park count.
+
 ### Queue-Times scraper fixes (hours filter, robustness)
 
 **Changed**:

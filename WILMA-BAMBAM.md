@@ -423,8 +423,6 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-- **[Pipeline: Dev Subset Filter]** — **PRIORITY** — See detailed instructions above ☝️
-
 - **[ETL: Only Process New Files Since Last Run]** — **PRIORITY**
   The S3 ETL (`src/get_tp_wait_time_data_from_s3.py`) currently processes ~36 files every run, but only 5-7 are actually new. The rest are old files (2013-2019) that fail with "No columns to parse" errors. Now that the full historical load is done, we should only pull files modified since the last successful ETL run.
   
@@ -443,6 +441,8 @@ python src/build_dimensions.py               # Dimensions
 ## Completed
 
 *(Bam-Bam: move items here when done; note what was done in the Log.)*
+
+- **[Pipeline: Dev Subset Filter (DEV_MODE)]** Implemented DEV_MODE per step-by-step guide: `config/dev_config.py` (DEV_MODE, DEV_ENTITIES, should_process_entity, get_dev_output_base); `src/utils/paths.py` uses pipeline_dev when DEV_MODE=true; ETL filters to DEV_ENTITIES during row processing and in merge_yesterday_queue_times; `scripts/common.sh` get_output_base returns repo/pipeline_dev when DEV_MODE=true. Run: `export DEV_MODE=true && ./scripts/run_daily_pipeline.sh` (use `--skip-dropbox-check` if not on Dropbox). Full pipeline run on this machine stopped at S3 sync (no AWS CLI) and ETL (no pandas in default Python); output base and local source correctly pointed to pipeline_dev.
 
 - **[URGENT - API URL Fix for Unified Workflow]** In `stream-dashboard.html`, API_BASE now always uses `http://wilma-server:8051/api` (no hostname switch). One URL for dev and stream: Fred views `http://localhost:8889/stream-dashboard.html`; data comes from wilma-server. Use `scripts/start-stream.sh` to start the dashboard server.
 
@@ -464,6 +464,7 @@ python src/build_dimensions.py               # Dimensions
 | 2026-02-05 | Bam-Bam | **Daily Wait Time Curve:** API: added optional `entity_code` for attraction-level curve (from forecast/backfill); case-insensitive park_code in WTI. Frontend: park-day X-axis (06:00–03:00 next day, origin 6 AM); placeholder curve when no server data; sort curve by park-day order. Docs: README_STREAM and WILMA-BAMBAM overview updated (daily curve, entity_code, park-day axis, placeholder). |
 | 2026-02-05 08:17 | Wilma | **ETL Efficiency Task:** Added priority task to only process S3 files since last ETL run. Currently processing 36 files/day when only 5-7 are new. Old 2013-2019 files keep failing with empty data errors. Fred confirmed full historical load is done — incremental mode is the way forward. |
 | 2026-02-05 09:12 | Wilma | **Dev Subset Filter Task:** Added priority task to create DEV_MODE that filters to 37 representative entities (2 standby + 2 priority per park across 10 parks). Small enough to iterate fast, broad enough to catch issues. Bam-Bam can use Cursor's Remote-SSH extension to connect directly to wilma-server and browse pipeline files. |
+| 2026-02-05 09:24 | Bam-Bam | **DEV_MODE implemented.** Created config/dev_config.py; integrated into paths.py and scripts/common.sh so output_base = repo/pipeline_dev when DEV_MODE=true; added entity filter in ETL (standby + fastpass + merge_yesterday_queue_times). Ran pipeline with DEV_MODE=true: shell and Python correctly used pipeline_dev (ETL log showed "Output: .../pipeline_dev", "Local source: .../pipeline_dev/raw"). Run failed on this machine at S3 sync (aws not found) and ETL (ModuleNotFoundError: pandas). On a box with AWS CLI + Python venv with deps, use: `export DEV_MODE=true && ./scripts/run_daily_pipeline.sh --skip-dropbox-check`. Task moved to Completed. |
 
 ---
 

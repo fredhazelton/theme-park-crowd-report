@@ -55,6 +55,9 @@ data/**
 !data/README.md
 !data/.gitkeep
 
+# Dev-mode pipeline output (repo-root pipeline_dev when DEV_MODE=true)
+pipeline_dev/
+
 # Output directories (but keep README files)
 output/**
 !output/README.md

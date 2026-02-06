@@ -60,12 +60,17 @@ from typing import List, Tuple, Dict, Set, Optional
 import pandas as pd
 from zoneinfo import ZoneInfo
 
-# ----- Ensure we can import from src/ when run from project root -----
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.insert(0, str(Path(__file__).parent))
+# ----- Ensure we can import from src/ and config/ when run from project root -----
+_src_dir = Path(__file__).resolve().parent
+_repo_root = _src_dir.parent
+if str(_src_dir) not in sys.path:
+    sys.path.insert(0, str(_src_dir))
+if str(_repo_root) not in sys.path:
+    sys.path.insert(0, str(_repo_root))
 
 from parsers import parse_standby_chunk, parse_fastpass_stream
 from utils import get_output_base, get_wait_time_filetype
+from config.dev_config import DEV_MODE, should_process_entity
 
 
 # =============================================================================
@@ -564,6 +569,11 @@ def merge_yesterday_queue_times(
                     logger.warning(f"Merge queue-times: skipping {path.name}, missing column {c}")
                     break
             else:
+                if DEV_MODE:
+                    df = df[df["entity_code"].apply(should_process_entity)]
+                if df.empty:
+                    logger.debug(f"Merge queue-times: no DEV_ENTITIES in {path.name}, skipping")
+                    continue
                 park = path.stem.replace(f"_{yesterday}", "")
                 fact_dir = dirs["fact_tables_clean"] / ym
                 fact_dir.mkdir(parents=True, exist_ok=True)
@@ -644,6 +654,10 @@ def process_file(
                 df = df.dropna(subset=["wait_time_minutes"])
                 if df.empty:
                     continue
+                if DEV_MODE:
+                    df = df[df["entity_code"].apply(should_process_entity)]
+                if df.empty:
+                    continue
                 new_mask = insert_new_mask(conn, df)
                 new_df = df.loc[new_mask]
                 if new_df.empty:
@@ -669,6 +683,10 @@ def process_file(
                 out = out.dropna(subset=["entity_code", "observed_at", "wait_time_minutes"])
                 out["wait_time_minutes"] = pd.to_numeric(out["wait_time_minutes"], errors="coerce").astype("Int64")
                 out = out.dropna(subset=["wait_time_minutes"])
+                if out.empty:
+                    continue
+                if DEV_MODE:
+                    out = out[out["entity_code"].apply(should_process_entity)]
                 if out.empty:
                     continue
                 new_mask = insert_new_mask(conn, out)
@@ -714,6 +732,8 @@ def main() -> None:
     logger.info("=" * 70)
     logger.info("Starting Wait Time Fact Table Build")
     logger.info(f"Output base: {output_base}")
+    if DEV_MODE:
+        logger.info("DEV_MODE=true: filtering to DEV_ENTITIES only")
     logger.info(f"Properties: {', '.join(props)}")
     logger.info(f"Full rebuild: {args.full_rebuild}")
     logger.info(f"Local source: {args.local_source} (sync-only; no S3 streaming)")

@@ -9,6 +9,7 @@ wrappers so all write to the same output_base (and thus one logs/).
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 # Fallback when config/config.json is missing or has no output_base
@@ -26,11 +27,13 @@ def get_output_base() -> Path:
     """
     Return the pipeline output base directory.
 
-    Uses config/config.json "output_base" when present and non-empty;
-    otherwise returns the default Dropbox path. Enables one output_base
-    for ETL, dimension fetch, queue-times, and reports.
+    When DEV_MODE=true (env), returns repo/pipeline_dev for fast iteration.
+    Otherwise uses config/config.json "output_base" when present and non-empty;
+    else the default Dropbox path.
     """
     root = _project_root()
+    if os.environ.get("DEV_MODE", "true").lower() == "true":
+        return root / "pipeline_dev"
     cfg_path = root / "config" / "config.json"
     if not cfg_path.exists():
         return _DEFAULT_OUTPUT_BASE
