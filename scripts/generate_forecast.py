@@ -267,12 +267,17 @@ def predict_actual_for_time_slot(
         return None
     
     try:
-        # Load model and metadata
+        # Load model and metadata (will fallback to global model if entity-specific not found)
         model, metadata = load_model(
             entity_code,
             output_base,
             model_type="without_posted",
+            fallback_to_global=True,
         )
+        
+        # Log if using global model
+        if metadata.get("model_source") == "global" and logger:
+            logger.debug(f"Using global model for {entity_code} (no entity-specific model)")
         
         # Check if this is a mean model (for entities with < 1000 observations)
         if model is None and metadata.get("model_type") == "mean":
@@ -552,6 +557,7 @@ def generate_forecast_for_entity_date(
                 entity_code,
                 output_base,
                 model_type="without_posted",
+                fallback_to_global=True,
             )
             is_mean_model = metadata_check.get("model_type") == "mean"
         except (FileNotFoundError, Exception):

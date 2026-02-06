@@ -530,21 +530,25 @@ def load_model(
     entity_code: str,
     output_base: Path,
     model_type: str,
+    fallback_to_global: bool = True,
 ) -> Tuple[Optional[xgb.XGBRegressor], Dict]:
     """
     Load trained model and metadata.
     
     Returns mean model metadata if XGBoost model doesn't exist.
+    Falls back to global model if entity-specific model not found and fallback_to_global=True.
     
     Args:
         entity_code: Entity code
         output_base: Pipeline output base directory
         model_type: "with_posted" or "without_posted"
+        fallback_to_global: If True, use global model when entity-specific model not found
     
     Returns:
         Tuple of (model, metadata)
         - model: XGBoost model if available, None if mean model
-        - metadata: Model metadata (includes "model_type": "mean" for mean models)
+        - metadata: Model metadata (includes "model_type": "mean" for mean models,
+                    "model_source": "entity" or "global" to indicate which model was loaded)
     """
     model_dir = output_base / "models" / entity_code
     model_path = model_dir / f"model_{model_type}.json"
@@ -557,27 +561,51 @@ def load_model(
             metadata = json.load(f)
         
         if metadata.get("model_type") == "mean":
+            metadata["model_source"] = "entity"
             return None, metadata  # None model, mean metadata
     
     # Load XGBoost model
     if xgb is None:
         raise ImportError("XGBoost not installed. Install with: pip install xgboost")
     
-    if not model_path.exists():
-        raise FileNotFoundError(f"Model not found: {model_path}")
+    # Try entity-specific model first
+    if model_path.exists():
+        model = xgb.XGBRegressor()
+        model.load_model(str(model_path))
+        
+        # Load metadata
+        if metadata_path.exists():
+            with open(metadata_path, "r", encoding="utf-8") as f:
+                metadata = json.load(f)
+        else:
+            metadata = {}
+        
+        metadata["model_source"] = "entity"
+        return model, metadata
     
-    # Load model
-    model = xgb.XGBRegressor()
-    model.load_model(str(model_path))
+    # Try global model fallback
+    if fallback_to_global:
+        global_model_dir = output_base / "models" / "_global"
+        global_model_path = global_model_dir / f"model_{model_type}.json"
+        global_metadata_path = global_model_dir / "metadata.json"
+        
+        if global_model_path.exists():
+            model = xgb.XGBRegressor()
+            model.load_model(str(global_model_path))
+            
+            # Load global metadata
+            if global_metadata_path.exists():
+                with open(global_metadata_path, "r", encoding="utf-8") as f:
+                    metadata = json.load(f)
+            else:
+                metadata = {}
+            
+            metadata["model_source"] = "global"
+            metadata["original_entity"] = entity_code
+            return model, metadata
     
-    # Load metadata
-    if metadata_path.exists():
-        with open(metadata_path, "r", encoding="utf-8") as f:
-            metadata = json.load(f)
-    else:
-        metadata = {}
-    
-    return model, metadata
+    # No model found
+    raise FileNotFoundError(f"Model not found: {model_path} (and no global fallback available)")
 
 
 # =============================================================================

@@ -341,12 +341,17 @@ def predict_actual_with_posted(
         return None
     
     try:
-        # Load model and metadata
+        # Load model and metadata (will fallback to global model if entity-specific not found)
         model, metadata = load_model(
             entity_code,
             output_base,
             model_type="with_posted",
+            fallback_to_global=True,
         )
+        
+        # Log if using global model
+        if metadata.get("model_source") == "global" and logger:
+            logger.debug(f"Using global model for {entity_code} (no entity-specific model)")
         
         # Check if this is a mean model (for entities with < 1000 observations)
         if model is None and metadata.get("model_type") == "mean":
@@ -447,12 +452,17 @@ def predict_actual_without_posted(
         return None
     
     try:
-        # Load model and metadata
+        # Load model and metadata (will fallback to global model if entity-specific not found)
         model, metadata = load_model(
             entity_code,
             output_base,
             model_type="without_posted",
+            fallback_to_global=True,
         )
+        
+        # Log if using global model
+        if metadata.get("model_source") == "global" and logger:
+            logger.debug(f"Using global model for {entity_code} (no entity-specific model)")
         
         # Check if this is a mean model (for entities with < 1000 observations)
         if model is None and metadata.get("model_type") == "mean":
