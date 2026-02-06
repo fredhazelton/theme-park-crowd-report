@@ -3,541 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦴 Mission Control — Hazeydata</title>
+    <title>🦴 Mission Control | hazeydata.ai</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            /* Hazeydata Brand */
-            --navy: #040C1F;
-            --navy-light: #1e3a5f;
-            --text-primary: #E9F4FF;
-            --text-secondary: #9BC4F2;
-            --accent: #A60038;
-            
-            /* Benedictus Scale (1-10) */
-            --level-1: #0A2F8F;
-            --level-2: #305FD1;
-            --level-3: #5A96EA;
-            --level-4: #9BC4F2;
-            --level-5: #C1DDFC;
-            --level-6: #E9F4FF;
-            --level-7: #FFE0E9;
-            --level-8: #FFB1C9;
-            --level-9: #EB427B;
-            --level-10: #A60038;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--navy) 0%, #0a1225 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #ffffff;
+            line-height: 1.6;
             min-height: 100vh;
-            color: var(--text-primary);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 20px;
         }
         
-        .container { max-width: 1400px; margin: 0 auto; }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .header {
+            text-align: center;
             margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(233,244,255,0.1);
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
         
-        h1 { font-size: 2rem; display: flex; align-items: center; gap: 10px; }
-        h1 span { font-size: 2.5rem; }
+        .header h1 {
+            font-size: 2.5em;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
         
-        .timestamp { color: var(--text-secondary); font-size: 0.9rem; }
+        .header .subtitle {
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+        
+        .header .timestamp {
+            opacity: 0.6;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
         
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 20px;
+            margin-bottom: 20px;
         }
         
         .card {
-            background: rgba(233,244,255,0.03);
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid rgba(233,244,255,0.08);
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
         }
         
         .card h2 {
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
+            color: #00d4ff;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 5px;
         }
         
-        /* Benedictus-styled borders */
-        .card.priority { border-left: 4px solid var(--level-10); }  /* Darkest pink */
-        .card.success { border-left: 4px solid var(--level-1); }    /* Darkest blue */
-        .card.neutral { border-left: 4px solid #FFFFFF; }           /* White */
-        
-        .task-list { list-style: none; }
-        .task-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(233,244,255,0.05);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .task-list li:last-child { border-bottom: none; }
-        
-        /* Benedictus status badges */
-        .status {
+        .status-indicator {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 8px;
         }
-        .status.critical { background: var(--level-10); color: white; }  /* Darkest pink - urgent */
-        .status.high { background: var(--level-9); color: white; }
-        .status.medium { background: #FFFFFF; color: var(--navy); }      /* White - neutral */
-        .status.low { background: var(--level-4); color: var(--navy); }
-        .status.good { background: var(--level-1); color: white; }       /* Darkest blue - good */
-        .status.empty { background: var(--level-2); color: white; }
         
-        .links-grid {
+        .status-good { background: #27ae60; }
+        .status-warning { background: #f39c12; }
+        .status-critical { background: #e74c3c; }
+        .status-blocked { background: #9b59b6; }
+        
+        .metric-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .metric {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 3px solid #00d4ff;
+        }
+        
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
         }
         
-        .link-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 16px;
-            background: rgba(233,244,255,0.08);
-            border-radius: 8px;
-            color: var(--text-primary);
+        .quick-link {
+            display: block;
+            padding: 10px 15px;
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
             text-decoration: none;
-            transition: background 0.2s;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+            font-size: 0.9em;
         }
-        .link-btn:hover { background: rgba(233,244,255,0.15); }
         
-        .date-card {
+        .quick-link:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: scale(1.02);
+        }
+        
+        .priority-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(233,244,255,0.05);
+            align-items: center;
         }
-        .date-card:last-child { border-bottom: none; }
-        .days-out {
-            background: var(--level-3);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-        .days-out.soon { background: var(--level-8); color: var(--navy); }
-        .days-out.imminent { background: var(--level-10); color: white; }
+        
+        .priority-critical { border-left: 4px solid #e74c3c; }
+        .priority-high { border-left: 4px solid #f39c12; }
+        .priority-medium { border-left: 4px solid #00d4ff; }
         
         .crew-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
         }
+        
         .crew-member {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(233,244,255,0.05);
-            border-radius: 8px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            text-align: center;
         }
+        
         .crew-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--navy-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
+            font-size: 2em;
+            margin-bottom: 10px;
         }
-        .crew-info { flex: 1; }
-        .crew-name { font-weight: 600; font-size: 0.9rem; }
-        .crew-role { font-size: 0.75rem; color: var(--text-secondary); }
         
-        .intel-item {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(233,244,255,0.05);
+        .auto-refresh {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 212, 255, 0.9);
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
         }
-        .intel-item:last-child { border-bottom: none; }
-        .intel-item strong { color: var(--text-secondary); }
-        
-        .full-width { grid-column: 1 / -1; }
-        
-        /* Benedictus scale preview */
-        .scale-preview {
-            display: flex;
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 16px;
-        }
-        .scale-preview div { flex: 1; }
         
         @media (max-width: 768px) {
-            .grid { grid-template-columns: 1fr; }
-            .links-grid { grid-template-columns: 1fr; }
-            .crew-grid { grid-template-columns: 1fr; }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 10px;
+            }
+            .header h1 {
+                font-size: 2em;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="auto-refresh">🔄 Auto-refresh: 60s</div>
+    
     <div class="container">
-        <header>
-            <h1><span>🦴</span> Mission Control</h1>
-            <div class="timestamp">Updated: <span id="timestamp"></span></div>
-        </header>
-        
+        <div class="header">
+            <h1>🦴 Mission Control</h1>
+            <div class="subtitle">Fred's External Brain — Everything in One Place</div>
+            <div class="timestamp">Last updated: Friday, February 6th, 2026 at 4:01 AM EST</div>
+            <div class="timestamp">🌙 Built during overnight autonomous session while Fred slept</div>
+        </div>
+
         <div class="grid">
-            <!-- Today's Focus (dynamic from JSON) -->
-            <div class="card priority">
-                <h2>🎯 Today's Focus</h2>
-                <ul class="task-list" id="todays-focus">
-                    <li><span class="status medium">Loading...</span></li>
-                </ul>
+            <!-- Today's Priorities -->
+            <div class="card">
+                <h2>🎯 Today's Priorities</h2>
+                <div class="priority-item priority-critical">
+                    <span>⚠️ Pipeline ETL Stalled</span>
+                    <span class="status-indicator status-critical">CRITICAL</span>
+                </div>
+                <div class="priority-item priority-high">
+                    <span>🔑 Configure Brave API</span>
+                    <span class="status-indicator status-blocked">BLOCKED</span>
+                </div>
+                <div class="priority-item priority-high">
+                    <span>💾 Main Disk 91% Full</span>
+                    <span class="status-indicator status-warning">WARNING</span>
+                </div>
+                <div class="priority-item priority-medium">
+                    <span>📅 John Visits Tomorrow</span>
+                    <span class="status-indicator status-good">READY</span>
+                </div>
             </div>
-            
+
+            <!-- System Status -->
+            <div class="card">
+                <h2>🚀 System Status</h2>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <strong>Uptime:</strong> 17+ hours <span class="status-indicator status-good">GOOD</span>
+                    </div>
+                    <div class="metric">
+                        <strong>Load:</strong> 0.81 <span class="status-indicator status-good">NORMAL</span>
+                    </div>
+                    <div class="metric">
+                        <strong>Memory:</strong> 5.0GB / 62GB <span class="status-indicator status-good">PLENTY</span>
+                    </div>
+                    <div class="metric">
+                        <strong>Main Disk:</strong> 91% <span class="status-indicator status-critical">CRITICAL</span>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
+                    <strong>⚠️ Use /mnt/data (1.7TB free) for new work!</strong>
+                </div>
+            </div>
+
             <!-- Pipeline Status -->
-            <div class="card priority" id="pipeline-card">
-                <h2>🚀 Pipeline Status</h2>
-                <div id="pipeline-status">
-                    <div style="margin-bottom: 12px;">
-                        <strong>Current Step:</strong> <span id="current-step">Loading...</span>
-                    </div>
-                    <div style="margin-bottom: 12px;">
-                        <strong>Progress:</strong> <span id="etl-progress">--</span>
-                    </div>
-                    <ul class="task-list" id="step-list">
-                        <li><span class="status medium" id="step-etl">⏳</span> ETL</li>
-                        <li><span class="status medium" id="step-dimensions">⏳</span> Dimensions</li>
-                        <li><span class="status medium" id="step-aggregates">⏳</span> Aggregates</li>
-                        <li><span class="status medium" id="step-report">⏳</span> Report</li>
-                    </ul>
-                    <div style="margin-top: 12px; font-size: 0.8rem; color: var(--text-secondary);">
-                        Last update: <span id="pipeline-updated">--</span>
-                    </div>
+            <div class="card">
+                <h2>📈 Pipeline Status</h2>
+                <div class="priority-item priority-critical">
+                    <span>ETL</span>
+                    <span class="status-indicator status-critical">STALLED</span>
+                </div>
+                <div class="priority-item">
+                    <span>Dimensions</span>
+                    <span class="status-indicator" style="background: #95a5a6;">PENDING</span>
+                </div>
+                <div class="priority-item">
+                    <span>Aggregates</span>
+                    <span class="status-indicator" style="background: #95a5a6;">PENDING</span>
+                </div>
+                <div class="priority-item">
+                    <span>Training</span>
+                    <span class="status-indicator" style="background: #95a5a6;">PENDING</span>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
+                    <strong>🚨 Action Required:</strong> ETL appears stalled. Check logs and restart.
                 </div>
             </div>
-            
-            <!-- Queue-Times Fetcher -->
-            <div class="card success" id="queue-times-card">
-                <h2>📡 Queue-Times Fetcher</h2>
-                <div id="queue-times-status">
-                    <div style="margin-bottom: 8px;">
-                        <strong>Status:</strong> <span id="qt-status" class="status good">Active</span>
-                    </div>
-                    <div style="margin-bottom: 12px;">
-                        <strong>Last fetch:</strong> <span id="qt-last-fetch">--</span>
-                    </div>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
-                        <strong>Sample waits (MK):</strong>
-                    </div>
-                    <div id="qt-samples" style="font-size: 0.85rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                        <!-- Filled by JS -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Quick Links (Dynamic from JSON) -->
-            <div class="card full-width" id="quick-links-card">
+
+            <!-- Quick Links -->
+            <div class="card">
                 <h2>🔗 Quick Links</h2>
-                <div id="quick-links-container">
-                    <div class="links-grid">
-                        <a href="#" class="link-btn">Loading...</a>
-                    </div>
+                <div class="quick-links">
+                    <a href="https://github.com/hazeydata/theme-park-crowd-report" class="quick-link">🐙 GitHub Repo</a>
+                    <a href="https://hazeydata.ai" class="quick-link">🌐 hazeydata.ai</a>
+                    <a href="https://dash.cloudflare.com" class="quick-link">☁️ Cloudflare</a>
+                    <a href="http://wilma-server:8888/chat-overlay.html" class="quick-link">💬 Chat Overlay</a>
+                    <a href="http://wilma-server:8051/api/stats/wdw" class="quick-link">🔧 Pipeline API</a>
+                    <a href="https://hazeydata.github.io/theme-park-crowd-report/stream/main-dashboard.html" class="quick-link">🎥 Stream Dashboard</a>
                 </div>
             </div>
-            
-            <!-- Key Dates (dynamic from JSON) -->
+
+            <!-- Active Projects -->
             <div class="card">
-                <h2>📅 Key Dates</h2>
-                <div id="key-dates">
-                    <div class="date-card"><span>Loading...</span></div>
+                <h2>🚀 Active Projects</h2>
+                <div class="priority-item">
+                    <span>🎬 Streaming Infrastructure</span>
+                    <span class="status-indicator status-good">PRODUCTION</span>
+                </div>
+                <div class="priority-item">
+                    <span>📊 Theme Park Pipeline</span>
+                    <span class="status-indicator status-warning">NEEDS ATTENTION</span>
+                </div>
+                <div class="priority-item">
+                    <span>🌐 hazeydata.ai Website</span>
+                    <span class="status-indicator status-good">LIVE</span>
+                </div>
+                <div class="priority-item">
+                    <span>🤖 AI Research Automation</span>
+                    <span class="status-indicator status-blocked">BLOCKED</span>
                 </div>
             </div>
-            
-            <!-- The Crew -->
+
+            <!-- The Flintstones Crew -->
             <div class="card">
-                <h2>🧠 The Flintstones</h2>
+                <h2>🧠 The Flintstones Crew</h2>
                 <div class="crew-grid">
                     <div class="crew-member">
-                        <div class="crew-avatar">👨</div>
-                        <div class="crew-info">
-                            <div class="crew-name">Fred</div>
-                            <div class="crew-role">The Boss</div>
-                        </div>
+                        <div class="crew-avatar">👨‍💼</div>
+                        <strong>Fred</strong><br>
+                        Product Owner<br>
+                        <span class="status-indicator" style="background: #34495e;">SLEEPING</span>
                     </div>
                     <div class="crew-member">
                         <div class="crew-avatar">🦴</div>
-                        <div class="crew-info">
-                            <div class="crew-name">Wilma</div>
-                            <div class="crew-role">24/7 PM</div>
-                        </div>
+                        <strong>Wilma</strong><br>
+                        24/7 Assistant<br>
+                        <span class="status-indicator status-good">ONLINE</span>
                     </div>
                     <div class="crew-member">
-                        <div class="crew-avatar">💻</div>
-                        <div class="crew-info">
-                            <div class="crew-name">Bam-Bam</div>
-                            <div class="crew-role">Deep Coder</div>
-                        </div>
+                        <div class="crew-avatar">🔵</div>
+                        <strong>Barney</strong><br>
+                        Strategic Advisor<br>
+                        <span class="status-indicator" style="background: #34495e;">STANDBY</span>
                     </div>
                     <div class="crew-member">
-                        <div class="crew-avatar">🦕</div>
-                        <div class="crew-info">
-                            <div class="crew-name">Dino</div>
-                            <div class="crew-role">Task Manager</div>
-                        </div>
-                    </div>
-                    <div class="crew-member">
-                        <div class="crew-avatar">🎨</div>
-                        <div class="crew-info">
-                            <div class="crew-name">Pebbles</div>
-                            <div class="crew-role">Design</div>
-                        </div>
+                        <div class="crew-avatar">💪</div>
+                        <strong>Bam-Bam</strong><br>
+                        Senior Developer<br>
+                        <span class="status-indicator" style="background: #34495e;">STANDBY</span>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Active Projects (dynamic from JSON) -->
-            <div class="card full-width">
-                <h2>🚀 Active Projects</h2>
-                <ul class="task-list" id="active-projects">
-                    <li><span class="status medium">Loading...</span></li>
-                </ul>
-                <!-- Benedictus scale preview -->
-                <div class="scale-preview">
-                    <div style="background: var(--level-1)"></div>
-                    <div style="background: var(--level-2)"></div>
-                    <div style="background: var(--level-3)"></div>
-                    <div style="background: var(--level-4)"></div>
-                    <div style="background: var(--level-5)"></div>
-                    <div style="background: var(--level-6)"></div>
-                    <div style="background: var(--level-7)"></div>
-                    <div style="background: var(--level-8)"></div>
-                    <div style="background: var(--level-9)"></div>
-                    <div style="background: var(--level-10)"></div>
-                </div>
-            </div>
-            
-            <!-- Dino Tasks (dynamic from JSON) -->
-            <div class="card priority">
-                <h2>🦕 Dino Tasks</h2>
-                <div id="dino-summary" style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-secondary);">
-                    Loading...
-                </div>
-                <ul class="task-list" id="dino-tasks">
-                    <li><span class="status medium">Loading...</span></li>
-                </ul>
-            </div>
-            
-            <!-- Theme Park Intel -->
-            <div class="card neutral">
-                <h2>🎢 Theme Park Intel</h2>
-                <div class="intel-item">
-                    <strong>DINOSAUR closed</strong> — DinoLand making way for Tropical Americas
-                </div>
-                <div class="intel-item">
-                    <strong>Epic Universe EPA</strong> — Only select attractions during early entry (Feb 1+)
-                </div>
-                <div class="intel-item">
-                    <strong>JP River Adventure</strong> — Down until Nov 2026
-                </div>
-            </div>
-            
-            <!-- Cron Jobs -->
-            <div class="card success">
-                <h2>⏰ Automated Tasks</h2>
-                <ul class="task-list">
-                    <li>
-                        <span class="status good">OK</span>
-                        <span>Pipeline Review — Daily 3am</span>
-                    </li>
-                    <li>
-                        <span class="status good">OK</span>
-                        <span>Overnight Surprise — Daily 4am</span>
-                    </li>
-                </ul>
             </div>
         </div>
     </div>
-    
+
     <script>
-        document.getElementById('timestamp').textContent = new Date().toLocaleString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+        // Auto-refresh every 60 seconds
+        setTimeout(function() {
+            location.reload();
+        }, 60000);
+        
+        // Add click tracking for links
+        document.querySelectorAll('.quick-link').forEach(link => {
+            link.addEventListener('click', function() {
+                console.log('Quick link clicked:', this.textContent);
+            });
         });
-        
-        // Load pipeline status
-        async function loadPipelineStatus() {
-            try {
-                const resp = await fetch('pipeline-status.json?' + Date.now());
-                const data = await resp.json();
-                
-                document.getElementById('current-step').textContent = data.current_step || '--';
-                document.getElementById('etl-progress').textContent = data.etl_progress || '--';
-                document.getElementById('pipeline-updated').textContent = data.last_updated ? 
-                    new Date(data.last_updated).toLocaleTimeString() : '--';
-                
-                // Update step statuses
-                const statusMap = {
-                    'done': { class: 'good', text: '✅' },
-                    'running': { class: 'critical', text: '🔄' },
-                    'pending': { class: 'medium', text: '⏳' },
-                    'failed': { class: 'critical', text: '❌' },
-                    'skipped': { class: 'low', text: '⏭️' }
-                };
-                
-                ['etl', 'dimensions', 'aggregates', 'report'].forEach(step => {
-                    const el = document.getElementById('step-' + step);
-                    const status = data.steps?.[step] || 'pending';
-                    const mapped = statusMap[status] || statusMap.pending;
-                    el.className = 'status ' + mapped.class;
-                    el.textContent = mapped.text;
-                });
-                
-                // Update card border based on status
-                const card = document.getElementById('pipeline-card');
-                if (Object.values(data.steps || {}).includes('running')) {
-                    card.className = 'card priority';
-                } else if (Object.values(data.steps || {}).every(s => s === 'done' || s === 'skipped')) {
-                    card.className = 'card success';
-                }
-            } catch (e) {
-                console.error('Failed to load pipeline status:', e);
-            }
-        }
-        
-        // Load queue-times status
-        async function loadQueueTimesStatus() {
-            try {
-                const resp = await fetch('pipeline-status.json?' + Date.now());
-                const data = await resp.json();
-                
-                if (data.queue_times) {
-                    const qt = data.queue_times;
-                    document.getElementById('qt-status').textContent = qt.status || 'Unknown';
-                    document.getElementById('qt-status').className = 'status ' + (qt.status === 'Active' ? 'good' : 'critical');
-                    document.getElementById('qt-last-fetch').textContent = qt.last_fetch || '--';
-                    
-                    const samplesEl = document.getElementById('qt-samples');
-                    if (qt.samples && qt.samples.length > 0) {
-                        samplesEl.innerHTML = qt.samples.map(s => 
-                            `<span>${s.name}: <strong>${s.wait}m</strong></span>`
-                        ).join('');
-                    }
-                    
-                    const card = document.getElementById('queue-times-card');
-                    card.className = 'card ' + (qt.status === 'Active' ? 'success' : 'priority');
-                }
-            } catch (e) {
-                console.error('Failed to load queue-times status:', e);
-            }
-        }
-        
-        // Load content (Today's Focus, Key Dates, Active Projects)
-        async function loadContent() {
-            try {
-                const resp = await fetch('mission-control-content.json?' + Date.now());
-                const data = await resp.json();
-                
-                // Today's Focus
-                const focusEl = document.getElementById('todays-focus');
-                if (data.todays_focus && data.todays_focus.length > 0) {
-                    focusEl.innerHTML = data.todays_focus.map(item => `
-                        <li>
-                            <span class="status ${item.status_class}">${item.status_text}</span>
-                            <span>${item.task}</span>
-                        </li>
-                    `).join('');
-                }
-                
-                // Key Dates
-                const datesEl = document.getElementById('key-dates');
-                if (data.key_dates && data.key_dates.length > 0) {
-                    datesEl.innerHTML = data.key_dates.map(item => `
-                        <div class="date-card">
-                            <span>${item.emoji} ${item.event}</span>
-                            <span class="days-out ${item.urgency}">${item.date} — ${item.days_out} day${item.days_out !== 1 ? 's' : ''}</span>
-                        </div>
-                    `).join('');
-                }
-                
-                // Active Projects
-                const projectsEl = document.getElementById('active-projects');
-                if (data.active_projects && data.active_projects.length > 0) {
-                    projectsEl.innerHTML = data.active_projects.map(item => `
-                        <li>
-                            <span class="status ${item.status_class}">${item.status_text}</span>
-                            <strong>${item.title}</strong> — ${item.description}
-                        </li>
-                    `).join('');
-                }
-                
-                // Dino Tasks
-                const dinoSummaryEl = document.getElementById('dino-summary');
-                const dinoTasksEl = document.getElementById('dino-tasks');
-                if (data.dino_summary) {
-                    const s = data.dino_summary;
-                    dinoSummaryEl.innerHTML = `${s.in_progress} in progress · ${s.blocked} blocked · ${s.todo} todo · ${s.done} done`;
-                }
-                if (data.dino_tasks && data.dino_tasks.length > 0) {
-                    // Show non-done tasks first, then recent done
-                    const activeTasks = data.dino_tasks.filter(t => t.status !== 'done');
-                    const doneTasks = data.dino_tasks.filter(t => t.status === 'done').slice(-2);
-                    const tasksToShow = [...activeTasks, ...doneTasks];
-                    
-                    dinoTasksEl.innerHTML = tasksToShow.map(task => `
-                        <li>
-                            <span class="status ${task.status_class}">${task.status_text}</span>
-                            <span><strong>${task.id}</strong> ${task.title} <small style="color: var(--text-secondary);">(${task.owner})</small></span>
-                        </li>
-                    `).join('');
-                }
-                
-                // Quick Links (grouped by category)
-                const quickLinksContainer = document.getElementById('quick-links-container');
-                if (data.quick_links && data.quick_links.length > 0) {
-                    quickLinksContainer.innerHTML = data.quick_links.map(category => `
-                        <div style="margin-bottom: 16px;">
-                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">${category.category}</div>
-                            <div class="links-grid" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));">
-                                ${category.links.map(link => `
-                                    <a href="${link.url}" class="link-btn" target="_blank" style="font-size: 0.85rem;">
-                                        ${link.icon} ${link.name}
-                                    </a>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            } catch (e) {
-                console.error('Failed to load content:', e);
-            }
-        }
-        
-        // Load immediately and refresh every 60 seconds
-        loadPipelineStatus();
-        loadQueueTimesStatus();
-        loadContent();
-        setInterval(loadPipelineStatus, 60000);
-        setInterval(loadQueueTimesStatus, 60000);
-        setInterval(loadContent, 60000);
     </script>
 </body>
 </html>
