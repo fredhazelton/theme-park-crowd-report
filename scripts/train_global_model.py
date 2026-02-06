@@ -43,11 +43,11 @@ if str(Path(__file__).parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from processors.encoding import encode_features, load_encoding_mappings, save_encoding_mappings
-from processors.features import add_features, load_dims
+from processors.features import add_features
 from processors.training import (
     DEFAULT_XGB_PARAMS,
     EARLY_STOPPING_ROUNDS,
-    evaluate_predictions,
+    evaluate_model,
     prepare_training_data,
 )
 from utils.paths import get_output_base
@@ -134,12 +134,28 @@ def train_global_model(
         logger.error("XGBoost not installed. Run: pip install xgboost")
         return {}
     
-    logger.info(f"Training global model on {len(df):,} rows")
+    logger.info(f"Loaded {len(df):,} total rows from fact tables")
     
-    # Prepare features
+    # CRITICAL OPTIMIZATION: Filter to rows with ACTUAL wait time BEFORE feature engineering
+    # This reduces the dataset from millions to thousands (only ~0.2% have ACTUAL)
+    actual_col = "actual_wait_time" if "actual_wait_time" in df.columns else "ACTUAL"
+    posted_col = "posted_wait_time" if "posted_wait_time" in df.columns else "POSTED"
+    
+    # Filter to rows that have both ACTUAL (target) and POSTED (feature)
+    has_actual = df[actual_col].notna() & (df[actual_col] > 0)
+    has_posted = df[posted_col].notna() & (df[posted_col] > 0)
+    df_filtered = df[has_actual & has_posted].copy()
+    
+    logger.info(f"Filtered to {len(df_filtered):,} rows with both ACTUAL and POSTED wait times")
+    logger.info(f"  (This is {len(df_filtered)/len(df)*100:.2f}% of loaded data)")
+    
+    if len(df_filtered) < 1000:
+        logger.error(f"Not enough training data ({len(df_filtered)} rows, need at least 1000)")
+        return {}
+    
+    # Now run feature engineering on the filtered dataset (much smaller!)
     logger.info("Adding features...")
-    dims = load_dims(output_base, logger)
-    df_features = add_features(df, output_base, dims=dims, logger=logger)
+    df_features = add_features(df_filtered, output_base, logger=logger)
     
     # Encode categorical features
     logger.info("Encoding features...")
@@ -212,7 +228,7 @@ def train_global_model(
     
     # Evaluate on test set
     y_pred = model.predict(X_test)
-    metrics = evaluate_predictions(y_test.values, y_pred, logger)
+    metrics = evaluate_model(y_test.values, y_pred, logger)
     
     logger.info("Test set metrics:")
     for metric, value in metrics.items():
