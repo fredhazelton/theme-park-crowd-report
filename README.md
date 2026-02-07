@@ -18,7 +18,8 @@ This pipeline:
 **Entity metadata index** (efficient modeling workflows, selective entity loading): [docs/ENTITY_INDEX.md](docs/ENTITY_INDEX.md).  
 **Legacy pipeline (attraction-io) alignment** and next steps: [docs/ATTRACTION_IO_ALIGNMENT.md](docs/ATTRACTION_IO_ALIGNMENT.md).  
 **Critical review** of the legacy pipeline (efficiency, workflow, quality) and how we improve: [docs/LEGACY_PIPELINE_CRITICAL_REVIEW.md](docs/LEGACY_PIPELINE_CRITICAL_REVIEW.md).  
-**Modeling and WTI methodology** (ACTUAL curves, forecast, live inference, Wait Time Index): [docs/MODELING_AND_WTI_METHODOLOGY.md](docs/MODELING_AND_WTI_METHODOLOGY.md).
+**Modeling and WTI methodology** (ACTUAL curves, forecast, live inference, Wait Time Index): [docs/MODELING_AND_WTI_METHODOLOGY.md](docs/MODELING_AND_WTI_METHODOLOGY.md).  
+**Hybrid pipeline** (Julia + Python for fast training): [docs/HYBRID_PIPELINE.md](docs/HYBRID_PIPELINE.md) — trains 141 models in ~67 seconds.
 
 ## Project Structure
 

@@ -39,7 +39,7 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 - **Runs as:** fred (your crontab).
 - **Log:** `output_base/logs/daily_pipeline_YYYY-MM-DD.log`
 - **Lock:** `state/daily_pipeline.lock` — only one run at a time. If the previous run is still in progress (e.g. still training), the next 6 AM run skips cleanly (exit 0) so it doesn’t kill or conflict with the other run.
-- **Training:** Uses `--workers 4` so batch training finishes within ~8 h (vs ~32 h sequential). See **docs/PIPELINE_TIMING_AND_PARALLELIZATION.md**.
+- **Training:** Uses **hybrid pipeline** (Julia XGBoost) — trains 141 models in ~67 seconds. See **docs/HYBRID_PIPELINE.md** and **docs/PIPELINE_TIMING_AND_PARALLELIZATION.md**.
 
 ### 3.2 Queue-times loop (systemd, on boot + always)
 

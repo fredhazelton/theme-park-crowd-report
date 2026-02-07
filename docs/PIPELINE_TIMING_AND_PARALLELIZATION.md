@@ -1,91 +1,167 @@
-# Pipeline timing and parallelization
+# Pipeline Timing and Parallelization
 
-Why the daily pipeline can exceed 24 hours and how to speed it up.
-
----
-
-## 1. Where time is spent
-
-| Step | Typical duration | Bottleneck |
-|------|------------------|------------|
-| **1. ETL** (incremental) | Minutes to tens of minutes | S3 reads, parsing, dedupe |
-| **2. Dimension fetches** | Minutes | S3 + local builds |
-| **3. Posted aggregates** | Tens of minutes | Scanning fact tables, grouping |
-| **4. Wait time DB report** | Minutes | Scanning fact tables |
-| **5. Batch training** | **~30+ hours** (sequential) | **One entity at a time** |
-| **6. Forecast** | Tens of minutes to hours | One entity-date at a time |
-| **7. WTI** | Minutes | Aggregation over curves |
-
-**Training dominates.** With ~148 entities and ~12–13 minutes per entity (XGBoost + feature prep), sequential training alone is **148 × 13 min ≈ 32 hours**. That alone exceeds 24 hours.
+**Last Updated:** 2026-02-07  
+**Status:** Optimized - Hybrid pipeline in production
 
 ---
 
-## 2. Why training is slow
+## Current Performance (Hybrid Pipeline)
 
-- **train_batch_entities.py** runs **one entity at a time**: for each entity it calls `train_entity_model.py` as a subprocess and waits for it to finish.
-- **train_entity_model.py** per entity:
-  - Loads entity data from fact tables
-  - Builds features (park hours, encoding, etc.)
-  - Trains up to two XGBoost models (with-POSTED, without-POSTED)
-  - Saves models and metadata
-- Each entity writes to its **own** directory (`models/{entity_code}/`), so there is **no file conflict** between entities. Training is **embarrassingly parallel** over entities.
+| Step | Tool | Time |
+|------|------|------|
+| ETL Sync | Python/boto3 | ~5 min |
+| Dimensions | Python | ~2 min |
+| Posted Aggregates | Python/DuckDB | ~1 min |
+| Report | Python | ~1 min |
+| **Matched Pairs** | DuckDB | ~78s |
+| **Training** | Julia XGBoost | ~67s |
+| Scoring | Python | ~30s |
+| Forecast | Python | ~5 min |
+| WTI | Python | ~1 min |
+| **TOTAL** | | **~15-20 min** |
 
----
-
-## 3. Parallelization strategy
-
-### 3.1 Training: `--workers N`
-
-**train_batch_entities.py** supports **`--workers N`** (default 1). With N > 1, N entities are trained **in parallel** in separate processes (each running `train_entity_model.py`).
-
-- **Recommendation:** Set `--workers` to the number of CPU cores you can dedicate (e.g. 4–8). More workers = more memory (each worker loads its own data and trains XGBoost).
-- **Rough speedup:** With 4 workers, training time drops from ~32 h to ~8 h. With 8 workers, ~4 h.
-- **Daily pipeline:** Use the same value in cron, e.g.  
-  `train_batch_entities.py --min-age-hours 24 --workers 4`
-
-### 3.2 Forecast: `--workers N` (optional)
-
-**generate_forecast.py** can support **`--workers N`** to process entity-date pairs in parallel. Forecast is usually much faster than training (seconds per entity-date), but with many entities × many dates it can add up. Parallel forecast is optional and can be added if needed.
-
-### 3.3 Other steps
-
-- **ETL:** Already I/O bound; parallelizing within the script would require careful locking (dedupe DB, CSV appends). Not changed for now.
-- **Posted aggregates:** Single pass over fact tables; could be parallelized by partition if needed.
-- **WTI:** Aggregation over precomputed curves; typically fast.
+**Training bottleneck eliminated.** What used to take 75+ minutes (or 30+ hours sequential) now takes ~2.5 minutes.
 
 ---
 
-## 4. Using parallel training
+## Historical Context
 
-**Manual run:**
-```bash
-python scripts/train_batch_entities.py --min-age-hours 24 --workers 4
+### Before Optimization (Jan 2026)
+- Sequential Python training: **30+ hours** for all entities
+- No parallelization, no early stopping
+- 2000 XGBoost trees per model
+
+### After Python Optimization (Feb 6, 2026)
+- Parallel training with 5 workers
+- Early stopping (50 rounds)
+- DuckDB for aggregations
+- Training time: **~10 minutes**
+
+### After Julia Hybrid (Feb 7, 2026)
+- Julia XGBoost.jl for training
+- Python/DuckDB for data prep
+- Training time: **~2.5 minutes**
+- **4x faster** than Python-only
+
+---
+
+## Why Julia is Faster
+
+1. **JIT Compilation** - Julia compiles to native code
+2. **No GIL** - True parallelism without Python's Global Interpreter Lock
+3. **XGBoost.jl** - Optimized bindings, less overhead than Python wrapper
+4. **Memory Layout** - Julia's column-major arrays match XGBoost expectations
+
+Benchmark (141 entity models):
+- Python XGBoost (parallel): ~10 min
+- Julia XGBoost: ~67s
+- **Speedup: ~9x**
+
+---
+
+## Current Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│              Daily Pipeline (6 AM)              │
+├─────────────────────────────────────────────────┤
+│  1. ETL Sync (S3 → Parquet)      [Python]      │
+│  2. Dimensions                    [Python]      │
+│  3. Posted Aggregates             [DuckDB]      │
+│  4. Report                        [Python]      │
+├─────────────────────────────────────────────────┤
+│  5. HYBRID TRAINING                             │
+│     ├─ Matched Pairs              [DuckDB]     │
+│     └─ XGBoost Training           [Julia]      │
+├─────────────────────────────────────────────────┤
+│  6. Forecast                      [Python]      │
+│  7. WTI Calculation               [Python]      │
+└─────────────────────────────────────────────────┘
 ```
 
-**Daily pipeline (run_daily_pipeline.sh):**  
-The master script invokes `train_batch_entities.py --min-age-hours 24`. To use 4 workers, either:
+---
 
-- Add a `--workers` option to **run_daily_pipeline.sh** and pass it through to `train_batch_entities.py`, or  
-- Edit the line in **run_daily_pipeline.sh** to:
-  `train_batch_entities.py --min-age-hours 24 --workers 4`
+## Key Scripts
 
-**Dashboard:** With parallel training, "current entity" may show the last completed or a representative in-progress entity; multiple entities run at once.
+| Script | Purpose | Language |
+|--------|---------|----------|
+| `run_daily_pipeline.sh` | Master orchestrator | Bash |
+| `hybrid_pipeline.py` | Training pipeline | Python + Julia |
+| `julia-ml/train_only.jl` | XGBoost training | Julia |
+| `score_fast.py` | Model scoring | Python |
+| `train_fast.py` | Python training (backup) | Python |
 
 ---
 
-## 5. Memory and CPU
+## Parallelization Strategy
 
-- Each training worker loads one entity’s data and trains 1–2 XGBoost models. Plan for **~1–2 GB RAM per worker** (depends on entity data size).
-- XGBoost uses multiple threads per process by default. If you run N workers, you may want to limit XGBoost threads (e.g. `nthread=2`) so total CPU usage stays reasonable. See **docs/XGBOOST_PARAMS.md** if you tune this.
+### Training (Julia)
+- Single-threaded per model (Julia handles internal parallelism)
+- 4 Julia threads for XGBoost tree building
+- Sequential entity loop (fast enough at 0.48s/entity)
+
+### Data Prep (DuckDB)
+- Automatic parallelization across all cores
+- Vectorized operations on parquet files
+- Memory-mapped file access
+
+### Scoring (Python)
+- ProcessPoolExecutor with 5 workers
+- Parallel across entities
 
 ---
 
-## 6. Summary
+## Memory Usage
 
-| Change | Effect |
-|--------|--------|
-| **train_batch_entities.py --workers 4** | Training ~32 h → ~8 h (rough) |
-| **train_batch_entities.py --workers 8** | Training ~32 h → ~4 h (rough) |
-| **generate_forecast.py --workers N** (optional) | Shorten forecast step if it’s slow |
+| Component | RAM |
+|-----------|-----|
+| DuckDB matched pairs query | ~10 GB peak |
+| Julia training | ~1.5 GB |
+| Python scoring | ~2 GB |
+| **Total peak** | **~12 GB** |
 
-With **--workers 4** or **--workers 8**, the full daily pipeline (ETL → dimensions → aggregates → report → training → forecast → WTI) can complete **within 24 hours** so the next 6 AM run is not blocked by the previous day’s run still training.
+Machine has 64 GB - plenty of headroom.
+
+---
+
+## Cron Schedule
+
+```bash
+# Daily pipeline at 6 AM ET
+0 6 * * * cd /home/wilma/theme-park-crowd-report && ./scripts/run_daily_pipeline.sh --skip-dropbox-check >> /home/wilma/hazeydata/pipeline/logs/daily_pipeline_$(date +\%Y-\%m-\%d).log 2>&1
+```
+
+Pipeline completes well before next day's run - no overlap issues.
+
+---
+
+## Troubleshooting
+
+### Julia not found
+```bash
+# Check Julia installation
+ls ~/julia-1.10.2/bin/julia
+
+# Or use juliaup
+~/.juliaup/bin/julia --version
+```
+
+### DuckDB out of memory
+Reduce concurrent queries or add swap:
+```bash
+sudo fallocate -l 8G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+```
+
+### Training failures
+Check logs: `/home/wilma/hazeydata/pipeline/logs/hybrid_pipeline_*.log`
+
+---
+
+## See Also
+
+- [HYBRID_PIPELINE.md](HYBRID_PIPELINE.md) - Detailed hybrid pipeline docs
+- [PREDICTIONS-API.md](PREDICTIONS-API.md) - Scoring API endpoints
+- [PIPELINE_STATE.md](PIPELINE_STATE.md) - Current pipeline configuration

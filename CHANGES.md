@@ -4,6 +4,43 @@ This document tracks significant changes to the Theme Park Wait Time Data Pipeli
 
 ## Recent Changes
 
+### Julia Hybrid Pipeline (2026-02-07)
+
+**Added** (`scripts/hybrid_pipeline.py`):
+- New hybrid training pipeline using best tool for each step:
+  - **Python/DuckDB** for matched pairs generation (vectorized SQL)
+  - **Julia/XGBoost.jl** for model training (2-3x faster than Python)
+  - **Python** for scoring (API integration)
+- Command line options: `--skip-pairs`, `--skip-scoring`, `--score-hours N`
+
+**Added** (`julia-ml/`):
+- `train_only.jl` - Julia XGBoost training script
+- `Project.toml` - Julia package dependencies
+
+**Changed** (`scripts/run_daily_pipeline.sh`):
+- Training step now uses `hybrid_pipeline.py --skip-scoring` instead of `train_batch_entities.py`
+- Training time reduced from ~10 minutes to ~67 seconds
+
+**Added** (`docs/HYBRID_PIPELINE.md`):
+- Full documentation for hybrid pipeline architecture and usage
+
+**Updated** (`docs/PIPELINE_TIMING_AND_PARALLELIZATION.md`):
+- Reflects current hybrid architecture and performance
+
+**Updated** (`docs/TRAINING_OPTIMIZATION.md`):
+- Marked as completed with link to new hybrid docs
+
+**Performance:**
+| Metric | Before | After |
+|--------|--------|-------|
+| Training time | ~10 min (Python) | ~67s (Julia) |
+| Models trained | 141 | 141 |
+| Avg MAE | 6.79 min | 6.78 min |
+
+**Why**: Julia XGBoost is significantly faster than Python for training. Combined with DuckDB for data prep, total training time dropped from 75+ minutes (original) to ~2.5 minutes.
+
+---
+
 ### Stream dashboard: Daily curve real data, fallbacks, and API
 
 **Changed** (`docs/stream/stream-dashboard.html`):

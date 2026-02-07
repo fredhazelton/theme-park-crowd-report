@@ -41,6 +41,15 @@ except:
 
 # Find python executable
 get_python() {
+    local project_root
+    project_root="$(get_project_root)"
+    
+    # Prefer project venv if it exists
+    if [[ -f "$project_root/.venv/bin/python" ]]; then
+        echo "$project_root/.venv/bin/python"
+        return
+    fi
+    
     # Add user's local bin to PATH for pip-installed packages
     export PATH="$HOME/.local/bin:$PATH"
     

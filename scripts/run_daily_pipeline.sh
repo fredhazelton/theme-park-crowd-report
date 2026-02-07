@@ -256,13 +256,13 @@ else
     fi
 fi
 
-# 5. Batch training (--workers 0 = auto from RAM; train_batch_entities.py updates status file)
-# Use quoted "$OUTPUT_BASE" so paths with spaces (e.g. Dropbox) are passed as one argument.
+# 5. Hybrid training (Julia XGBoost - faster than Python)
+# Uses DuckDB for matched pairs + Julia for training + Python for scoring
 if $SKIP_TRAINING; then
-    log_info "=== Batch training (skipped) ==="
+    log_info "=== Hybrid training (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
 else
-    if run_step "Batch training" $PYTHON scripts/train_batch_entities.py --min-age-hours 24 --workers 0 --output-base "$OUTPUT_BASE" ${PARK:+--park "$PARK"}; then
+    if run_step "Hybrid training (Julia)" $PYTHON scripts/hybrid_pipeline.py --skip-scoring; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
     else
         FAILED_ANY=true
