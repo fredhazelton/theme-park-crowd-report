@@ -256,13 +256,13 @@ else
     fi
 fi
 
-# 5. Hybrid training (Julia XGBoost - faster than Python)
-# Uses DuckDB for matched pairs + Julia for training + Python for scoring
+# 5. Hybrid training V2 (Julia XGBoost with geo decay weights)
+# Uses DuckDB for matched pairs + Julia for training (with date_group_id, season, geo_decay)
 if $SKIP_TRAINING; then
-    log_info "=== Hybrid training (skipped) ==="
+    log_info "=== Hybrid training V2 (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
 else
-    if run_step "Hybrid training (Julia)" $PYTHON scripts/hybrid_pipeline.py --skip-scoring; then
+    if run_step "Hybrid training V2 (Julia + geo decay)" $PYTHON scripts/hybrid_pipeline_v2.py --skip-scoring; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
     else
         FAILED_ANY=true
