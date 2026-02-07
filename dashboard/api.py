@@ -1463,6 +1463,195 @@ def get_prediction_entities():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/forecast-detail/<park_code>", methods=["GET"])
+def get_forecast_detail(park_code: str):
+    """
+    Get detailed forecast predictions from vectorized parquet.
+    
+    Query params:
+        - entity_code: Filter by entity (optional)
+        - date: Filter by specific date YYYY-MM-DD (optional)
+        - start_date: Start of date range (optional)
+        - end_date: End of date range (optional, default: +7 days)
+        - limit: Max rows to return (default: 1000)
+    """
+    import duckdb
+    
+    output_base = get_output_base_path()
+    forecast_path = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
+    
+    if not forecast_path.exists():
+        return jsonify({"error": "Forecast data not available"}), 404
+    
+    pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower()).upper()
+    entity_code = request.args.get("entity_code", "").upper()
+    date_filter = request.args.get("date")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    limit = int(request.args.get("limit", 1000))
+    
+    # Build WHERE clause
+    conditions = [f"UPPER(LEFT(entity_code, 2)) = '{pipeline_park}'"]
+    
+    if entity_code:
+        conditions.append(f"UPPER(entity_code) = '{entity_code}'")
+    
+    if date_filter:
+        conditions.append(f"park_date = '{date_filter}'")
+    elif start_date:
+        conditions.append(f"park_date >= '{start_date}'")
+        if end_date:
+            conditions.append(f"park_date <= '{end_date}'")
+        else:
+            # Default to 7 days from start
+            from datetime import datetime, timedelta
+            end = datetime.strptime(start_date, "%Y-%m-%d") + timedelta(days=7)
+            conditions.append(f"park_date <= '{end.strftime('%Y-%m-%d')}'")
+    
+    where_clause = " AND ".join(conditions)
+    
+    query = f"""
+        SELECT 
+            entity_code,
+            park_date,
+            time_slot,
+            predicted_actual,
+            prediction_method
+        FROM read_parquet('{forecast_path}')
+        WHERE {where_clause}
+        ORDER BY entity_code, park_date, time_slot
+        LIMIT {limit}
+    """
+    
+    try:
+        con = duckdb.connect()
+        df = con.execute(query).fetchdf()
+        con.close()
+        
+        predictions = []
+        for _, row in df.iterrows():
+            predictions.append({
+                "entity_code": row["entity_code"],
+                "park_date": str(row["park_date"]),
+                "time_slot": str(row["time_slot"]),
+                "predicted_actual": round(float(row["predicted_actual"]), 1),
+                "method": row["prediction_method"],
+            })
+        
+        return jsonify({
+            "park_code": park_code,
+            "count": len(predictions),
+            "predictions": predictions,
+        })
+    except Exception as e:
+        logger.error(f"Error loading forecast detail: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/forecast-detail/<park_code>/daily-curve", methods=["GET"])
+def get_forecast_daily_curve(park_code: str):
+    """
+    Get forecast curve for a specific entity and date.
+    Returns predicted actual wait times at 5-minute intervals.
+    
+    Query params:
+        - entity_code: Required
+        - date: Required (YYYY-MM-DD)
+    """
+    import duckdb
+    
+    output_base = get_output_base_path()
+    forecast_path = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
+    
+    if not forecast_path.exists():
+        return jsonify({"error": "Forecast data not available"}), 404
+    
+    entity_code = request.args.get("entity_code", "").upper()
+    date_filter = request.args.get("date")
+    
+    if not entity_code or not date_filter:
+        return jsonify({"error": "entity_code and date are required"}), 400
+    
+    query = f"""
+        SELECT 
+            entity_code,
+            park_date,
+            time_slot,
+            predicted_actual,
+            prediction_method
+        FROM read_parquet('{forecast_path}')
+        WHERE UPPER(entity_code) = '{entity_code}'
+          AND park_date = '{date_filter}'
+        ORDER BY time_slot
+    """
+    
+    try:
+        con = duckdb.connect()
+        df = con.execute(query).fetchdf()
+        con.close()
+        
+        if df.empty:
+            return jsonify({
+                "entity_code": entity_code,
+                "date": date_filter,
+                "curve": [],
+            })
+        
+        curve = []
+        for _, row in df.iterrows():
+            curve.append({
+                "time": str(row["time_slot"]),
+                "predicted": round(float(row["predicted_actual"]), 1),
+            })
+        
+        return jsonify({
+            "entity_code": entity_code,
+            "date": date_filter,
+            "method": df["prediction_method"].iloc[0] if not df.empty else None,
+            "curve": curve,
+        })
+    except Exception as e:
+        logger.error(f"Error loading forecast curve: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/forecast-summary", methods=["GET"])
+def get_forecast_summary():
+    """Get summary of available forecast data."""
+    import duckdb
+    
+    output_base = get_output_base_path()
+    forecast_path = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
+    
+    if not forecast_path.exists():
+        return jsonify({"error": "Forecast data not available"}), 404
+    
+    try:
+        con = duckdb.connect()
+        summary = con.execute(f"""
+            SELECT 
+                COUNT(*) as total_predictions,
+                COUNT(DISTINCT entity_code) as entity_count,
+                MIN(park_date) as start_date,
+                MAX(park_date) as end_date,
+                COUNT(DISTINCT park_date) as date_count
+            FROM read_parquet('{forecast_path}')
+        """).fetchdf()
+        con.close()
+        
+        row = summary.iloc[0]
+        return jsonify({
+            "total_predictions": int(row["total_predictions"]),
+            "entity_count": int(row["entity_count"]),
+            "start_date": str(row["start_date"]),
+            "end_date": str(row["end_date"]),
+            "date_count": int(row["date_count"]),
+        })
+    except Exception as e:
+        logger.error(f"Error loading forecast summary: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     logger.info("Starting Dashboard API server...")
     logger.info(f"Output base: {get_output_base_path()}")
