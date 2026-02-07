@@ -7,141 +7,96 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #e0e0e0;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
         
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #fff;
-        }
-        
-        .controls {
-            display: flex;
             gap: 10px;
-            flex-wrap: wrap;
         }
         
-        select, input {
-            padding: 10px 15px;
-            border: 1px solid #3a3a5c;
-            border-radius: 8px;
-            background: #252542;
-            color: #e0e0e0;
-            font-size: 14px;
-            cursor: pointer;
-        }
+        h1 { font-size: 1.4rem; font-weight: 600; color: #fff; }
         
-        select:hover, input:hover {
-            border-color: #5a5a8c;
+        .entity-name { font-size: 0.95rem; color: #888; margin-top: 3px; }
+        
+        .badge {
+            background: #e17055;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
         
         .chart-container {
             background: #252542;
             border-radius: 16px;
-            padding: 25px;
+            padding: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
         
-        .chart-wrapper {
-            position: relative;
-            height: 500px;
+        .chart-wrapper { position: relative; height: 350px; }
+        
+        @media (min-width: 768px) {
+            .chart-wrapper { height: 450px; }
         }
         
         .legend {
             display: flex;
             justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
+            gap: 20px;
+            margin-top: 15px;
             flex-wrap: wrap;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
+            gap: 6px;
+            font-size: 12px;
         }
         
-        .legend-color {
-            width: 20px;
-            height: 12px;
-            border-radius: 3px;
-        }
+        .legend-color { width: 16px; height: 10px; border-radius: 3px; }
+        .legend-dot { width: 6px; height: 6px; border-radius: 50%; }
         
-        .legend-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-        
-        .observed-actual { background: linear-gradient(90deg, #00d4aa, #00b894); }
         .predicted-actual { background: linear-gradient(90deg, #74b9ff, #0984e3); }
         .posted-dots { background: #636e72; }
         
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .stat-card {
             background: #1a1a2e;
             border-radius: 10px;
-            padding: 15px;
+            padding: 12px 8px;
             text-align: center;
         }
         
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #fff;
-        }
+        .stat-value { font-size: 1.3rem; font-weight: 700; color: #fff; }
+        .stat-label { font-size: 0.7rem; color: #888; margin-top: 3px; }
         
-        .stat-label {
+        .date-info {
+            text-align: center;
+            margin-top: 15px;
             font-size: 0.85rem;
-            color: #888;
-            margin-top: 5px;
-        }
-        
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 400px;
-            color: #888;
-        }
-        
-        .entity-name {
-            font-size: 1.1rem;
-            color: #888;
-            margin-top: 5px;
+            color: #666;
         }
     </style>
 </head>
@@ -150,20 +105,9 @@
         <div class="header">
             <div>
                 <h1>Daily Wait Time Curve</h1>
-                <div class="entity-name" id="entityName">Select an entity</div>
+                <div class="entity-name">MK23 — Pirates of the Caribbean</div>
             </div>
-            <div class="controls">
-                <select id="parkSelect">
-                    <option value="mk">Magic Kingdom</option>
-                    <option value="ep">EPCOT</option>
-                    <option value="hs">Hollywood Studios</option>
-                    <option value="ak">Animal Kingdom</option>
-                </select>
-                <select id="entitySelect">
-                    <option value="">Loading...</option>
-                </select>
-                <input type="date" id="dateSelect" />
-            </div>
+            <span class="badge">DEMO DATA</span>
         </div>
         
         <div class="chart-container">
@@ -173,313 +117,146 @@
             
             <div class="legend">
                 <div class="legend-item">
-                    <div class="legend-color observed-actual"></div>
-                    <span>Observed Actual</span>
-                </div>
-                <div class="legend-item">
                     <div class="legend-color predicted-actual"></div>
                     <span>Predicted Actual</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-dot posted-dots"></div>
-                    <span>Posted Wait Time</span>
+                    <span>Posted Time</span>
                 </div>
             </div>
             
             <div class="stats">
                 <div class="stat-card">
-                    <div class="stat-value" id="avgActual">--</div>
+                    <div class="stat-value" id="avgActual">18</div>
                     <div class="stat-label">Avg Actual</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="avgPosted">--</div>
+                    <div class="stat-value" id="avgPosted">30</div>
                     <div class="stat-label">Avg Posted</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="peakTime">--</div>
+                    <div class="stat-value" id="peakTime">2 PM</div>
                     <div class="stat-label">Peak Time</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="peakWait">--</div>
+                    <div class="stat-value" id="peakWait">32</div>
                     <div class="stat-label">Peak Wait</div>
                 </div>
             </div>
+            
+            <div class="date-info">February 5, 2026 • Magic Kingdom</div>
         </div>
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:8051/api';
-        let chart = null;
+const SAMPLE_DATA = 
+{"curve":[{"hour":19,"method":"model","posted":40,"predicted":24.6,"time":"2026-02-04T19:00:04-05:00"},{"hour":19,"method":"model","posted":40,"predicted":24.6,"time":"2026-02-04T19:00:27-05:00"},{"hour":19,"method":"model","posted":40,"predicted":24.6,"time":"2026-02-04T19:03:03-05:00"},{"hour":19,"method":"model","posted":40,"predicted":24.6,"time":"2026-02-04T19:05:33-05:00"},{"hour":19,"method":"model","posted":40,"predicted":24.6,"time":"2026-02-04T19:06:04-05:00"},{"hour":19,"method":"model","posted":40,"predicted":23.1,"time":"2026-02-04T19:09:03-05:00"},{"hour":19,"method":"model","posted":40,"predicted":23.1,"time":"2026-02-04T19:10:39-05:00"},{"hour":19,"method":"model","posted":40,"predicted":23.1,"time":"2026-02-04T19:12:03-05:00"},{"hour":19,"method":"model","posted":35,"predicted":20.9,"time":"2026-02-04T19:14:16-05:00"},{"hour":19,"method":"model","posted":35,"predicted":20.7,"time":"2026-02-04T19:15:19-05:00"},{"hour":19,"method":"model","posted":35,"predicted":20.7,"time":"2026-02-04T19:18:03-05:00"},{"hour":19,"method":"model","posted":35,"predicted":20.7,"time":"2026-02-04T19:20:34-05:00"},{"hour":19,"method":"model","posted":35,"predicted":20.7,"time":"2026-02-04T19:21:03-05:00"},{"hour":19,"method":"model","posted":35,"predicted":19.9,"time":"2026-02-04T19:24:04-05:00"},{"hour":19,"method":"model","posted":35,"predicted":19.9,"time":"2026-02-04T19:25:28-05:00"},{"hour":19,"method":"model","posted":35,"predicted":21.0,"time":"2026-02-04T19:27:03-05:00"},{"hour":19,"method":"model","posted":35,"predicted":18.4,"time":"2026-02-04T19:30:03-05:00"},{"hour":19,"method":"model","posted":35,"predicted":18.4,"time":"2026-02-04T19:30:30-05:00"},{"hour":19,"method":"model","posted":30,"predicted":19.3,"time":"2026-02-04T19:32:13-05:00"},{"hour":19,"method":"model","posted":30,"predicted":21.6,"time":"2026-02-04T19:35:23-05:00"},{"hour":19,"method":"model","posted":30,"predicted":21.6,"time":"2026-02-04T19:36:03-05:00"},{"hour":19,"method":"model","posted":30,"predicted":20.4,"time":"2026-02-04T19:39:03-05:00"},{"hour":19,"method":"model","posted":30,"predicted":20.4,"time":"2026-02-04T19:40:23-05:00"},{"hour":19,"method":"model","posted":30,"predicted":20.7,"time":"2026-02-04T19:42:04-05:00"},{"hour":19,"method":"model","posted":30,"predicted":20.7,"time":"2026-02-04T19:45:03-05:00"},{"hour":19,"method":"model","posted":30,"predicted":20.7,"time":"2026-02-04T19:45:20-05:00"},{"hour":19,"method":"model","posted":30,"predicted":20.0,"time":"2026-02-04T19:48:05-05:00"},{"hour":19,"method":"model","posted":30,"predicted":21.1,"time":"2026-02-04T19:50:44-05:00"},{"hour":19,"method":"model","posted":30,"predicted":21.1,"time":"2026-02-04T19:51:03-05:00"},{"hour":19,"method":"model","posted":20,"predicted":14.7,"time":"2026-02-04T19:53:14-05:00"},{"hour":19,"method":"model","posted":20,"predicted":14.7,"time":"2026-02-04T19:55:15-05:00"},{"hour":19,"method":"model","posted":20,"predicted":15.1,"time":"2026-02-04T19:57:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:00:04-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:00:18-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:03:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:05:14-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:06:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:09:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:12:04-05:00"},{"hour":20,"method":"model","posted":20,"predicted":14.5,"time":"2026-02-04T20:15:04-05:00"},{"hour":20,"method":"model","posted":20,"predicted":14.5,"time":"2026-02-04T20:15:21-05:00"},{"hour":20,"method":"model","posted":20,"predicted":14.5,"time":"2026-02-04T20:18:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:20:17-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:21:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.2,"time":"2026-02-04T20:24:04-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.2,"time":"2026-02-04T20:25:26-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.2,"time":"2026-02-04T20:27:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:30:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:30:16-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.0,"time":"2026-02-04T20:33:04-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.3,"time":"2026-02-04T20:35:19-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.3,"time":"2026-02-04T20:36:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":14.5,"time":"2026-02-04T20:39:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":14.5,"time":"2026-02-04T20:40:25-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.7,"time":"2026-02-04T20:42:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.7,"time":"2026-02-04T20:45:03-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.7,"time":"2026-02-04T20:45:16-05:00"},{"hour":20,"method":"model","posted":20,"predicted":14.6,"time":"2026-02-04T20:48:04-05:00"},{"hour":20,"method":"model","posted":15,"predicted":8.9,"time":"2026-02-04T20:50:16-05:00"},{"hour":20,"method":"model","posted":20,"predicted":15.4,"time":"2026-02-04T20:50:19-05:00"},{"hour":20,"method":"model","posted":15,"predicted":8.9,"time":"2026-02-04T20:54:03-05:00"},{"hour":20,"method":"model","posted":15,"predicted":8.6,"time":"2026-02-04T20:55:19-05:00"},{"hour":20,"method":"model","posted":15,"predicted":9.2,"time":"2026-02-04T20:57:04-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.6,"time":"2026-02-04T21:00:04-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.6,"time":"2026-02-04T21:00:22-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.6,"time":"2026-02-04T21:00:22-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.6,"time":"2026-02-04T21:05:25-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.6,"time":"2026-02-04T21:06:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.3,"time":"2026-02-04T21:09:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.3,"time":"2026-02-04T21:10:17-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.3,"time":"2026-02-04T21:12:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.3,"time":"2026-02-04T21:15:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.3,"time":"2026-02-04T21:15:26-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.3,"time":"2026-02-04T21:18:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.0,"time":"2026-02-04T21:20:14-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.0,"time":"2026-02-04T21:21:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.0,"time":"2026-02-04T21:24:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.0,"time":"2026-02-04T21:25:26-05:00"},{"hour":21,"method":"model","posted":15,"predicted":8.0,"time":"2026-02-04T21:27:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.6,"time":"2026-02-04T21:30:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.6,"time":"2026-02-04T21:30:20-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.6,"time":"2026-02-04T21:33:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.6,"time":"2026-02-04T21:35:23-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.6,"time":"2026-02-04T21:36:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.6,"time":"2026-02-04T21:39:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.6,"time":"2026-02-04T21:40:18-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T21:42:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.2,"time":"2026-02-04T21:45:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.2,"time":"2026-02-04T21:45:26-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.2,"time":"2026-02-04T21:48:04-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.0,"time":"2026-02-04T21:50:24-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.0,"time":"2026-02-04T21:51:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.1,"time":"2026-02-04T21:54:03-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.1,"time":"2026-02-04T21:55:17-05:00"},{"hour":21,"method":"model","posted":15,"predicted":7.1,"time":"2026-02-04T21:57:03-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:00:03-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:00:19-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:03:03-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:05:15-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:06:03-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:09:04-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:10:20-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:12:04-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:15:04-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.3,"time":"2026-02-04T22:15:26-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.1,"time":"2026-02-04T22:18:04-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.1,"time":"2026-02-04T22:20:19-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.1,"time":"2026-02-04T22:21:03-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.1,"time":"2026-02-04T22:24:03-05:00"},{"hour":22,"method":"model","posted":15,"predicted":7.1,"time":"2026-02-04T22:25:19-05:00"},{"hour":22,"method":"model","posted":15,"predicted":6.7,"time":"2026-02-04T22:27:03-05:00"},{"hour":22,"method":"model","posted":15,"predicted":6.7,"time":"2026-02-04T22:30:04-05:00"},{"hour":22,"method":"model","posted":15,"predicted":6.7,"time":"2026-02-04T22:30:18-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.2,"time":"2026-02-04T22:32:15-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.2,"time":"2026-02-04T22:35:17-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.2,"time":"2026-02-04T22:36:03-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.1,"time":"2026-02-04T22:39:03-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.1,"time":"2026-02-04T22:40:23-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.6,"time":"2026-02-04T22:42:03-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.6,"time":"2026-02-04T22:45:03-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.6,"time":"2026-02-04T22:45:20-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.6,"time":"2026-02-04T22:48:04-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.4,"time":"2026-02-04T22:50:26-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.4,"time":"2026-02-04T22:51:04-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.4,"time":"2026-02-04T22:54:03-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.4,"time":"2026-02-04T22:55:20-05:00"},{"hour":22,"method":"model","posted":13,"predicted":5.4,"time":"2026-02-04T22:57:03-05:00"},{"hour":23,"method":"model","posted":13,"predicted":5.4,"time":"2026-02-04T23:00:06-05:00"},{"hour":23,"method":"model","posted":13,"predicted":5.4,"time":"2026-02-04T23:00:20-05:00"},{"hour":23,"method":"model","posted":13,"predicted":5.4,"time":"2026-02-04T23:03:04-05:00"}],"date":"2026-02-05","entity_code":"MK23","method":"model"}
+;
+
+        // Process sample data
+        const curve = SAMPLE_DATA.curve || [];
         
-        // Entity name mapping (add more as needed)
-        const ENTITY_NAMES = {
-            'MK01': 'Space Mountain',
-            'MK02': 'Splash Mountain',
-            'MK03': 'Big Thunder Mountain',
-            'MK05': 'Pirates of the Caribbean',
-            'MK06': 'Haunted Mansion',
-            'MK13': 'Peter Pan\'s Flight',
-            'MK16': 'Jungle Cruise',
-            'MK23': 'Pirates of the Caribbean',
-            'MK27': 'It\'s a Small World',
-            'MK29': 'Seven Dwarfs Mine Train',
-            'MK34': 'Buzz Lightyear',
-            'MK43': 'TRON Lightcycle',
-            'MK142': 'Tiana\'s Bayou Adventure',
-            'HS12': 'Tower of Terror',
-            'HS15': 'Rock \'n\' Roller Coaster',
-            'HS20': 'Toy Story Mania',
-            'HS22': 'Star Tours',
-            'AK11': 'Kilimanjaro Safaris',
-            'EP02': 'Test Track',
-            'EP09': 'Frozen Ever After',
-        };
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set default date to yesterday
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            document.getElementById('dateSelect').value = yesterday.toISOString().split('T')[0];
+        // Aggregate by 15-min intervals
+        const timeSlots = {};
+        curve.forEach(point => {
+            const time = new Date(point.time);
+            const minutes = Math.floor(time.getMinutes() / 15) * 15;
+            time.setMinutes(minutes, 0, 0);
+            const key = time.toISOString();
             
-            loadEntities();
-            
-            document.getElementById('parkSelect').addEventListener('change', loadEntities);
-            document.getElementById('entitySelect').addEventListener('change', loadChart);
-            document.getElementById('dateSelect').addEventListener('change', loadChart);
+            if (!timeSlots[key]) {
+                timeSlots[key] = { time, predicted: [], posted: [] };
+            }
+            timeSlots[key].predicted.push(point.predicted);
+            timeSlots[key].posted.push(point.posted);
         });
         
-        async function loadEntities() {
-            const park = document.getElementById('parkSelect').value;
-            const select = document.getElementById('entitySelect');
-            
-            try {
-                const resp = await fetch(`${API_BASE}/predictions/entities?park=${park}`);
-                const data = await resp.json();
-                
-                select.innerHTML = data.entities
-                    .filter(e => e.method === 'model')  // Only show entities with models
-                    .slice(0, 50)  // Top 50
-                    .map(e => {
-                        const name = ENTITY_NAMES[e.entity_code] || e.entity_code;
-                        return `<option value="${e.entity_code}">${e.entity_code} - ${name}</option>`;
-                    })
-                    .join('');
-                
-                if (select.options.length > 0) {
-                    loadChart();
-                }
-            } catch (err) {
-                console.error('Failed to load entities:', err);
-                select.innerHTML = '<option value="">Error loading entities</option>';
-            }
-        }
+        const sortedSlots = Object.values(timeSlots).sort((a, b) => a.time - b.time);
         
-        async function loadChart() {
-            const entityCode = document.getElementById('entitySelect').value;
-            const date = document.getElementById('dateSelect').value;
-            
-            if (!entityCode || !date) return;
-            
-            const entityName = ENTITY_NAMES[entityCode] || entityCode;
-            document.getElementById('entityName').textContent = entityName;
-            
-            try {
-                // Load predictions (includes posted and predicted actual)
-                const predResp = await fetch(
-                    `${API_BASE}/predictions/mk/daily-curve?entity_code=${entityCode}&date=${date}`
-                );
-                const predData = await predResp.json();
-                
-                // Load actual observed data if available
-                const actualResp = await fetch(
-                    `${API_BASE}/actual-points/mk?entity_code=${entityCode}&date=${date}`
-                );
-                let actualData = { points: [] };
-                try {
-                    actualData = await actualResp.json();
-                } catch (e) {}
-                
-                renderChart(predData, actualData);
-                
-            } catch (err) {
-                console.error('Failed to load chart data:', err);
-            }
-        }
+        const predictedData = sortedSlots.map(slot => ({
+            x: slot.time,
+            y: slot.predicted.reduce((a, b) => a + b, 0) / slot.predicted.length
+        }));
         
-        function renderChart(predData, actualData) {
-            const ctx = document.getElementById('waitTimeChart').getContext('2d');
-            
-            if (chart) {
-                chart.destroy();
-            }
-            
-            // Process prediction data
-            const curve = predData.curve || [];
-            
-            // Separate by time and aggregate by 15-min intervals
-            const timeSlots = {};
-            
-            curve.forEach(point => {
-                const time = new Date(point.time);
-                // Round to 15-min intervals
-                const minutes = Math.floor(time.getMinutes() / 15) * 15;
-                time.setMinutes(minutes, 0, 0);
-                const key = time.toISOString();
-                
-                if (!timeSlots[key]) {
-                    timeSlots[key] = {
-                        time: time,
-                        predicted: [],
-                        posted: []
-                    };
-                }
-                
-                timeSlots[key].predicted.push(point.predicted);
-                timeSlots[key].posted.push(point.posted);
-            });
-            
-            // Process actual observed data
-            const actualPoints = (actualData.points || []).map(p => ({
-                x: new Date(p.time || p.observed_at),
-                y: p.actual || p.wait_time_minutes
-            })).filter(p => p.y > 0);
-            
-            // Convert to arrays
-            const sortedSlots = Object.values(timeSlots).sort((a, b) => a.time - b.time);
-            
-            const predictedData = sortedSlots.map(slot => ({
-                x: slot.time,
-                y: slot.predicted.reduce((a, b) => a + b, 0) / slot.predicted.length
-            }));
-            
-            const postedData = sortedSlots.map(slot => ({
-                x: slot.time,
-                y: slot.posted.reduce((a, b) => a + b, 0) / slot.posted.length
-            }));
-            
-            // Calculate stats
-            if (predictedData.length > 0) {
-                const avgPred = predictedData.reduce((a, b) => a + b.y, 0) / predictedData.length;
-                const avgPost = postedData.reduce((a, b) => a + b.y, 0) / postedData.length;
-                const peak = predictedData.reduce((max, p) => p.y > max.y ? p : max, predictedData[0]);
-                
-                document.getElementById('avgActual').textContent = Math.round(avgPred) + ' min';
-                document.getElementById('avgPosted').textContent = Math.round(avgPost) + ' min';
-                document.getElementById('peakTime').textContent = peak.x.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                document.getElementById('peakWait').textContent = Math.round(peak.y) + ' min';
-            }
-            
-            // Build datasets
-            const datasets = [];
-            
-            // Observed actuals (if available) - Green area
-            if (actualPoints.length > 0) {
-                datasets.push({
-                    label: 'Observed Actual',
-                    data: actualPoints,
-                    fill: true,
-                    backgroundColor: 'rgba(0, 212, 170, 0.4)',
-                    borderColor: '#00d4aa',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    pointRadius: 0,
-                    order: 2
-                });
-            }
-            
-            // Predicted actuals - Blue area
-            datasets.push({
-                label: 'Predicted Actual',
-                data: predictedData,
-                fill: true,
-                backgroundColor: actualPoints.length > 0 ? 'rgba(116, 185, 255, 0.3)' : 'rgba(116, 185, 255, 0.5)',
-                borderColor: '#74b9ff',
-                borderWidth: 2,
-                tension: 0.4,
-                pointRadius: 0,
-                order: 1
-            });
-            
-            // Posted times - Subtle dots
-            datasets.push({
-                label: 'Posted Wait',
-                data: postedData,
-                fill: false,
-                backgroundColor: '#636e72',
-                borderColor: 'transparent',
-                pointRadius: 3,
-                pointHoverRadius: 5,
-                showLine: false,
-                order: 0
-            });
-            
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: { datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
+        const postedData = sortedSlots.map(slot => ({
+            x: slot.time,
+            y: slot.posted.reduce((a, b) => a + b, 0) / slot.posted.length
+        }));
+        
+        // Calculate stats
+        const avgPred = predictedData.reduce((a, b) => a + b.y, 0) / predictedData.length;
+        const avgPost = postedData.reduce((a, b) => a + b.y, 0) / postedData.length;
+        const peak = predictedData.reduce((max, p) => p.y > max.y ? p : max, predictedData[0]);
+        
+        document.getElementById('avgActual').textContent = Math.round(avgPred) + ' min';
+        document.getElementById('avgPosted').textContent = Math.round(avgPost) + ' min';
+        document.getElementById('peakTime').textContent = peak.x.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        document.getElementById('peakWait').textContent = Math.round(peak.y) + ' min';
+        
+        // Create chart
+        const ctx = document.getElementById('waitTimeChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'Predicted Actual',
+                        data: predictedData,
+                        fill: true,
+                        backgroundColor: 'rgba(116, 185, 255, 0.5)',
+                        borderColor: '#74b9ff',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0,
                     },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#252542',
-                            titleColor: '#fff',
-                            bodyColor: '#e0e0e0',
-                            borderColor: '#3a3a5c',
-                            borderWidth: 1,
-                            padding: 12,
-                            callbacks: {
-                                title: (items) => {
-                                    const date = new Date(items[0].parsed.x);
-                                    return date.toLocaleTimeString('en-US', { 
-                                        hour: 'numeric', 
-                                        minute: '2-digit',
-                                        hour12: true 
-                                    });
-                                },
-                                label: (item) => {
-                                    return `${item.dataset.label}: ${Math.round(item.parsed.y)} min`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'hour',
-                                displayFormats: {
-                                    hour: 'h a'
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(255,255,255,0.05)'
-                            },
-                            ticks: {
-                                color: '#888'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255,255,255,0.05)'
-                            },
-                            ticks: {
-                                color: '#888',
-                                callback: (value) => value + ' min'
-                            }
+                    {
+                        label: 'Posted Wait',
+                        data: postedData,
+                        fill: false,
+                        backgroundColor: '#636e72',
+                        borderColor: 'transparent',
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        showLine: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#252542',
+                        titleColor: '#fff',
+                        bodyColor: '#e0e0e0',
+                        borderColor: '#3a3a5c',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            title: (items) => new Date(items[0].parsed.x).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+                            label: (item) => `${item.dataset.label}: ${Math.round(item.parsed.y)} min`
                         }
                     }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: { unit: 'hour', displayFormats: { hour: 'h a' } },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#888', maxRotation: 0 }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#888', callback: (v) => v + ' min' }
+                    }
                 }
-            });
-        }
+            }
+        });
     </script>
 </body>
 </html>
