@@ -9,33 +9,33 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "17:35:46",
+    "last_fetch": "17:43:59",
     "samples": [
       {
-        "name": "MK45",
-        "wait": "5"
-      },
-      {
-        "name": "MK191",
-        "wait": "85"
-      },
-      {
-        "name": "MK44",
+        "name": "MK21",
         "wait": "20"
       },
       {
-        "name": "MK43",
-        "wait": "30"
+        "name": "MK23",
+        "wait": "15"
       },
       {
-        "name": "MK40",
+        "name": "MK210",
+        "wait": "35"
+      },
+      {
+        "name": "MK18",
         "wait": "10"
       },
       {
-        "name": "MK39",
-        "wait": "30"
+        "name": "MK49",
+        "wait": "20"
+      },
+      {
+        "name": "MK26",
+        "wait": "15"
       }
     ]
   },
-  "last_updated": "2026-02-07T17:40:01.493965-05:00"
+  "last_updated": "2026-02-07T17:45:01.262609-05:00"
 }
