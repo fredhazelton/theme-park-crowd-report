@@ -186,14 +186,23 @@ For each entity with ≥500 matched pairs:
     5. Save model as JSON with metadata
 ```
 
-### Performance (V2)
+### Performance (V2) — Tested 2026-02-07
 
 | Metric | Value |
 |--------|-------|
 | Entities trained | 141 |
-| Training time | ~66 seconds |
-| Average MAE | 7.83 minutes |
+| Training time | 69 seconds |
+| Average MAE | 7.86 minutes |
 | Uses geo decay | ✅ Yes |
+
+### Full Pipeline Timing (V2)
+
+| Step | Time | Output |
+|------|------|--------|
+| Matched Pairs (DuckDB) | 76s | 2,393,511 pairs |
+| Training (Julia) | 83s | 141 models |
+| Scoring (Python) | 179s | 89,942,244 predictions |
+| **Total** | **338s (~5.6 min)** | ✅ |
 
 ### Model Versioning
 
@@ -266,11 +275,13 @@ entity_code  park_date  posted_time  predicted_actual prediction_method      mod
        AK04 2022-05-09           60                49          fallback  FALLBACK_82PCT
 ```
 
-### Statistics
+### Statistics (as of 2026-02-07)
 
-- **Total predictions:** ~90 million
-- **Model predictions:** ~70 million (from 141 entities)
-- **Fallback predictions:** ~20 million (from 607 entities)
+- **Total predictions:** 89,942,244
+- **Model predictions:** 150 entities with models
+- **Fallback predictions:** 607 entities using 82% rule
+- **File size:** 1.4 GB (Parquet)
+- **Date range:** 2009-03-02 to 2026-02-05
 
 ---
 
@@ -429,9 +440,12 @@ All data is served via REST API at `http://localhost:8051`:
 
 | Script | Purpose | Time |
 |--------|---------|------|
-| `scripts/hybrid_pipeline_v2.py` | Matched pairs + Julia training (V2) | ~2.5 min |
-| `scripts/score_historical.py` | Score all historical POSTED | ~2.5 min |
+| `scripts/hybrid_pipeline_v2.py` | Full V2 pipeline (pairs + training + scoring) | ~5.6 min |
+| `scripts/hybrid_pipeline_v2.py --skip-scoring` | Pairs + training only | ~2.7 min |
+| `scripts/score_historical.py` | Score all historical POSTED | ~3 min |
 | `scripts/forecast_vectorized.py` | Generate 2-year forecasts | ~8 min |
+
+**Daily cron (6am):** Runs `run_daily_pipeline.sh` which calls `hybrid_pipeline_v2.py`
 
 ---
 
