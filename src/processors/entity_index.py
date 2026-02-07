@@ -383,6 +383,62 @@ def get_valid_entity_codes(output_base: Path) -> Optional[set[str]]:
         return None
 
 
+def get_trainable_entities(
+    output_base: Path,
+    min_actual_count: int = 500,
+    logger: Optional[logging.Logger] = None,
+) -> set[str]:
+    """
+    Get entities that are trainable: exist in dimEntity AND have sufficient actual observations.
+    
+    This implements the filtering logic:
+    1. Entity must appear in dimEntity (has TouringPlans S3 mapping)
+    2. Entity must have actual observations in fact tables (via entity_index)
+    3. Entity must have at least min_actual_count ACTUAL observations
+    
+    Args:
+        output_base: Pipeline output base directory
+        min_actual_count: Minimum ACTUAL observations required (default: 500)
+        logger: Optional logger
+    
+    Returns:
+        Set of entity codes that meet all criteria
+    """
+    # Get valid entity codes from dimEntity
+    valid_codes = get_valid_entity_codes(output_base)
+    if valid_codes is None:
+        if logger:
+            logger.warning("Could not load dimEntity - no entity filtering applied")
+        valid_codes = set()
+    
+    # Get entities with actual observations from index
+    index_db = output_base / "state" / "entity_index.sqlite"
+    if not index_db.exists():
+        if logger:
+            logger.warning(f"Entity index not found: {index_db}")
+        return set()
+    
+    ensure_index_db(index_db)
+    
+    with sqlite3.connect(str(index_db)) as conn:
+        cursor = conn.execute(
+            """SELECT entity_code, actual_count 
+               FROM entity_index 
+               WHERE actual_count >= ?""",
+            (min_actual_count,)
+        )
+        entities_with_actual = {row[0].upper(): row[1] for row in cursor.fetchall()}
+    
+    # Intersection: entities in dimEntity AND have sufficient actual observations
+    trainable = valid_codes & set(entities_with_actual.keys())
+    
+    if logger:
+        logger.info(f"Trainable entities: {len(trainable)} (from {len(valid_codes)} in dimEntity, "
+                   f"{len(entities_with_actual)} with >={min_actual_count} ACTUAL)")
+    
+    return trainable
+
+
 def get_all_entities(db_path: Path) -> pd.DataFrame:
     """Get all entities from index as DataFrame."""
     if not db_path.exists():

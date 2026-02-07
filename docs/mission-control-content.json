@@ -26,21 +26,21 @@
       "emoji": "\ud83d\udc64",
       "event": "John visits",
       "date": "Feb 7",
-      "days_out": 2,
-      "urgency": "soon"
+      "days_out": 1,
+      "urgency": "imminent"
     },
     {
       "emoji": "\u26a0\ufe0f",
       "event": "GPT-4o retires",
       "date": "Feb 13",
-      "days_out": 8,
+      "days_out": 7,
       "urgency": ""
     },
     {
       "emoji": "\ud83d\udcc5",
       "event": "Valentine's Day \u2764",
       "date": "Feb 14",
-      "days_out": 9,
+      "days_out": 8,
       "urgency": ""
     }
   ],
@@ -139,5 +139,5 @@
     "blocked": 0,
     "done": 0
   },
-  "last_updated": "2026-02-05T09:45:01.389650-05:00"
+  "last_updated": "2026-02-06T23:45:01.300367-05:00"
 }

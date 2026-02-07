@@ -1251,6 +1251,218 @@ def get_stats(park_code: str):
     })
 
 
+# =============================================================================
+# PREDICTIONS API
+# =============================================================================
+
+def load_historical_predictions(output_base: Path):
+    """Load historical predictions parquet file."""
+    pred_path = output_base / "predictions" / "historical_predictions.parquet"
+    if not pred_path.exists():
+        return None
+    return pred_path  # Return path for DuckDB queries
+
+
+@app.route("/api/predictions/<park_code>", methods=["GET"])
+def get_predictions(park_code: str):
+    """
+    Get predicted vs posted wait times for a park.
+    
+    Query params:
+        - entity_code: Filter by specific entity (e.g., MK23)
+        - date: Filter by date (YYYY-MM-DD)
+        - start_date, end_date: Date range filter
+        - limit: Max results (default 1000)
+    """
+    import duckdb
+    
+    pipeline_park = PARK_CODE_MAP.get(park_code.lower(), park_code.lower())
+    output_base = get_output_base_path()
+    pred_path = output_base / "predictions" / "historical_predictions.parquet"
+    
+    if not pred_path.exists():
+        return jsonify({"error": "Historical predictions not available"}), 404
+    
+    entity_code = request.args.get("entity_code")
+    date_filter = request.args.get("date")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    limit = int(request.args.get("limit", 1000))
+    
+    # Build query
+    conditions = [f"UPPER(LEFT(entity_code, 2)) = UPPER('{pipeline_park}')"]
+    
+    if entity_code:
+        conditions.append(f"entity_code = '{entity_code.upper()}'")
+    
+    if date_filter:
+        conditions.append(f"park_date = '{date_filter}'")
+    elif start_date and end_date:
+        conditions.append(f"park_date >= '{start_date}' AND park_date <= '{end_date}'")
+    elif start_date:
+        conditions.append(f"park_date >= '{start_date}'")
+    elif end_date:
+        conditions.append(f"park_date <= '{end_date}'")
+    
+    where_clause = " AND ".join(conditions)
+    
+    query = f"""
+        SELECT 
+            entity_code,
+            observed_at,
+            park_date,
+            posted_time,
+            predicted_actual,
+            prediction_method,
+            hour_of_day
+        FROM read_parquet('{pred_path}')
+        WHERE {where_clause}
+        ORDER BY observed_at_ts DESC
+        LIMIT {limit}
+    """
+    
+    try:
+        con = duckdb.connect()
+        df = con.execute(query).fetchdf()
+        con.close()
+        
+        results = df.to_dict(orient="records")
+        
+        return jsonify({
+            "park_code": park_code,
+            "count": len(results),
+            "predictions": results,
+        })
+    except Exception as e:
+        logger.error(f"Error loading predictions: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/predictions/<park_code>/daily-curve", methods=["GET"])
+def get_predictions_daily_curve(park_code: str):
+    """
+    Get daily wait time curve for an entity showing posted vs predicted.
+    
+    Query params:
+        - entity_code: Entity to get curve for (required)
+        - date: Date to get curve for (default: today)
+    """
+    import duckdb
+    
+    entity_code = request.args.get("entity_code")
+    if not entity_code:
+        return jsonify({"error": "entity_code required"}), 400
+    
+    date_filter = request.args.get("date", date.today().isoformat())
+    
+    output_base = get_output_base_path()
+    pred_path = output_base / "predictions" / "historical_predictions.parquet"
+    
+    if not pred_path.exists():
+        return jsonify({"error": "Historical predictions not available"}), 404
+    
+    query = f"""
+        SELECT 
+            entity_code,
+            observed_at,
+            hour_of_day,
+            posted_time,
+            predicted_actual,
+            prediction_method
+        FROM read_parquet('{pred_path}')
+        WHERE entity_code = '{entity_code.upper()}'
+          AND park_date = '{date_filter}'
+        ORDER BY observed_at_ts
+    """
+    
+    try:
+        con = duckdb.connect()
+        df = con.execute(query).fetchdf()
+        con.close()
+        
+        if df.empty:
+            return jsonify({
+                "entity_code": entity_code,
+                "date": date_filter,
+                "curve": [],
+            })
+        
+        # Build curve data
+        curve = []
+        for _, row in df.iterrows():
+            curve.append({
+                "time": row["observed_at"],
+                "hour": int(row["hour_of_day"]) if pd.notna(row["hour_of_day"]) else None,
+                "posted": int(row["posted_time"]),
+                "predicted": round(float(row["predicted_actual"]), 1),
+                "method": row["prediction_method"],
+            })
+        
+        return jsonify({
+            "entity_code": entity_code.upper(),
+            "date": date_filter,
+            "method": df["prediction_method"].iloc[0] if not df.empty else None,
+            "curve": curve,
+        })
+    except Exception as e:
+        logger.error(f"Error loading daily curve: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/predictions/entities", methods=["GET"])
+def get_prediction_entities():
+    """Get list of entities with predictions and their stats."""
+    import duckdb
+    
+    output_base = get_output_base_path()
+    pred_path = output_base / "predictions" / "historical_predictions.parquet"
+    
+    if not pred_path.exists():
+        return jsonify({"error": "Historical predictions not available"}), 404
+    
+    park_code = request.args.get("park")
+    
+    query = f"""
+        SELECT 
+            entity_code,
+            COUNT(*) as prediction_count,
+            MIN(park_date) as first_date,
+            MAX(park_date) as last_date,
+            AVG(posted_time) as avg_posted,
+            AVG(predicted_actual) as avg_predicted,
+            prediction_method
+        FROM read_parquet('{pred_path}')
+        {"WHERE UPPER(LEFT(entity_code, 2)) = UPPER('" + park_code + "')" if park_code else ""}
+        GROUP BY entity_code, prediction_method
+        ORDER BY prediction_count DESC
+    """
+    
+    try:
+        con = duckdb.connect()
+        df = con.execute(query).fetchdf()
+        con.close()
+        
+        entities = []
+        for _, row in df.iterrows():
+            entities.append({
+                "entity_code": row["entity_code"],
+                "prediction_count": int(row["prediction_count"]),
+                "first_date": str(row["first_date"]),
+                "last_date": str(row["last_date"]),
+                "avg_posted": round(float(row["avg_posted"]), 1),
+                "avg_predicted": round(float(row["avg_predicted"]), 1),
+                "method": row["prediction_method"],
+            })
+        
+        return jsonify({
+            "count": len(entities),
+            "entities": entities,
+        })
+    except Exception as e:
+        logger.error(f"Error loading entities: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     logger.info("Starting Dashboard API server...")
     logger.info(f"Output base: {get_output_base_path()}")

@@ -24,8 +24,29 @@ import pandas as pd
 DEV_OUTPUT = PROJECT_ROOT / 'pipeline_dev'
 PROD_OUTPUT = Path('/home/wilma/hazeydata/pipeline')
 
-# Test entities - 2 with trained models
-TEST_ENTITIES = ['AK01', 'AK06']  # It's Tough to Be a Bug + Kilimanjaro Safaris
+# Full 37 entity dev set
+TEST_ENTITIES = [
+    # MK - Magic Kingdom
+    'MK01', 'MK02', 'MK07', 'MK08',
+    # EP - Epcot
+    'EP01', 'EP02', 'EP08', 'EP10',
+    # HS - Hollywood Studios
+    'HS01', 'HS02', 'HS06', 'HS09',
+    # AK - Animal Kingdom
+    'AK01', 'AK03', 'AK02', 'AK06',
+    # DL - Disneyland
+    'DL01', 'DL02', 'DL04', 'DL06',
+    # CA - California Adventure
+    'CA01', 'CA02', 'CA07', 'CA10',
+    # IA - Islands of Adventure
+    'IA01', 'IA02',
+    # UF - Universal Studios Florida
+    'UF01', 'UF02', 'UF71',
+    # TDL - Tokyo Disneyland
+    'TDL01', 'TDL02', 'TDL13', 'TDL16',
+    # TDS - Tokyo DisneySea
+    'TDS01', 'TDS02', 'TDS11', 'TDS16',
+]
 
 def print_header(step_name):
     print("\n" + "="*70)
@@ -59,7 +80,7 @@ def run_step_1_etl():
     
     # Look for recent month's data
     for month_dir in sorted(fact_tables_src.glob('202*'))[-3:]:  # Last 3 months
-        for csv_file in month_dir.glob('ak_*.csv'):  # AK park only for test (lowercase filename)
+        for csv_file in month_dir.glob('*.csv'):  # All parks
             try:
                 df = pd.read_csv(csv_file)
                 # Filter to test entities
@@ -222,12 +243,9 @@ def run_step_6_wti():
         else:
             continue
             
-        # Filter to AK park for test entities
-        if 'park_code' in df.columns:
-            df = df[df['park_code'] == 'AK']
-        
+        # Show sample of WTI data
         print(f"✅ WTI file: {wti_file.name}")
-        print_snapshot("Wait Time Index (AK park, recent dates)", df.tail(15))
+        print_snapshot("Wait Time Index (recent dates)", df.tail(15))
         return df
     
     print("⚠️ No WTI file found")

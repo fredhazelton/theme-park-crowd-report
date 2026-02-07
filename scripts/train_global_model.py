@@ -17,11 +17,28 @@ Use cases:
 The global model is saved to: models/_global/model_with_posted.json
 
 ================================================================================
+DATA FILTERING (Critical!)
+================================================================================
+Two filters are applied to limit the training set:
+
+1. **Entity filter**: Only entities that:
+   - Appear in dimEntity (have TouringPlans S3 mapping)
+   - Have actual observations in fact tables
+   - Have >= 500 ACTUAL observations
+
+2. **Row filter**: Only rows that have BOTH:
+   - ACTUAL wait time
+   - Matching POSTED wait time (same entity + park_date)
+
+This dramatically reduces the data volume and focuses training on useful data.
+
+================================================================================
 USAGE
 ================================================================================
   python scripts/train_global_model.py
   python scripts/train_global_model.py --output-base /path/to/pipeline
   python scripts/train_global_model.py --max-rows 1000000  # Limit for testing
+  python scripts/train_global_model.py --min-observations 1000  # Stricter entity filter
 """
 
 from __future__ import annotations
@@ -42,7 +59,8 @@ from zoneinfo import ZoneInfo
 if str(Path(__file__).parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from processors.encoding import encode_features, load_encoding_mappings, save_encoding_mappings
+from processors.encoding import encode_features
+from processors.entity_index import get_trainable_entities
 from processors.features import add_features
 from processors.training import (
     DEFAULT_XGB_PARAMS,
@@ -79,16 +97,48 @@ def setup_logging(output_base: Path) -> logging.Logger:
     return logger
 
 
-def load_all_fact_data(output_base: Path, logger: logging.Logger, max_rows: Optional[int] = None) -> pd.DataFrame:
-    """Load all fact table data from clean CSVs."""
+def load_training_data(
+    output_base: Path,
+    logger: logging.Logger,
+    min_observations: int = 500,
+    max_rows: Optional[int] = None,
+) -> pd.DataFrame:
+    """
+    Load training data with entity and row filtering.
+    
+    Applies two filters:
+    1. Entity filter: Only trainable entities (in dimEntity + have actual data)
+    2. Row filter: Only rows with both ACTUAL and POSTED times
+    
+    Returns a DataFrame ready for feature engineering with columns:
+    - entity_code, observed_at, park_date
+    - observed_wait_time (ACTUAL)
+    - posted_wait_time (matched POSTED)
+    """
+    # Step 1: Get trainable entities
+    trainable_entities = get_trainable_entities(
+        output_base,
+        min_actual_count=min_observations,
+        logger=logger,
+    )
+    
+    if not trainable_entities:
+        logger.error("No trainable entities found!")
+        return pd.DataFrame()
+    
+    logger.info(f"Loading data for {len(trainable_entities)} trainable entities...")
+    
+    # Step 2: Load fact table data for trainable entities only
     fact_dir = output_base / "fact_tables" / "clean"
     
     if not fact_dir.exists():
         logger.error(f"Fact tables directory not found: {fact_dir}")
         return pd.DataFrame()
     
-    all_dfs = []
-    total_rows = 0
+    actual_dfs = []
+    posted_dfs = []
+    total_actual = 0
+    total_posted = 0
     
     # Iterate through year-month directories
     for month_dir in sorted(fact_dir.iterdir()):
@@ -97,30 +147,152 @@ def load_all_fact_data(output_base: Path, logger: logging.Logger, max_rows: Opti
         
         for csv_file in sorted(month_dir.glob("*.csv")):
             try:
-                df = pd.read_csv(csv_file)
-                all_dfs.append(df)
-                total_rows += len(df)
+                df = pd.read_csv(csv_file, low_memory=False)
                 
-                if max_rows and total_rows >= max_rows:
+                # Filter to trainable entities only
+                df = df[df["entity_code"].str.upper().isin(trainable_entities)]
+                
+                if df.empty:
+                    continue
+                
+                # Normalize entity_code to uppercase
+                df["entity_code"] = df["entity_code"].str.upper()
+                
+                # Split into ACTUAL and POSTED
+                df_actual = df[df["wait_time_type"] == "ACTUAL"].copy()
+                df_posted = df[df["wait_time_type"] == "POSTED"].copy()
+                
+                if not df_actual.empty:
+                    actual_dfs.append(df_actual)
+                    total_actual += len(df_actual)
+                
+                if not df_posted.empty:
+                    posted_dfs.append(df_posted)
+                    total_posted += len(df_posted)
+                
+                # Check max_rows limit
+                if max_rows and total_actual >= max_rows:
                     logger.info(f"Reached max_rows limit ({max_rows}), stopping load")
                     break
+                    
             except Exception as e:
                 logger.warning(f"Error reading {csv_file}: {e}")
         
-        if max_rows and total_rows >= max_rows:
+        if max_rows and total_actual >= max_rows:
             break
     
-    if not all_dfs:
-        logger.error("No fact table data found")
+    if not actual_dfs:
+        logger.error("No ACTUAL data found for trainable entities")
         return pd.DataFrame()
     
-    combined = pd.concat(all_dfs, ignore_index=True)
+    logger.info(f"Loaded {total_actual:,} ACTUAL rows, {total_posted:,} POSTED rows")
     
-    if max_rows and len(combined) > max_rows:
-        combined = combined.head(max_rows)
+    # Combine data
+    df_actual = pd.concat(actual_dfs, ignore_index=True)
+    df_posted = pd.concat(posted_dfs, ignore_index=True) if posted_dfs else pd.DataFrame()
     
-    logger.info(f"Loaded {len(combined):,} rows from fact tables")
-    return combined
+    if max_rows and len(df_actual) > max_rows:
+        df_actual = df_actual.head(max_rows)
+        logger.info(f"Limited to {max_rows:,} ACTUAL rows")
+    
+    # Step 3: Add park_date for joining
+    df_actual["observed_at_dt"] = pd.to_datetime(df_actual["observed_at"], utc=True, errors="coerce")
+    df_actual["park_date"] = df_actual["observed_at_dt"].dt.date
+    
+    if df_posted.empty:
+        logger.error("No POSTED data found - cannot train with-POSTED model")
+        return pd.DataFrame()
+    
+    df_posted["observed_at_dt"] = pd.to_datetime(df_posted["observed_at"], utc=True, errors="coerce")
+    df_posted["park_date"] = df_posted["observed_at_dt"].dt.date
+    
+    # Step 4: Join POSTED to ACTUAL using 15-minute window matching
+    # Any POSTED within 15 minutes of ACTUAL is a valid pair
+    # If multiple POSTEDs within 15 min, keep all pairs (creates multiple training rows)
+    logger.info("Joining POSTED values to ACTUAL rows (15-minute window)...")
+    
+    MATCH_WINDOW_MINUTES = 15
+    match_window_ns = MATCH_WINDOW_MINUTES * 60 * 1e9  # nanoseconds
+    
+    # Build lookup dict for POSTED values
+    posted_lookup = {}
+    for (entity, park_date), group in df_posted.groupby(["entity_code", "park_date"]):
+        times = group["observed_at_dt"].values  # numpy datetime64
+        values = group["wait_time_minutes"].values
+        posted_lookup[(entity, park_date)] = (times, values)
+    
+    # Match POSTED to each ACTUAL row - keep all matches within window
+    matched_rows = []
+    
+    for idx, row in df_actual.iterrows():
+        key = (row["entity_code"], row["park_date"])
+        if key not in posted_lookup:
+            continue
+        
+        posted_times, posted_vals = posted_lookup[key]
+        actual_time = row["observed_at_dt"]
+        
+        if pd.isna(actual_time):
+            continue
+        
+        # Find all POSTED times within 15-minute window
+        actual_time_np = np.datetime64(actual_time)
+        time_diffs = np.abs(posted_times.astype('datetime64[ns]') - actual_time_np.astype('datetime64[ns]'))
+        time_diffs_ns = time_diffs.astype('timedelta64[ns]').astype(np.int64)
+        
+        # Get indices of POSTEDs within window
+        within_window = np.where(time_diffs_ns <= match_window_ns)[0]
+        
+        if len(within_window) == 0:
+            continue
+        
+        # Create a row for each valid POSTED match
+        for posted_idx in within_window:
+            posted_value = posted_vals[posted_idx]
+            if pd.notna(posted_value) and posted_value > 0:
+                new_row = row.copy()
+                new_row["posted_wait_time"] = float(posted_value)
+                matched_rows.append(new_row)
+    
+    if not matched_rows:
+        logger.error("No ACTUAL/POSTED pairs found within 15-minute window")
+        return pd.DataFrame()
+    
+    # Combine matched rows and deduplicate
+    df_matched = pd.DataFrame(matched_rows)
+    
+    # Dedupe: keep unique combinations of entity_code, observed_at, posted_wait_time
+    before_dedupe = len(df_matched)
+    df_matched = df_matched.drop_duplicates(
+        subset=["entity_code", "observed_at", "posted_wait_time"]
+    )
+    
+    logger.info(f"Matched {len(df_matched):,} ACTUAL/POSTED pairs within {MATCH_WINDOW_MINUTES}-min window "
+                f"(from {len(df_actual):,} ACTUAL rows, {before_dedupe - len(df_matched):,} dupes removed)")
+    
+    # Step 5: Prepare training dataset
+    df_training = df_matched.reset_index(drop=True)  # Reset index for feature engineering
+    
+    logger.info(f"Training dataset: {len(df_training):,} rows with both ACTUAL and POSTED")
+    
+    if len(df_training) < 1000:
+        logger.error(f"Not enough training data ({len(df_training)} rows, need at least 1000)")
+        return pd.DataFrame()
+    
+    # Rename columns for compatibility with feature engineering
+    df_training["observed_wait_time"] = df_training["wait_time_minutes"]
+    
+    # Clean up temporary columns
+    df_training = df_training.drop(columns=["observed_at_dt"], errors="ignore")
+    
+    # Log entity distribution
+    entity_counts = df_training["entity_code"].value_counts()
+    logger.info(f"Data spans {len(entity_counts)} entities")
+    logger.info(f"Top 5 entities by row count:")
+    for entity, count in entity_counts.head().items():
+        logger.info(f"  {entity}: {count:,} rows")
+    
+    return df_training
 
 
 def train_global_model(
@@ -128,34 +300,17 @@ def train_global_model(
     output_base: Path,
     logger: logging.Logger,
 ) -> dict:
-    """Train global model on all entity data."""
+    """Train global model on filtered training data."""
     
     if xgb is None:
         logger.error("XGBoost not installed. Run: pip install xgboost")
         return {}
     
-    logger.info(f"Loaded {len(df):,} total rows from fact tables")
+    logger.info(f"Starting training with {len(df):,} rows...")
     
-    # CRITICAL OPTIMIZATION: Filter to rows with ACTUAL wait time BEFORE feature engineering
-    # This reduces the dataset from millions to thousands (only ~0.2% have ACTUAL)
-    actual_col = "actual_wait_time" if "actual_wait_time" in df.columns else "ACTUAL"
-    posted_col = "posted_wait_time" if "posted_wait_time" in df.columns else "POSTED"
-    
-    # Filter to rows that have both ACTUAL (target) and POSTED (feature)
-    has_actual = df[actual_col].notna() & (df[actual_col] > 0)
-    has_posted = df[posted_col].notna() & (df[posted_col] > 0)
-    df_filtered = df[has_actual & has_posted].copy()
-    
-    logger.info(f"Filtered to {len(df_filtered):,} rows with both ACTUAL and POSTED wait times")
-    logger.info(f"  (This is {len(df_filtered)/len(df)*100:.2f}% of loaded data)")
-    
-    if len(df_filtered) < 1000:
-        logger.error(f"Not enough training data ({len(df_filtered)} rows, need at least 1000)")
-        return {}
-    
-    # Now run feature engineering on the filtered dataset (much smaller!)
+    # Add features
     logger.info("Adding features...")
-    df_features = add_features(df_filtered, output_base, logger=logger)
+    df_features = add_features(df, output_base, logger=logger)
     
     # Encode categorical features
     logger.info("Encoding features...")
@@ -168,18 +323,25 @@ def train_global_model(
         logger=logger,
     )
     
-    # Prepare training data (ACTUAL target with POSTED as feature)
+    # Prepare training data
+    # NOTE: We set include_posted=False because we already joined POSTED
+    # We'll manually include posted_wait_time as a feature
     logger.info("Preparing training data...")
     try:
         X, y, feature_names = prepare_training_data(
             df_encoded,
-            include_posted=True,
+            include_posted=False,  # We already joined POSTED manually
             target_wait_type="ACTUAL",
             logger=logger,
         )
     except ValueError as e:
         logger.error(f"Failed to prepare training data: {e}")
         return {}
+    
+    # Manually add posted_wait_time as a feature
+    if "posted_wait_time" in df_encoded.columns:
+        X["posted_wait_time"] = df_encoded.loc[X.index, "posted_wait_time"].values
+        feature_names = list(feature_names) + ["posted_wait_time"]
     
     logger.info(f"Training data: {len(X):,} samples, {len(feature_names)} features")
     logger.info(f"Features: {feature_names}")
@@ -227,12 +389,12 @@ def train_global_model(
     logger.info(f"Best iteration: {best_iteration} (of {n_estimators} max)")
     
     # Evaluate on test set
-    y_pred = model.predict(X_test)
-    metrics = evaluate_model(y_test.values, y_pred, logger)
+    metrics = evaluate_model(model, X_test, y_test, logger)
     
     logger.info("Test set metrics:")
     for metric, value in metrics.items():
-        logger.info(f"  {metric}: {value:.4f}")
+        if value is not None:
+            logger.info(f"  {metric}: {value:.4f}")
     
     # Save model
     model_dir = output_base / "models" / "_global"
@@ -249,9 +411,14 @@ def train_global_model(
         "n_training_samples": len(X_train),
         "n_validation_samples": len(X_val),
         "n_test_samples": len(X_test),
+        "n_entities": df["entity_code"].nunique(),
         "best_iteration": best_iteration,
         "features": feature_names,
         "metrics": metrics,
+        "filters_applied": {
+            "entity_filter": "dimEntity AND has_actual_observations",
+            "row_filter": "has_both_actual_and_posted",
+        },
     }
     
     metadata_path = model_dir / "metadata.json"
@@ -278,7 +445,14 @@ def main() -> None:
     parser.add_argument(
         "--max-rows",
         type=int,
-        help="Maximum rows to load (for testing)",
+        help="Maximum ACTUAL rows to load (for testing)",
+    )
+    
+    parser.add_argument(
+        "--min-observations",
+        type=int,
+        default=500,
+        help="Minimum ACTUAL observations per entity (default: 500)",
     )
     
     args = parser.parse_args()
@@ -294,12 +468,20 @@ def main() -> None:
     logger.info("GLOBAL MODEL TRAINING")
     logger.info("=" * 60)
     logger.info(f"Output base: {output_base}")
+    logger.info(f"Min observations per entity: {args.min_observations}")
+    if args.max_rows:
+        logger.info(f"Max rows: {args.max_rows}")
     
-    # Load all fact data
-    df = load_all_fact_data(output_base, logger, max_rows=args.max_rows)
+    # Load training data (with entity and row filtering)
+    df = load_training_data(
+        output_base,
+        logger,
+        min_observations=args.min_observations,
+        max_rows=args.max_rows,
+    )
     
     if df.empty:
-        logger.error("No data to train on")
+        logger.error("No training data available")
         sys.exit(1)
     
     # Train global model
