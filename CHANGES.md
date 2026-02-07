@@ -4,6 +4,29 @@ This document tracks significant changes to the Theme Park Wait Time Data Pipeli
 
 ## Recent Changes
 
+### WTI Status Update (2026-02-07)
+
+**Status** (`wti/wti.csv`):
+- **34,905 total rows** — one WTI value per park per day
+- **Historical**: 34,177 rows (2009-03-02 → 2026-02-06)
+  - `historical_actual`: 22,244 rows
+  - `historical_posted`: 11,930 rows
+- **Future**: 728 rows (AK only, 2026-02-07 → 2028-02-04)
+
+**Coverage by Park**:
+| Park | Historical | Future | Notes |
+|------|------------|--------|-------|
+| AK | 5,859 ✅ | 728 ✅ | Complete |
+| CA | 5,284 | 0 ❌ | Needs forecast |
+| DL | 5,366 | 0 ❌ | Needs forecast |
+| EP | 5,880 | 0 ❌ | Needs forecast |
+| HS | 5,875 | 0 ❌ | Needs forecast |
+| MK | 5,913 | 0 ❌ | Needs forecast |
+
+**Gap**: Forecast curves only generated for AK. Other parks need forecast generation before WTI can include future dates.
+
+---
+
 ### Julia Hybrid Pipeline (2026-02-07)
 
 **Added** (`scripts/hybrid_pipeline.py`):
