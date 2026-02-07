@@ -1,16 +1,16 @@
 {
   "current_step": "ETL",
-  "etl_progress": "Processing...",
+  "etl_progress": "1/36 (3%) [2026-02-07]",
   "steps": {
-    "etl": "failed",
+    "etl": "pending",
     "dimensions": "pending",
     "aggregates": "pending",
     "report": "pending"
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "--",
+    "last_fetch": "06:01:04",
     "samples": []
   },
-  "last_updated": "2026-02-07T06:00:02.019436-05:00"
+  "last_updated": "2026-02-07T06:05:01.205270-05:00"
 }
