@@ -8,7 +8,7 @@ This document describes the complete data flow through the theme park wait time 
 ---
 
 ## Overview
-
+##TODO - We also collect priority times, identified as wait_time_type = "PRIORITY"
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         DATA FLOW PIPELINE                              │
@@ -45,7 +45,7 @@ This document describes the complete data flow through the theme park wait time 
 | `observed_at` | timestamp | When the observation was recorded |
 | `observed_at_ts` | timestamp | UTC timestamp |
 | `park_date` | date | Operating date (may differ from calendar date) |
-| `wait_time_type` | string | `POSTED` or `ACTUAL` |
+| `wait_time_type` | string | `POSTED` or `ACTUAL` | ##TODO also PRIORITY
 | `wait_time_minutes` | int | Wait time in minutes |
 
 ### Sample Data
@@ -64,7 +64,7 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 - **Date range:** 2009-03-02 to present
 - **POSTED rows:** ~90 million
 - **ACTUAL rows:** ~2.5 million
-
+##TODO add stats for priority here too
 ---
 
 ## Stage 2: Matched Pairs
@@ -77,7 +77,7 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 
 1. Find all ACTUAL observations
 2. For each ACTUAL, find all POSTED for same entity + park_date within ±15 minutes
-3. Select the POSTED with smallest time difference
+3. Select the POSTED with smallest time difference ##TODO I'd prefer to keep all unique observations that meet the 15-minute window, not the smallest difference
 4. Add time-based features for training
 
 ### Columns
@@ -89,11 +89,13 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 | `park_date` | date | Operating date |
 | `actual_time` | float | Actual wait time (target variable) |
 | `posted_time` | float | Posted wait time (feature) |
-| `hour_of_day` | int | Hour (0-23) |
+| `hour_of_day` | int | Hour (0-23) | ##TODO In my experiecne hour of day is not a mediocre predictor at best - we can keep it
 | `mins_since_6am` | int | Minutes since 6 AM |
 | `day_of_week` | int | Day of week (0=Monday) |
 | `month` | int | Month (1-12) |
 | `is_weekend` | int | 1 if Saturday/Sunday |
+##TODO day of week, month, is_weekend can all be replaced by date_group_id - you shoudl have the spec for that
+##TODO add predictors season and season_year, you should also have spec for that
 
 ### Sample Data
 
@@ -130,11 +132,17 @@ For each entity with ≥500 matched pairs:
     1. Load matched pairs for entity
     2. Split 85% train / 15% validation (chronological)
     3. Train XGBoost regressor:
-       - Features: posted_time, mins_since_6am, hour_of_day, day_of_week, month, is_weekend
+       - Features: posted_time, mins_since_6am, hour_of_day, day_of_week, month, is_weekend ##TODO update this
        - Target: actual_time
        - Early stopping after 20 rounds without improvement
     4. Save model as JSON
 ```
+
+##TODO Add in the model specs here, including number of trees, size of node, etc, all the hyper parameters
+##TODO IS the training using the geo decay weights?
+##TODO We will want to add alternate models for testing so it will be important to track them
+##TODO Call this model XGBOOST_BASE_MODEL and make sure that label gets applied to the files or datasets (as a column) somehow
+##TODO As we make other alternates we will label them accordingly e.g. XGBOOST_NO_GEODECAY_WEIGHT
 
 ### Performance
 - **Entities trained:** 150
@@ -188,6 +196,8 @@ entity_code  park_date  posted_time  predicted_actual prediction_method
        MK01 2026-02-05           55         43.542458             model
        MK01 2026-02-05           55         43.672344             model
 ```
+##TODO Predicted actuals shoudl alwasy be roudned to the nearest integer
+##TODO Predicted posteds should be rounded to nearest 5 minutes (if we ever predict posteds we will need this logic)
 
 Note: Same posted_time (55) yields slightly different predictions based on time-of-day features.
 
@@ -215,6 +225,8 @@ Verification: `4.1 / 5 = 0.82`, `45.1 / 55 = 0.82`, etc.
 ## Stage 5: Future Forecasts
 
 **Purpose:** Generate 2-year forward predictions at 5-minute resolution.
+##TODO Make sure we use park hours stored in dimParkhours for future predictions, these can change daily
+##TODO Any features change from previous days' predictions, this needs to trigger a re-scoring
 
 **Location:** `/home/wilma/hazeydata/pipeline/curves/forecast_parquet/all_forecasts.parquet`  
 **Script:** `scripts/forecast_vectorized.py`
@@ -307,6 +319,8 @@ For forecasts, we don't just use the overall average posted time. Instead:
 
 This preserves the natural daily pattern of wait times.
 
+##TODO we shoudl add the date group id to this - 
+##TODO so we compute avergae POSTED for each (entity, time_slot, date_group_id) to get a better estimate, then take 82% 
 ---
 
 ## Data Volumes Summary
