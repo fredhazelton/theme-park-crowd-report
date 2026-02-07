@@ -75,6 +75,7 @@ def step1_create_matched_pairs(logger) -> int:
     # Paths for dimension tables
     dategroupid_path = DIMENSION_DIR / "dimdategroupid.csv"
     season_path = DIMENSION_DIR / "dimseason.csv"
+    parkhours_path = DIMENSION_DIR / "dimparkhours.csv"
     
     if not dategroupid_path.exists():
         logger.error(f"dimdategroupid.csv not found: {dategroupid_path}")
@@ -82,6 +83,8 @@ def step1_create_matched_pairs(logger) -> int:
     if not season_path.exists():
         logger.error(f"dimseason.csv not found: {season_path}")
         return 0
+    if not parkhours_path.exists():
+        logger.warning(f"dimparkhours.csv not found: {parkhours_path} - mins_since_open will be NULL")
     
     # Calculate reference date for geo decay
     today = date.today()
@@ -125,6 +128,15 @@ def step1_create_matched_pairs(logger) -> int:
                 season_year
             FROM read_csv('{season_path}', AUTO_DETECT=TRUE)
         ),
+        parkhours AS (
+            SELECT 
+                park,
+                CAST(date AS DATE) as park_date,
+                EXTRACT(HOUR FROM CAST(opening_time AS TIMESTAMP)) as open_hour,
+                EXTRACT(MINUTE FROM CAST(opening_time AS TIMESTAMP)) as open_minute
+            FROM read_csv('{parkhours_path}', AUTO_DETECT=TRUE)
+            WHERE opening_time IS NOT NULL
+        ),
         matched AS (
             SELECT 
                 a.entity_code,
@@ -165,11 +177,15 @@ def step1_create_matched_pairs(logger) -> int:
                 dg.date_group_id,
                 s.season,
                 s.season_year,
+                ph.open_hour,
+                ph.open_minute,
                 -- Geo decay: 0.5^(days_since / 730)
                 POWER(0.5, (DATE '{today}' - CAST(bm.park_date AS DATE))::DOUBLE / {GEO_DECAY_HALFLIFE_DAYS}.0) as geo_decay_weight
             FROM best_match bm
             LEFT JOIN dategroupid dg ON bm.park_date = dg.park_date
             LEFT JOIN season s ON bm.park_date = s.park_date
+            LEFT JOIN parkhours ph ON UPPER(SUBSTRING(bm.entity_code, 1, 2)) = UPPER(ph.park) 
+                                   AND bm.park_date = ph.park_date
             WHERE bm.rn = 1
         )
         SELECT 
@@ -183,9 +199,16 @@ def step1_create_matched_pairs(logger) -> int:
             season,
             season_year,
             geo_decay_weight,
-            -- Time features (still useful)
+            -- Time features
             EXTRACT(HOUR FROM observed_at_ts) as hour_of_day,
-            (EXTRACT(HOUR FROM observed_at_ts) - 6) * 60 + EXTRACT(MINUTE FROM observed_at_ts) as mins_since_6am
+            (EXTRACT(HOUR FROM observed_at_ts) - 6) * 60 + EXTRACT(MINUTE FROM observed_at_ts) as mins_since_6am,
+            -- Minutes since park open (NULL if no park hours data)
+            CASE 
+                WHEN open_hour IS NOT NULL THEN
+                    (EXTRACT(HOUR FROM observed_at_ts) - open_hour) * 60 + 
+                    (EXTRACT(MINUTE FROM observed_at_ts) - open_minute)
+                ELSE NULL
+            END as mins_since_open
         FROM with_dims
         WHERE date_group_id IS NOT NULL
           AND season IS NOT NULL
@@ -231,8 +254,36 @@ def step1_create_matched_pairs(logger) -> int:
     df.to_parquet(output_path, index=False)
     
     elapsed = time.time() - start
+    # Calculate dynamic fallback ratios per entity
+    logger.info("  Computing dynamic fallback ratios...")
+    ratio_df = df.groupby('entity_code').agg(
+        actual_sum=('actual_time', 'sum'),
+        posted_sum=('posted_time', 'sum'),
+        count=('actual_time', 'count')
+    ).reset_index()
+    
+    # Global average ratio
+    global_ratio = ratio_df['actual_sum'].sum() / ratio_df['posted_sum'].sum()
+    
+    # Per-entity ratio (use global if < 50 samples)
+    ratio_df['fallback_ratio'] = ratio_df.apply(
+        lambda row: row['actual_sum'] / row['posted_sum'] if row['count'] >= 50 else global_ratio,
+        axis=1
+    )
+    
+    # Save fallback ratios
+    fallback_ratios = dict(zip(ratio_df['entity_code'], ratio_df['fallback_ratio']))
+    fallback_ratios['__global__'] = global_ratio
+    
+    ratios_path = OUTPUT_BASE / "state" / "fallback_ratios.json"
+    with open(ratios_path, 'w') as f:
+        json.dump(fallback_ratios, f, indent=2)
+    logger.info(f"  Global fallback ratio: {global_ratio:.3f}")
+    logger.info(f"  Per-entity ratios: {len([r for r in ratio_df['count'] if r >= 50])} entities with ≥50 samples")
+    logger.info(f"  Saved ratios to: {ratios_path}")
+    
     logger.info(f"  Saved to: {output_path}")
-    logger.info(f"  Features: posted_time, mins_since_6am, hour_of_day, date_group_id, season, season_year")
+    logger.info(f"  Features: posted_time, mins_since_6am, mins_since_open, hour_of_day, date_group_id, season, season_year")
     logger.info(f"  Weights: geo_decay_weight (half-life={GEO_DECAY_HALFLIFE_DAYS} days)")
     logger.info(f"  ⏱️  Matched pairs: {elapsed:.1f}s")
     

@@ -24,6 +24,7 @@ const MODEL_LABEL = "XGBOOST_BASE_MODEL"
 const FEATURE_COLS_V2 = [
     :posted_time,
     :mins_since_6am,
+    :mins_since_open,
     :hour_of_day,
     :date_group_id_encoded,
     :season_encoded,
@@ -39,10 +40,12 @@ function train_single_entity_v2(entity_code::String, matched_df::DataFrame, mode
         return nothing, "Not enough samples ($(nrow(entity_df)))"
     end
     
-    # Build feature matrix
+    # Build feature matrix (handle NULL mins_since_open with 0)
+    mins_since_open = coalesce.(entity_df.mins_since_open, 0.0)
     X = Matrix{Float32}(hcat(
         Float32.(entity_df.posted_time),
         Float32.(entity_df.mins_since_6am),
+        Float32.(mins_since_open),
         Float32.(entity_df.hour_of_day),
         Float32.(entity_df.date_group_id_encoded),
         Float32.(entity_df.season_encoded),
@@ -79,9 +82,9 @@ function train_single_entity_v2(entity_code::String, matched_df::DataFrame, mode
     
     # Train XGBoost with specified hyperparameters
     bst = xgboost(dtrain;
-                  num_round=500,
+                  num_round=2000,
                   watchlist=watchlist,
-                  max_depth=6,
+                  max_depth=10,
                   eta=0.1,
                   min_child_weight=1,
                   subsample=0.8,
@@ -113,8 +116,8 @@ function train_single_entity_v2(entity_code::String, matched_df::DataFrame, mode
         "uses_geo_decay_weights" => true,
         "geo_decay_halflife_days" => 730,
         "hyperparameters" => Dict(
-            "num_round" => 500,
-            "max_depth" => 6,
+            "num_round" => 2000,
+            "max_depth" => 10,
             "eta" => 0.1,
             "min_child_weight" => 1,
             "subsample" => 0.8,
@@ -165,7 +168,7 @@ function main()
     println("  Loaded $(nrow(matched_df)) pairs in $(round(time() - load_start, digits=1))s")
     
     # Check for required columns
-    required_cols = [:posted_time, :mins_since_6am, :hour_of_day, 
+    required_cols = [:posted_time, :mins_since_6am, :mins_since_open, :hour_of_day, 
                      :date_group_id_encoded, :season_encoded, :season_year_encoded,
                      :geo_decay_weight, :actual_time, :entity_code]
     
