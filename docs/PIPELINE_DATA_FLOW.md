@@ -82,6 +82,8 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 ## Stage 2: Matched Pairs (V2)
 
 **Purpose:** Pair each ACTUAL observation with the closest POSTED observation within a 15-minute window, enriched with calendar features.
+##TODO: For historical observtions this only needs to be perfomred once. Once we generate pairs of POSTED and ACTUAL, we do not need to pair the same obs in the next run. Only new observations will need to be paired.
+
 
 **Location:** `/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs_v2.parquet`  
 **Script:** `scripts/hybrid_pipeline_v2.py`
@@ -92,6 +94,7 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 2. For each ACTUAL, find all POSTED for same entity + park_date within ±15 minutes
 3. Select the POSTED with smallest time difference (best temporal match)
 4. Join with `dimdategroupid` and `dimseason` for calendar features
+##TODO Join with dimparkhours for mins_since_open feature
 5. Calculate geo decay weight based on observation age
 6. Label-encode categorical features
 
@@ -113,6 +116,7 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 | `geo_decay_weight` | float | Training weight: `0.5^(days_old / 730)` |
 | `hour_of_day` | int | Hour (0-23) |
 | `mins_since_6am` | int | Minutes since 6 AM |
+##TODO add mins_since_open 
 
 ### Geo Decay Weight Formula
 
@@ -166,8 +170,8 @@ entity_code  park_date  actual_time  posted_time  date_group_id    season  geo_d
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `num_round` | 500 | Maximum boosting rounds |
-| `max_depth` | 6 | Maximum tree depth |
+| `num_round` | 500 | Maximum boosting rounds | ##TODO I'd like to do MAX 2000 for accuracy 
+| `max_depth` | 6 | Maximum tree depth | ##TODO MAX 10
 | `eta` | 0.1 | Learning rate |
 | `min_child_weight` | 1 | Minimum child weight |
 | `subsample` | 0.8 | Row subsampling |
@@ -176,7 +180,7 @@ entity_code  park_date  actual_time  posted_time  date_group_id    season  geo_d
 | `early_stopping_rounds` | 20 | Early stopping patience |
 
 ### Training Logic
-
+##TODO - Note that training also only needs to be done on entities with new data - but the WHOLE dataset of observations must be retrained for that entity
 ```
 For each entity with ≥500 matched pairs:
     1. Load matched pairs for entity
@@ -239,7 +243,7 @@ For each POSTED observation:
         predicted_actual = ROUND(model.predict(features))  # Integer
         method = "model"
     ELSE:
-        predicted_actual = ROUND(posted_time × 0.82)  # Integer
+        predicted_actual = ROUND(posted_time × 0.82)  # Integer ##TODO we should calculate the ratio dynamically rather than using 82% hard coded
         method = "fallback"
 ```
 
@@ -266,7 +270,7 @@ entity_code  park_date  posted_time  predicted_actual prediction_method        m
        MK01 2026-02-05           60                48             model  XGBOOST_BASE_MODEL
 ```
 
-### Sample Data (Fallback - 82% Rule)
+### Sample Data (Fallback - 82% Rule) ##TODO we should calculate the ratio dynamically rather than using 82% hard coded
 
 ```
 entity_code  park_date  posted_time  predicted_actual prediction_method      model_label
