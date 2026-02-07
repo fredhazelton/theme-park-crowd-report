@@ -94,8 +94,8 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 2. For each ACTUAL, find all POSTED for same entity + park_date within ±15 minutes
 3. Select the POSTED with smallest time difference (best temporal match)
 4. Join with `dimdategroupid` and `dimseason` for calendar features
-##TODO Join with dimparkhours for mins_since_open feature
-5. Calculate geo decay weight based on observation age
+5. Join with `dimparkhours` for park opening time
+6. Calculate geo decay weight based on observation age
 6. Label-encode categorical features
 
 ### Columns
@@ -116,7 +116,7 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 | `geo_decay_weight` | float | Training weight: `0.5^(days_old / 730)` |
 | `hour_of_day` | int | Hour (0-23) |
 | `mins_since_6am` | int | Minutes since 6 AM |
-##TODO add mins_since_open 
+| `mins_since_open` | int | Minutes since park opened (from dimparkhours) |
 
 ### Geo Decay Weight Formula
 
@@ -170,8 +170,8 @@ entity_code  park_date  actual_time  posted_time  date_group_id    season  geo_d
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `num_round` | 500 | Maximum boosting rounds | ##TODO I'd like to do MAX 2000 for accuracy 
-| `max_depth` | 6 | Maximum tree depth | ##TODO MAX 10
+| `num_round` | 2000 | Maximum boosting rounds |
+| `max_depth` | 10 | Maximum tree depth |
 | `eta` | 0.1 | Learning rate |
 | `min_child_weight` | 1 | Minimum child weight |
 | `subsample` | 0.8 | Row subsampling |
@@ -195,18 +195,18 @@ For each entity with ≥500 matched pairs:
 | Metric | Value |
 |--------|-------|
 | Entities trained | 141 |
-| Training time | 69 seconds |
-| Average MAE | 7.86 minutes |
+| Training time | 83 seconds |
+| Average MAE | 7.89 minutes |
 | Uses geo decay | ✅ Yes |
 
 ### Full Pipeline Timing (V2)
 
 | Step | Time | Output |
 |------|------|--------|
-| Matched Pairs (DuckDB) | 76s | 2,393,511 pairs |
-| Training (Julia) | 83s | 141 models |
+| Matched Pairs (DuckDB) | 78s | 2,393,511 pairs |
+| Training (Julia) | 97s | 141 models |
 | Scoring (Python) | 179s | 89,942,244 predictions |
-| **Total** | **338s (~5.6 min)** | ✅ |
+| **Total** | **354s (~5.9 min)** | ✅ |
 
 ### Model Versioning
 
@@ -225,7 +225,7 @@ Model metadata (`metadata_julia_v2.json`) includes:
 
 ### Entities Without Models
 
-Entities with <500 matched pairs use the **82% fallback rule** (see below).
+Entities with <500 matched pairs use the **dynamic fallback rule** (see below).
 
 ---
 
@@ -243,7 +243,9 @@ For each POSTED observation:
         predicted_actual = ROUND(model.predict(features))  # Integer
         method = "model"
     ELSE:
-        predicted_actual = ROUND(posted_time × 0.82)  # Integer ##TODO we should calculate the ratio dynamically rather than using 82% hard coded
+        # Use per-entity ratio if ≥50 samples, else global ratio (0.678)
+        ratio = entity_ratio if entity_samples >= 50 else global_ratio
+        predicted_actual = ROUND(posted_time × ratio)  # Integer
         method = "fallback"
 ```
 
@@ -270,7 +272,7 @@ entity_code  park_date  posted_time  predicted_actual prediction_method        m
        MK01 2026-02-05           60                48             model  XGBOOST_BASE_MODEL
 ```
 
-### Sample Data (Fallback - 82% Rule) ##TODO we should calculate the ratio dynamically rather than using 82% hard coded
+### Sample Data (Fallback - Dynamic Ratio)
 
 ```
 entity_code  park_date  posted_time  predicted_actual prediction_method      model_label
@@ -348,18 +350,33 @@ entity_code  park_date time_slot  predicted_actual prediction_method        mode
 
 ---
 
-## The 82% Fallback Rule
+## The Dynamic Fallback Rule
 
-### Why 82%?
+### How It Works
 
-Historical analysis shows that **ACTUAL wait times are approximately 82% of POSTED wait times** on average.
+Fallback ratios are calculated dynamically from matched pairs data:
+- **Per-entity ratio**: If entity has ≥50 matched pairs, use `actual_sum / posted_sum`
+- **Global ratio**: If entity has <50 pairs, use global average (currently **0.678**)
+
+The global ratio of 0.678 means ACTUAL wait times are approximately **68% of POSTED** on average.
 
 ### Application by Scenario
 
 | Scenario | What We Know | Calculation |
 |----------|--------------|-------------|
-| **Historical** | Actual POSTED observed | `predicted = ROUND(posted × 0.82)` |
-| **Forecast** | No POSTED yet | `predicted = ROUND(avg_posted_for_slot_and_dategroupid × 0.82)` |
+| **Historical** | Actual POSTED observed | `predicted = ROUND(posted × entity_ratio)` |
+| **Forecast** | No POSTED yet | `predicted = ROUND(avg_posted × entity_ratio)` |
+
+### Fallback Ratios File
+
+Ratios are stored in `state/fallback_ratios.json`:
+```json
+{
+  "MK01": 0.72,
+  "AK07": 0.65,
+  "__global__": 0.678
+}
+```
 
 ### Improved Fallback (V2)
 
@@ -369,6 +386,10 @@ For forecasts, we compute average POSTED using:
 - **date_group_id** (calendar pattern)
 
 This preserves both the daily pattern AND the calendar pattern (holidays vs. regular days).
+
+**Statistics (2026-02-07):**
+- 219 entities with per-entity ratios (≥50 samples)
+- Global fallback ratio: 0.678
 
 ---
 
