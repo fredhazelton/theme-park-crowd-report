@@ -4,6 +4,43 @@ Critical review of the proposed ACTUAL-curve and WTI methodology, plus a detaile
 
 ---
 
+## Current Implementation Status (2026-02-07)
+
+### ✅ What's Working
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| **WTI Table** | ✅ Complete | `wti/wti.csv` — 34,905 rows |
+| **Historical WTI** | ✅ Complete | 2009-03-02 → 2026-02-06 (34,177 rows) |
+| **Sources** | ✅ Complete | `historical_actual` (22,244), `historical_posted` (11,930) |
+| **Daily Granularity** | ✅ Complete | One WTI value per park per day |
+
+### ⚠️ Gaps to Address
+
+| Issue | Parks Affected | Action Needed |
+|-------|----------------|---------------|
+| **Future forecasts missing** | CA, DL, EP, HS, MK | Generate forecast curves, then recalculate WTI |
+| **AK-only future WTI** | Others missing | AK has 728 future days (to 2028-02-04); others stop at 2026-02-01 |
+
+### WTI Coverage by Park
+
+| Park | Historical Days | Future Days | Last Date |
+|------|-----------------|-------------|-----------|
+| AK | 5,859 ✅ | 728 ✅ | 2028-02-04 |
+| CA | 5,284 | **0** ❌ | 2026-02-01 |
+| DL | 5,366 | **0** ❌ | 2026-02-01 |
+| EP | 5,880 | **0** ❌ | 2026-02-01 |
+| HS | 5,875 | **0** ❌ | 2026-02-01 |
+| MK | 5,913 | **0** ❌ | 2026-02-01 |
+
+### Next Steps
+
+1. **Generate forecast curves** for CA, DL, EP, HS, MK (same process used for AK)
+2. **Run WTI calculation** to pick up new forecast curves
+3. **Verify** all parks have ~2 years of future WTI
+
+---
+
 ## 1. Stated Purposes
 
 1. **Historical ACTUAL curves** — For every attraction, park, and day in the past: compute the full ACTUAL wait-time curve by modeling the relationship between POSTED (and possibly PRIORITY) and ACTUAL, using features such as minutes since 6am, minutes since park open, date_group_id, season, season_year, and others.
