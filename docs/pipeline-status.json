@@ -1,5 +1,5 @@
 {
-  "current_step": "TRAINING",
+  "current_step": "FORECAST",
   "etl_progress": "36/36 (100%) [2026-02-08]",
   "steps": {
     "etl": "done",
@@ -9,8 +9,8 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "08:19:12",
+    "last_fetch": "08:24:15",
     "samples": []
   },
-  "last_updated": "2026-02-08T08:20:01.472132-05:00"
+  "last_updated": "2026-02-08T08:25:01.330417-05:00"
 }
