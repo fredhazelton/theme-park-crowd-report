@@ -9,33 +9,33 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "16:34:48",
+    "last_fetch": "16:36:22",
     "samples": [
+      {
+        "name": "MK45",
+        "wait": "5"
+      },
+      {
+        "name": "MK191",
+        "wait": "90"
+      },
+      {
+        "name": "MK44",
+        "wait": "10"
+      },
       {
         "name": "MK43",
         "wait": "25"
       },
       {
-        "name": "MK21",
-        "wait": "20"
-      },
-      {
-        "name": "MK06",
-        "wait": "35"
-      },
-      {
-        "name": "MK26",
+        "name": "MK40",
         "wait": "10"
       },
       {
-        "name": "MK177",
-        "wait": "10"
-      },
-      {
-        "name": "Space Mountain",
+        "name": "MK39",
         "wait": "20"
       }
     ]
   },
-  "last_updated": "2026-02-08T16:35:01.367854-05:00"
+  "last_updated": "2026-02-08T16:40:01.169383-05:00"
 }
