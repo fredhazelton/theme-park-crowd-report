@@ -1,5 +1,5 @@
 {
-  "current_step": "FORECAST",
+  "current_step": "WTI",
   "etl_progress": "36/36 (100%) [2026-02-08]",
   "steps": {
     "etl": "done",
@@ -9,11 +9,15 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "09:01:05",
+    "last_fetch": "09:06:08",
     "samples": [
       {
         "name": "MK45",
         "wait": "5"
+      },
+      {
+        "name": "MK191",
+        "wait": "45"
       },
       {
         "name": "MK44",
@@ -21,21 +25,17 @@
       },
       {
         "name": "MK43",
-        "wait": "10"
+        "wait": "15"
       },
       {
         "name": "MK39",
         "wait": "5"
       },
       {
-        "name": "MK06",
-        "wait": "30"
-      },
-      {
-        "name": "MK34",
-        "wait": "5"
+        "name": "MK96",
+        "wait": "15"
       }
     ]
   },
-  "last_updated": "2026-02-08T09:05:02.065823-05:00"
+  "last_updated": "2026-02-08T09:10:01.826196-05:00"
 }
