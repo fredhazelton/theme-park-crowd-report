@@ -1,5 +1,7 @@
 #!/bin/bash
 # sync_s3_data.sh - Sync TouringPlans S3 wait_times and fastpass_times to local storage
+# Ensure aws CLI is in PATH (for cron jobs)
+export PATH="$HOME/.local/bin:$PATH"
 #
 # Run before ETL so the pipeline reads from local files (reliable, resumable).
 # Used by run_daily_pipeline.sh; can also run on a schedule (e.g. 5:30 AM before pipeline).

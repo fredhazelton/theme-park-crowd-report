@@ -77,6 +77,39 @@ Full daily pipeline order:
 
 ---
 
+## Design Decision: Full Retrain Daily
+
+At 2.5 minutes for a complete training run, **incremental model updates aren't worth the complexity**.
+
+The daily cron does a full retrain every morning:
+- Fresh matched pairs from all historical data
+- All 141 models rebuilt from scratch
+- No stale model drift, no incremental edge cases
+
+**Simple > Clever** when the simple approach takes under 3 minutes.
+
+---
+
+## Why Julia is So Fast
+
+The 67-second training time (vs 10+ minutes in Python) comes from several factors:
+
+| Factor | Python XGBoost | Julia XGBoost |
+|--------|----------------|---------------|
+| **GIL** | Global Interpreter Lock blocks true parallelism | No GIL — real parallel execution |
+| **Compilation** | Interpreted with C extension calls | JIT-compiles to native code |
+| **XGBoost bindings** | scikit-learn wrapper adds overhead | Direct libxgboost bindings |
+| **Loop overhead** | Python loops are slow | Loops run at C speed |
+
+**The hybrid approach:** Each language does what it's best at:
+- **Python/DuckDB** → SQL heavy-lifting (vectorized joins across 120M rows)
+- **Julia/XGBoost.jl** → Training (parallel model fitting with no GIL)
+- **Python** → Scoring & API (ecosystem integration)
+
+This is why 141 models train in 67 seconds — Julia bypasses all the Python overhead and trains models truly in parallel.
+
+---
+
 ## Technical Details
 
 ### Step 1: Matched Pairs (Python/DuckDB)

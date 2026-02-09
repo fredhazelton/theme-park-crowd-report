@@ -32,6 +32,7 @@ SKIP_FORECAST=false
 SKIP_WTI=false
 SKIP_DROPBOX_CHECK=false
 SKIP_SYNC=false
+SKIP_IF_UNCHANGED=false
 PARK=""
 
 while [[ $# -gt 0 ]]; do
@@ -80,6 +81,10 @@ while [[ $# -gt 0 ]]; do
             SKIP_SYNC=true
             shift
             ;;
+        --skip-if-unchanged)
+            SKIP_IF_UNCHANGED=true
+            shift
+            ;;
         --park)
             PARK="$2"
             shift 2
@@ -101,6 +106,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-wti             Skip WTI calculation"
             echo "  --skip-dropbox-check   Do not force-quit Dropbox (use if output_base is not on Dropbox)"
             echo "  --skip-sync             Skip S3 sync (use existing local raw data)"
+            echo "  --skip-if-unchanged    Skip training/forecast/WTI if data hasn't changed (fast incremental mode)"
             echo "  --park PARK            Run training, forecast, and WTI for one park only (e.g. MK, EP, AK, BB)"
             exit 0
             ;;
@@ -274,9 +280,13 @@ fi
 if $SKIP_TRAINING; then
     log_info "=== Hybrid training V2 (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
+elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check training 2>/dev/null; then
+    log_info "=== Hybrid training V2 (skipped - unchanged) ==="
+    $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
 else
     if run_step "Hybrid training V2 (Julia + geo decay)" $PYTHON scripts/hybrid_pipeline_v2.py --skip-scoring; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
+        $PYTHON scripts/pipeline_state.py update training 2>/dev/null || true
     else
         FAILED_ANY=true
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training failed 2>/dev/null || true
@@ -288,9 +298,13 @@ fi
 if $SKIP_FORECAST; then
     log_info "=== Forecast (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
+elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check forecast 2>/dev/null; then
+    log_info "=== Forecast (skipped - unchanged) ==="
+    $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
 else
     if run_step "Forecast (vectorized)" $PYTHON scripts/forecast_vectorized.py --days 730; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
+        $PYTHON scripts/pipeline_state.py update forecast 2>/dev/null || true
     else
         FAILED_ANY=true
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast failed 2>/dev/null || true
@@ -302,9 +316,13 @@ fi
 if $SKIP_WTI; then
     log_info "=== WTI (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti done 2>/dev/null || true
+elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check wti 2>/dev/null; then
+    log_info "=== WTI (skipped - unchanged) ==="
+    $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti done 2>/dev/null || true
 else
     if run_step "WTI" $PYTHON scripts/calculate_wti_simple.py --output-base "$OUTPUT_BASE"; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti done 2>/dev/null || true
+        $PYTHON scripts/pipeline_state.py update wti 2>/dev/null || true
     else
         FAILED_ANY=true
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti failed 2>/dev/null || true
