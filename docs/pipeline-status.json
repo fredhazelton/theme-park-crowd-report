@@ -1,16 +1,16 @@
 {
-  "current_step": "WTI",
-  "etl_progress": "Processing...",
+  "current_step": "ETL",
+  "etl_progress": "1/6 (17%) [2026-02-09]",
   "steps": {
-    "etl": "done",
-    "dimensions": "done",
-    "aggregates": "done",
-    "report": "done"
+    "etl": "pending",
+    "dimensions": "pending",
+    "aggregates": "pending",
+    "report": "pending"
   },
   "queue_times": {
     "status": "Active",
     "last_fetch": "--",
     "samples": []
   },
-  "last_updated": "2026-02-09T06:00:01.166098-05:00"
+  "last_updated": "2026-02-09T06:05:02.051265-05:00"
 }
