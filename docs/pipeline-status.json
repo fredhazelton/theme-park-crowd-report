@@ -1,5 +1,5 @@
 {
-  "current_step": "FORECAST",
+  "current_step": "TRAINING",
   "etl_progress": "6/6 (100%) [2026-02-09]",
   "steps": {
     "etl": "done",
@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "11:48:58",
+    "last_fetch": "11:52:50",
     "samples": [
       {
         "name": "MK45",
@@ -29,7 +29,7 @@
       },
       {
         "name": "MK01",
-        "wait": "40"
+        "wait": "25"
       },
       {
         "name": "MK40",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-09T11:50:01.319079-05:00"
+  "last_updated": "2026-02-09T11:55:01.272319-05:00"
 }
