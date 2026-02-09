@@ -228,12 +228,25 @@ else
     fi
 fi
 
+# 2b. Impute park hours (fills missing future park hours using donor pool)
+# Runs after dimensions because it needs dimparkhours + dimdategroupid
+if $SKIP_DIMENSIONS; then
+    log_info "=== Impute park hours (skipped - dimensions skipped) ==="
+else
+    if run_step "Impute park hours" $PYTHON scripts/impute_park_hours.py --output-base "$OUTPUT_BASE"; then
+        :
+    else
+        FAILED_ANY=true
+        $STOP_ON_ERROR && exit 1
+    fi
+fi
+
 # 3. Posted aggregates
 if $SKIP_AGGREGATES; then
     log_info "=== Posted aggregates (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step aggregates done 2>/dev/null || true
 else
-    if run_step "Posted aggregates" $PYTHON scripts/build_posted_aggregates.py --output-base "$OUTPUT_BASE"; then
+    if run_step "Posted aggregates (fast)" $PYTHON scripts/build_posted_aggregates_fast.py --output-base "$OUTPUT_BASE"; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step aggregates done 2>/dev/null || true
     else
         FAILED_ANY=true
@@ -276,7 +289,7 @@ if $SKIP_FORECAST; then
     log_info "=== Forecast (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
 else
-    if run_step "Forecast" $PYTHON scripts/generate_forecast.py --output-base "$OUTPUT_BASE" ${PARK:+--park "$PARK"}; then
+    if run_step "Forecast (vectorized)" $PYTHON scripts/forecast_vectorized.py --days 730; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
     else
         FAILED_ANY=true

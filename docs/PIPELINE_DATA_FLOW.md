@@ -1,8 +1,57 @@
 # Pipeline Data Flow - Complete Documentation
 
 **Created:** 2026-02-07  
-**Updated:** 2026-02-07 (V2 with geo decay, date_group_id, season)  
+**Updated:** 2026-02-08 (Production pipeline fixes)  
 **Author:** Wilma
+
+---
+
+## ⚠️ DAILY CRON - CRITICAL INFO (READ THIS FIRST!)
+
+The daily cron runs at **6:00 AM ET** via `run_daily_pipeline.sh`.
+
+### ✅ Correct Scripts for Each Step
+
+| Step | Script | Time | Notes |
+|------|--------|------|-------|
+| S3 Sync | `sync_s3_data.sh` | ~10s | Has `export PATH="$HOME/.local/bin:$PATH"` for AWS CLI |
+| Aggregates | **`build_posted_aggregates_fast.py`** | **~7s** | Uses monthly parquet files (NOT CSVs!) |
+| Training | `hybrid_pipeline_v2.py --skip-scoring` | ~80s | Julia XGBoost |
+| Forecast | **`forecast_vectorized.py --days 730`** | **~8 min** | 159M predictions |
+
+### ❌ DO NOT USE — These are slow/broken:
+
+| Script | Problem | Use Instead |
+|--------|---------|-------------|
+| `generate_forecast.py` | Non-vectorized, takes hours | `forecast_vectorized.py` |
+| `build_posted_aggregates.py` | Scans 50K CSVs, crashes/takes 30+ min | `build_posted_aggregates_fast.py` |
+| `hybrid_pipeline.py` | V1, outdated | `hybrid_pipeline_v2.py` |
+
+### Known Issues (2026-02-08)
+1. **WTI step fails** — Looks for curves in wrong location. Needs path fix. (Non-critical)
+
+### Fixes Applied (2026-02-08)
+1. ✅ **AWS CLI PATH** — Added `export PATH="$HOME/.local/bin:$PATH"` to `sync_s3_data.sh`
+2. ✅ **Aggregates** — Switched to `build_posted_aggregates_fast.py` (reads 202 parquet files, not 50K CSVs)
+3. ✅ **Forecast** — Switched to `forecast_vectorized.py` (159M predictions in 8 min)
+
+### Full Pipeline Timing (Production)
+
+| Step | Script | Time |
+|------|--------|------|
+| S3 Sync | `sync_s3_data.sh` | ~10s |
+| ETL | (incremental) | ~1 min |
+| Dimensions | (incremental) | ~30s |
+| **Impute Park Hours** | `impute_park_hours.py` | **~1s** |
+| Aggregates | `build_posted_aggregates_fast.py` | **7s** |
+| Report | | ~1s |
+| Training | `hybrid_pipeline_v2.py` | **80s** |
+| Forecast | `forecast_vectorized.py` | **8 min** |
+| **TOTAL** | | **~10-12 min** |
+
+*Previously took 8+ hours before optimizations.*
+
+---
 
 This document describes the complete data flow through the theme park wait time prediction pipeline, with sample data at each stage.
 
@@ -34,9 +83,16 @@ This document describes the complete data flow through the theme park wait time 
 
 ## Stage 1: Raw Fact Tables
 
-**Source:** S3 historical data + Queue-Times live scraper  
-**Location:** `/home/wilma/hazeydata/pipeline/fact_tables/parquet/*.parquet`  
-**Format:** Parquet (columnar, compressed)
+**Source:** S3 historical data + Queue-Times live scraper
+
+### Storage Locations (TWO FORMATS!)
+
+| Format | Location | Size | Files | Use For |
+|--------|----------|------|-------|---------|
+| **Parquet (monthly)** | `fact_tables/parquet/*.parquet` | 611 MB | 202 | ✅ Aggregates, fast queries |
+| CSV (daily) | `fact_tables/clean/{YYYY-MM}/*.csv` | 5.4 GB | 50K | ETL output, raw backup |
+
+**⚠️ IMPORTANT:** Always use the parquet files for queries. Scanning 50K CSVs is slow and crashes.
 
 ### Columns
 
@@ -431,19 +487,50 @@ Seasons: `WINTER`, `SPRING`, `SUMMER`, `SUMMER_PEAK`, `FALL`, `THANKSGIVING`, `C
 | `park_code` | string | MK |
 | `opening_time` | string | 09:00 |
 | `closing_time` | string | 22:00 |
+| `donor_date` | date | 2025-02-07 |
 
 **Note:** Park hours can change daily. Forecasts should be re-generated when hours change.
+
+#### Park Hours Imputation
+
+**Script:** `scripts/impute_park_hours.py`  
+**Runs after:** Dimension fetches (needs dimparkhours + dimdategroupid)
+
+Future dates often lack official park hours. The imputation process fills these gaps:
+
+1. **Primary method (date_group_id match):**
+   - Find all historical dates with same `date_group_id` that have park hours
+   - Weight by recency: ≤1 year = 1.0, 2-4 years = 0.8→0.4, 5+ years = 0.1
+   - Select the weighted mode (most common hours combo)
+   - Store the donor date for tracking
+
+2. **Fallback (12-month mode):**
+   - For dates with no matching date_group_id donors
+   - Use the mode park hours from the last 12 months for that park
+
+**Outputs:**
+- `dimparkhours.csv` — Updated with imputed hours (donor_date populated)
+- `parkhours_donations.csv` — Accuracy tracking log
+
+**Accuracy tracking:** When official hours become available, compare against donated hours to measure imputation accuracy.
+
+| Metric | Value |
+|--------|-------|
+| Typical imputed rows | ~10,000 |
+| Processing time | ~0.6s |
 
 ---
 
 ## Data Volumes Summary
 
-| Stage | Rows | Size | Format |
-|-------|------|------|--------|
-| Fact Tables | 120M | 640 MB | Parquet |
-| Matched Pairs (V2) | 2.4M | ~120 MB | Parquet |
-| Historical Predictions | 90M | 1.4 GB | Parquet |
-| Future Forecasts | 159M | 44 MB | Parquet |
+| Stage | Rows | Size | Format | Notes |
+|-------|------|------|--------|-------|
+| Fact Tables (parquet) | 120M | 611 MB | Parquet | ✅ 202 monthly files |
+| Fact Tables (CSV) | 120M | 5.4 GB | CSV | ⚠️ 50K files, don't scan |
+| Matched Pairs (V2) | 2.4M | ~120 MB | Parquet | ✅ Single file |
+| Historical Predictions | 90M | 1.4 GB | Parquet | ✅ |
+| Future Forecasts | 159M | 44 MB | Parquet | ✅ Single file |
+| Posted Aggregates | 1.7M | 19 MB | Parquet | ✅ 7s rebuild |
 
 ---
 
@@ -463,14 +550,59 @@ All data is served via REST API at `http://localhost:8051`:
 
 ## Scripts Reference
 
+### ✅ Production Scripts (USE THESE)
+
 | Script | Purpose | Time |
 |--------|---------|------|
-| `scripts/hybrid_pipeline_v2.py` | Full V2 pipeline (pairs + training + scoring) | ~5.6 min |
-| `scripts/hybrid_pipeline_v2.py --skip-scoring` | Pairs + training only | ~2.7 min |
-| `scripts/score_historical.py` | Score all historical POSTED | ~3 min |
-| `scripts/forecast_vectorized.py` | Generate 2-year forecasts | ~8 min |
+| `scripts/impute_park_hours.py` | Fill missing future park hours from donor pool | **~1s** |
+| `scripts/build_posted_aggregates_fast.py` | Build aggregates from parquet | **~7s** |
+| `scripts/hybrid_pipeline_v2.py --skip-scoring` | Matched pairs + Julia training | **~2.5 min** |
+| `scripts/forecast_vectorized.py --days 730` | Generate 2-year forecasts (159M predictions) | **~8 min** |
 
-**Daily cron (6am):** Runs `run_daily_pipeline.sh` which calls `hybrid_pipeline_v2.py`
+### ❌ DO NOT USE (Slow/Broken)
+
+| Script | Problem |
+|--------|---------|
+| `build_posted_aggregates.py` | Scans 50K CSVs, crashes |
+| `generate_forecast.py` | Non-vectorized, takes hours |
+| `hybrid_pipeline.py` | V1, use V2 instead |
+
+### Other Scripts
+
+| Script | Purpose | Time | Notes |
+|--------|---------|------|-------|
+| `scripts/hybrid_pipeline_v2.py` | Full V2 pipeline (pairs + training + scoring) | ~5.6 min | |
+| `scripts/score_historical.py` | Score all historical POSTED | ~3 min | |
+| `scripts/generate_forecast.py` | ❌ SLOW forecast | Hours | **DO NOT USE in cron** |
+
+### Daily Cron (6:00 AM ET)
+
+**File:** `scripts/run_daily_pipeline.sh`
+
+```bash
+# Order of operations:
+1. S3 Sync             # sync_s3_data.sh (needs PATH fix for AWS CLI)
+2. ETL                 # Incremental parquet updates
+3. Dimensions          # dimdategroupid, dimseason, dimparkhours
+4. Impute Park Hours   # impute_park_hours.py - fills missing future hours
+5. Posted Aggregates   # build_posted_aggregates_fast.py (~7s)
+6. Report              # wait_time_db_report.md
+7. Training            # hybrid_pipeline_v2.py --skip-scoring (Julia, ~80s)
+8. Forecast            # forecast_vectorized.py --days 730 (~8 min)
+9. WTI                 # ⚠️ BROKEN - path issue
+```
+
+**Total time:** ~10-12 minutes
+
+| Step | Time |
+|------|------|
+| S3 Sync | ~10s |
+| ETL | ~1 min |
+| Dimensions | ~30s |
+| **Impute Park Hours** | **~1s** |
+| **Aggregates (fast)** | **~7s** |
+| Training (Julia) | ~80s |
+| Forecast (vectorized) | ~8 min |
 
 ---
 
