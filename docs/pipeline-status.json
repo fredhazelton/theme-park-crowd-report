@@ -1,6 +1,6 @@
 {
   "current_step": "WTI",
-  "etl_progress": "36/36 (100%) [2026-02-08]",
+  "etl_progress": "Processing...",
   "steps": {
     "etl": "done",
     "dimensions": "done",
@@ -12,5 +12,5 @@
     "last_fetch": "--",
     "samples": []
   },
-  "last_updated": "2026-02-09T05:55:01.312109-05:00"
+  "last_updated": "2026-02-09T06:00:01.166098-05:00"
 }
