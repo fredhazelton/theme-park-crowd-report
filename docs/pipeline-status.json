@@ -1,5 +1,5 @@
 {
-  "current_step": "FORECAST",
+  "current_step": "WTI",
   "etl_progress": "6/6 (100%) [2026-02-09]",
   "steps": {
     "etl": "done",
@@ -9,8 +9,8 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "06:20:31",
+    "last_fetch": "06:25:33",
     "samples": []
   },
-  "last_updated": "2026-02-09T06:25:01.862736-05:00"
+  "last_updated": "2026-02-09T06:30:01.914809-05:00"
 }
