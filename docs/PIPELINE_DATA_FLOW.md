@@ -1,7 +1,7 @@
 # Pipeline Data Flow - Complete Documentation
 
 **Created:** 2026-02-07  
-**Updated:** 2026-02-08 (Production pipeline fixes)  
+**Updated:** 2026-02-09 (V2 models, aggregates, imputation, WTI fix)  
 **Author:** Wilma
 
 ---
@@ -348,35 +348,46 @@ entity_code  park_date  posted_time  predicted_actual prediction_method      mod
 
 ---
 
-## Stage 5: Future Forecasts
+## Stage 5: Future Forecasts (V2)
 
-**Purpose:** Generate 2-year forward predictions at 5-minute resolution.
+**Purpose:** Generate 2-year forward predictions at 5-minute resolution using V2 models.
 
 **Location:** `/home/wilma/hazeydata/pipeline/curves/forecast_parquet/all_forecasts.parquet`  
 **Script:** `scripts/forecast_vectorized.py`
 
-### Forecast Logic
+### V2 Model Features
+
+The V2 forecast uses the same features as V2 training:
+
+| Feature | Type | Description |
+|---------|------|-------------|
+| `posted_time` | float | Estimated from model aggregates |
+| `mins_since_6am` | int | Minutes since 6 AM |
+| `mins_since_open` | int | Minutes since park opening |
+| `hour_of_day` | int | Hour (0-23) |
+| `date_group_id_encoded` | int | Encoded calendar group |
+| `season_encoded` | int | Encoded season |
+| `season_year_encoded` | int | Encoded season+year |
+
+### Forecast Logic (V2)
 
 ```
 For each entity × each date × each 5-minute slot:
-    1. Get park hours from dimparkhours for that date
-    2. Build features (time slot, date_group_id, season, season_year)
+    1. Get park hours from dimparkhours
+    2. Get date_group_id, season, season_year from dimensions
+    3. Encode features using mappings from matched_pairs_v2.parquet
+    4. Estimate posted_time from model_aggregates.parquet
     
-    IF entity has trained model:
+    IF entity has V2 model (model_julia_v2.json):
         predicted_actual = ROUND(model.predict(features))
-        method = "model"
+        method = "model_v2"
+    ELIF aggregate exists for (entity, date_group_id, time_slot):
+        predicted_actual = wait_median from aggregates
+        method = "aggregate"
     ELSE:
-        # Use historical average POSTED for (entity, time_slot, date_group_id)
-        avg_posted = AVERAGE(historical posted for entity + time_slot + date_group_id)
-        predicted_actual = ROUND(avg_posted × 0.82)
-        method = "fallback"
+        predicted_actual = ROUND(posted_estimate × 0.82)
+        method = "fallback_ratio"
 ```
-
-**Key points:**
-- Uses `dimparkhours` for park hours (can change daily)
-- Fallback uses `(entity, time_slot, date_group_id)` for better estimates
-- All predictions rounded to integers
-- If date_group_id changes, re-scoring is triggered
 
 ### Columns
 
@@ -386,28 +397,82 @@ For each entity × each date × each 5-minute slot:
 | `park_date` | date | Future date |
 | `time_slot` | time | 5-minute slot (00:00:00, 00:05:00, ...) |
 | `predicted_actual` | int | Predicted actual wait time (integer) |
-| `prediction_method` | string | `model` or `fallback` |
-| `model_label` | string | Model used for prediction |
+| `prediction_method` | string | `model_v2`, `aggregate`, or `fallback_ratio` |
 
 ### Sample Data
 
 ```
-entity_code  park_date time_slot  predicted_actual prediction_method        model_label
-       AK01 2026-02-08  09:00:00                24             model  XGBOOST_BASE_MODEL
-       AK01 2026-02-08  09:05:00                26             model  XGBOOST_BASE_MODEL
-       AK04 2026-02-08  10:00:00                25          fallback     FALLBACK_82PCT
+entity_code  park_date time_slot  predicted_actual prediction_method
+       AK01 2026-02-10  09:00:00                24          model_v2
+       AK01 2026-02-10  09:05:00                26          model_v2
+       AK04 2026-02-15  09:45:00                10         aggregate
+       AK08 2026-02-10  10:00:00                25    fallback_ratio
 ```
 
 ### Statistics
 
 - **Total predictions:** ~159 million
 - **Date range:** Tomorrow → +2 years (731 days)
-- **Entities:** 757
+- **Entities:** 757 (141 with V2 models, 616 using fallback)
 - **Time slots per day:** 288 (every 5 minutes)
 
 ---
 
-## The Dynamic Fallback Rule
+## Model Aggregates (for Fallback Predictions)
+
+**Purpose:** Provide historical wait time statistics for entities without trained models.
+
+**Script:** `scripts/build_model_aggregates.py`  
+**Location:** `/home/wilma/hazeydata/pipeline/aggregates/model_aggregates.parquet`
+
+### Grouping
+
+Aggregates are computed at:
+- **Entity** (attraction)
+- **date_group_id** (calendar pattern - holidays, weekdays, etc.)
+- **time_slot** (15-minute intervals, 0-95)
+
+### Columns
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `entity_code` | string | Attraction identifier |
+| `date_group_id` | string | Calendar group (e.g., "FEB_WEEK2_TUE") |
+| `time_slot` | int | 15-min slot (0-95, where 0=00:00, 36=09:00) |
+| `hour_of_day` | int | Hour (0-23) |
+| `wait_median` | float | Median wait time |
+| `wait_mean` | float | Mean wait time |
+| `wait_mean_weighted` | float | Geo-decay weighted mean (2yr half-life) |
+| `wait_p25`, `wait_p75` | float | 25th/75th percentiles |
+| `wait_std` | float | Standard deviation |
+| `sample_count` | int | Number of observations |
+| `date_count` | int | Number of unique dates |
+
+### Statistics
+
+| Metric | Value |
+|--------|-------|
+| Total rows | 6,446,321 |
+| Entities | 757 |
+| Date groups | 387 |
+| Time slots | 96 (15-min intervals) |
+| Build time | ~72s |
+| File size | 85 MB |
+
+### Usage in Forecasts
+
+For entities without V2 models, the forecast script uses:
+```
+(entity, date_group_id, time_slot) → wait_median
+```
+
+If no aggregate match exists, falls back to ratio-based method.
+
+---
+
+## The Dynamic Fallback Rule (Legacy)
+
+**Note:** The V2 forecast now uses model aggregates as the primary fallback. The ratio-based method below is the ultimate fallback when no aggregate data exists.
 
 ### How It Works
 
@@ -435,18 +500,15 @@ Ratios are stored in `state/fallback_ratios.json`:
 }
 ```
 
-### Improved Fallback (V2)
+### Fallback Priority (V2 Forecast)
 
-For forecasts, we compute average POSTED using:
-- **Entity** (attraction)
-- **Time slot** (5-minute window)
-- **date_group_id** (calendar pattern)
+1. **V2 Model** — If `model_julia_v2.json` exists, use it
+2. **Aggregate Lookup** — `(entity, date_group_id, time_slot)` → `wait_median`
+3. **Ratio Fallback** — `posted_estimate × 0.82`
 
-This preserves both the daily pattern AND the calendar pattern (holidays vs. regular days).
-
-**Statistics (2026-02-07):**
-- 219 entities with per-entity ratios (≥50 samples)
-- Global fallback ratio: 0.678
+**Statistics (2026-02-09):**
+- 141 entities with V2 models
+- 616 entities using aggregate/ratio fallback
 
 ---
 
@@ -532,6 +594,43 @@ Future dates often lack official park hours. The imputation process fills these 
 | Historical Predictions | 90M | 1.4 GB | Parquet | ✅ |
 | Future Forecasts | 159M | 44 MB | Parquet | ✅ Single file |
 | Posted Aggregates | 1.7M | 19 MB | Parquet | ✅ 7s rebuild |
+| **Model Aggregates** | 6.4M | 85 MB | Parquet | ✅ 72s rebuild |
+| **WTI** | 48K+ | ~1 MB | Parquet | ✅ 2s rebuild |
+
+---
+
+## Wait Time Index (WTI)
+
+**Purpose:** Daily average wait time per park for crowd level analysis.
+
+**Script:** `scripts/calculate_wti_simple.py`  
+**Location:** `/home/wilma/hazeydata/pipeline/wti/wti.parquet`
+
+### Calculation
+
+| Source | Method |
+|--------|--------|
+| **Historical** | Average of entity wait times from fact tables (ACTUAL preferred, POSTED fallback) |
+| **Forecast** | Average of predicted_actual from forecast file |
+
+### Columns
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `park_code` | string | Park identifier (MK, AK, EP, etc.) |
+| `park_date` | date | Date |
+| `wti` | float | Wait Time Index (avg wait across entities) |
+| `n_entities` | int | Number of entities included |
+| `source` | string | `historical` or `forecast` |
+
+### Statistics
+
+| Metric | Value |
+|--------|-------|
+| Historical park-dates | ~48,000 |
+| Parks | 13 |
+| Date range | 2009 to present + 2 years |
+| Build time | ~2s |
 
 ---
 
@@ -556,9 +655,11 @@ All data is served via REST API at `http://localhost:8051`:
 | Script | Purpose | Time |
 |--------|---------|------|
 | `scripts/impute_park_hours.py` | Fill missing future park hours from donor pool | **~1s** |
-| `scripts/build_posted_aggregates_fast.py` | Build aggregates from parquet | **~7s** |
+| `scripts/build_posted_aggregates_fast.py` | Build posted aggregates (hourly) | **~7s** |
+| `scripts/build_model_aggregates.py` | Build model aggregates (15-min, for fallback) | **~72s** |
 | `scripts/hybrid_pipeline_v2.py --skip-scoring` | Matched pairs + Julia training | **~2.5 min** |
-| `scripts/forecast_vectorized.py --days 730` | Generate 2-year forecasts (159M predictions) | **~8 min** |
+| `scripts/forecast_vectorized.py --days 730` | Generate 2-year forecasts (V2 models) | **~40 min** |
+| `scripts/calculate_wti_simple.py` | Calculate Wait Time Index | **~2s** |
 
 ### ❌ DO NOT USE (Slow/Broken)
 
