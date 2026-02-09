@@ -28,7 +28,8 @@ The daily cron runs at **6:00 AM ET** via `run_daily_pipeline.sh`.
 | `hybrid_pipeline.py` | V1, outdated | `hybrid_pipeline_v2.py` |
 
 ### Known Issues (2026-02-08)
-1. **WTI step fails** — Looks for curves in wrong location. Needs path fix. (Non-critical)
+~~1. **WTI step fails** — Looks for curves in wrong location. Needs path fix. (Non-critical)~~
+✅ Fixed 2026-02-09: Created `calculate_wti_simple.py` that works with current data structures.
 
 ### Fixes Applied (2026-02-08)
 1. ✅ **AWS CLI PATH** — Added `export PATH="$HOME/.local/bin:$PATH"` to `sync_s3_data.sh`
@@ -589,7 +590,7 @@ All data is served via REST API at `http://localhost:8051`:
 6. Report              # wait_time_db_report.md
 7. Training            # hybrid_pipeline_v2.py --skip-scoring (Julia, ~80s)
 8. Forecast            # forecast_vectorized.py --days 730 (~8 min)
-9. WTI                 # ⚠️ BROKEN - path issue
+9. WTI                 # calculate_wti_simple.py (~2s)
 ```
 
 **Total time:** ~10-12 minutes

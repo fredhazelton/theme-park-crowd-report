@@ -298,12 +298,12 @@ else
     fi
 fi
 
-# 7. WTI
+# 7. WTI (simplified version that works with current data)
 if $SKIP_WTI; then
     log_info "=== WTI (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti done 2>/dev/null || true
 else
-    if run_step "WTI" $PYTHON scripts/calculate_wti.py --output-base "$OUTPUT_BASE" ${PARK:+--park "$PARK"}; then
+    if run_step "WTI" $PYTHON scripts/calculate_wti_simple.py --output-base "$OUTPUT_BASE"; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti done 2>/dev/null || true
     else
         FAILED_ANY=true
