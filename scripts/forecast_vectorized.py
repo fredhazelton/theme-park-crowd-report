@@ -83,7 +83,7 @@ def generate_time_grid(start_date: date, end_date: date) -> pd.DataFrame:
 
 def forecast_entity(args) -> tuple:
     """Generate forecast for single entity (worker function)."""
-    entity_code, time_grid, models_dir, fallback_ratio, time_slot_lookup = args
+    entity_code, time_grid, models_dir, fallback_ratio, time_slot_lookup, agg_lookup, date_group_lookup = args
     
     try:
         df = time_grid.copy()
@@ -122,13 +122,36 @@ def forecast_entity(args) -> tuple:
             df['predicted_actual'] = predictions
             df['prediction_method'] = 'model'
         else:
-            # No model - use 82% fallback rule with TIME-SLOT SPECIFIC average
-            # Look up average posted for this entity + time slot
-            df['avg_posted'] = df['time_slot'].apply(
-                lambda t: time_slot_lookup.get((entity_code, str(t)), 30.0)
-            )
-            df['predicted_actual'] = df['avg_posted'] * fallback_ratio
-            df['prediction_method'] = 'fallback'
+            # No model - use AGGREGATE-BASED FALLBACK
+            # Look up by entity + date_group_id + time_slot (15-min) → wait_median
+            
+            def get_fallback_prediction(row):
+                park_date = row['park_date']
+                time_slot_5min = row['time_slot']  # e.g., datetime.time(9, 0, 0)
+                
+                # Convert 5-min time slot to 15-min slot index (0-95)
+                hour = time_slot_5min.hour
+                minute = time_slot_5min.minute
+                time_slot_15min = hour * 4 + minute // 15
+                
+                # Get date_group_id for this date
+                date_group_id = date_group_lookup.get(park_date)
+                
+                if date_group_id:
+                    # Try aggregate lookup: (entity, date_group_id, time_slot_15min) → wait_median
+                    agg_key = (entity_code, date_group_id, time_slot_15min)
+                    if agg_key in agg_lookup:
+                        return agg_lookup[agg_key], 'aggregate'
+                
+                # Fallback to old method: time_slot avg × 0.82
+                ts_key = (entity_code, str(time_slot_5min))
+                avg_posted = time_slot_lookup.get(ts_key, 30.0)
+                return avg_posted * fallback_ratio, 'fallback_ratio'
+            
+            # Apply fallback logic
+            results = df.apply(get_fallback_prediction, axis=1)
+            df['predicted_actual'] = results.apply(lambda x: x[0])
+            df['prediction_method'] = results.apply(lambda x: x[1])
         
         # Select output columns
         result = df[['entity_code', 'park_date', 'time_slot', 'predicted_actual', 'prediction_method']].copy()
@@ -184,7 +207,7 @@ def main():
           AND wait_time_minutes > 0
     """).fetchdf()['entity_code'].tolist()
     
-    # Get average posted by entity + time slot (5-min buckets)
+    # Get average posted by entity + time slot (5-min buckets) - for ratio fallback
     logger.info("  Computing average posted by entity + time slot...")
     time_slot_avgs = con.execute(f"""
         SELECT 
@@ -197,7 +220,6 @@ def main():
           AND wait_time_minutes > 0
         GROUP BY entity_code, time_slot
     """).fetchdf()
-    con.close()
     
     # Create lookup dict: {(entity, time_slot): avg_posted}
     time_slot_lookup = {}
@@ -206,6 +228,41 @@ def main():
         time_slot_lookup[key] = row['avg_posted']
     
     logger.info(f"  Loaded {len(time_slot_lookup):,} entity-timeslot averages")
+    
+    # Load model aggregates for better fallback - keep as DataFrame for vectorized merge
+    agg_file = OUTPUT_BASE / "aggregates" / "model_aggregates.parquet"
+    agg_df = None
+    if agg_file.exists():
+        logger.info("  Loading model aggregates for fallback...")
+        agg_df = con.execute(f"""
+            SELECT entity_code, date_group_id, time_slot, wait_median
+            FROM read_parquet('{agg_file}')
+            WHERE wait_median IS NOT NULL
+        """).fetchdf()
+        # Create indexed lookup for fast access
+        agg_df = agg_df.set_index(['entity_code', 'date_group_id', 'time_slot'])
+        agg_lookup = agg_df['wait_median'].to_dict()
+        logger.info(f"  Loaded {len(agg_lookup):,} aggregate entries")
+    else:
+        logger.warning(f"  Model aggregates not found: {agg_file}")
+        agg_lookup = {}
+    
+    # Load date_group_id lookup: date → date_group_id (using vectorized approach)
+    dategroupid_file = OUTPUT_BASE / "dimension_tables" / "dimdategroupid.csv"
+    date_group_lookup = {}
+    if dategroupid_file.exists():
+        logger.info("  Loading date_group_id lookup...")
+        dgid_df = con.execute(f"""
+            SELECT CAST(park_date AS DATE) as park_date, date_group_id
+            FROM read_csv_auto('{dategroupid_file}')
+        """).fetchdf()
+        # Convert pandas Timestamp to datetime.date for consistent lookup
+        date_group_lookup = {pd.Timestamp(k).date(): v for k, v in zip(dgid_df['park_date'], dgid_df['date_group_id'])}
+        logger.info(f"  Loaded {len(date_group_lookup):,} date_group_id mappings")
+    else:
+        logger.warning(f"  dimdategroupid not found: {dategroupid_file}")
+    
+    con.close()
     
     all_entities = entity_list
     
@@ -232,7 +289,7 @@ def main():
     FORECAST_DIR.mkdir(parents=True, exist_ok=True)
     
     work_items = [
-        (entity, time_grid, MODELS_DIR, DEFAULT_FALLBACK_RATIO, time_slot_lookup)
+        (entity, time_grid, MODELS_DIR, DEFAULT_FALLBACK_RATIO, time_slot_lookup, agg_lookup, date_group_lookup)
         for entity in entities
     ]
     
