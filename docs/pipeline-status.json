@@ -9,7 +9,7 @@
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "09:27:25",
+    "last_fetch": "09:32:28",
     "samples": [
       {
         "name": "MK45",
@@ -29,7 +29,7 @@
       },
       {
         "name": "MK01",
-        "wait": "30"
+        "wait": "40"
       },
       {
         "name": "MK40",
@@ -37,5 +37,5 @@
       }
     ]
   },
-  "last_updated": "2026-02-09T09:30:01.761557-05:00"
+  "last_updated": "2026-02-09T09:35:01.617904-05:00"
 }
