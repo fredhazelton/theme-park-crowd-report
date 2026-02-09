@@ -1,16 +1,16 @@
 {
-  "current_step": "DIMENSIONS",
+  "current_step": "FORECAST",
   "etl_progress": "6/6 (100%) [2026-02-09]",
   "steps": {
     "etl": "done",
-    "dimensions": "pending",
-    "aggregates": "pending",
-    "report": "pending"
+    "dimensions": "done",
+    "aggregates": "done",
+    "report": "done"
   },
   "queue_times": {
     "status": "Active",
-    "last_fetch": "06:10:24",
+    "last_fetch": "06:15:27",
     "samples": []
   },
-  "last_updated": "2026-02-09T06:15:01.060934-05:00"
+  "last_updated": "2026-02-09T06:20:01.911077-05:00"
 }
