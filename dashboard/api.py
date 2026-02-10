@@ -363,12 +363,18 @@ def _get_park_hours(park_upper: str, target_date: date) -> tuple[str, str, str]:
     except Exception:
         close_hm = "23:00"
 
-    # Determine source: official (no donor) vs expected (donor date used)
-    has_donor = pd.notna(row.get("donor_date")) and str(row.get("donor_date", "")).strip() != ""
-    if is_nearest or has_donor:
+    # Determine source: official vs expected.
+    # The imputation pipeline copies donor hours into opening_time for all dates,
+    # so we can't distinguish by column presence alone. Use date logic:
+    # - Past/today dates: hours are official (parks publish well in advance)
+    # - Future dates: hours are expected (from donor date projection)
+    # - Nearest-date fallback: always expected
+    if is_nearest:
         hours_source = "expected"
-    else:
+    elif target_date <= date.today():
         hours_source = "official"
+    else:
+        hours_source = "expected"
 
     return (open_hm, close_hm, hours_source)
 
