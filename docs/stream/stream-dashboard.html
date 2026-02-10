@@ -770,58 +770,27 @@
             const ctx = document.getElementById('timeSeriesChart').getContext('2d');
             if (charts.timeSeries) charts.timeSeries.destroy();
             let curve = curveData && curveData.curve ? curveData.curve : [];
-            const actualPoints = curveData && curveData.actual_points ? curveData.actual_points : [];
-            const apiCurveEmpty = curve.length === 0;
-            const hasActualOnly = apiCurveEmpty && actualPoints.length > 0;
-            const isPlaceholder = apiCurveEmpty && actualPoints.length === 0;
-            if (hasActualOnly) {
-                curve = buildCurveFromActualPoints(actualPoints);
-            } else if (curve.length === 0) {
+            const isPlaceholder = curve.length === 0;
+            if (curve.length === 0) {
                 curve = buildPlaceholderCurve();
             } else {
                 curve = sortCurveByParkDay(curve);
             }
             const labels = curve.map(p => p.time_slot);
             const values = curve.map(p => p.avg_wait);
-            const pointBySlot = {};
-            actualPoints.forEach(p => {
-                const t = p.time_slot;
-                if (!pointBySlot[t]) pointBySlot[t] = [];
-                pointBySlot[t].push(p.wait_time_minutes);
-            });
-            const actualValues = labels.map(l => {
-                const arr = pointBySlot[l];
-                if (!arr || arr.length === 0) return null;
-                return arr.reduce((a, b) => a + b, 0) / arr.length;
-            });
-            const allValues = [...values.filter(v => v != null), ...actualValues.filter(v => v != null)];
-            const yMax = allValues.length ? Math.max(60, Math.ceil(Math.max(...allValues) / 10) * 10) : 60;
+            const allValues = values.filter(v => v != null);
+            const yMax = allValues.length ? Math.max(60, Math.ceil(Math.max(...allValues) * 1.15 / 10) * 10) : 60;
             const datasets = [{
-                label: hasActualOnly ? 'Actual wait (observed)' : (isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)'),
+                label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                 data: values,
-                borderColor: hasActualOnly ? '#A60038' : (isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4'),
-                backgroundColor: hasActualOnly ? 'rgba(166, 0, 56, 0.2)' : (isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : 'rgba(74, 144, 164, 0.25)'),
+                borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4',
+                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : 'rgba(74, 144, 164, 0.25)',
                 fill: true,
-                tension: 0.2,
-                pointRadius: hasActualOnly ? 5 : (values.length ? 2 : 0),
-                pointBackgroundColor: hasActualOnly ? '#A60038' : (isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4'),
-                pointBorderColor: hasActualOnly ? 'rgba(233, 244, 255, 0.9)' : (isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4')
+                tension: 0.3,
+                pointRadius: values.length > 40 ? 0 : 2,
+                pointBackgroundColor: '#4a90a4',
+                pointBorderColor: '#4a90a4'
             }];
-            if (actualValues.some(v => v != null) && !hasActualOnly) {
-                datasets.push({
-                    label: 'Actual (observed)',
-                    data: actualValues,
-                    borderColor: '#A60038',
-                    backgroundColor: '#A60038',
-                    fill: false,
-                    tension: 0,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#A60038',
-                    pointBorderColor: 'rgba(233, 244, 255, 0.9)',
-                    pointBorderWidth: 1,
-                    order: 0
-                });
-            }
             charts.timeSeries = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -853,21 +822,15 @@
             const entityLabel = (curveData && curveData.entity_code) ? ' · ' + curveData.entity_code : '';
             if (curveData && curveData._noPark) {
                 sub.textContent = 'Select a park to see the daily wait time curve';
-            } else if (hasActualOnly && curveData && curveData.start_date) {
-                sub.textContent = 'Actual observed · ' + actualPoints.length + ' points · ' + curveData.start_date + entityLabel;
             } else if (isPlaceholder) {
                 sub.textContent = 'No curve data for this park/date';
             } else if (curveData && curveData.start_date && curveData.end_date) {
-                // Determine if date is in the future (forecast) or past (historical)
                 const today = new Date().toISOString().slice(0, 10);
                 const isForecast = curveData.start_date > today;
                 const label = isForecast ? 'Forecast avg wait' : 'Avg actual wait every 5 min';
                 let text = (curveData.start_date === curveData.end_date
                     ? label + ' · ' + curveData.start_date
                     : label + ' · ' + curveData.start_date + ' – ' + curveData.end_date) + entityLabel;
-                if (curveData.actual_points && curveData.actual_points.length > 0) {
-                    text += ' · ' + curveData.actual_points.length + ' actual observed';
-                }
                 sub.textContent = text;
             } else {
                 sub.textContent = 'Avg actual wait every 5 min' + entityLabel;
@@ -944,23 +907,8 @@
                 const curveLen = (data.curve && data.curve.length) || 0;
                 console.log('Daily curve:', url, '→', curveLen, 'points');
                 if (curveLen === 0) console.warn('Daily curve empty — check API has WTI or forecast/backfill curves for this park/date');
-                // When an attraction and single date are selected, fetch raw ACTUAL observations for that day
-                if (attraction && attraction !== 'all' && range.date) {
-                    try {
-                        const ptsUrl = `${API_BASE}/actual-points/${park}?date=${encodeURIComponent(range.date)}&entity_code=${encodeURIComponent(attraction)}`;
-                        const ptsRes = await fetch(ptsUrl);
-                        if (ptsRes.ok) {
-                            const ptsData = await ptsRes.json();
-                            data.actual_points = ptsData.points || [];
-                        } else {
-                            data.actual_points = [];
-                        }
-                    } catch (e) {
-                        data.actual_points = [];
-                    }
-                } else {
-                    data.actual_points = [];
-                }
+                // Actual observations are now merged into the curve by the API
+                // (no separate actual_points fetch needed)
                 updateTimeSeriesChart(data);
             } catch (e) {
                 console.warn('Daily curve load failed:', e.message || e, '(URL:', url + ')');

@@ -477,7 +477,11 @@ def _curve_from_forecasts(park_upper: str, start_d: date, end_d: date,
 
 def _curve_from_model_aggregates(park_upper: str, target_date: date,
                                   entity_code: Optional[str] = None) -> list[dict]:
-    """Build curve from model_aggregates.parquet using date_group_id for the target date."""
+    """Build curve from model_aggregates.parquet using date_group_id for the target date.
+    
+    Model aggregate time_slots are 0-based indices relative to park opening time.
+    Each slot = 5 minutes. We convert to absolute HH:MM using the park's opening time.
+    """
     if not MODEL_AGG_PARQUET.exists():
         return []
     date_str = target_date.isoformat()
@@ -501,7 +505,16 @@ def _curve_from_model_aggregates(park_upper: str, target_date: date,
     """
     try:
         rows = _duckdb_query(sql)
-        return [{"time_slot": _slot_int_to_time(int(r[0])), "avg_wait": round(float(r[1]), 1)} for r in rows]
+        # Convert park-relative slot indices to absolute HH:MM
+        open_hm, _, _ = _get_park_hours(park_upper, target_date)
+        open_parts = open_hm.split(":")
+        open_minutes = int(open_parts[0]) * 60 + int(open_parts[1])
+        
+        def slot_to_abs_time(slot_idx: int) -> str:
+            total = open_minutes + slot_idx * 5
+            return f"{total // 60:02d}:{total % 60:02d}"
+        
+        return [{"time_slot": slot_to_abs_time(int(r[0])), "avg_wait": round(float(r[1]), 1)} for r in rows]
     except Exception as e:
         logger.error("Model aggregates curve failed: %s", e)
         return []
