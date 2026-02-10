@@ -878,7 +878,7 @@
                         x: {
                             display: true,
                             grid: { display: false },
-                            border: { display: false },
+                            border: { display: true, width: 2, color: 'rgba(255, 255, 255, 0.35)' },
                             ticks: { color: '#6a7a8a', font: { size: 9 }, maxTicksLimit: 20 }
                         },
                         y: {
@@ -1088,7 +1088,7 @@
                         x: {
                             display: true,
                             grid: { display: false },
-                            border: { display: false },
+                            border: { display: true, width: 2, color: 'rgba(255, 255, 255, 0.35)' },
                             ticks: { color: '#6a7a8a', font: { size: 9 }, maxTicksLimit: 20 }
                         },
                         y: {
@@ -1426,7 +1426,7 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: '#6a7a8a', font: { size: 9 } } },
+                        x: { grid: { display: false }, border: { display: true, width: 2, color: 'rgba(255, 255, 255, 0.35)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } },
                         y: { grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } }
                     }
                 }
