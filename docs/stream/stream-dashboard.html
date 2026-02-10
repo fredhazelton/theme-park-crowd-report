@@ -393,8 +393,8 @@
                 
                 <div class="chart-panel">
                     <div class="chart-header">
-                        <div class="chart-title">Distribution</div>
-                        <div class="chart-subtitle" id="distribution-subtitle">Historical range</div>
+                        <div class="chart-title">Crowd Gauge</div>
+                        <div class="chart-subtitle" id="distribution-subtitle">How busy is it?</div>
                     </div>
                     <div class="chart-container" style="position:relative;">
                         <canvas id="distributionCanvas"></canvas>
@@ -1260,7 +1260,7 @@
                     drawEmptyDistribution(ctx, canvas, d.error);
                     return;
                 }
-                drawBoxPlot(ctx, canvas, d);
+                drawGauge(ctx, canvas, d);
                 // Update subtitle
                 const sub = document.getElementById('distribution-subtitle');
                 const label = d.entity_name || park.toUpperCase();
@@ -1282,7 +1282,7 @@
             ctx.fillText(msg || 'No data', w / 2, h / 2);
         }
 
-        function drawBoxPlot(ctx, canvas, d) {
+        function drawGauge(ctx, canvas, d) {
             const dpr = window.devicePixelRatio || 1;
             const cssW = canvas.parentElement.clientWidth;
             const cssH = canvas.parentElement.clientHeight;
@@ -1296,134 +1296,156 @@
             const h = cssH;
             ctx.clearRect(0, 0, w, h);
 
-            // Gather values to determine y-scale (no outliers — just the 5-number summary)
-            const allVals = [d.min, d.q1, d.median, d.q3, d.max];
-            if (d.today_value != null) allVals.push(d.today_value);
-            const dataMin = Math.min(...allVals);
-            const dataMax = Math.max(...allVals);
-            const range = dataMax - dataMin || 1;
+            // Use historical min/max as the gauge range
+            const gaugeMin = d.min;
+            const gaugeMax = d.max;
+            const gaugeRange = gaugeMax - gaugeMin || 1;
 
-            // Layout — center the box in the available space
-            const padTop = 20;
-            const padBottom = 20;
-            const padLeft = 55;   // space for labels on the left
-            const padRight = 60;  // space for today indicator label
-            const plotH = h - padTop - padBottom;
-            const boxWidth = Math.min(80, (w - padLeft - padRight) * 0.4);
-            const boxCenterX = padLeft + (w - padLeft - padRight) / 2;
-            const boxLeft = boxCenterX - boxWidth / 2;
+            // Gauge geometry — semicircle
+            const centerX = w / 2;
+            const radius = Math.min(w / 2 - 20, h * 0.42);
+            const centerY = h * 0.55;
+            const arcWidth = radius * 0.22;
+            const startAngle = Math.PI;       // left (180°)
+            const endAngle = 2 * Math.PI;     // right (360°)
 
-            // y mapping: value → pixel (top = high value, bottom = low value)
-            const scaleMin = dataMin - range * 0.08;
-            const scaleMax = dataMax + range * 0.08;
-            function yOf(val) {
-                return padTop + plotH * (1 - (val - scaleMin) / (scaleMax - scaleMin));
-            }
+            // ── Draw gauge arc segments (gradient from cool to hot) ──
+            const segments = 60;
+            for (let i = 0; i < segments; i++) {
+                const t1 = i / segments;
+                const t2 = (i + 1) / segments;
+                const a1 = startAngle + t1 * Math.PI;
+                const a2 = startAngle + t2 * Math.PI;
 
-            const yMin = yOf(d.min);
-            const yMax = yOf(d.max);
-            const yQ1 = yOf(d.q1);
-            const yQ3 = yOf(d.q3);
-            const yMedian = yOf(d.median);
-
-            // ── Whiskers (vertical line from min to max) ──
-            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(boxCenterX, yMax);
-            ctx.lineTo(boxCenterX, yQ3);
-            ctx.moveTo(boxCenterX, yQ1);
-            ctx.lineTo(boxCenterX, yMin);
-            ctx.stroke();
-
-            // Whisker caps
-            const capW = boxWidth * 0.5;
-            ctx.beginPath();
-            ctx.moveTo(boxCenterX - capW / 2, yMax);
-            ctx.lineTo(boxCenterX + capW / 2, yMax);
-            ctx.moveTo(boxCenterX - capW / 2, yMin);
-            ctx.lineTo(boxCenterX + capW / 2, yMin);
-            ctx.stroke();
-
-            // ── Box (Q1 to Q3) ──
-            ctx.fillStyle = 'rgba(74, 144, 164, 0.3)';
-            ctx.fillRect(boxLeft, yQ3, boxWidth, yQ1 - yQ3);
-            ctx.strokeStyle = '#4a90a4';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(boxLeft, yQ3, boxWidth, yQ1 - yQ3);
-
-            // ── Median line ──
-            ctx.strokeStyle = '#e9f4ff';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.moveTo(boxLeft, yMedian);
-            ctx.lineTo(boxLeft + boxWidth, yMedian);
-            ctx.stroke();
-
-            // ── Labels on the left ──
-            ctx.fillStyle = '#e9f4ff';
-            ctx.font = '11px Inter, sans-serif';
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'middle';
-            const labelX = padLeft - 4;
-
-            // Avoid label overlap: collect labels with y positions, then push apart
-            const labels = [
-                { text: `${Math.round(d.max)}  max`, y: yMax },
-                { text: `${Math.round(d.q3)}  Q3`, y: yQ3 },
-                { text: `${Math.round(d.median)}  med`, y: yMedian },
-                { text: `${Math.round(d.q1)}  Q1`, y: yQ1 },
-                { text: `${Math.round(d.min)}  min`, y: yMin },
-            ];
-            // Simple overlap avoidance: push apart if too close
-            const minGap = 14;
-            for (let i = 1; i < labels.length; i++) {
-                // labels sorted top→bottom (yMax is smallest pixel)
-                if (labels[i].y - labels[i-1].y < minGap) {
-                    labels[i].y = labels[i-1].y + minGap;
+                // Color gradient: cyan → yellow → pink/red
+                let r, g, b;
+                if (t1 < 0.5) {
+                    const t = t1 * 2; // 0→1 within first half
+                    r = Math.round(74 + (240 - 74) * t);
+                    g = Math.round(144 + (192 - 144) * t);
+                    b = Math.round(164 + (64 - 164) * t);
+                } else {
+                    const t = (t1 - 0.5) * 2; // 0→1 within second half
+                    r = Math.round(240 + (166 - 240) * t);
+                    g = Math.round(192 + (0 - 192) * t);
+                    b = Math.round(64 + (56 - 64) * t);
                 }
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, a1, a2 + 0.02);
+                ctx.arc(centerX, centerY, radius - arcWidth, a2 + 0.02, a1, true);
+                ctx.closePath();
+                ctx.fillStyle = `rgba(${r},${g},${b},0.7)`;
+                ctx.fill();
             }
-            labels.forEach(l => {
-                ctx.fillStyle = '#e9f4ff';
-                ctx.fillText(l.text, labelX, l.y);
-            });
 
-            // ── Today value indicator (triangle + value) ──
+            // ── Tick marks along the arc ──
+            const tickCount = 5;
+            ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+            ctx.lineWidth = 1.5;
+            for (let i = 0; i <= tickCount; i++) {
+                const t = i / tickCount;
+                const angle = startAngle + t * Math.PI;
+                const innerR = radius - arcWidth - 4;
+                const outerR = radius + 4;
+                ctx.beginPath();
+                ctx.moveTo(centerX + Math.cos(angle) * innerR, centerY + Math.sin(angle) * innerR);
+                ctx.lineTo(centerX + Math.cos(angle) * outerR, centerY + Math.sin(angle) * outerR);
+                ctx.stroke();
+            }
+
+            // ── Needle for today's value ──
             if (d.today_value != null) {
-                const yToday = yOf(d.today_value);
-                const triX = boxLeft + boxWidth + 14;
-                const triSize = 8;
+                const pct = Math.max(0, Math.min(1, (d.today_value - gaugeMin) / gaugeRange));
+                const needleAngle = startAngle + pct * Math.PI;
+                const needleLen = radius + 8;
+                const needleBase = 12;
 
-                // Draw filled triangle pointing left
+                ctx.save();
+                ctx.translate(centerX, centerY);
+
+                // Needle shadow
+                ctx.shadowColor = 'rgba(0,0,0,0.4)';
+                ctx.shadowBlur = 6;
+
+                // Needle
                 ctx.fillStyle = '#A60038';
                 ctx.beginPath();
-                ctx.moveTo(triX, yToday);
-                ctx.lineTo(triX + triSize, yToday - triSize);
-                ctx.lineTo(triX + triSize, yToday + triSize);
+                ctx.moveTo(
+                    Math.cos(needleAngle) * needleLen,
+                    Math.sin(needleAngle) * needleLen
+                );
+                ctx.lineTo(
+                    Math.cos(needleAngle + Math.PI / 2) * needleBase / 2,
+                    Math.sin(needleAngle + Math.PI / 2) * needleBase / 2
+                );
+                ctx.lineTo(
+                    Math.cos(needleAngle - Math.PI / 2) * needleBase / 2,
+                    Math.sin(needleAngle - Math.PI / 2) * needleBase / 2
+                );
                 ctx.closePath();
                 ctx.fill();
 
-                // Horizontal line from triangle to box
-                ctx.strokeStyle = '#A60038';
-                ctx.lineWidth = 1.5;
-                ctx.setLineDash([3, 3]);
-                ctx.beginPath();
-                ctx.moveTo(boxLeft + boxWidth, yToday);
-                ctx.lineTo(triX, yToday);
-                ctx.stroke();
-                ctx.setLineDash([]);
-
-                // Label
+                // Center hub
+                ctx.shadowBlur = 0;
                 ctx.fillStyle = '#A60038';
-                ctx.font = 'bold 12px Inter, sans-serif';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(`${Math.round(d.today_value)}`, triX + triSize + 5, yToday);
+                ctx.beginPath();
+                ctx.arc(0, 0, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#0a1628';
+                ctx.beginPath();
+                ctx.arc(0, 0, 3, 0, Math.PI * 2);
+                ctx.fill();
 
-                // "today" label below the value
-                ctx.font = '9px Inter, sans-serif';
-                ctx.fillStyle = 'rgba(166, 0, 56, 0.7)';
-                ctx.fillText('today', triX + triSize + 5, yToday + 13);
+                ctx.restore();
+            }
+
+            // ── Big center value ──
+            const displayVal = d.today_value != null ? Math.round(d.today_value) : '--';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#e9f4ff';
+            ctx.font = 'bold 28px Inter, sans-serif';
+            ctx.fillText(displayVal, centerX, centerY + 6);
+
+            // "min" label below
+            ctx.font = '10px Inter, sans-serif';
+            ctx.fillStyle = 'rgba(233, 244, 255, 0.5)';
+            ctx.fillText('minutes', centerX, centerY + 36);
+
+            // ── Endpoint labels ──
+            // Left: Cold January
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.fillStyle = 'rgba(74, 144, 164, 0.9)';
+            const leftLabelX = centerX - radius + 5;
+            const labelY = centerY + 10;
+            ctx.fillText('Cold', leftLabelX, labelY);
+            ctx.fillText('January', leftLabelX, labelY + 13);
+
+            // Right: New Year's Eve
+            ctx.fillStyle = 'rgba(166, 0, 56, 0.9)';
+            const rightLabelX = centerX + radius - 5;
+            ctx.fillText("New Year's", rightLabelX, labelY);
+            ctx.fillText('Eve', rightLabelX, labelY + 13);
+
+            // ── Min/Max values at the ends ──
+            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.fillStyle = 'rgba(233, 244, 255, 0.6)';
+            ctx.textBaseline = 'bottom';
+            ctx.textAlign = 'center';
+            ctx.fillText(Math.round(gaugeMin), centerX - radius, centerY - 4);
+            ctx.fillText(Math.round(gaugeMax), centerX + radius, centerY - 4);
+
+            // ── Percentile label ──
+            if (d.today_value != null) {
+                const pct = Math.max(0, Math.min(100, Math.round(((d.today_value - gaugeMin) / gaugeRange) * 100)));
+                ctx.font = '11px Inter, sans-serif';
+                ctx.fillStyle = 'rgba(233, 244, 255, 0.4)';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(`${pct}th percentile`, centerX, centerY + 50);
             }
         }
         
