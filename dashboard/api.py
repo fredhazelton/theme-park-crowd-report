@@ -1550,6 +1550,125 @@ def get_distribution(park_code: str):
     })
 
 
+# ----- Z-Score Trend -----
+
+@app.route("/api/trend/<park_code>", methods=["GET"])
+def get_trend(park_code: str):
+    """
+    Z-score trend for WTI over time.
+
+    Query params:
+      days       – number of days to return (default 90)
+      date       – end date (default today)
+      property   – property code filter when park_code=all
+
+    Returns: {points: [{date, wti, z_score, seasonal_mean, seasonal_std, label}], park_name}
+    
+    Z-scores are seasonal: each day's WTI is compared against the historical
+    mean/std for that day-of-year (±7 day window for smoothing).
+    """
+    if WTI_DF.empty:
+        return jsonify({"error": "No WTI data loaded"}), 404
+
+    days = int(request.args.get("days", 90))
+    date_str = request.args.get("date", "").strip()
+    prop_code = request.args.get("property", "").strip().lower()
+
+    end_d = date.today()
+    if date_str:
+        try:
+            end_d = date.fromisoformat(date_str)
+        except ValueError:
+            pass
+    start_d = end_d - timedelta(days=days)
+
+    park = _park_upper(park_code)
+
+    # --- Select the relevant WTI rows ---
+    if park == "ALL":
+        if prop_code and prop_code != "all":
+            prop_parks = [code for code, info in PARK_INFO.items()
+                          if info.get("property", "").lower() == prop_code]
+            base_df = WTI_DF[WTI_DF["park_code"].isin(prop_parks)].copy()
+            park_name = PROPERTY_NAMES.get(prop_code, prop_code.upper())
+        else:
+            base_df = WTI_DF.copy()
+            park_name = "All Parks"
+        # Average across parks per day
+        daily = base_df.groupby("park_date")["wti"].mean().reset_index()
+    else:
+        base_df = WTI_DF[WTI_DF["park_code"] == park].copy()
+        park_name = PARK_INFO.get(park, {}).get("name", park)
+        daily = base_df[["park_date", "wti"]].copy()
+
+    if daily.empty:
+        return jsonify({"error": f"No WTI data for {park}"}), 404
+
+    daily = daily.sort_values("park_date").reset_index(drop=True)
+    daily["park_date_dt"] = pd.to_datetime(daily["park_date"])
+    daily["day_of_year"] = daily["park_date_dt"].dt.dayofyear
+
+    # --- Seasonal baseline: mean/std for each day-of-year ±7 day window ---
+    all_doys = daily[["day_of_year", "wti"]].copy()
+    seasonal_stats = {}
+    for doy in range(1, 367):
+        # Window: doy ±7, wrapping around year boundary
+        window_doys = set()
+        for offset in range(-7, 8):
+            d = doy + offset
+            if d < 1:
+                d += 365
+            elif d > 365:
+                d -= 365
+            window_doys.add(d)
+        vals = all_doys.loc[all_doys["day_of_year"].isin(window_doys), "wti"].dropna()
+        if len(vals) >= 5:
+            seasonal_stats[doy] = {"mean": float(vals.mean()), "std": float(vals.std())}
+        else:
+            seasonal_stats[doy] = {"mean": float(vals.mean()) if len(vals) > 0 else 0,
+                                    "std": 1.0}  # fallback
+
+    # --- Calculate z-scores for the requested window ---
+    mask = (daily["park_date"] >= start_d) & (daily["park_date"] <= end_d)
+    window = daily.loc[mask].copy()
+
+    points = []
+    for _, row in window.iterrows():
+        doy = int(row["day_of_year"])
+        ss = seasonal_stats.get(doy, {"mean": 0, "std": 1})
+        wti_val = float(row["wti"])
+        std = ss["std"] if ss["std"] > 0 else 1.0
+        z = (wti_val - ss["mean"]) / std
+
+        # Label for extreme values
+        label = None
+        if z >= 2.0:
+            label = "Unusually Busy"
+        elif z >= 1.5:
+            label = "Above Average"
+        elif z <= -2.0:
+            label = "Unusually Quiet"
+        elif z <= -1.5:
+            label = "Below Average"
+
+        points.append({
+            "date": row["park_date"].isoformat() if hasattr(row["park_date"], "isoformat") else str(row["park_date"]),
+            "wti": round(wti_val, 1),
+            "z_score": round(z, 2),
+            "seasonal_mean": round(ss["mean"], 1),
+            "seasonal_std": round(std, 1),
+            "label": label,
+        })
+
+    return jsonify({
+        "points": points,
+        "park_name": park_name,
+        "start_date": start_d.isoformat(),
+        "end_date": end_d.isoformat(),
+        "n_points": len(points),
+    })
+
+
 # ----- Debug -----
 
 @app.route("/api/debug/entity-table", methods=["GET"])

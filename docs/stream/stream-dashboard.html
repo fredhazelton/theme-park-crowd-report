@@ -420,11 +420,11 @@
                 
                 <div class="chart-panel">
                     <div class="chart-header">
-                        <div class="chart-title">Day of Week</div>
-                        <div class="chart-subtitle">Weekly pattern</div>
+                        <div class="chart-title">Trend Analysis</div>
+                        <div class="chart-subtitle" id="trend-subtitle">Z-score vs seasonal average</div>
                     </div>
                     <div class="chart-container">
-                        <canvas id="weekdayChart"></canvas>
+                        <canvas id="trendChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -1697,30 +1697,165 @@
             });
         }
         
-        function updateWeekdayChart(park) {
-            // TODO: Implement weekday chart with historical data
-            const ctx = document.getElementById('weekdayChart').getContext('2d');
-            if (charts.weekday) charts.weekday.destroy();
-            
-            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            let weekdayData = Array(7).fill(0);
-            
-            charts.weekday = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: dayNames,
-                    datasets: [{ data: weekdayData, backgroundColor: '#4a90a4' }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, border: { display: true, width: 2, color: 'rgba(255, 255, 255, 0.35)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } },
-                        y: { grid: { color: 'rgba(74,144,164,0.1)' }, ticks: { color: '#6a7a8a', font: { size: 9 } } }
-                    }
+        async function updateTrendChart(park) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (charts.trend) charts.trend.destroy();
+
+            // Build API URL with filters
+            const parkCode = park || 'all';
+            const property = document.getElementById('property-filter').value;
+            let url = `${API_BASE}/trend/${parkCode}?days=90`;
+            if (parkCode === 'all' && property && property !== 'all') {
+                url += `&property=${property}`;
+            }
+            // Pass date range if set
+            const params = getDateQueryParams();
+            if (params.end) url += `&date=${params.end}`;
+            if (params.start && params.end) {
+                const d0 = new Date(params.start), d1 = new Date(params.end);
+                const daysDiff = Math.round((d1 - d0) / 86400000);
+                if (daysDiff > 0) url = url.replace(/days=\d+/, `days=${daysDiff}`);
+            }
+
+            try {
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error('trend fetch failed');
+                const data = await resp.json();
+                const points = data.points || [];
+
+                if (points.length === 0) {
+                    document.getElementById('trend-subtitle').textContent = 'No trend data available';
+                    return;
                 }
-            });
+
+                document.getElementById('trend-subtitle').textContent =
+                    `${data.park_name} — ${points.length} days`;
+
+                const labels = points.map(p => p.date);
+                const zScores = points.map(p => p.z_score);
+
+                // Color each bar based on Benedictus scale
+                const barColors = zScores.map(z => {
+                    if (z >= 2.0) return 'rgba(166, 0, 56, 0.9)';      // D10 dark red
+                    if (z >= 1.5) return 'rgba(235, 66, 123, 0.9)';    // D9
+                    if (z >= 1.0) return 'rgba(255, 129, 172, 0.8)';   // D8
+                    if (z >= 0.5) return 'rgba(255, 177, 201, 0.7)';   // D7
+                    if (z > -0.5) return 'rgba(233, 244, 255, 0.4)';   // neutral
+                    if (z > -1.0) return 'rgba(193, 221, 252, 0.7)';   // D5
+                    if (z > -1.5) return 'rgba(152, 196, 242, 0.8)';   // D4
+                    if (z > -2.0) return 'rgba(90, 150, 234, 0.9)';    // D3
+                    return 'rgba(10, 47, 143, 0.9)';                    // D1 dark blue
+                });
+
+                charts.trend = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: zScores,
+                            backgroundColor: barColors,
+                            borderColor: barColors.map(c => c.replace(/[\d.]+\)$/, '1)')),
+                            borderWidth: 1,
+                            borderRadius: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: (items) => {
+                                        const i = items[0].dataIndex;
+                                        const p = points[i];
+                                        return p.date;
+                                    },
+                                    label: (item) => {
+                                        const p = points[item.dataIndex];
+                                        const lines = [
+                                            `WTI: ${p.wti} min`,
+                                            `Seasonal avg: ${p.seasonal_mean} min`,
+                                            `Z-score: ${p.z_score > 0 ? '+' : ''}${p.z_score}`,
+                                        ];
+                                        if (p.label) lines.push(p.label);
+                                        return lines;
+                                    }
+                                }
+                            },
+                            // Draw horizontal reference bands
+                            annotation: undefined,
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                border: { display: true, width: 2, color: 'rgba(255, 255, 255, 0.35)' },
+                                ticks: {
+                                    color: '#6a7a8a',
+                                    font: { size: 8 },
+                                    maxRotation: 45,
+                                    autoSkip: true,
+                                    maxTicksLimit: 10,
+                                    callback: function(val, idx) {
+                                        const d = labels[idx];
+                                        if (!d) return '';
+                                        const parts = d.split('-');
+                                        return `${parts[1]}/${parts[2]}`;
+                                    }
+                                }
+                            },
+                            y: {
+                                grid: { color: 'rgba(74,144,164,0.1)' },
+                                border: { display: false },
+                                ticks: {
+                                    color: '#6a7a8a',
+                                    font: { size: 9 },
+                                    callback: v => v > 0 ? `+${v}` : v
+                                },
+                                suggestedMin: -3,
+                                suggestedMax: 3,
+                            }
+                        }
+                    },
+                    plugins: [{
+                        // Draw zero line + ±2 reference bands
+                        id: 'trendBands',
+                        beforeDraw(chart) {
+                            const { ctx: c, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
+                            
+                            // Zero line
+                            const y0 = y.getPixelForValue(0);
+                            c.save();
+                            c.strokeStyle = 'rgba(233, 244, 255, 0.3)';
+                            c.lineWidth = 1.5;
+                            c.setLineDash([4, 4]);
+                            c.beginPath();
+                            c.moveTo(left, y0);
+                            c.lineTo(right, y0);
+                            c.stroke();
+
+                            // ±2 bands (unusually busy/quiet)
+                            const y2 = y.getPixelForValue(2);
+                            const yN2 = y.getPixelForValue(-2);
+                            c.strokeStyle = 'rgba(166, 0, 56, 0.25)';
+                            c.beginPath();
+                            c.moveTo(left, y2);
+                            c.lineTo(right, y2);
+                            c.stroke();
+                            c.strokeStyle = 'rgba(10, 47, 143, 0.25)';
+                            c.beginPath();
+                            c.moveTo(left, yN2);
+                            c.lineTo(right, yN2);
+                            c.stroke();
+                            c.setLineDash([]);
+                            c.restore();
+                        }
+                    }]
+                });
+            } catch (err) {
+                console.warn('Trend chart error:', err);
+                document.getElementById('trend-subtitle').textContent = 'Trend unavailable';
+            }
         }
         
         async function loadProperties() {
@@ -1894,7 +2029,7 @@
             loadDailyCurve();
             loadDistribution();
             await updateParkCompareChart();
-            updateWeekdayChart(document.getElementById('park-filter').value);
+            updateTrendChart(document.getElementById('park-filter').value);
         }
         
         // Event listeners
@@ -1906,7 +2041,7 @@
             await loadData(); // Load data for the newly selected park
             await populateAttractions(); // Populate attractions for the selected park
             await updateParkCompareChart(); // Refresh Wait by Park with parks for selected property; width auto-adjusts
-            updateWeekdayChart(document.getElementById('park-filter').value);
+            updateTrendChart(document.getElementById('park-filter').value);
             loadDistribution();
         });
         
@@ -1933,7 +2068,7 @@
             await loadData(); // Load data for the selected park (includes daily curve)
             await populateAttractions(); // Populate attractions filtered by the selected park
             await updateParkCompareChart(); // Refresh WTI lollipops
-            updateWeekdayChart(document.getElementById('park-filter').value);
+            updateTrendChart(document.getElementById('park-filter').value);
             loadDistribution();
         });
         
@@ -1959,7 +2094,7 @@
         async function onDateChanged() {
             await loadData();  // KPIs + daily curve + distribution
             await updateParkCompareChart();  // WTI lollipops
-            updateWeekdayChart(document.getElementById('park-filter').value);
+            updateTrendChart(document.getElementById('park-filter').value);
             loadDistribution();
         }
 
@@ -2039,7 +2174,7 @@
             await loadData();
             await populateAttractions();
             await updateParkCompareChart();
-            updateWeekdayChart(document.getElementById('park-filter').value);
+            updateTrendChart(document.getElementById('park-filter').value);
             loadDistribution();
         })();
     </script>
