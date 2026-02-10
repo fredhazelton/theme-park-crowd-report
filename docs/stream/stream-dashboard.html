@@ -888,7 +888,7 @@
                         const meta = chart.getDatasetMeta(0);
                         if (!meta || !meta.data) return;
                         ctx.save();
-                        ctx.font = 'bold 11px Inter, sans-serif';
+                        ctx.font = 'bold 14px Inter, sans-serif';
                         ctx.textAlign = 'center';
                         meta.data.forEach((point, i) => {
                             if (!labelIndices.has(i)) return;
@@ -897,7 +897,7 @@
                             const x = point.x;
                             const y = point.y;
                             // Draw above the point (or below if near top)
-                            const offsetY = y < 30 ? 16 : -10;
+                            const offsetY = y < 40 ? 22 : -18;
                             ctx.fillStyle = '#e9f4ff';
                             ctx.fillText(Math.round(val), x, y + offsetY);
                         });
