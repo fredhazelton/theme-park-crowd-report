@@ -1394,18 +1394,18 @@
     <div class="overlay-element goal-tracker">
         <div class="goal-header">
             <span>FOLLOWER_GOAL</span>
-            <span id="follower-percentage">67%</span>
+            <span id="follower-percentage">0%</span>
         </div>
         <div class="goal-bar">
-            <div class="goal-fill" id="follower-goal-fill" style="width: 67%;"></div>
+            <div class="goal-fill" id="follower-goal-fill" style="width: 0%;"></div>
         </div>
         <div class="goal-stats">
-            <span><span id="follower-count">672</span> / <span id="follower-goal">1000</span></span>
-            <span id="followers-today">+23 today</span>
+            <span><span id="follower-count">0</span> / <span id="follower-goal">5</span></span>
+            <span id="followers-today">+0 today</span>
         </div>
         <div class="recent-follower">
             <span class="label">LATEST:</span>
-            <span class="name" id="recent-follower">DataDragon_42</span>
+            <span class="name" id="recent-follower">—</span>
         </div>
     </div>
     
@@ -1941,24 +1941,29 @@
             }
         }
         
-        function updateFollowerGoal() {
+        function updateFollowerGoal(newFollowerName) {
             const countEl = document.getElementById('follower-count');
+            const goalEl = document.getElementById('follower-goal');
             const percentEl = document.getElementById('follower-percentage');
             const fillEl = document.getElementById('follower-goal-fill');
             const recentEl = document.getElementById('recent-follower');
             const todayEl = document.getElementById('followers-today');
             
+            const goal = parseInt(goalEl.textContent) || 5;
+            
             // Increment follower count
             let count = parseInt(countEl.textContent) + 1;
             countEl.textContent = count;
             
-            // Update percentage
-            let percent = Math.round((count / 1000) * 100);
+            // Update percentage (cap at 100%)
+            let percent = Math.min(100, Math.round((count / goal) * 100));
             percentEl.textContent = percent + '%';
             fillEl.style.width = percent + '%';
             
             // Update recent follower
-            recentEl.textContent = 'DataWizard_42';
+            if (newFollowerName) {
+                recentEl.textContent = newFollowerName;
+            }
             
             // Update today count
             let today = parseInt(todayEl.textContent.replace(/[^0-9]/g, '')) + 1;
@@ -2245,22 +2250,45 @@
         // ═══════════════════════════════════════════════════════════════
         // TWITCH VIEWER COUNT — Poll from twitch-viewers.json
         // ═══════════════════════════════════════════════════════════════
-        async function updateViewerCount() {
+        async function updateTwitchData() {
             try {
                 const res = await fetch(`http://${window.location.hostname}:8888/twitch-viewers.json?_=${Date.now()}`);
                 if (!res.ok) return;
                 const data = await res.json();
-                const el = document.getElementById('viewer-count');
-                if (el && data.viewers != null) {
-                    el.textContent = Number(data.viewers).toLocaleString();
+                
+                // Update viewer count
+                const viewerEl = document.getElementById('viewer-count');
+                if (viewerEl && data.viewers != null) {
+                    viewerEl.textContent = Number(data.viewers).toLocaleString();
+                }
+                
+                // Update follower goal from real data
+                if (data.followers != null) {
+                    const countEl = document.getElementById('follower-count');
+                    const goalEl = document.getElementById('follower-goal');
+                    const percentEl = document.getElementById('follower-percentage');
+                    const fillEl = document.getElementById('follower-goal-fill');
+                    const recentEl = document.getElementById('recent-follower');
+                    
+                    const goal = parseInt(goalEl.textContent) || 5;
+                    const count = data.followers;
+                    countEl.textContent = count;
+                    
+                    const percent = Math.min(100, Math.round((count / goal) * 100));
+                    percentEl.textContent = percent + '%';
+                    fillEl.style.width = percent + '%';
+                    
+                    if (data.latestFollower) {
+                        recentEl.textContent = data.latestFollower;
+                    }
                 }
             } catch (e) {
-                console.warn('Viewer count fetch failed:', e);
+                console.warn('Twitch data fetch failed:', e);
             }
         }
         // Poll every 30 seconds, initial fetch on load
-        document.addEventListener('DOMContentLoaded', updateViewerCount);
-        setInterval(updateViewerCount, 30000);
+        document.addEventListener('DOMContentLoaded', updateTwitchData);
+        setInterval(updateTwitchData, 30000);
     </script>
 </body>
 </html>
