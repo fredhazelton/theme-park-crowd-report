@@ -1769,13 +1769,13 @@
                                     title: (items) => {
                                         const i = items[0].dataIndex;
                                         const p = points[i];
-                                        return p.date;
+                                        return `${p.date}  (${p.date_group_id || ''})`;
                                     },
                                     label: (item) => {
                                         const p = points[item.dataIndex];
                                         const lines = [
                                             `WTI: ${p.wti} min`,
-                                            `Seasonal avg: ${p.seasonal_mean} min`,
+                                            `Seasonal avg: ${p.seasonal_mean} min (${p.n_comparable || 0} similar days)`,
                                             `Z-score: ${p.z_score > 0 ? '+' : ''}${p.z_score}`,
                                         ];
                                         if (p.label) lines.push(p.label);

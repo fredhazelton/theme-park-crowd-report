@@ -1555,17 +1555,19 @@ def get_distribution(park_code: str):
 @app.route("/api/trend/<park_code>", methods=["GET"])
 def get_trend(park_code: str):
     """
-    Z-score trend for WTI over time.
+    Z-score trend for WTI over time, using date_group_id for seasonal comparison.
+
+    Each day's WTI is compared against the historical mean/std of all days
+    sharing the same date_group_id (e.g. FEB_WEEK2_TUE, THANKSGIVING_THU).
+    This captures week-of-month, day-of-week, and holiday patterns across years.
 
     Query params:
       days       – number of days to return (default 90)
       date       – end date (default today)
       property   – property code filter when park_code=all
 
-    Returns: {points: [{date, wti, z_score, seasonal_mean, seasonal_std, label}], park_name}
-    
-    Z-scores are seasonal: each day's WTI is compared against the historical
-    mean/std for that day-of-year (±7 day window for smoothing).
+    Returns: {points: [{date, wti, z_score, seasonal_mean, seasonal_std,
+                         date_group_id, n_comparable, label}], park_name}
     """
     if WTI_DF.empty:
         return jsonify({"error": "No WTI data loaded"}), 404
@@ -1605,28 +1607,21 @@ def get_trend(park_code: str):
         return jsonify({"error": f"No WTI data for {park}"}), 404
 
     daily = daily.sort_values("park_date").reset_index(drop=True)
-    daily["park_date_dt"] = pd.to_datetime(daily["park_date"])
-    daily["day_of_year"] = daily["park_date_dt"].dt.dayofyear
 
-    # --- Seasonal baseline: mean/std for each day-of-year ±7 day window ---
-    all_doys = daily[["day_of_year", "wti"]].copy()
-    seasonal_stats = {}
-    for doy in range(1, 367):
-        # Window: doy ±7, wrapping around year boundary
-        window_doys = set()
-        for offset in range(-7, 8):
-            d = doy + offset
-            if d < 1:
-                d += 365
-            elif d > 365:
-                d -= 365
-            window_doys.add(d)
-        vals = all_doys.loc[all_doys["day_of_year"].isin(window_doys), "wti"].dropna()
-        if len(vals) >= 5:
-            seasonal_stats[doy] = {"mean": float(vals.mean()), "std": float(vals.std())}
-        else:
-            seasonal_stats[doy] = {"mean": float(vals.mean()) if len(vals) > 0 else 0,
-                                    "std": 1.0}  # fallback
+    # --- Attach date_group_id to each WTI row ---
+    daily["date_str"] = daily["park_date"].apply(
+        lambda d: d.isoformat() if hasattr(d, "isoformat") else str(d)
+    )
+    daily["date_group_id"] = daily["date_str"].map(DATE_GROUP_MAP)
+
+    # --- Compute seasonal stats per date_group_id (historical only: before today) ---
+    # Use all historical data (not just the window) for robust baselines
+    hist_mask = daily["park_date"] < date.today()
+    hist = daily.loc[hist_mask & daily["date_group_id"].notna()].copy()
+    group_stats = hist.groupby("date_group_id")["wti"].agg(["mean", "std", "count"])
+    group_stats.columns = ["seasonal_mean", "seasonal_std", "n_comparable"]
+    # Ensure std is never zero/NaN
+    group_stats["seasonal_std"] = group_stats["seasonal_std"].fillna(0).replace(0, 1.0)
 
     # --- Calculate z-scores for the requested window ---
     mask = (daily["park_date"] >= start_d) & (daily["park_date"] <= end_d)
@@ -1634,11 +1629,21 @@ def get_trend(park_code: str):
 
     points = []
     for _, row in window.iterrows():
-        doy = int(row["day_of_year"])
-        ss = seasonal_stats.get(doy, {"mean": 0, "std": 1})
         wti_val = float(row["wti"])
-        std = ss["std"] if ss["std"] > 0 else 1.0
-        z = (wti_val - ss["mean"]) / std
+        dgid = row.get("date_group_id")
+        
+        if dgid and dgid in group_stats.index:
+            ss = group_stats.loc[dgid]
+            s_mean = float(ss["seasonal_mean"])
+            s_std = float(ss["seasonal_std"]) if ss["seasonal_std"] > 0 else 1.0
+            n_comp = int(ss["n_comparable"])
+            z = (wti_val - s_mean) / s_std
+        else:
+            # Fallback: no date_group_id mapped — use overall park mean/std
+            s_mean = float(daily["wti"].mean())
+            s_std = float(daily["wti"].std()) or 1.0
+            n_comp = 0
+            z = (wti_val - s_mean) / s_std
 
         # Label for extreme values
         label = None
@@ -1655,8 +1660,10 @@ def get_trend(park_code: str):
             "date": row["park_date"].isoformat() if hasattr(row["park_date"], "isoformat") else str(row["park_date"]),
             "wti": round(wti_val, 1),
             "z_score": round(z, 2),
-            "seasonal_mean": round(ss["mean"], 1),
-            "seasonal_std": round(std, 1),
+            "seasonal_mean": round(s_mean, 1),
+            "seasonal_std": round(s_std, 1),
+            "date_group_id": dgid or "unknown",
+            "n_comparable": n_comp,
             "label": label,
         })
 
