@@ -791,6 +791,69 @@
                 pointBackgroundColor: '#4a90a4',
                 pointBorderColor: '#4a90a4'
             }];
+            // ── Smart label picker: peaks, valleys, and periodic labels ──
+            function pickLabelIndices(values) {
+                if (!values || values.length < 3) return [];
+                const n = values.length;
+                const selected = new Set();
+                const MIN_GAP = Math.max(6, Math.floor(n / 15)); // min indices apart
+
+                // Find local peaks and valleys (using a window of 5 on each side)
+                const window = 5;
+                const scored = [];
+                for (let i = window; i < n - window; i++) {
+                    if (values[i] == null) continue;
+                    const neighbors = values.slice(Math.max(0, i - window), i + window + 1).filter(v => v != null);
+                    const avg = neighbors.reduce((a, b) => a + b, 0) / neighbors.length;
+                    const diff = Math.abs(values[i] - avg);
+                    const isPeak = neighbors.every(v => values[i] >= v);
+                    const isValley = neighbors.every(v => values[i] <= v);
+                    if (isPeak || isValley) {
+                        scored.push({ idx: i, score: diff, type: isPeak ? 'peak' : 'valley' });
+                    }
+                }
+                // Sort by prominence (biggest diff first)
+                scored.sort((a, b) => b.score - a.score);
+
+                // Add global max and min first
+                let globalMax = 0, globalMin = 0;
+                for (let i = 0; i < n; i++) {
+                    if (values[i] != null) {
+                        if (values[i] > (values[globalMax] || 0)) globalMax = i;
+                        if (values[i] < (values[globalMin] || Infinity)) globalMin = i;
+                    }
+                }
+                selected.add(globalMax);
+                if (Math.abs(globalMin - globalMax) >= MIN_GAP) selected.add(globalMin);
+
+                // Add prominent peaks/valleys respecting MIN_GAP
+                for (const item of scored) {
+                    let tooClose = false;
+                    for (const existing of selected) {
+                        if (Math.abs(item.idx - existing) < MIN_GAP) { tooClose = true; break; }
+                    }
+                    if (!tooClose) selected.add(item.idx);
+                    if (selected.size >= 8) break; // cap extremes
+                }
+
+                // Fill periodic labels in remaining gaps
+                const sortedSelected = Array.from(selected).sort((a, b) => a - b);
+                const PERIODIC_GAP = Math.max(12, Math.floor(n / 6));
+                // Walk the curve and add labels where there are big gaps
+                for (let i = 0; i < n; i += PERIODIC_GAP) {
+                    if (values[i] == null) continue;
+                    let tooClose = false;
+                    for (const existing of selected) {
+                        if (Math.abs(i - existing) < MIN_GAP) { tooClose = true; break; }
+                    }
+                    if (!tooClose) selected.add(i);
+                }
+
+                return selected;
+            }
+
+            const labelIndices = pickLabelIndices(values);
+
             charts.timeSeries = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -804,19 +867,43 @@
                     scales: {
                         x: {
                             display: true,
-                            grid: { color: 'rgba(74,144,164,0.08)' },
+                            grid: { display: false },
+                            border: { display: false },
                             ticks: { color: '#6a7a8a', font: { size: 9 }, maxTicksLimit: 20 }
                         },
                         y: {
                             display: true,
                             min: 0,
                             max: yMax,
-                            grid: { color: 'rgba(74,144,164,0.08)' },
-                            ticks: { color: '#6a7a8a', font: { size: 9 } },
-                            beginAtZero: true
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { display: false }
                         }
                     }
-                }
+                },
+                plugins: [{
+                    id: 'curveDataLabels',
+                    afterDatasetsDraw(chart) {
+                        const ctx = chart.ctx;
+                        const meta = chart.getDatasetMeta(0);
+                        if (!meta || !meta.data) return;
+                        ctx.save();
+                        ctx.font = 'bold 11px Inter, sans-serif';
+                        ctx.textAlign = 'center';
+                        meta.data.forEach((point, i) => {
+                            if (!labelIndices.has(i)) return;
+                            const val = values[i];
+                            if (val == null) return;
+                            const x = point.x;
+                            const y = point.y;
+                            // Draw above the point (or below if near top)
+                            const offsetY = y < 30 ? 16 : -10;
+                            ctx.fillStyle = '#e9f4ff';
+                            ctx.fillText(Math.round(val), x, y + offsetY);
+                        });
+                        ctx.restore();
+                    }
+                }]
             });
             const sub = document.getElementById('chart1-subtitle');
             const entityLabel = (curveData && curveData.entity_code) ? ' · ' + curveData.entity_code : '';
