@@ -1104,7 +1104,28 @@
             });
 
             const sub = document.getElementById('chart1-subtitle');
-            sub.textContent = `Avg wait by park · ${datasets.length} parks`;
+            const property = document.getElementById('property-filter').value;
+            const level = property === 'all' ? 'property' : 'park';
+            sub.textContent = `Avg wait by ${level} · ${datasets.length} ${level}${datasets.length !== 1 ? 's' : ''}`;
+        }
+
+        /** Average multiple park curves into one combined curve */
+        function averageCurves(curves) {
+            const slotSums = {};
+            const slotCounts = {};
+            curves.forEach(curve => {
+                curve.forEach(pt => {
+                    const ts = pt.time_slot;
+                    const val = pt.avg_wait != null ? pt.avg_wait : pt.wait_time_minutes;
+                    if (val != null && val > 0) {
+                        slotSums[ts] = (slotSums[ts] || 0) + val;
+                        slotCounts[ts] = (slotCounts[ts] || 0) + 1;
+                    }
+                });
+            });
+            return Object.keys(slotSums)
+                .sort((a, b) => parkDaySort(a, b))
+                .map(ts => ({ time_slot: ts, avg_wait: slotSums[ts] / slotCounts[ts] }));
         }
 
         async function loadAllParksCurve() {
@@ -1113,39 +1134,64 @@
             const property = document.getElementById('property-filter').value;
 
             try {
-                // 1. Get park list
-                let parksUrl = property === 'all' ? `${API_BASE}/parks` : `${API_BASE}/parks?property=${encodeURIComponent(property)}`;
-                const parksRes = await fetch(parksUrl);
-                const parksList = (await parksRes.json()).parks || [];
+                if (property !== 'all') {
+                    // ── Level 2: Property selected → one line per park ──
+                    const parksRes = await fetch(`${API_BASE}/parks?property=${encodeURIComponent(property)}`);
+                    const parksList = (await parksRes.json()).parks || [];
 
-                // 2. Fetch each park's curve in parallel
-                const results = await Promise.all(parksList.map(async (p) => {
-                    try {
-                        let url = `${API_BASE}/daily-curve/${p.code}?${dateParams}&wait_type=${encodeURIComponent(waitType)}`;
-                        const res = await fetch(url);
-                        if (!res.ok) return { name: p.name, curve: [] };
-                        const data = await res.json();
-                        return { name: p.name, curve: data.curve || [] };
-                    } catch { return { name: p.name, curve: [] }; }
-                }));
+                    const results = await Promise.all(parksList.map(async (p) => {
+                        try {
+                            const url = `${API_BASE}/daily-curve/${p.code}?${dateParams}&wait_type=${encodeURIComponent(waitType)}`;
+                            const res = await fetch(url);
+                            if (!res.ok) return { name: p.name, curve: [] };
+                            const data = await res.json();
+                            return { name: p.name, curve: data.curve || [] };
+                        } catch { return { name: p.name, curve: [] }; }
+                    }));
 
-                // 3. Filter out parks with no data
-                const validResults = results.filter(r => r.curve.length > 0);
+                    const valid = results.filter(r => r.curve.length > 0);
+                    if (valid.length === 0) { updateTimeSeriesChart({ curve: [] }); return; }
 
-                if (validResults.length === 0) {
-                    updateTimeSeriesChart({ curve: [] });
-                    return;
+                    updateMultiParkChart(valid.map(r => r.curve), valid.map(r => r.name));
+                    console.log(`Property ${property}: ${valid.length} park lines`);
+
+                } else {
+                    // ── Level 1: All Properties → one line per property ──
+                    const propsRes = await fetch(`${API_BASE}/properties`);
+                    const propsList = (await propsRes.json()).properties || [];
+
+                    const results = await Promise.all(propsList.map(async (prop) => {
+                        try {
+                            // Get parks for this property
+                            const parksRes = await fetch(`${API_BASE}/parks?property=${encodeURIComponent(prop.code)}`);
+                            const parksList = (await parksRes.json()).parks || [];
+
+                            // Fetch each park's curve
+                            const parkCurves = await Promise.all(parksList.map(async (p) => {
+                                try {
+                                    const url = `${API_BASE}/daily-curve/${p.code}?${dateParams}&wait_type=${encodeURIComponent(waitType)}`;
+                                    const res = await fetch(url);
+                                    if (!res.ok) return [];
+                                    const data = await res.json();
+                                    return data.curve || [];
+                                } catch { return []; }
+                            }));
+
+                            // Average all parks in this property into one curve
+                            const validCurves = parkCurves.filter(c => c.length > 0);
+                            if (validCurves.length === 0) return { name: prop.name, curve: [] };
+                            return { name: prop.name, curve: averageCurves(validCurves) };
+                        } catch { return { name: prop.name, curve: [] }; }
+                    }));
+
+                    const valid = results.filter(r => r.curve.length > 0);
+                    if (valid.length === 0) { updateTimeSeriesChart({ curve: [] }); return; }
+
+                    updateMultiParkChart(valid.map(r => r.curve), valid.map(r => r.name));
+                    console.log(`All properties: ${valid.length} property lines`);
                 }
-
-                // 4. Render multi-line chart
-                updateMultiParkChart(
-                    validResults.map(r => r.curve),
-                    validResults.map(r => r.name)
-                );
-
-                console.log(`All-parks multi-line: ${validResults.length} parks with data`);
             } catch (e) {
-                console.warn('All-parks curve failed:', e.message || e);
+                console.warn('Multi-line curve failed:', e.message || e);
                 updateTimeSeriesChart({ curve: [] });
             }
         }
