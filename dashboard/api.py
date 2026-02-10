@@ -720,6 +720,62 @@ def health():
     return jsonify({"status": "ok", "timestamp": datetime.now().isoformat()})
 
 
+@app.route("/api/park-hours", methods=["GET"])
+def get_park_hours():
+    """
+    Return park hours for all parks (or filtered) on a given date.
+    Also returns the earliest open and latest close across all parks.
+    
+    Query params:
+      date     - YYYY-MM-DD (default: today)
+      property - filter by property code (e.g., wdw)
+      park     - single park code (e.g., MK)
+    
+    Response:
+      { parks: [{code, name, open, close, source}], 
+        earliest_open, latest_close }
+    """
+    date_str = request.args.get("date", date.today().isoformat())
+    try:
+        target_date = date.fromisoformat(date_str)
+    except ValueError:
+        target_date = date.today()
+
+    prop_filter = request.args.get("property", "").lower()
+    park_filter = request.args.get("park", "").upper()
+
+    results = []
+    for code, info in PARK_INFO.items():
+        if prop_filter and info["property"] != prop_filter:
+            continue
+        if park_filter and code != park_filter:
+            continue
+        open_hm, close_hm, source = _get_park_hours(code, target_date)
+        results.append({
+            "code": code,
+            "name": info["name"],
+            "open": open_hm,
+            "close": close_hm,
+            "source": source,
+        })
+
+    # Compute earliest open and latest close
+    opens = [r["open"] for r in results if r["open"]]
+    closes = [r["close"] for r in results if r["close"]]
+    # For closes, handle after-midnight (00:xx, 01:xx, 02:xx) as late
+    def close_sort_key(t):
+        return t if t >= "06:00" else "Z" + t  # push after-midnight to end
+    earliest_open = min(opens) if opens else "08:00"
+    latest_close = max(closes, key=close_sort_key) if closes else "23:00"
+
+    return jsonify({
+        "parks": results,
+        "earliest_open": earliest_open,
+        "latest_close": latest_close,
+        "date": date_str,
+    })
+
+
 # ----- Properties & Parks -----
 
 @app.route("/api/properties", methods=["GET"])

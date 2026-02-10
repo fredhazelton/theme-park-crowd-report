@@ -877,10 +877,92 @@
             }
         }
 
+        /**
+         * Load average daily curve across ALL parks, trimmed to park hours window.
+         * Fetches each park's curve, averages them, then trims x-axis to
+         * earliest open → latest close + 1h buffer on each side.
+         */
+        async function loadAllParksCurve() {
+            const selectedDate = getSelectedDateStr();
+            const waitType = document.getElementById('wait-type-filter').value || 'actual';
+            const property = document.getElementById('property-filter').value;
+
+            try {
+                // 1. Get park hours window
+                let hoursUrl = `${API_BASE}/park-hours?date=${encodeURIComponent(selectedDate)}`;
+                if (property !== 'all') hoursUrl += `&property=${encodeURIComponent(property)}`;
+                const hoursRes = await fetch(hoursUrl);
+                const hoursData = await hoursRes.json();
+                const earliestOpen = hoursData.earliest_open || '08:00';
+                const latestClose = hoursData.latest_close || '23:00';
+
+                // 2. Get park list
+                let parksUrl = property === 'all' ? `${API_BASE}/parks` : `${API_BASE}/parks?property=${encodeURIComponent(property)}`;
+                const parksRes = await fetch(parksUrl);
+                const parksList = (await parksRes.json()).parks || [];
+
+                // 3. Fetch each park's curve in parallel
+                const curvePromises = parksList.map(async (p) => {
+                    try {
+                        let url = `${API_BASE}/daily-curve/${p.code}?date=${encodeURIComponent(selectedDate)}&wait_type=${encodeURIComponent(waitType)}`;
+                        const res = await fetch(url);
+                        if (!res.ok) return [];
+                        const data = await res.json();
+                        return data.curve || [];
+                    } catch { return []; }
+                });
+                const allCurves = await Promise.all(curvePromises);
+
+                // 4. Average all curves by time_slot
+                const slotSums = {};
+                const slotCounts = {};
+                allCurves.forEach(curve => {
+                    curve.forEach(pt => {
+                        const ts = pt.time_slot;
+                        const val = pt.avg_wait != null ? pt.avg_wait : pt.wait_time_minutes;
+                        if (val != null && val > 0) {
+                            slotSums[ts] = (slotSums[ts] || 0) + val;
+                            slotCounts[ts] = (slotCounts[ts] || 0) + 1;
+                        }
+                    });
+                });
+                const avgCurve = Object.keys(slotSums)
+                    .sort((a, b) => parkDaySort(a, b))
+                    .map(ts => ({ time_slot: ts, avg_wait: Math.round(slotSums[ts] / slotCounts[ts]) }));
+
+                // 5. Trim to park hours window with 1h buffer
+                function addHours(timeStr, hours) {
+                    let [h, m] = timeStr.split(':').map(Number);
+                    h += hours;
+                    if (h < 0) h = 0;
+                    if (h > 23) h = 23;
+                    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+                }
+                const windowStart = addHours(earliestOpen, -1);
+                const windowEnd = addHours(latestClose, 1);
+                const isAfterMidnight = latestClose < '06:00';
+
+                const trimmedCurve = avgCurve.filter(pt => {
+                    const t = pt.time_slot;
+                    if (isAfterMidnight) {
+                        // Window wraps past midnight: show windowStart→23:59 and 00:00→windowEnd
+                        return t >= windowStart || t <= windowEnd;
+                    }
+                    return t >= windowStart && t <= windowEnd;
+                });
+
+                console.log(`All-parks curve: ${avgCurve.length} slots → ${trimmedCurve.length} after trim (${windowStart}-${windowEnd})`);
+                updateTimeSeriesChart({ curve: trimmedCurve.length > 0 ? trimmedCurve : avgCurve });
+            } catch (e) {
+                console.warn('All-parks curve failed:', e.message || e);
+                updateTimeSeriesChart({ curve: [] });
+            }
+        }
+
         async function loadDailyCurve() {
             const park = document.getElementById('park-filter').value;
             if (park === 'all') {
-                updateTimeSeriesChart({ curve: [], _noPark: true });
+                await loadAllParksCurve();
                 return;
             }
             if (USE_FAKE_CURVE_DATA) {
