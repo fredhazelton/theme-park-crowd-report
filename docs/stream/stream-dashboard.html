@@ -133,6 +133,31 @@
             background: var(--cyan);
             color: var(--navy);
         }
+        .date-today-btn {
+            height: 24px;
+            padding: 0 8px;
+            background: rgba(74, 144, 164, 0.1);
+            border: 1px solid var(--cyan-dim);
+            color: var(--text-secondary);
+            font-size: 11px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        .date-today-btn:hover {
+            background: rgba(74, 144, 164, 0.2);
+            border-color: var(--cyan);
+            color: var(--text-primary);
+        }
+        .date-today-btn:active {
+            background: var(--cyan);
+            color: var(--navy);
+        }
         .date-calendar-input {
             flex: 1;
             padding: 4px 8px;
@@ -304,6 +329,7 @@
                     <button class="date-calendar-arrow" id="date-arrow-left" title="Previous day">←</button>
                     <input type="date" class="date-calendar-input" id="date-calendar-picker" />
                     <button class="date-calendar-arrow" id="date-arrow-right" title="Next day">→</button>
+                    <button class="date-today-btn" id="date-today-btn" title="Jump to today">⊙</button>
                 </div>
             </div>
             
@@ -341,14 +367,14 @@
                     <div class="kpi-subtext">min actual</div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-label">Data Points</div>
+                    <div class="kpi-label" id="kpi-readings-label">Data Points</div>
                     <div class="kpi-value orange" id="kpi-readings">--</div>
-                    <div class="kpi-subtext">readings</div>
+                    <div class="kpi-subtext" id="kpi-readings-subtext">readings</div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-label">Days</div>
+                    <div class="kpi-label" id="kpi-days-label">Days</div>
                     <div class="kpi-value purple" id="kpi-days">--</div>
-                    <div class="kpi-subtext">in range</div>
+                    <div class="kpi-subtext" id="kpi-days-subtext">in range</div>
                 </div>
             </div>
             
@@ -401,8 +427,8 @@
     
     <script>
         // API: use localhost when running API locally (python3 dashboard/api.py); use wilma-server when API runs there
-        // const API_BASE = 'http://wilma-server:8051/api';
-        const API_BASE = 'http://localhost:8051/api';  // uncomment when API runs on this machine
+        // Auto-detect: use current hostname so it works from any machine on the LAN
+        const API_BASE = `http://${window.location.hostname}:8051/api`;
         // One-off: use hardcoded fake curve + actual points for visual tinkering (set to false to use real API)
         const USE_FAKE_CURVE_DATA = false;
         console.log('API Base URL:', API_BASE);
@@ -410,14 +436,70 @@
         let dashboardData = null;
         let charts = {};
         
+        /** Get the selected date string (YYYY-MM-DD) from the date picker, or today if empty. */
+        function getSelectedDateStr() {
+            const dateInput = document.getElementById('date-calendar-picker');
+            if (dateInput && dateInput.value) return dateInput.value;
+            const today = new Date();
+            return `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+        }
+
         async function loadData() {
             try {
                 const park = document.getElementById('park-filter').value;
-                const parkCode = park === 'mk' ? 'mk' : park === 'ep' ? 'ep' : park === 'hs' ? 'hs' : park === 'ak' ? 'ak' : 'mk';
+                const selectedDate = getSelectedDateStr();
+
+                // When no park is selected, show aggregate KPIs across all parks
+                if (park === 'all') {
+                    // Fetch WTI for all parks to compute aggregate stats
+                    try {
+                        const parksRes = await fetch(`${API_BASE}/parks`);
+                        const parksData = parksRes.ok ? await parksRes.json() : { parks: [] };
+                        const allParks = (parksData.parks || []).map(p => p.code || p.park_code).filter(Boolean);
+                        
+                        const allStats = await Promise.all(
+                            allParks.map(async (p) => {
+                                try {
+                                    const r = await fetch(`${API_BASE}/stats/${p}?date=${encodeURIComponent(selectedDate)}`);
+                                    return r.ok ? await r.json() : null;
+                                } catch { return null; }
+                            })
+                        );
+                        const validStats = allStats.filter(s => s && s.wti != null);
+                        
+                        if (validStats.length > 0) {
+                            const wtiValues = validStats.map(s => s.wti);
+                            const avg = wtiValues.reduce((a, b) => a + b, 0) / wtiValues.length;
+                            document.getElementById('kpi-avg').textContent = Math.round(avg);
+                            document.getElementById('kpi-max').textContent = Math.round(Math.max(...wtiValues));
+                            document.getElementById('kpi-min').textContent = Math.round(Math.min(...wtiValues));
+                        } else {
+                            document.getElementById('kpi-avg').textContent = '--';
+                            document.getElementById('kpi-max').textContent = '--';
+                            document.getElementById('kpi-min').textContent = '--';
+                        }
+                        document.getElementById('kpi-readings-label').textContent = 'Parks';
+                        document.getElementById('kpi-readings').textContent = validStats.length;
+                        document.getElementById('kpi-readings-subtext').textContent = 'with data';
+                        document.getElementById('kpi-days-label').textContent = 'Date';
+                        document.getElementById('kpi-days').textContent = selectedDate.slice(5); // MM-DD
+                        document.getElementById('kpi-days-subtext').textContent = selectedDate.slice(0, 4);
+                    } catch (e) {
+                        console.warn('Aggregate KPI load failed:', e);
+                    }
+                    document.getElementById('data-info').innerHTML = 'Date: ' + selectedDate + '<br>Showing all parks';
+                    const topList = document.getElementById('top-waits-list');
+                    if (topList) topList.innerHTML = '<div class="loading">Select a park for top waits</div>';
+                    dashboardData = {};
+                    await loadDailyCurve();
+                    fetchSampleCurveExample();
+                    return;
+                }
+                const parkCode = park;
                 
-                // Fetch data from API
+                // Fetch data from API — pass date to stats so it responds to slicer
                 const [statsRes, waitTimesRes] = await Promise.all([
-                    fetch(`${API_BASE}/stats/${parkCode}`).catch(() => null),
+                    fetch(`${API_BASE}/stats/${parkCode}?date=${encodeURIComponent(selectedDate)}`).catch(() => null),
                     fetch(`${API_BASE}/wait-times/${parkCode}?limit=20`).catch(() => null)
                 ]);
                 
@@ -432,21 +514,55 @@
                 const waits = waitTimes.wait_times || [];
                 const waitValues = waits.map(w => w.wait_minutes).filter(w => w != null && w > 0);
                 
-                // Update KPIs
-                if (waitValues.length > 0) {
+                // Update KPIs — prefer WTI from stats when a park is selected
+                const isParkSelected = park !== 'all';
+                if (isParkSelected && stats.wti != null) {
+                    document.getElementById('kpi-avg').textContent = Math.round(stats.wti);
+                } else if (waitValues.length > 0) {
                     const avg = waitValues.reduce((a, b) => a + b, 0) / waitValues.length;
                     document.getElementById('kpi-avg').textContent = Math.round(avg);
+                } else {
+                    document.getElementById('kpi-avg').textContent = '--';
+                }
+
+                if (waitValues.length > 0) {
                     document.getElementById('kpi-max').textContent = Math.round(Math.max(...waitValues));
                     document.getElementById('kpi-min').textContent = Math.round(Math.min(...waitValues));
-                    document.getElementById('kpi-readings').textContent = waitValues.length.toLocaleString();
+                } else {
+                    document.getElementById('kpi-max').textContent = '--';
+                    document.getElementById('kpi-min').textContent = '--';
+                }
+
+                // KPI cards 4 & 5: show Open/Close when a park is selected
+                if (isParkSelected && stats.open_time) {
+                    // Format time for display (e.g., "09:00" → "9 AM")
+                    function fmtTime(hhmm) {
+                        if (!hhmm) return '--';
+                        const [h, m] = hhmm.split(':').map(Number);
+                        const suffix = h >= 12 ? 'PM' : 'AM';
+                        const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+                        return m === 0 ? `${h12} ${suffix}` : `${h12}:${String(m).padStart(2,'0')} ${suffix}`;
+                    }
+                    document.getElementById('kpi-readings-label').textContent = 'Opens';
+                    document.getElementById('kpi-readings').textContent = fmtTime(stats.open_time);
+                    document.getElementById('kpi-readings-subtext').textContent = 'park open';
+                    document.getElementById('kpi-days-label').textContent = 'Closes';
+                    document.getElementById('kpi-days').textContent = fmtTime(stats.close_time);
+                    document.getElementById('kpi-days-subtext').textContent = 'park close';
+                } else {
+                    document.getElementById('kpi-readings-label').textContent = 'Data Points';
+                    document.getElementById('kpi-readings').textContent = waitValues.length > 0 ? waitValues.length.toLocaleString() : '--';
+                    document.getElementById('kpi-readings-subtext').textContent = 'readings';
+                    document.getElementById('kpi-days-label').textContent = 'Days';
                     document.getElementById('kpi-days').textContent = '--';
+                    document.getElementById('kpi-days-subtext').textContent = 'in range';
                 }
                 
                 // Update data info
                 document.getElementById('data-info').innerHTML = 
-                    'Generated: ' + new Date().toLocaleDateString() + '<br>' +
-                    'Files: ' + (waitValues.length || 0) + '<br>' +
-                    'Range: Live data';
+                    'Date: ' + selectedDate + '<br>' +
+                    'Readings: ' + (waitValues.length || 0) + '<br>' +
+                    (stats.best_time ? 'Best time: ' + stats.best_time : '');
                 
                 // Update top waits list
                 updateTopWaitsListFromAPI(waits);
@@ -733,14 +849,20 @@
             });
             const sub = document.getElementById('chart1-subtitle');
             const entityLabel = (curveData && curveData.entity_code) ? ' · ' + curveData.entity_code : '';
-            if (hasActualOnly && curveData && curveData.start_date) {
+            if (curveData && curveData._noPark) {
+                sub.textContent = 'Select a park to see the daily wait time curve';
+            } else if (hasActualOnly && curveData && curveData.start_date) {
                 sub.textContent = 'Actual observed · ' + actualPoints.length + ' points · ' + curveData.start_date + entityLabel;
             } else if (isPlaceholder) {
-                sub.textContent = 'Placeholder curve — no server data (pipeline needs WTI or curves/forecast for this park' + (curveData && curveData.entity_code ? ' / ' + curveData.entity_code : '') + ')';
+                sub.textContent = 'No curve data for this park/date';
             } else if (curveData && curveData.start_date && curveData.end_date) {
+                // Determine if date is in the future (forecast) or past (historical)
+                const today = new Date().toISOString().slice(0, 10);
+                const isForecast = curveData.start_date > today;
+                const label = isForecast ? 'Forecast avg wait' : 'Avg actual wait every 5 min';
                 let text = (curveData.start_date === curveData.end_date
-                    ? 'Avg actual wait every 5 min · ' + curveData.start_date
-                    : 'Avg actual wait every 5 min · ' + curveData.start_date + ' – ' + curveData.end_date) + entityLabel;
+                    ? label + ' · ' + curveData.start_date
+                    : label + ' · ' + curveData.start_date + ' – ' + curveData.end_date) + entityLabel;
                 if (curveData.actual_points && curveData.actual_points.length > 0) {
                     text += ' · ' + curveData.actual_points.length + ' actual observed';
                 }
@@ -793,7 +915,7 @@
         async function loadDailyCurve() {
             const park = document.getElementById('park-filter').value;
             if (park === 'all') {
-                updateTimeSeriesChart({ curve: [] });
+                updateTimeSeriesChart({ curve: [], _noPark: true });
                 return;
             }
             if (USE_FAKE_CURVE_DATA) {
@@ -902,13 +1024,14 @@
                 labels = fallback.labels;
             }
             
-            // Fetch stats for each park (real data from pipeline)
+            // Fetch stats for each park (real data from pipeline) — pass selected date
+            const selectedDate = getSelectedDateStr();
             const parkData = await Promise.all(
                 parks.map(async (p) => {
                     try {
-                        const res = await fetch(`${API_BASE}/stats/${p}`);
+                        const res = await fetch(`${API_BASE}/stats/${p}?date=${encodeURIComponent(selectedDate)}`);
                         const data = await res.json();
-                        return data.avg_wait != null ? data.avg_wait : 0;
+                        return data.wti != null ? data.wti : (data.avg_wait != null ? data.avg_wait : 0);
                     } catch {
                         return 0;
                     }
@@ -924,21 +1047,14 @@
             
             const lollipopColor = '#A60038'; /* WTI / dark pink */
             
-            const parkCount = parks.length;
-            const maxParksForFullWidth = 12;
-            const maxWaitByParkFr = 3;
-            const totalRowFr = 4;
-            let waitByParkFr = Math.max(0.5, Math.min(maxWaitByParkFr, maxWaitByParkFr * (parkCount / maxParksForFullWidth)));
-            if (parkCount <= 4) {
-                waitByParkFr = Math.max(waitByParkFr, 1.15);
-            }
-            const dayOfWeekFr = totalRowFr - waitByParkFr;
+            // Lock WTI chart to same width ratio as Daily Curve (2fr : 1fr)
             const row2 = document.querySelector('.charts-row-2');
-            if (row2) row2.style.gridTemplateColumns = `${waitByParkFr}fr ${dayOfWeekFr}fr`;
+            if (row2) row2.style.gridTemplateColumns = '2fr 1fr';
             
+            const parkCount = parks.length;
             const barPctMin = 0.5;
             const barPctMax = 0.9;
-            const barPercentage = barPctMin + (barPctMax - barPctMin) * (parkCount / maxParksForFullWidth);
+            const barPercentage = barPctMin + (barPctMax - barPctMin) * (parkCount / 12);
             
             charts.parkCompare = new Chart(ctx, {
                 type: 'bar',
@@ -955,7 +1071,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     barThickness: 1,
-                    layout: { padding: { left: 80, right: 24, top: 110, bottom: 12 } },
+                    layout: { padding: { left: 16, right: 16, top: 110, bottom: 12 } },
                     parks: parks,
                     datasets: {
                         bar: { barPercentage: barPercentage }
@@ -1237,6 +1353,7 @@
             await loadData(); // Load data for the newly selected park
             await populateAttractions(); // Populate attractions for the selected park
             await updateParkCompareChart(); // Refresh Wait by Park with parks for selected property; width auto-adjusts
+            updateWeekdayChart(document.getElementById('park-filter').value);
         });
         
         function updateKPIDisplay() {
@@ -1247,22 +1364,22 @@
             const avgSubtext = document.getElementById('kpi-avg-subtext');
             
             if (isParkSelected) {
-                // Show Wait Time Index - label stays normal, only value color changes
                 avgLabel.textContent = 'Wait Time Index';
                 avgValue.classList.add('wti');
                 avgSubtext.textContent = 'minutes';
             } else {
-                // Show regular Avg Wait styling
-                avgLabel.textContent = 'Avg Wait';
-                avgValue.classList.remove('wti');
-                avgSubtext.textContent = 'minutes';
+                avgLabel.textContent = 'Avg WTI';
+                avgValue.classList.add('wti');
+                avgSubtext.textContent = 'all parks';
             }
         }
         
         document.getElementById('park-filter').addEventListener('change', async () => { 
             updateKPIDisplay();
-            await loadData(); // Load data for the selected park
+            await loadData(); // Load data for the selected park (includes daily curve)
             await populateAttractions(); // Populate attractions filtered by the selected park
+            await updateParkCompareChart(); // Refresh WTI lollipops
+            updateWeekdayChart(document.getElementById('park-filter').value);
         });
         
         document.getElementById('attraction-filter').addEventListener('change', () => {
@@ -1278,6 +1395,8 @@
                     updateTopWaitsListFromAPI(filtered);
                 }
             }
+            // Refresh the daily curve for the selected attraction
+            loadDailyCurve();
         });
         
         function clearAllDateSelections() {
@@ -1287,6 +1406,13 @@
             document.getElementById('date-calendar-picker').value = '';
         }
         
+        /** Refresh all date-sensitive charts and KPIs */
+        async function onDateChanged() {
+            await loadData();  // KPIs + daily curve + top waits
+            await updateParkCompareChart();  // WTI lollipops
+            updateWeekdayChart(document.getElementById('park-filter').value);
+        }
+
         document.querySelectorAll('.date-preset').forEach(btn => {
             btn.addEventListener('click', () => {
                 // If clicking an already active button, deselect it (allowing "none")
@@ -1296,7 +1422,7 @@
                     clearAllDateSelections();
                     btn.classList.add('active');
                 }
-                loadDailyCurve();
+                onDateChanged();
             });
         });
         
@@ -1319,7 +1445,6 @@
             
             // Trigger change event to update filters
             dateInput.dispatchEvent(new Event('change'));
-            loadDailyCurve();
         }
         
         // Left arrow - go back one day
@@ -1332,12 +1457,21 @@
             adjustCalendarDate(1);
         });
         
+        // Today button - jump back to today
+        document.getElementById('date-today-btn').addEventListener('click', () => {
+            const today = new Date();
+            const y = today.getFullYear(), m = String(today.getMonth() + 1).padStart(2, '0'), d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('date-calendar-picker').value = `${y}-${m}-${d}`;
+            document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+            onDateChanged();
+        });
+        
         // Calendar picker - when a date is manually selected, clear preset buttons
         document.getElementById('date-calendar-picker').addEventListener('change', (e) => {
             if (e.target.value) {
                 // Clear all preset buttons when calendar date is manually selected
                 document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
-                loadDailyCurve();
+                onDateChanged();
             }
         });
         
