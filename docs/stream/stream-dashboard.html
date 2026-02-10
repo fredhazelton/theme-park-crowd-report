@@ -1319,33 +1319,40 @@
             const startAngle = Math.PI;       // left (180°)
             const endAngle = 2 * Math.PI;     // right (360°)
 
-            // ── Draw gauge arc segments (gradient from cool to hot) ──
+            // ── Draw gauge arc segments (monochromatic pink matching WTI scale) ──
+            // WTI decile colors: pale pink → dark pink
+            const gaugeColors = [
+                [222, 115, 148],  // #DE7394 D1 lightest
+                [216, 102, 137],  // #D86689 D2
+                [210, 89, 127],   // #D2597F D3
+                [203, 76, 117],   // #CB4C75 D4
+                [197, 64, 107],   // #C5406B D5
+                [191, 51, 96],    // #BF3360 D6
+                [184, 38, 86],    // #B82656 D7
+                [178, 25, 76],    // #B2194C D8
+                [172, 12, 66],    // #AC0C42 D9
+                [166, 0, 56],     // #A60038 D10 darkest
+            ];
             const segments = 60;
             for (let i = 0; i < segments; i++) {
-                const t1 = i / segments;
-                const t2 = (i + 1) / segments;
-                const a1 = startAngle + t1 * Math.PI;
-                const a2 = startAngle + t2 * Math.PI;
+                const t = i / segments;
+                const a1 = startAngle + t * Math.PI;
+                const a2 = startAngle + (i + 1) / segments * Math.PI;
 
-                // Color gradient: cyan → yellow → pink/red
-                let r, g, b;
-                if (t1 < 0.5) {
-                    const t = t1 * 2; // 0→1 within first half
-                    r = Math.round(74 + (240 - 74) * t);
-                    g = Math.round(144 + (192 - 144) * t);
-                    b = Math.round(164 + (64 - 164) * t);
-                } else {
-                    const t = (t1 - 0.5) * 2; // 0→1 within second half
-                    r = Math.round(240 + (166 - 240) * t);
-                    g = Math.round(192 + (0 - 192) * t);
-                    b = Math.round(64 + (56 - 64) * t);
-                }
+                // Interpolate through the 10 WTI colors
+                const colorIdx = Math.min(t * gaugeColors.length, gaugeColors.length - 1);
+                const cLow = gaugeColors[Math.floor(colorIdx)];
+                const cHigh = gaugeColors[Math.min(Math.ceil(colorIdx), gaugeColors.length - 1)];
+                const frac = colorIdx - Math.floor(colorIdx);
+                const r = Math.round(cLow[0] + (cHigh[0] - cLow[0]) * frac);
+                const g = Math.round(cLow[1] + (cHigh[1] - cLow[1]) * frac);
+                const b = Math.round(cLow[2] + (cHigh[2] - cLow[2]) * frac);
 
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius, a1, a2 + 0.02);
                 ctx.arc(centerX, centerY, radius - arcWidth, a2 + 0.02, a1, true);
                 ctx.closePath();
-                ctx.fillStyle = `rgba(${r},${g},${b},0.7)`;
+                ctx.fillStyle = `rgba(${r},${g},${b},0.85)`;
                 ctx.fill();
             }
 
@@ -1440,13 +1447,16 @@
             ctx.fillText("New Year's", rightLabelX, labelY);
             ctx.fillText('Eve', rightLabelX, labelY + 15);
 
-            // ── Min/Max values at the ends ──
-            ctx.font = 'bold 13px Inter, sans-serif';
-            ctx.fillStyle = 'rgba(233, 244, 255, 0.6)';
-            ctx.textBaseline = 'bottom';
-            ctx.textAlign = 'center';
-            ctx.fillText(Math.round(gaugeMin), centerX - radius, centerY - 6);
-            ctx.fillText(Math.round(gaugeMax), centerX + radius, centerY - 6);
+            // ── Min/Max values outside the gauge ends ──
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillStyle = '#e9f4ff';
+            ctx.textBaseline = 'middle';
+            // Left value — outside the arc to the left
+            ctx.textAlign = 'right';
+            ctx.fillText(Math.round(gaugeMin), centerX - radius - 8, centerY);
+            // Right value — outside the arc to the right
+            ctx.textAlign = 'left';
+            ctx.fillText(Math.round(gaugeMax), centerX + radius + 8, centerY);
 
             // ── Percentile label ──
             if (d.today_value != null) {
