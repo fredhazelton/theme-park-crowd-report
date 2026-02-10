@@ -778,8 +778,15 @@
             }
             const labels = curve.map(p => p.time_slot);
             const values = curve.map(p => p.avg_wait);
-            const allValues = values.filter(v => v != null);
+            const allValues = values.filter(v => v != null && v > 0);
             const yMax = allValues.length ? Math.max(60, Math.ceil(Math.max(...allValues) * 1.15 / 10) * 10) : 60;
+            // Update Peak and Min KPIs from the actual curve data
+            if (allValues.length > 0) {
+                const curvePeak = Math.round(Math.max(...allValues));
+                const curveMin = Math.round(Math.min(...allValues));
+                document.getElementById('kpi-max').textContent = curvePeak;
+                document.getElementById('kpi-min').textContent = curveMin;
+            }
             const datasets = [{
                 label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                 data: values,
