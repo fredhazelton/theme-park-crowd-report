@@ -453,6 +453,7 @@
                 // When no park is selected, show aggregate KPIs across all parks
                 if (park === 'all') {
                     // Fetch WTI for all parks to compute aggregate stats
+                    const dateParams = getDateQueryParams();
                     try {
                         const parksRes = await fetch(`${API_BASE}/parks`);
                         const parksData = parksRes.ok ? await parksRes.json() : { parks: [] };
@@ -461,7 +462,7 @@
                         const allStats = await Promise.all(
                             allParks.map(async (p) => {
                                 try {
-                                    const r = await fetch(`${API_BASE}/stats/${p}?date=${encodeURIComponent(selectedDate)}`);
+                                    const r = await fetch(`${API_BASE}/stats/${p}?${dateParams}`);
                                     return r.ok ? await r.json() : null;
                                 } catch { return null; }
                             })
@@ -498,9 +499,10 @@
                 }
                 const parkCode = park;
                 
-                // Fetch data from API — pass date to stats so it responds to slicer
+                // Fetch data from API — pass date/range to stats so it responds to slicer
+                const dateParams = getDateQueryParams();
                 const [statsRes, waitTimesRes] = await Promise.all([
-                    fetch(`${API_BASE}/stats/${parkCode}?date=${encodeURIComponent(selectedDate)}`).catch(() => null),
+                    fetch(`${API_BASE}/stats/${parkCode}?${dateParams}`).catch(() => null),
                     fetch(`${API_BASE}/wait-times/${parkCode}?limit=20`).catch(() => null)
                 ]);
                 
@@ -946,6 +948,15 @@
             }
         }
 
+        /** Build URL query params string for the current date selection (single date or range). */
+        function getDateQueryParams() {
+            const range = getDateRangeForCurve();
+            if (range.date) {
+                return 'date=' + encodeURIComponent(range.date);
+            }
+            return 'start=' + encodeURIComponent(range.start) + '&end=' + encodeURIComponent(range.end);
+        }
+
         function getDateRangeForCurve() {
             const dateInput = document.getElementById('date-calendar-picker');
             const activePreset = document.querySelector('.date-preset.active');
@@ -992,13 +1003,13 @@
          * earliest open → latest close + 1h buffer on each side.
          */
         async function loadAllParksCurve() {
-            const selectedDate = getSelectedDateStr();
+            const dateParams = getDateQueryParams();
             const waitType = document.getElementById('wait-type-filter').value || 'actual';
             const property = document.getElementById('property-filter').value;
 
             try {
                 // 1. Get park hours window
-                let hoursUrl = `${API_BASE}/park-hours?date=${encodeURIComponent(selectedDate)}`;
+                let hoursUrl = `${API_BASE}/park-hours?${dateParams}`;
                 if (property !== 'all') hoursUrl += `&property=${encodeURIComponent(property)}`;
                 const hoursRes = await fetch(hoursUrl);
                 const hoursData = await hoursRes.json();
@@ -1013,7 +1024,7 @@
                 // 3. Fetch each park's curve in parallel
                 const curvePromises = parksList.map(async (p) => {
                     try {
-                        let url = `${API_BASE}/daily-curve/${p.code}?date=${encodeURIComponent(selectedDate)}&wait_type=${encodeURIComponent(waitType)}`;
+                        let url = `${API_BASE}/daily-curve/${p.code}?${dateParams}&wait_type=${encodeURIComponent(waitType)}`;
                         const res = await fetch(url);
                         if (!res.ok) return [];
                         const data = await res.json();
@@ -1167,12 +1178,12 @@
                 labels = fallback.labels;
             }
             
-            // Fetch stats for each park (real data from pipeline) — pass selected date
-            const selectedDate = getSelectedDateStr();
+            // Fetch stats for each park (real data from pipeline) — pass selected date/range
+            const dateParams = getDateQueryParams();
             const parkData = await Promise.all(
                 parks.map(async (p) => {
                     try {
-                        const res = await fetch(`${API_BASE}/stats/${p}?date=${encodeURIComponent(selectedDate)}`);
+                        const res = await fetch(`${API_BASE}/stats/${p}?${dateParams}`);
                         const data = await res.json();
                         return data.wti != null ? data.wti : (data.avg_wait != null ? data.avg_wait : 0);
                     } catch {
