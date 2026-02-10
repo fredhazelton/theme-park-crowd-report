@@ -2042,6 +2042,8 @@
         
         document.getElementById('property-filter').addEventListener('change', async () => {
             await updateParkFilter(); // This will update park options and reset park selection
+            // Reset attraction filter to prevent stale entity codes
+            document.getElementById('attraction-filter').innerHTML = '<option value="all">All Attractions</option>';
             updateKPIDisplay();
             await loadData(); // Load data for the newly selected park
             await populateAttractions(); // Populate attractions for the selected park
@@ -2069,6 +2071,8 @@
         }
         
         document.getElementById('park-filter').addEventListener('change', async () => { 
+            // Reset attraction filter FIRST to prevent stale entity codes
+            document.getElementById('attraction-filter').innerHTML = '<option value="all">All Attractions</option>';
             updateKPIDisplay();
             await loadData(); // Load data for the selected park (includes daily curve)
             await populateAttractions(); // Populate attractions filtered by the selected park
