@@ -890,16 +890,31 @@
                         ctx.save();
                         ctx.font = 'bold 14px Inter, sans-serif';
                         ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
                         meta.data.forEach((point, i) => {
                             if (!labelIndices.has(i)) return;
                             const val = values[i];
                             if (val == null) return;
                             const x = point.x;
                             const y = point.y;
-                            // Draw above the point (or below if near top)
                             const offsetY = y < 40 ? 22 : -18;
+                            const textY = y + offsetY;
+                            const text = String(Math.round(val));
+                            const textW = ctx.measureText(text).width;
+                            const padX = 6, padY = 4;
+                            // Semi-transparent background pill
+                            ctx.fillStyle = 'rgba(10, 22, 40, 0.5)';
+                            const rx = 4; // border radius
+                            const bx = x - textW / 2 - padX;
+                            const by = textY - 7 - padY;
+                            const bw = textW + padX * 2;
+                            const bh = 14 + padY * 2;
+                            ctx.beginPath();
+                            ctx.roundRect(bx, by, bw, bh, rx);
+                            ctx.fill();
+                            // Label text
                             ctx.fillStyle = '#e9f4ff';
-                            ctx.fillText(Math.round(val), x, y + offsetY);
+                            ctx.fillText(text, x, textY);
                         });
                         ctx.restore();
                     }
