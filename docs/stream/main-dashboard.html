@@ -1380,7 +1380,7 @@
             <div class="status-item">
                 <span class="status-label">VIEWERS:</span>
                 <span class="viewer-count-wrapper">
-                    <span id="viewer-count">1,247</span>
+                    <span id="viewer-count">—</span>
                 </span>
             </div>
             <div class="status-item">
@@ -2241,6 +2241,26 @@
         
         // Refresh chart every 5 minutes
         setInterval(loadWaitTimeChart, 5 * 60 * 1000);
+
+        // ═══════════════════════════════════════════════════════════════
+        // TWITCH VIEWER COUNT — Poll from twitch-viewers.json
+        // ═══════════════════════════════════════════════════════════════
+        async function updateViewerCount() {
+            try {
+                const res = await fetch(`http://${window.location.hostname}:8888/twitch-viewers.json?_=${Date.now()}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                const el = document.getElementById('viewer-count');
+                if (el && data.viewers != null) {
+                    el.textContent = Number(data.viewers).toLocaleString();
+                }
+            } catch (e) {
+                console.warn('Viewer count fetch failed:', e);
+            }
+        }
+        // Poll every 30 seconds, initial fetch on load
+        document.addEventListener('DOMContentLoaded', updateViewerCount);
+        setInterval(updateViewerCount, 30000);
     </script>
 </body>
 </html>
