@@ -423,8 +423,22 @@
                         <div class="chart-title">Trend Analysis</div>
                         <div class="chart-subtitle" id="trend-subtitle">Z-score vs seasonal average</div>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-container" style="position:relative;">
                         <canvas id="trendChart"></canvas>
+                        <div id="trend-z-card" style="
+                            position:absolute; top:8px; left:8px;
+                            background:rgba(10,22,40,0.85);
+                            border:1px solid rgba(233,244,255,0.15);
+                            border-radius:8px;
+                            padding:6px 12px;
+                            text-align:center;
+                            pointer-events:none;
+                            min-width:70px;
+                        ">
+                            <div style="font-size:9px; color:rgba(233,244,255,0.5); text-transform:uppercase; letter-spacing:0.5px;">Avg Z</div>
+                            <div id="trend-z-value" style="font-size:24px; font-weight:700; font-family:'JetBrains Mono',monospace; color:#e9f4ff;">—</div>
+                            <div id="trend-z-label" style="font-size:9px; font-weight:600; color:rgba(233,244,255,0.6);">—</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1753,11 +1767,23 @@
 
                 const avgZ = data.avg_z_score || 0;
                 const avgZSign = avgZ > 0 ? '+' : '';
-                const avgZLabel = Math.abs(avgZ) >= 1.5 ? (avgZ > 0 ? ' ↑ Busy' : ' ↓ Quiet') 
-                                : Math.abs(avgZ) >= 0.5 ? (avgZ > 0 ? ' ↑ Above avg' : ' ↓ Below avg')
-                                : ' — Normal';
+                const avgZLabel = Math.abs(avgZ) >= 1.5 ? (avgZ > 0 ? 'Unusually Busy' : 'Unusually Quiet') 
+                                : Math.abs(avgZ) >= 0.5 ? (avgZ > 0 ? 'Above Average' : 'Below Average')
+                                : 'Normal';
                 document.getElementById('trend-subtitle').textContent =
-                    `${data.park_name} — ${points.length} days — Avg z: ${avgZSign}${avgZ.toFixed(2)}${avgZLabel}`;
+                    `${data.park_name} — ${points.length} days`;
+
+                // Update the floating Z card
+                const zValEl = document.getElementById('trend-z-value');
+                const zLabelEl = document.getElementById('trend-z-label');
+                zValEl.textContent = `${avgZSign}${avgZ.toFixed(2)}`;
+                zLabelEl.textContent = avgZLabel;
+                // Color the value by Benedictus scale
+                if (avgZ >= 1.5) { zValEl.style.color = '#A60038'; zLabelEl.style.color = '#EB427B'; }
+                else if (avgZ >= 0.5) { zValEl.style.color = '#FF81AC'; zLabelEl.style.color = '#FFB1C9'; }
+                else if (avgZ <= -1.5) { zValEl.style.color = '#0A2F8F'; zLabelEl.style.color = '#5A96EA'; }
+                else if (avgZ <= -0.5) { zValEl.style.color = '#5A96EA'; zLabelEl.style.color = '#98C4F2'; }
+                else { zValEl.style.color = '#e9f4ff'; zLabelEl.style.color = 'rgba(233,244,255,0.6)'; }
 
                 const labels = points.map(p => p.date);
                 const zScores = points.map(p => p.z_score);
