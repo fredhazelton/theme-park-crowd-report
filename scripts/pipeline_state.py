@@ -55,7 +55,22 @@ def check_should_skip(step):
     base = Path("/home/wilma/hazeydata/pipeline")
     
     if step == "training":
-        # Skip if matched_pairs parquet hasn't changed
+        # Skip if no entities have new observations since last modeling.
+        # The entity_index.sqlite tracks latest_observed_at vs last_modeled_at.
+        index_db = base / "state" / "entity_index.sqlite"
+        if index_db.exists():
+            import sqlite3
+            with sqlite3.connect(str(index_db)) as conn:
+                row = conn.execute("""
+                    SELECT COUNT(*) FROM entity_index
+                    WHERE last_modeled_at IS NULL
+                       OR latest_observed_at > last_modeled_at
+                """).fetchone()
+                needs_modeling = row[0] if row else 0
+            if needs_modeling == 0:
+                return True, f"No entities need remodeling (all up to date)"
+            return False, f"{needs_modeling} entities have new observations since last model"
+        # Fallback: check matched_pairs hash
         pairs_file = base / "matched_pairs/all_pairs_v2.parquet"
         current_hash = get_file_hash(pairs_file)
         last_hash = state.get("matched_pairs_hash")
