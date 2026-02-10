@@ -419,26 +419,18 @@
                 </div>
                 
                 <div class="chart-panel">
-                    <div class="chart-header">
-                        <div class="chart-title">Trend Analysis</div>
-                        <div class="chart-subtitle" id="trend-subtitle">Z-score vs seasonal average</div>
-                    </div>
-                    <div class="chart-container" style="position:relative;">
-                        <canvas id="trendChart"></canvas>
-                        <div id="trend-z-card" style="
-                            position:absolute; top:8px; left:8px;
-                            background:rgba(10,22,40,0.85);
-                            border:1px solid rgba(233,244,255,0.15);
-                            border-radius:8px;
-                            padding:6px 12px;
-                            text-align:center;
-                            pointer-events:none;
-                            min-width:70px;
-                        ">
-                            <div style="font-size:9px; color:rgba(233,244,255,0.5); text-transform:uppercase; letter-spacing:0.5px;">Avg Z</div>
-                            <div id="trend-z-value" style="font-size:24px; font-weight:700; font-family:'JetBrains Mono',monospace; color:#e9f4ff;">—</div>
-                            <div id="trend-z-label" style="font-size:9px; font-weight:600; color:rgba(233,244,255,0.6);">—</div>
+                    <div class="chart-header" style="display:flex; align-items:flex-start; justify-content:space-between;">
+                        <div>
+                            <div class="chart-title">Trend Analysis</div>
+                            <div class="chart-subtitle" id="trend-subtitle">Z-score vs seasonal average</div>
                         </div>
+                        <div id="trend-z-card" style="text-align:right; padding-left:8px;">
+                            <div id="trend-z-value" style="font-size:22px; font-weight:700; font-family:'JetBrains Mono',monospace; color:#e9f4ff; line-height:1;">—</div>
+                            <div id="trend-z-label" style="font-size:9px; font-weight:600; color:rgba(233,244,255,0.6); margin-top:2px;">—</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
                     </div>
                 </div>
             </div>
