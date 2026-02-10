@@ -33,7 +33,7 @@
             width: 1540px;
             height: 890px;
             overflow: hidden;
-            padding: 10px;
+            padding: 8px;
         }
         
         .dashboard {
@@ -211,7 +211,7 @@
         .main-content {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             height: 100%;
             overflow: hidden;
         }
@@ -220,13 +220,13 @@
         .kpi-row {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
         .kpi-card {
             background: var(--navy-card);
             border: 1px solid var(--cyan-dim);
             border-radius: 6px;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
         }
         .kpi-label { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
@@ -247,14 +247,16 @@
         .charts-row {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 10px;
+            gap: 8px;
             flex: 1;
+            min-height: 0;
         }
         .charts-row-2 {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 10px;
+            gap: 8px;
             flex: 1;
+            min-height: 0;
         }
         .chart-panel {
             background: var(--navy-card);
