@@ -1048,6 +1048,8 @@
             
             const lollipopColor = '#A60038'; /* WTI / dark pink */
             
+            const parkCount = parks.length;
+            
             // Auto-resize WTI chart based on number of parks
             const row2 = document.querySelector('.charts-row-2');
             if (row2) {
@@ -1059,8 +1061,6 @@
                     row2.style.gridTemplateColumns = '2fr 1fr';   // Full width for all parks
                 }
             }
-            
-            const parkCount = parks.length;
             const barPctMin = 0.5;
             const barPctMax = 0.9;
             const barPercentage = barPctMin + (barPctMax - barPctMin) * (parkCount / 12);
