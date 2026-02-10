@@ -32,8 +32,7 @@
             color: var(--text-primary);
             width: 1540px;
             height: 890px;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow: hidden;
             padding: 10px;
         }
         
@@ -43,7 +42,7 @@
             gap: 12px;
             height: 100%;
             position: relative;
-            overflow: visible;
+            overflow: hidden;
         }
         
         /* Sidebar - Filters */
@@ -213,6 +212,8 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            height: 100%;
+            overflow: hidden;
         }
         
         /* KPI Row */
@@ -262,6 +263,8 @@
             padding: 10px;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
         }
         .chart-header { margin-bottom: 8px; }
         .chart-title { 
@@ -271,7 +274,7 @@
             color: var(--cyan); 
         }
         .chart-subtitle { font-size: 12px; color: var(--text-secondary); }
-        .chart-container { flex: 1; position: relative; min-height: 150px; }
+        .chart-container { flex: 1; position: relative; min-height: 0; overflow: hidden; }
         
         /* Top Waits List */
         .top-list { flex: 1; overflow-y: auto; }
