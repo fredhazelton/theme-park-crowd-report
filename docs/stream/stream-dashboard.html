@@ -1324,17 +1324,17 @@
             const startAngle = Math.PI;       // left (180°)
             const endAngle = 2 * Math.PI;     // right (360°)
 
-            // ── Draw gauge arc segments (monochromatic: pure white → brand dark pink) ──
+            // ── Draw gauge arc segments (brand: cyan #4A90A4 → dark red #A60038) ──
             const gaugeColors = [
-                [255, 255, 255],  // #FFFFFF D1 pure white (quietest)
-                [245, 227, 233],  // #F5E3E9 D2 pale pink
-                [235, 198, 211],  // #EBC6D3 D3 light pink
-                [225, 170, 189],  // #E1AABD D4 soft pink
-                [215, 142, 167],  // #D78EA7 D5 medium pink
-                [206, 113, 145],  // #CE7191 D6 rose
-                [196, 85, 123],   // #C4557B D7 deep rose
-                [186, 57, 101],   // #BA3965 D8 dark pink
-                [176, 28, 79],    // #B01C4F D9 deep pink
+                [74, 144, 164],   // #4A90A4 D1 brand cyan (quietest)
+                [84, 128, 152],   // #548098 D2 steel cyan
+                [94, 112, 140],   // #5E708C D3 slate
+                [104, 96, 128],   // #686080 D4 blue-grey
+                [114, 80, 116],   // #725074 D5 mauve
+                [124, 64, 104],   // #7C4068 D6 plum
+                [134, 48, 92],    // #86305C D7 deep plum
+                [144, 32, 80],    // #902050 D8 berry
+                [155, 16, 68],    // #9B1044 D9 deep berry
                 [166, 0, 56],     // #A60038 D10 brand dark red (busiest)
             ];
             const segments = 60;
@@ -1439,7 +1439,7 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.font = '12px Inter, sans-serif';
-            ctx.fillStyle = 'rgba(215, 142, 167, 0.95)';
+            ctx.fillStyle = 'rgba(74, 144, 164, 0.95)';
             const leftLabelX = centerX - radius + 5;
             const labelY = centerY + 12;
             ctx.fillText('Cold', leftLabelX, labelY);
@@ -1540,15 +1540,15 @@
              * significantly (e.g., new parks added).
              */
             const WTI_COLORS = [
-                { min: 0,    max: 13.1, bg: '#FFFFFF', text: '#1a1a2e' },  /* D1 — quietest (pure white) */
-                { min: 13.1, max: 15.7, bg: '#F5E3E9', text: '#1a1a2e' },  /* D2  (pale pink) */
-                { min: 15.7, max: 18.0, bg: '#EBC6D3', text: '#1a1a2e' },  /* D3  (light pink) */
-                { min: 18.0, max: 20.1, bg: '#E1AABD', text: '#1a1a2e' },  /* D4  (soft pink) */
-                { min: 20.1, max: 21.8, bg: '#D78EA7', text: '#FFFFFF' },  /* D5  (medium pink) */
-                { min: 21.8, max: 23.2, bg: '#CE7191', text: '#FFFFFF' },  /* D6  (rose) */
-                { min: 23.2, max: 24.8, bg: '#C4557B', text: '#FFFFFF' },  /* D7  (deep rose) */
-                { min: 24.8, max: 26.8, bg: '#BA3965', text: '#FFFFFF' },  /* D8  (dark pink) */
-                { min: 26.8, max: 31.6, bg: '#B01C4F', text: '#FFFFFF' },  /* D9  (deep pink) */
+                { min: 0,    max: 13.1, bg: '#4A90A4', text: '#FFFFFF' },  /* D1 — quietest (brand cyan) */
+                { min: 13.1, max: 15.7, bg: '#548098', text: '#FFFFFF' },  /* D2  (steel cyan) */
+                { min: 15.7, max: 18.0, bg: '#5E708C', text: '#FFFFFF' },  /* D3  (slate) */
+                { min: 18.0, max: 20.1, bg: '#686080', text: '#FFFFFF' },  /* D4  (blue-grey) */
+                { min: 20.1, max: 21.8, bg: '#725074', text: '#FFFFFF' },  /* D5  (mauve) */
+                { min: 21.8, max: 23.2, bg: '#7C4068', text: '#FFFFFF' },  /* D6  (plum) */
+                { min: 23.2, max: 24.8, bg: '#86305C', text: '#FFFFFF' },  /* D7  (deep plum) */
+                { min: 24.8, max: 26.8, bg: '#902050', text: '#FFFFFF' },  /* D8  (berry) */
+                { min: 26.8, max: 31.6, bg: '#9B1044', text: '#FFFFFF' },  /* D9  (deep berry) */
                 { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (brand dark red) */
             ];
             function getWtiColor(wti) {
