@@ -1324,18 +1324,18 @@
             const startAngle = Math.PI;       // left (180°)
             const endAngle = 2 * Math.PI;     // right (360°)
 
-            // ── Draw gauge arc segments (Plasma-inspired: indigo → teal → mint → gold → red) ──
+            // ── Draw gauge arc segments (monochromatic: pure white → brand dark pink) ──
             const gaugeColors = [
-                [92, 61, 153],    // #5C3D99 D1 deep indigo (quietest)
-                [74, 94, 170],    // #4A5EAA D2 blue-indigo
-                [74, 128, 176],   // #4A80B0 D3 steel blue
-                [74, 144, 164],   // #4A90A4 D4 brand teal
-                [80, 200, 160],   // #50C8A0 D5 seafoam
-                [128, 216, 136],  // #80D888 D6 mint
-                [200, 216, 80],   // #C8D850 D7 lime-gold
-                [232, 200, 64],   // #E8C840 D8 gold
-                [216, 120, 56],   // #D87838 D9 burnt orange
-                [166, 0, 56],     // #A60038 D10 dark red (busiest)
+                [255, 255, 255],  // #FFFFFF D1 pure white (quietest)
+                [245, 227, 233],  // #F5E3E9 D2 pale pink
+                [235, 198, 211],  // #EBC6D3 D3 light pink
+                [225, 170, 189],  // #E1AABD D4 soft pink
+                [215, 142, 167],  // #D78EA7 D5 medium pink
+                [206, 113, 145],  // #CE7191 D6 rose
+                [196, 85, 123],   // #C4557B D7 deep rose
+                [186, 57, 101],   // #BA3965 D8 dark pink
+                [176, 28, 79],    // #B01C4F D9 deep pink
+                [166, 0, 56],     // #A60038 D10 brand dark red (busiest)
             ];
             const segments = 60;
             for (let i = 0; i < segments; i++) {
@@ -1439,7 +1439,7 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.font = '12px Inter, sans-serif';
-            ctx.fillStyle = 'rgba(130, 110, 200, 0.95)';
+            ctx.fillStyle = 'rgba(215, 142, 167, 0.95)';
             const leftLabelX = centerX - radius + 5;
             const labelY = centerY + 12;
             ctx.fillText('Cold', leftLabelX, labelY);
@@ -1540,16 +1540,16 @@
              * significantly (e.g., new parks added).
              */
             const WTI_COLORS = [
-                { min: 0,    max: 13.1, bg: '#5C3D99', text: '#FFFFFF' },  /* D1 — quietest (deep indigo) */
-                { min: 13.1, max: 15.7, bg: '#4A5EAA', text: '#FFFFFF' },  /* D2  (blue-indigo) */
-                { min: 15.7, max: 18.0, bg: '#4A80B0', text: '#FFFFFF' },  /* D3  (steel blue) */
-                { min: 18.0, max: 20.1, bg: '#4A90A4', text: '#FFFFFF' },  /* D4  (brand teal) */
-                { min: 20.1, max: 21.8, bg: '#50C8A0', text: '#1a1a2e' },  /* D5  (seafoam) */
-                { min: 21.8, max: 23.2, bg: '#80D888', text: '#1a1a2e' },  /* D6  (mint) */
-                { min: 23.2, max: 24.8, bg: '#C8D850', text: '#1a1a2e' },  /* D7  (lime-gold) */
-                { min: 24.8, max: 26.8, bg: '#E8C840', text: '#1a1a2e' },  /* D8  (gold) */
-                { min: 26.8, max: 31.6, bg: '#D87838', text: '#FFFFFF' },  /* D9  (burnt orange) */
-                { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (dark red) */
+                { min: 0,    max: 13.1, bg: '#FFFFFF', text: '#1a1a2e' },  /* D1 — quietest (pure white) */
+                { min: 13.1, max: 15.7, bg: '#F5E3E9', text: '#1a1a2e' },  /* D2  (pale pink) */
+                { min: 15.7, max: 18.0, bg: '#EBC6D3', text: '#1a1a2e' },  /* D3  (light pink) */
+                { min: 18.0, max: 20.1, bg: '#E1AABD', text: '#1a1a2e' },  /* D4  (soft pink) */
+                { min: 20.1, max: 21.8, bg: '#D78EA7', text: '#FFFFFF' },  /* D5  (medium pink) */
+                { min: 21.8, max: 23.2, bg: '#CE7191', text: '#FFFFFF' },  /* D6  (rose) */
+                { min: 23.2, max: 24.8, bg: '#C4557B', text: '#FFFFFF' },  /* D7  (deep rose) */
+                { min: 24.8, max: 26.8, bg: '#BA3965', text: '#FFFFFF' },  /* D8  (dark pink) */
+                { min: 26.8, max: 31.6, bg: '#B01C4F', text: '#FFFFFF' },  /* D9  (deep pink) */
+                { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (brand dark red) */
             ];
             function getWtiColor(wti) {
                 const v = Number(wti) || 0;
