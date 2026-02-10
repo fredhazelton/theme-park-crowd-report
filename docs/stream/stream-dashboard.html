@@ -1324,18 +1324,17 @@
             const startAngle = Math.PI;       // left (180°)
             const endAngle = 2 * Math.PI;     // right (360°)
 
-            // ── Draw gauge arc segments (cool→warm matching WTI scale) ──
-            // Teal → Cyan → Green → Yellow → Orange → Red
+            // ── Draw gauge arc segments (Plasma-inspired: indigo → teal → mint → gold → red) ──
             const gaugeColors = [
-                [74, 144, 164],   // #4A90A4 D1 teal (quietest)
-                [80, 168, 184],   // #50A8B8 D2 light teal
-                [90, 180, 204],   // #5AB4CC D3 cyan
-                [128, 200, 160],  // #80C8A0 D4 teal-green
-                [184, 212, 104],  // #B8D468 D5 yellow-green
-                [232, 200, 64],   // #E8C840 D6 gold
-                [232, 160, 48],   // #E8A030 D7 orange-yellow
-                [232, 112, 64],   // #E87040 D8 orange
-                [208, 64, 48],    // #D04030 D9 red-orange
+                [92, 61, 153],    // #5C3D99 D1 deep indigo (quietest)
+                [74, 94, 170],    // #4A5EAA D2 blue-indigo
+                [74, 128, 176],   // #4A80B0 D3 steel blue
+                [74, 144, 164],   // #4A90A4 D4 brand teal
+                [80, 200, 160],   // #50C8A0 D5 seafoam
+                [128, 216, 136],  // #80D888 D6 mint
+                [200, 216, 80],   // #C8D850 D7 lime-gold
+                [232, 200, 64],   // #E8C840 D8 gold
+                [216, 120, 56],   // #D87838 D9 burnt orange
                 [166, 0, 56],     // #A60038 D10 dark red (busiest)
             ];
             const segments = 60;
@@ -1440,7 +1439,7 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.font = '12px Inter, sans-serif';
-            ctx.fillStyle = 'rgba(74, 144, 164, 0.9)';
+            ctx.fillStyle = 'rgba(130, 110, 200, 0.95)';
             const leftLabelX = centerX - radius + 5;
             const labelY = centerY + 12;
             ctx.fillText('Cold', leftLabelX, labelY);
@@ -1541,15 +1540,15 @@
              * significantly (e.g., new parks added).
              */
             const WTI_COLORS = [
-                { min: 0,    max: 13.1, bg: '#4A90A4', text: '#FFFFFF' },  /* D1 — quietest (teal) */
-                { min: 13.1, max: 15.7, bg: '#50A8B8', text: '#FFFFFF' },  /* D2  (light teal) */
-                { min: 15.7, max: 18.0, bg: '#5AB4CC', text: '#FFFFFF' },  /* D3  (cyan) */
-                { min: 18.0, max: 20.1, bg: '#80C8A0', text: '#FFFFFF' },  /* D4  (teal-green) */
-                { min: 20.1, max: 21.8, bg: '#B8D468', text: '#1a1a2e' },  /* D5  (yellow-green) */
-                { min: 21.8, max: 23.2, bg: '#E8C840', text: '#1a1a2e' },  /* D6  (gold) */
-                { min: 23.2, max: 24.8, bg: '#E8A030', text: '#FFFFFF' },  /* D7  (orange-yellow) */
-                { min: 24.8, max: 26.8, bg: '#E87040', text: '#FFFFFF' },  /* D8  (orange) */
-                { min: 26.8, max: 31.6, bg: '#D04030', text: '#FFFFFF' },  /* D9  (red-orange) */
+                { min: 0,    max: 13.1, bg: '#5C3D99', text: '#FFFFFF' },  /* D1 — quietest (deep indigo) */
+                { min: 13.1, max: 15.7, bg: '#4A5EAA', text: '#FFFFFF' },  /* D2  (blue-indigo) */
+                { min: 15.7, max: 18.0, bg: '#4A80B0', text: '#FFFFFF' },  /* D3  (steel blue) */
+                { min: 18.0, max: 20.1, bg: '#4A90A4', text: '#FFFFFF' },  /* D4  (brand teal) */
+                { min: 20.1, max: 21.8, bg: '#50C8A0', text: '#1a1a2e' },  /* D5  (seafoam) */
+                { min: 21.8, max: 23.2, bg: '#80D888', text: '#1a1a2e' },  /* D6  (mint) */
+                { min: 23.2, max: 24.8, bg: '#C8D850', text: '#1a1a2e' },  /* D7  (lime-gold) */
+                { min: 24.8, max: 26.8, bg: '#E8C840', text: '#1a1a2e' },  /* D8  (gold) */
+                { min: 26.8, max: 31.6, bg: '#D87838', text: '#FFFFFF' },  /* D9  (burnt orange) */
                 { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (dark red) */
             ];
             function getWtiColor(wti) {
