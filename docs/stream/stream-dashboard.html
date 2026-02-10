@@ -544,12 +544,13 @@
                         const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
                         return m === 0 ? `${h12} ${suffix}` : `${h12}:${String(m).padStart(2,'0')} ${suffix}`;
                     }
+                    const hoursLabel = stats.hours_source === 'official' ? 'official' : 'expected';
                     document.getElementById('kpi-readings-label').textContent = 'Opens';
                     document.getElementById('kpi-readings').textContent = fmtTime(stats.open_time);
-                    document.getElementById('kpi-readings-subtext').textContent = 'park open';
+                    document.getElementById('kpi-readings-subtext').textContent = hoursLabel;
                     document.getElementById('kpi-days-label').textContent = 'Closes';
                     document.getElementById('kpi-days').textContent = fmtTime(stats.close_time);
-                    document.getElementById('kpi-days-subtext').textContent = 'park close';
+                    document.getElementById('kpi-days-subtext').textContent = hoursLabel;
                 } else {
                     document.getElementById('kpi-readings-label').textContent = 'Data Points';
                     document.getElementById('kpi-readings').textContent = waitValues.length > 0 ? waitValues.length.toLocaleString() : '--';

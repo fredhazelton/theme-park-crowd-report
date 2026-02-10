@@ -325,29 +325,31 @@ def _fixed_crowd_level(wti: float) -> int:
 # Park Hours helpers
 # ---------------------------------------------------------------------------
 
-def _get_park_hours(park_upper: str, target_date: date) -> tuple[str, str]:
+def _get_park_hours(park_upper: str, target_date: date) -> tuple[str, str, str]:
     """
-    Return (open_hhmm, close_hhmm) for a park on a date.
-    Falls back to typical hours (08:00 - 23:00) if not found.
+    Return (open_hhmm, close_hhmm, hours_source) for a park on a date.
+    hours_source: "official" if real hours, "expected" if from donor date, "fallback" if default.
     """
     if PARK_HOURS_DF.empty:
-        return ("08:00", "23:00")
+        return ("08:00", "23:00", "fallback")
 
     date_str = target_date.isoformat()
     rows = PARK_HOURS_DF[
         (PARK_HOURS_DF["park"] == park_upper) &
         (PARK_HOURS_DF["date"] == date_str)
     ]
+    is_nearest = False
     if rows.empty:
         # Try nearest date for this park
         park_rows = PARK_HOURS_DF[PARK_HOURS_DF["park"] == park_upper]
         if park_rows.empty:
-            return ("08:00", "23:00")
+            return ("08:00", "23:00", "fallback")
         # Find closest date
         park_dates = pd.to_datetime(park_rows["date"]).dt.date
         diffs = abs(park_dates - target_date)
         nearest_idx = diffs.idxmin()
         rows = park_rows.loc[[nearest_idx]]
+        is_nearest = True
 
     row = rows.iloc[0]
     try:
@@ -361,7 +363,14 @@ def _get_park_hours(park_upper: str, target_date: date) -> tuple[str, str]:
     except Exception:
         close_hm = "23:00"
 
-    return (open_hm, close_hm)
+    # Determine source: official (no donor) vs expected (donor date used)
+    has_donor = pd.notna(row.get("donor_date")) and str(row.get("donor_date", "")).strip() != ""
+    if is_nearest or has_donor:
+        hours_source = "expected"
+    else:
+        hours_source = "official"
+
+    return (open_hm, close_hm, hours_source)
 
 
 def _filter_curve_to_park_hours(curve: list[dict], park_upper: str,
@@ -374,7 +383,7 @@ def _filter_curve_to_park_hours(curve: list[dict], park_upper: str,
     if not curve:
         return curve
 
-    open_hm, close_hm = _get_park_hours(park_upper, target_date)
+    open_hm, close_hm, _ = _get_park_hours(park_upper, target_date)
 
     # Parse to minutes from midnight
     def hm_to_min(hm: str) -> int:
@@ -585,10 +594,12 @@ def _build_daily_curve(park_upper: str, start_d: date, end_d: date,
 
         if wait_type == "actual":
             # For "actual" mode: use ACTUAL observations where we have them,
-            # fill gaps with model predictions (predicted_actual values)
-            prediction_curve = _curve_from_forecasts(park_upper, start_d, end_d, entity_code)
+            # fill gaps with model predictions (predicted_actual values).
+            # Priority: model_aggregates (date-group matched, has proper curves)
+            # then forecasts as fallback.
+            prediction_curve = _curve_from_model_aggregates(park_upper, start_d, entity_code)
             if not prediction_curve:
-                prediction_curve = _curve_from_model_aggregates(park_upper, start_d, entity_code)
+                prediction_curve = _curve_from_forecasts(park_upper, start_d, end_d, entity_code)
 
             if fact_curve and prediction_curve:
                 # Merge: actual observations take priority, predictions fill gaps
@@ -771,7 +782,7 @@ def get_stats(park_code: str):
             best_time = best_pt["time_slot"]
 
     # Park hours for this date
-    open_time, close_time = _get_park_hours(park, target_date)
+    open_time, close_time, hours_source = _get_park_hours(park, target_date)
 
     return jsonify({
         "park_code": park_code,
@@ -781,6 +792,7 @@ def get_stats(park_code: str):
         "wti": round(wti_val, 1) if wti_val is not None else None,
         "open_time": open_time,
         "close_time": close_time,
+        "hours_source": hours_source,
     })
 
 
