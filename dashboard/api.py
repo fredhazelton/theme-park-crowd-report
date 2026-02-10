@@ -496,8 +496,13 @@ def _curve_from_model_aggregates(park_upper: str, target_date: date,
 
 
 def _curve_from_fact_tables(park_upper: str, target_date: date,
-                             entity_code: Optional[str] = None) -> list[dict]:
-    """Build curve from fact_tables/clean CSV for a historical date."""
+                             entity_code: Optional[str] = None,
+                             wait_type: str = "actual") -> list[dict]:
+    """Build curve from fact_tables/clean CSV for a historical date.
+    
+    wait_type="actual" → use ACTUAL observations only (caller fills gaps with predictions)
+    wait_type="posted" → use POSTED observations for the curve
+    """
     pc_lower = park_upper.lower()
     ym = target_date.strftime("%Y-%m")
     date_str = target_date.strftime("%Y-%m-%d")
@@ -517,16 +522,19 @@ def _curve_from_fact_tables(park_upper: str, target_date: date,
     if entity_code:
         df = df[df["entity_code"].astype(str).str.upper() == entity_code.upper()]
 
-    # Use POSTED wait times — they're the primary data source in the fact tables.
-    # ACTUAL observations are very sparse (typically < 20 per park-day) and don't
-    # form a usable curve.  The "actual points" overlay is handled separately.
+    # Filter by requested wait_time_type
     if "wait_time_type" in df.columns:
-        posted = df[df["wait_time_type"].astype(str).str.upper() == "POSTED"]
-        if not posted.empty:
-            df = posted
+        if wait_type == "posted":
+            posted = df[df["wait_time_type"].astype(str).str.upper() == "POSTED"]
+            if not posted.empty:
+                df = posted
+            else:
+                df = df[df["wait_time_type"].astype(str).str.upper() != "PRIORITY"]
         else:
-            # Last resort: use whatever is there (ACTUAL, PRIORITY, etc.)
-            df = df[df["wait_time_type"].astype(str).str.upper() != "PRIORITY"]
+            # "actual" mode — only use ACTUAL observations (may be sparse; gaps
+            # will be filled by model predictions in _build_daily_curve)
+            actual = df[df["wait_time_type"].astype(str).str.upper() == "ACTUAL"]
+            df = actual  # may be empty — that's OK, predictions will fill in
 
     if df.empty or "observed_at" not in df.columns or "wait_time_minutes" not in df.columns:
         return []
@@ -555,12 +563,15 @@ def _curve_from_fact_tables(park_upper: str, target_date: date,
 
 
 def _build_daily_curve(park_upper: str, start_d: date, end_d: date,
-                        entity_code: Optional[str] = None) -> list[dict]:
+                        entity_code: Optional[str] = None,
+                        wait_type: str = "actual") -> list[dict]:
     """
     Unified daily curve builder:
-      - Future dates (>= FORECAST_START) → all_forecasts.parquet
-      - Today / gap dates → model_aggregates.parquet
-      - Historical dates → fact_tables CSVs
+      - Future dates (>= FORECAST_START) → all_forecasts.parquet (predicted_actual)
+      - Historical dates → fact_tables CSVs (filtered by wait_type)
+      - For wait_type="actual": uses ACTUAL observations where available,
+        then fills gaps with model predictions (forecasts / model_aggregates).
+      - For wait_type="posted": uses POSTED observations directly.
     Results are filtered to park operating hours ± 1h buffer.
     """
     curve = []
@@ -569,19 +580,52 @@ def _build_daily_curve(park_upper: str, start_d: date, end_d: date,
         curve = _curve_from_forecasts(park_upper, start_d, end_d, entity_code)
 
     if not curve and start_d == end_d:
-        # Single date – try fact tables first (historical with actual observations)
-        curve = _curve_from_fact_tables(park_upper, start_d, entity_code)
-        # If curve is too sparse (< 10 points), try forecast for a proper shape
-        if len(curve) < 10:
-            forecast_curve = _curve_from_forecasts(park_upper, FORECAST_START, FORECAST_START, entity_code)
-            if forecast_curve:
-                curve = forecast_curve
+        # Single date – get observations from fact tables
+        fact_curve = _curve_from_fact_tables(park_upper, start_d, entity_code, wait_type=wait_type)
+
+        if wait_type == "actual":
+            # For "actual" mode: use ACTUAL observations where we have them,
+            # fill gaps with model predictions (predicted_actual values)
+            prediction_curve = _curve_from_forecasts(park_upper, start_d, end_d, entity_code)
+            if not prediction_curve:
+                prediction_curve = _curve_from_model_aggregates(park_upper, start_d, entity_code)
+
+            if fact_curve and prediction_curve:
+                # Merge: actual observations take priority, predictions fill gaps
+                actual_slots = {pt["time_slot"]: pt["avg_wait"] for pt in fact_curve}
+                merged = []
+                for pt in prediction_curve:
+                    ts = pt["time_slot"]
+                    if ts in actual_slots:
+                        merged.append({"time_slot": ts, "avg_wait": actual_slots[ts]})
+                    else:
+                        merged.append(pt)
+                # Also include any actual slots not in predictions
+                pred_slots = {pt["time_slot"] for pt in prediction_curve}
+                for pt in fact_curve:
+                    if pt["time_slot"] not in pred_slots:
+                        merged.append(pt)
+                merged.sort(key=lambda p: p["time_slot"])
+                curve = merged
+            elif fact_curve:
+                curve = fact_curve
+            elif prediction_curve:
+                curve = prediction_curve
+        else:
+            # "posted" mode: just use the POSTED observations directly
+            curve = fact_curve
+            if len(curve) < 10:
+                # Sparse posted data — try forecast as fallback
+                forecast_curve = _curve_from_forecasts(park_upper, FORECAST_START, FORECAST_START, entity_code)
+                if forecast_curve:
+                    curve = forecast_curve
+
     elif not curve:
         # Multi-day historical range: aggregate fact tables
         all_slots: dict[str, list[float]] = {}
         current = start_d
         while current <= end_d:
-            day_curve = _curve_from_fact_tables(park_upper, current, entity_code)
+            day_curve = _curve_from_fact_tables(park_upper, current, entity_code, wait_type=wait_type)
             for pt in day_curve:
                 all_slots.setdefault(pt["time_slot"], []).append(pt["avg_wait"])
             current += timedelta(days=1)
@@ -777,6 +821,9 @@ def get_daily_curve(park_code: str):
     start_param = request.args.get("start")
     end_param = request.args.get("end")
     entity_param = request.args.get("entity_code") or request.args.get("entity")
+    wait_type = request.args.get("wait_type", "actual").lower()
+    if wait_type not in ("actual", "posted"):
+        wait_type = "actual"
 
     if date_param:
         try:
@@ -794,7 +841,7 @@ def get_daily_curve(park_code: str):
     else:
         start_date = end_date = date.today()
 
-    curve = _build_daily_curve(park, start_date, end_date, entity_param)
+    curve = _build_daily_curve(park, start_date, end_date, entity_param, wait_type=wait_type)
 
     return jsonify({
         "curve": curve,
