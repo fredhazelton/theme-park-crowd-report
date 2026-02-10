@@ -1728,8 +1728,13 @@
                     return;
                 }
 
+                const avgZ = data.avg_z_score || 0;
+                const avgZSign = avgZ > 0 ? '+' : '';
+                const avgZLabel = Math.abs(avgZ) >= 1.5 ? (avgZ > 0 ? ' ↑ Busy' : ' ↓ Quiet') 
+                                : Math.abs(avgZ) >= 0.5 ? (avgZ > 0 ? ' ↑ Above avg' : ' ↓ Below avg')
+                                : ' — Normal';
                 document.getElementById('trend-subtitle').textContent =
-                    `${data.park_name} — ${points.length} days`;
+                    `${data.park_name} — ${points.length} days — Avg z: ${avgZSign}${avgZ.toFixed(2)}${avgZLabel}`;
 
                 const labels = points.map(p => p.date);
                 const zScores = points.map(p => p.z_score);

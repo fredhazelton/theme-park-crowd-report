@@ -1667,12 +1667,17 @@ def get_trend(park_code: str):
             "label": label,
         })
 
+    # Summary stats
+    z_values = [p["z_score"] for p in points]
+    avg_z = round(sum(z_values) / len(z_values), 2) if z_values else 0
+
     return jsonify({
         "points": points,
         "park_name": park_name,
         "start_date": start_d.isoformat(),
         "end_date": end_d.isoformat(),
         "n_points": len(points),
+        "avg_z_score": avg_z,
     })
 
 
