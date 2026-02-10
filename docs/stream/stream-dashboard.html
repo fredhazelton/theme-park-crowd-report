@@ -792,30 +792,39 @@
                 document.getElementById('kpi-max').textContent = curvePeak;
                 document.getElementById('kpi-min').textContent = curveMin;
             }
-            // Benedictus gradient for the fill (created after chart init, applied via plugin)
+            // Benedictus vertical gradient: blue (bottom/low) → red (top/high)
+            // Create on the canvas upfront — gradient uses pixel coords (top=0, bottom=height)
+            const canvasEl = document.getElementById('timeSeriesChart');
+            const canvasH = canvasEl.parentElement.clientHeight || 300;
+            const fillGrad = ctx.createLinearGradient(0, canvasH, 0, 0); // bottom → top
+            const lineGrad = ctx.createLinearGradient(0, canvasH, 0, 0);
             const benedictusStops = [
-                [0.0, '10, 47, 143'],     // #0A2F8F D1 dark blue (low wait)
-                [0.1, '48, 95, 209'],     // #305FD1 D2
-                [0.2, '90, 150, 234'],    // #5A96EA D3
-                [0.3, '152, 196, 242'],   // #98C4F2 D4
-                [0.4, '193, 221, 252'],   // #C1DDFC D5
-                [0.5, '255, 224, 233'],   // #FFE0E9 D6
-                [0.6, '255, 177, 201'],   // #FFB1C9 D7
-                [0.7, '255, 129, 172'],   // #FF81AC D8
-                [0.8, '235, 66, 123'],    // #EB427B D9
-                [1.0, '166, 0, 56'],      // #A60038 D10 dark red (high wait)
+                [0.0, '10, 47, 143'],     // D1 dark blue (low wait)
+                [0.1, '48, 95, 209'],     // D2
+                [0.2, '90, 150, 234'],    // D3
+                [0.3, '152, 196, 242'],   // D4
+                [0.4, '193, 221, 252'],   // D5
+                [0.5, '255, 224, 233'],   // D6
+                [0.6, '255, 177, 201'],   // D7
+                [0.7, '255, 129, 172'],   // D8
+                [0.8, '235, 66, 123'],    // D9
+                [1.0, '166, 0, 56'],      // D10 dark red (high wait)
             ];
+            for (const [stop, rgb] of benedictusStops) {
+                fillGrad.addColorStop(stop, `rgba(${rgb}, 0.35)`);
+                lineGrad.addColorStop(stop, `rgba(${rgb}, 1)`);
+            }
 
             const datasets = [{
                 label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                 data: values,
-                borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : '#4a90a4',
-                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : 'rgba(74, 144, 164, 0.25)',
+                borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : lineGrad,
+                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : fillGrad,
                 fill: true,
                 tension: 0.3,
                 pointRadius: values.length > 40 ? 0 : 2,
-                pointBackgroundColor: '#4a90a4',
-                pointBorderColor: '#4a90a4'
+                pointBackgroundColor: isPlaceholder ? '#4a90a4' : lineGrad,
+                pointBorderColor: isPlaceholder ? '#4a90a4' : lineGrad,
             }];
             // ── Smart label picker: peaks, valleys, and periodic labels ──
             function pickLabelIndices(values) {
@@ -909,29 +918,6 @@
                     }
                 },
                 plugins: [{
-                    // Apply Benedictus vertical gradient to fill + line
-                    id: 'benedictusGradient',
-                    beforeDatasetsDraw(chart) {
-                        if (isPlaceholder) return;
-                        const { chartArea: { top, bottom }, scales: { y } } = chart;
-                        if (!y) return;
-                        const c = chart.ctx;
-                        const ds = chart.data.datasets[0];
-
-                        // Build vertical gradient: bottom (y=0, blue) → top (y=max, red)
-                        const fillGrad = c.createLinearGradient(0, y.getPixelForValue(0), 0, y.getPixelForValue(yMax));
-                        const lineGrad = c.createLinearGradient(0, y.getPixelForValue(0), 0, y.getPixelForValue(yMax));
-                        for (const [stop, rgb] of benedictusStops) {
-                            fillGrad.addColorStop(1 - stop, `rgba(${rgb}, 0.35)`);
-                            lineGrad.addColorStop(1 - stop, `rgba(${rgb}, 1)`);
-                        }
-                        ds.backgroundColor = fillGrad;
-                        ds.borderColor = lineGrad;
-                        // Update point colors to match line
-                        ds.pointBackgroundColor = lineGrad;
-                        ds.pointBorderColor = lineGrad;
-                    }
-                }, {
                     id: 'curveDataLabels',
                     afterDatasetsDraw(chart) {
                         const ctx = chart.ctx;
