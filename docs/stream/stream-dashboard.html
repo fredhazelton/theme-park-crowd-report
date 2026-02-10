@@ -997,23 +997,25 @@
             labels = combined.map(c => c.label);
             const sortedData = combined.map(c => c.value);
             
-            /* ── WTI Color Scale (universal, fixed 0–60 range) ──
+            /* ── WTI Color Scale (universal, decile-based) ──────────
              * 10 steps: dark blue (quiet) → dark pink (busiest)
-             * From Figma brand palette. Scale is fixed so colors
+             * Breakpoints from deciles of the full WTI dataset.
+             * From Figma brand palette. Scale is FIXED so colors
              * mean the same thing regardless of what subset is shown.
+             * Recalculate deciles only when the full dataset changes
+             * significantly (e.g., new parks added).
              */
-            const WTI_SCALE_MAX = 60; /* WTI values above this get darkest pink */
             const WTI_COLORS = [
-                { min: 0,  max: 6,  bg: '#0A2F8F', text: '#FFFFFF' },  /* Level 1 — quietest */
-                { min: 6,  max: 12, bg: '#305FD1', text: '#FFFFFF' },  /* Level 2 */
-                { min: 12, max: 18, bg: '#5A96EA', text: '#FFFFFF' },  /* Level 3 */
-                { min: 18, max: 24, bg: '#98C4F2', text: '#0a1628' },  /* Level 4 */
-                { min: 24, max: 30, bg: '#C1DDFC', text: '#0a1628' },  /* Level 5 */
-                { min: 30, max: 36, bg: '#FFE0E9', text: '#0a1628' },  /* Level 6 */
-                { min: 36, max: 42, bg: '#FFB1C9', text: '#0a1628' },  /* Level 7 */
-                { min: 42, max: 48, bg: '#FF81AC', text: '#0a1628' },  /* Level 8 */
-                { min: 48, max: 54, bg: '#CA2360', text: '#FFFFFF' },  /* Level 9 */
-                { min: 54, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* Level 10 — busiest */
+                { min: 0,    max: 13.1, bg: '#0A2F8F', text: '#FFFFFF' },  /* D1 — quietest 10% */
+                { min: 13.1, max: 15.7, bg: '#305FD1', text: '#FFFFFF' },  /* D2 */
+                { min: 15.7, max: 18.0, bg: '#5A96EA', text: '#FFFFFF' },  /* D3 */
+                { min: 18.0, max: 20.1, bg: '#98C4F2', text: '#0a1628' },  /* D4 */
+                { min: 20.1, max: 21.8, bg: '#C1DDFC', text: '#0a1628' },  /* D5 */
+                { min: 21.8, max: 23.2, bg: '#FFE0E9', text: '#0a1628' },  /* D6 */
+                { min: 23.2, max: 24.8, bg: '#FFB1C9', text: '#0a1628' },  /* D7 */
+                { min: 24.8, max: 26.8, bg: '#FF81AC', text: '#0a1628' },  /* D8 */
+                { min: 26.8, max: 31.6, bg: '#CA2360', text: '#FFFFFF' },  /* D9 */
+                { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest 10% */
             ];
             function getWtiColor(wti) {
                 const v = Number(wti) || 0;
