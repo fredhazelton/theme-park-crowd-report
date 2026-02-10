@@ -1379,6 +1379,157 @@ def get_forecast_summary():
         return jsonify({"error": str(e)}), 500
 
 
+# ----- Distribution (Box Plot) -----
+
+@app.route("/api/distribution/<park_code>", methods=["GET"])
+def get_distribution(park_code: str):
+    """
+    Box-plot statistics for a park's WTI or an entity's daily average wait.
+
+    Query params:
+      entity_code  – if provided, compute distribution for that entity
+      date         – the "current" date to highlight (today_value)
+
+    Returns: {min, q1, median, q3, max, outliers, today_value, today_date, n_days, entity_name}
+    """
+    entity_code = request.args.get("entity_code", "").strip()
+    date_str = request.args.get("date", "").strip()
+    target_date: Optional[date] = None
+    if date_str:
+        try:
+            target_date = date.fromisoformat(date_str)
+        except ValueError:
+            target_date = None
+
+    # ------------------------------------------------------------------
+    # Entity-level distribution
+    # ------------------------------------------------------------------
+    if entity_code:
+        ec_upper = entity_code.upper()
+        # Scan fact_tables for last 90 days
+        end_d = target_date or date.today()
+        start_d = end_d - timedelta(days=90)
+
+        daily_avgs: list[float] = []
+        today_value = None
+        current = start_d
+        while current <= end_d:
+            pc_lower = _park_upper(park_code).lower() if park_code.lower() != "all" else None
+            ym = current.strftime("%Y-%m")
+            date_s = current.strftime("%Y-%m-%d")
+
+            # Find the correct CSV — need park code prefix
+            fact_dir = OUTPUT_BASE / "fact_tables" / "clean" / ym
+            if fact_dir.exists():
+                # Try exact park file first, then scan for entity across parks
+                csvs_to_check = []
+                if pc_lower:
+                    candidate = fact_dir / f"{pc_lower}_{date_s}.csv"
+                    if candidate.exists():
+                        csvs_to_check.append(candidate)
+                else:
+                    csvs_to_check = list(fact_dir.glob(f"*_{date_s}.csv"))
+
+                for csv_path in csvs_to_check:
+                    try:
+                        df = pd.read_csv(csv_path, low_memory=False)
+                        mask = (
+                            (df["entity_code"].astype(str).str.upper().str.strip() == ec_upper)
+                            & (df["wait_time_type"].astype(str).str.upper() == "ACTUAL")
+                        )
+                        subset = df.loc[mask]
+                        if subset.empty:
+                            continue
+                        vals = pd.to_numeric(subset["wait_time_minutes"], errors="coerce").dropna()
+                        if vals.empty:
+                            continue
+                        day_avg = float(vals.mean())
+                        daily_avgs.append(day_avg)
+                        if current == (target_date or date.today()):
+                            today_value = round(day_avg, 1)
+                        break  # found data for this day
+                    except Exception:
+                        continue
+            current += timedelta(days=1)
+
+        if not daily_avgs:
+            return jsonify({"error": f"No ACTUAL wait data for entity {ec_upper} in last 90 days"}), 404
+
+        values = np.array(daily_avgs)
+        q1 = float(np.percentile(values, 25))
+        median_val = float(np.percentile(values, 50))
+        q3 = float(np.percentile(values, 75))
+        iqr = q3 - q1
+        lower_fence = q1 - 1.5 * iqr
+        upper_fence = q3 + 1.5 * iqr
+        non_outliers = values[(values >= lower_fence) & (values <= upper_fence)]
+        outliers = values[(values < lower_fence) | (values > upper_fence)]
+
+        return jsonify({
+            "min": round(float(non_outliers.min()), 1) if len(non_outliers) > 0 else round(float(values.min()), 1),
+            "q1": round(q1, 1),
+            "median": round(median_val, 1),
+            "q3": round(q3, 1),
+            "max": round(float(non_outliers.max()), 1) if len(non_outliers) > 0 else round(float(values.max()), 1),
+            "outliers": sorted([round(float(o), 1) for o in outliers]),
+            "today_value": today_value,
+            "today_date": (target_date or date.today()).isoformat(),
+            "n_days": len(daily_avgs),
+            "entity_name": _entity_name(ec_upper),
+        })
+
+    # ------------------------------------------------------------------
+    # Park-level distribution (WTI)
+    # ------------------------------------------------------------------
+    if WTI_DF.empty:
+        return jsonify({"error": "No WTI data loaded"}), 404
+
+    park = _park_upper(park_code)
+    if park == "ALL":
+        wti_values = WTI_DF["wti"].dropna().values
+    else:
+        wti_values = WTI_DF.loc[WTI_DF["park_code"] == park, "wti"].dropna().values
+
+    if len(wti_values) == 0:
+        return jsonify({"error": f"No WTI data for park {park}"}), 404
+
+    values = np.array(wti_values, dtype=float)
+    q1 = float(np.percentile(values, 25))
+    median_val = float(np.percentile(values, 50))
+    q3 = float(np.percentile(values, 75))
+    iqr = q3 - q1
+    lower_fence = q1 - 1.5 * iqr
+    upper_fence = q3 + 1.5 * iqr
+    non_outliers = values[(values >= lower_fence) & (values <= upper_fence)]
+    outliers = values[(values < lower_fence) | (values > upper_fence)]
+
+    today_value = None
+    td = target_date or date.today()
+    if park == "ALL":
+        day_vals = WTI_DF.loc[WTI_DF["park_date"] == td, "wti"].dropna()
+        if not day_vals.empty:
+            today_value = round(float(day_vals.mean()), 1)
+    else:
+        wti_row = _wti_for_park_date(park, td)
+        if wti_row:
+            today_value = round(wti_row["wti"], 1)
+
+    park_name = PARK_INFO.get(park, {}).get("name", park) if park != "ALL" else "All Parks"
+
+    return jsonify({
+        "min": round(float(non_outliers.min()), 1) if len(non_outliers) > 0 else round(float(values.min()), 1),
+        "q1": round(q1, 1),
+        "median": round(median_val, 1),
+        "q3": round(q3, 1),
+        "max": round(float(non_outliers.max()), 1) if len(non_outliers) > 0 else round(float(values.max()), 1),
+        "outliers": sorted([round(float(o), 1) for o in outliers]),
+        "today_value": today_value,
+        "today_date": td.isoformat(),
+        "n_days": int(len(values)),
+        "entity_name": park_name,
+    })
+
+
 # ----- Debug -----
 
 @app.route("/api/debug/entity-table", methods=["GET"])

@@ -393,11 +393,11 @@
                 
                 <div class="chart-panel">
                     <div class="chart-header">
-                        <div class="chart-title">Top 10 Longest Waits</div>
-                        <div class="chart-subtitle">Average posted wait</div>
+                        <div class="chart-title">Distribution</div>
+                        <div class="chart-subtitle" id="distribution-subtitle">Historical range</div>
                     </div>
-                    <div class="top-list" id="top-waits-list">
-                        <div class="loading">Loading...</div>
+                    <div class="chart-container" style="position:relative;">
+                        <canvas id="distributionCanvas"></canvas>
                     </div>
                 </div>
             </div>
@@ -490,10 +490,9 @@
                         console.warn('Aggregate KPI load failed:', e);
                     }
                     document.getElementById('data-info').innerHTML = 'Date: ' + selectedDate + '<br>Showing all parks';
-                    const topList = document.getElementById('top-waits-list');
-                    if (topList) topList.innerHTML = '<div class="loading">Select a park for top waits</div>';
                     dashboardData = {};
                     await loadDailyCurve();
+                    loadDistribution();
                     fetchSampleCurveExample();
                     return;
                 }
@@ -568,9 +567,6 @@
                     'Readings: ' + (waitValues.length || 0) + '<br>' +
                     (stats.best_time ? 'Best time: ' + stats.best_time : '');
                 
-                // Update top waits list
-                updateTopWaitsListFromAPI(waits);
-                
                 // Store data for charts
                 dashboardData = {
                     wait_times: waits,
@@ -579,6 +575,8 @@
                 
                 // Load daily wait time curve (area chart)
                 await loadDailyCurve();
+                // Load distribution box plot
+                loadDistribution();
                 // Fetch example (park, attraction, date) with real actual data for the curve hint
                 fetchSampleCurveExample();
             } catch (e) {
@@ -1235,26 +1233,208 @@
             }
         }
         
-        function updateTopWaitsListFromAPI(waits) {
-            const list = document.getElementById('top-waits-list');
-            if (!waits || waits.length === 0) {
-                list.innerHTML = '<div class="loading">No data available</div>';
-                return;
+        // ── Distribution Box Plot ──
+        async function loadDistribution() {
+            const canvas = document.getElementById('distributionCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const park = document.getElementById('park-filter').value || 'all';
+            const attraction = document.getElementById('attraction-filter').value;
+            const selectedDate = getSelectedDateStr();
+
+            let url = `${API_BASE}/distribution/${park}?date=${encodeURIComponent(selectedDate)}`;
+            if (attraction && attraction !== 'all') {
+                url += '&entity_code=' + encodeURIComponent(attraction);
             }
-            
-            const sorted = waits
-                .filter(w => w.wait_minutes != null && w.wait_minutes > 0)
-                .sort((a, b) => (b.wait_minutes || 0) - (a.wait_minutes || 0))
-                .slice(0, 10);
-            
-            list.innerHTML = sorted.map((item, i) => 
-                '<div class="top-item"><span class="rank">' + (i+1) + '</span><span class="name">' + (item.entity_name || item.entity_code) + '</span><span class="wait">' + Math.round(item.wait_minutes) + 'm</span></div>'
-            ).join('');
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) {
+                    drawEmptyDistribution(ctx, canvas, 'No distribution data');
+                    document.getElementById('distribution-subtitle').textContent = 'Historical range';
+                    return;
+                }
+                const d = await res.json();
+                if (d.error) {
+                    drawEmptyDistribution(ctx, canvas, d.error);
+                    return;
+                }
+                drawBoxPlot(ctx, canvas, d);
+                // Update subtitle
+                const sub = document.getElementById('distribution-subtitle');
+                const label = d.entity_name || park.toUpperCase();
+                sub.textContent = `${label} · ${d.n_days} days`;
+            } catch (e) {
+                console.warn('Distribution load failed:', e);
+                drawEmptyDistribution(ctx, canvas, 'Load failed');
+            }
         }
-        
-        function updateTopWaitsList(park) {
-            if (dashboardData && dashboardData.wait_times) {
-                updateTopWaitsListFromAPI(dashboardData.wait_times);
+
+        function drawEmptyDistribution(ctx, canvas, msg) {
+            const w = canvas.width = canvas.parentElement.clientWidth;
+            const h = canvas.height = canvas.parentElement.clientHeight;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = 'rgba(233, 244, 255, 0.4)';
+            ctx.font = '12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(msg || 'No data', w / 2, h / 2);
+        }
+
+        function drawBoxPlot(ctx, canvas, d) {
+            const dpr = window.devicePixelRatio || 1;
+            const cssW = canvas.parentElement.clientWidth;
+            const cssH = canvas.parentElement.clientHeight;
+            canvas.width = cssW * dpr;
+            canvas.height = cssH * dpr;
+            canvas.style.width = cssW + 'px';
+            canvas.style.height = cssH + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const w = cssW;
+            const h = cssH;
+            ctx.clearRect(0, 0, w, h);
+
+            // Gather all values to determine y-scale
+            const allVals = [d.min, d.q1, d.median, d.q3, d.max, ...(d.outliers || [])];
+            if (d.today_value != null) allVals.push(d.today_value);
+            const dataMin = Math.min(...allVals);
+            const dataMax = Math.max(...allVals);
+            const range = dataMax - dataMin || 1;
+
+            // Layout
+            const padTop = 20;
+            const padBottom = 20;
+            const padLeft = 55;   // space for labels on the left
+            const padRight = 60;  // space for today indicator label
+            const plotH = h - padTop - padBottom;
+            const boxLeft = padLeft + 10;
+            const boxWidth = Math.min(80, (w - padLeft - padRight) * 0.5);
+            const boxCenterX = boxLeft + boxWidth / 2;
+
+            // y mapping: value → pixel (top = high value, bottom = low value)
+            const scaleMin = dataMin - range * 0.08;
+            const scaleMax = dataMax + range * 0.08;
+            function yOf(val) {
+                return padTop + plotH * (1 - (val - scaleMin) / (scaleMax - scaleMin));
+            }
+
+            const yMin = yOf(d.min);
+            const yMax = yOf(d.max);
+            const yQ1 = yOf(d.q1);
+            const yQ3 = yOf(d.q3);
+            const yMedian = yOf(d.median);
+
+            // ── Whiskers (vertical line from min to max) ──
+            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(boxCenterX, yMax);
+            ctx.lineTo(boxCenterX, yQ3);
+            ctx.moveTo(boxCenterX, yQ1);
+            ctx.lineTo(boxCenterX, yMin);
+            ctx.stroke();
+
+            // Whisker caps
+            const capW = boxWidth * 0.5;
+            ctx.beginPath();
+            ctx.moveTo(boxCenterX - capW / 2, yMax);
+            ctx.lineTo(boxCenterX + capW / 2, yMax);
+            ctx.moveTo(boxCenterX - capW / 2, yMin);
+            ctx.lineTo(boxCenterX + capW / 2, yMin);
+            ctx.stroke();
+
+            // ── Box (Q1 to Q3) ──
+            ctx.fillStyle = 'rgba(74, 144, 164, 0.3)';
+            ctx.fillRect(boxLeft, yQ3, boxWidth, yQ1 - yQ3);
+            ctx.strokeStyle = '#4a90a4';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxLeft, yQ3, boxWidth, yQ1 - yQ3);
+
+            // ── Median line ──
+            ctx.strokeStyle = '#e9f4ff';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(boxLeft, yMedian);
+            ctx.lineTo(boxLeft + boxWidth, yMedian);
+            ctx.stroke();
+
+            // ── Outlier dots ──
+            if (d.outliers && d.outliers.length > 0) {
+                ctx.fillStyle = 'rgba(74, 144, 164, 0.6)';
+                d.outliers.forEach(o => {
+                    const yO = yOf(o);
+                    ctx.beginPath();
+                    ctx.arc(boxCenterX, yO, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            // ── Labels on the left ──
+            ctx.fillStyle = '#e9f4ff';
+            ctx.font = '11px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            const labelX = padLeft - 4;
+
+            // Avoid label overlap: collect labels with y positions, then push apart
+            const labels = [
+                { text: `${Math.round(d.max)}  max`, y: yMax },
+                { text: `${Math.round(d.q3)}  Q3`, y: yQ3 },
+                { text: `${Math.round(d.median)}  med`, y: yMedian },
+                { text: `${Math.round(d.q1)}  Q1`, y: yQ1 },
+                { text: `${Math.round(d.min)}  min`, y: yMin },
+            ];
+            // Simple overlap avoidance: push apart if too close
+            const minGap = 14;
+            for (let i = 1; i < labels.length; i++) {
+                // labels sorted top→bottom (yMax is smallest pixel)
+                if (labels[i].y - labels[i-1].y < minGap) {
+                    labels[i].y = labels[i-1].y + minGap;
+                }
+            }
+            labels.forEach(l => {
+                ctx.fillStyle = '#e9f4ff';
+                ctx.fillText(l.text, labelX, l.y);
+            });
+
+            // ── Today value indicator (triangle + value) ──
+            if (d.today_value != null) {
+                const yToday = yOf(d.today_value);
+                const triX = boxLeft + boxWidth + 14;
+                const triSize = 8;
+
+                // Draw filled triangle pointing left
+                ctx.fillStyle = '#A60038';
+                ctx.beginPath();
+                ctx.moveTo(triX, yToday);
+                ctx.lineTo(triX + triSize, yToday - triSize);
+                ctx.lineTo(triX + triSize, yToday + triSize);
+                ctx.closePath();
+                ctx.fill();
+
+                // Horizontal line from triangle to box
+                ctx.strokeStyle = '#A60038';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.moveTo(boxLeft + boxWidth, yToday);
+                ctx.lineTo(triX, yToday);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Label
+                ctx.fillStyle = '#A60038';
+                ctx.font = 'bold 12px Inter, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${Math.round(d.today_value)}`, triX + triSize + 5, yToday);
+
+                // "today" label below the value
+                ctx.font = '9px Inter, sans-serif';
+                ctx.fillStyle = 'rgba(166, 0, 56, 0.7)';
+                ctx.fillText('today', triX + triSize + 5, yToday + 13);
             }
         }
         
@@ -1648,6 +1828,7 @@
             await loadData();
             await populateAttractions();
             loadDailyCurve();
+            loadDistribution();
             await updateParkCompareChart();
             updateWeekdayChart(document.getElementById('park-filter').value);
         }
@@ -1662,6 +1843,7 @@
             await populateAttractions(); // Populate attractions for the selected park
             await updateParkCompareChart(); // Refresh Wait by Park with parks for selected property; width auto-adjusts
             updateWeekdayChart(document.getElementById('park-filter').value);
+            loadDistribution();
         });
         
         function updateKPIDisplay() {
@@ -1688,27 +1870,18 @@
             await populateAttractions(); // Populate attractions filtered by the selected park
             await updateParkCompareChart(); // Refresh WTI lollipops
             updateWeekdayChart(document.getElementById('park-filter').value);
+            loadDistribution();
         });
         
         document.getElementById('wait-type-filter').addEventListener('change', () => {
             loadDailyCurve();
+            loadDistribution();
         });
         
         document.getElementById('attraction-filter').addEventListener('change', () => {
-            // Filter top waits by attraction if needed
-            if (dashboardData && dashboardData.wait_times) {
-                const attraction = document.getElementById('attraction-filter').value;
-                if (attraction === 'all') {
-                    updateTopWaitsListFromAPI(dashboardData.wait_times);
-                } else {
-                    const filtered = dashboardData.wait_times.filter(w => 
-                        (w.entity_name || w.entity_code) === attraction
-                    );
-                    updateTopWaitsListFromAPI(filtered);
-                }
-            }
-            // Refresh the daily curve for the selected attraction
+            // Refresh the daily curve and distribution for the selected attraction
             loadDailyCurve();
+            loadDistribution();
         });
         
         function clearAllDateSelections() {
@@ -1720,9 +1893,10 @@
         
         /** Refresh all date-sensitive charts and KPIs */
         async function onDateChanged() {
-            await loadData();  // KPIs + daily curve + top waits
+            await loadData();  // KPIs + daily curve + distribution
             await updateParkCompareChart();  // WTI lollipops
             updateWeekdayChart(document.getElementById('park-filter').value);
+            loadDistribution();
         }
 
         document.querySelectorAll('.date-preset').forEach(btn => {
@@ -1802,6 +1976,7 @@
             await populateAttractions();
             await updateParkCompareChart();
             updateWeekdayChart(document.getElementById('park-filter').value);
+            loadDistribution();
         })();
     </script>
 </body>
