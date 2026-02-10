@@ -1296,22 +1296,22 @@
             const h = cssH;
             ctx.clearRect(0, 0, w, h);
 
-            // Gather all values to determine y-scale
-            const allVals = [d.min, d.q1, d.median, d.q3, d.max, ...(d.outliers || [])];
+            // Gather values to determine y-scale (no outliers — just the 5-number summary)
+            const allVals = [d.min, d.q1, d.median, d.q3, d.max];
             if (d.today_value != null) allVals.push(d.today_value);
             const dataMin = Math.min(...allVals);
             const dataMax = Math.max(...allVals);
             const range = dataMax - dataMin || 1;
 
-            // Layout
+            // Layout — center the box in the available space
             const padTop = 20;
             const padBottom = 20;
             const padLeft = 55;   // space for labels on the left
             const padRight = 60;  // space for today indicator label
             const plotH = h - padTop - padBottom;
-            const boxLeft = padLeft + 10;
-            const boxWidth = Math.min(80, (w - padLeft - padRight) * 0.5);
-            const boxCenterX = boxLeft + boxWidth / 2;
+            const boxWidth = Math.min(80, (w - padLeft - padRight) * 0.4);
+            const boxCenterX = padLeft + (w - padLeft - padRight) / 2;
+            const boxLeft = boxCenterX - boxWidth / 2;
 
             // y mapping: value → pixel (top = high value, bottom = low value)
             const scaleMin = dataMin - range * 0.08;
@@ -1359,17 +1359,6 @@
             ctx.moveTo(boxLeft, yMedian);
             ctx.lineTo(boxLeft + boxWidth, yMedian);
             ctx.stroke();
-
-            // ── Outlier dots ──
-            if (d.outliers && d.outliers.length > 0) {
-                ctx.fillStyle = 'rgba(74, 144, 164, 0.6)';
-                d.outliers.forEach(o => {
-                    const yO = yOf(o);
-                    ctx.beginPath();
-                    ctx.arc(boxCenterX, yO, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-            }
 
             // ── Labels on the left ──
             ctx.fillStyle = '#e9f4ff';
