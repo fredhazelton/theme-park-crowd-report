@@ -1324,19 +1324,19 @@
             const startAngle = Math.PI;       // left (180°)
             const endAngle = 2 * Math.PI;     // right (360°)
 
-            // ── Draw gauge arc segments (monochromatic pink matching WTI scale) ──
-            // WTI decile colors: pale pink → dark pink
+            // ── Draw gauge arc segments (cool→warm matching WTI scale) ──
+            // Teal → Cyan → Green → Yellow → Orange → Red
             const gaugeColors = [
-                [222, 115, 148],  // #DE7394 D1 lightest
-                [216, 102, 137],  // #D86689 D2
-                [210, 89, 127],   // #D2597F D3
-                [203, 76, 117],   // #CB4C75 D4
-                [197, 64, 107],   // #C5406B D5
-                [191, 51, 96],    // #BF3360 D6
-                [184, 38, 86],    // #B82656 D7
-                [178, 25, 76],    // #B2194C D8
-                [172, 12, 66],    // #AC0C42 D9
-                [166, 0, 56],     // #A60038 D10 darkest
+                [74, 144, 164],   // #4A90A4 D1 teal (quietest)
+                [80, 168, 184],   // #50A8B8 D2 light teal
+                [90, 180, 204],   // #5AB4CC D3 cyan
+                [128, 200, 160],  // #80C8A0 D4 teal-green
+                [184, 212, 104],  // #B8D468 D5 yellow-green
+                [232, 200, 64],   // #E8C840 D6 gold
+                [232, 160, 48],   // #E8A030 D7 orange-yellow
+                [232, 112, 64],   // #E87040 D8 orange
+                [208, 64, 48],    // #D04030 D9 red-orange
+                [166, 0, 56],     // #A60038 D10 dark red (busiest)
             ];
             const segments = 60;
             for (let i = 0; i < segments; i++) {
@@ -1541,16 +1541,16 @@
              * significantly (e.g., new parks added).
              */
             const WTI_COLORS = [
-                { min: 0,    max: 13.1, bg: '#DE7394', text: '#FFFFFF' },  /* D1 — quietest 10% (3.0:1) */
-                { min: 13.1, max: 15.7, bg: '#D86689', text: '#FFFFFF' },  /* D2  (3.4:1) */
-                { min: 15.7, max: 18.0, bg: '#D2597F', text: '#FFFFFF' },  /* D3  (3.8:1) */
-                { min: 18.0, max: 20.1, bg: '#CB4C75', text: '#FFFFFF' },  /* D4  (4.3:1) */
-                { min: 20.1, max: 21.8, bg: '#C5406B', text: '#FFFFFF' },  /* D5  (4.9:1) */
-                { min: 21.8, max: 23.2, bg: '#BF3360', text: '#FFFFFF' },  /* D6  (5.4:1) */
-                { min: 23.2, max: 24.8, bg: '#B82656', text: '#FFFFFF' },  /* D7  (6.1:1) */
-                { min: 24.8, max: 26.8, bg: '#B2194C', text: '#FFFFFF' },  /* D8  (6.7:1) */
-                { min: 26.8, max: 31.6, bg: '#AC0C42', text: '#FFFFFF' },  /* D9  (7.3:1) */
-                { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (7.8:1) */
+                { min: 0,    max: 13.1, bg: '#4A90A4', text: '#FFFFFF' },  /* D1 — quietest (teal) */
+                { min: 13.1, max: 15.7, bg: '#50A8B8', text: '#FFFFFF' },  /* D2  (light teal) */
+                { min: 15.7, max: 18.0, bg: '#5AB4CC', text: '#FFFFFF' },  /* D3  (cyan) */
+                { min: 18.0, max: 20.1, bg: '#80C8A0', text: '#FFFFFF' },  /* D4  (teal-green) */
+                { min: 20.1, max: 21.8, bg: '#B8D468', text: '#1a1a2e' },  /* D5  (yellow-green) */
+                { min: 21.8, max: 23.2, bg: '#E8C840', text: '#1a1a2e' },  /* D6  (gold) */
+                { min: 23.2, max: 24.8, bg: '#E8A030', text: '#FFFFFF' },  /* D7  (orange-yellow) */
+                { min: 24.8, max: 26.8, bg: '#E87040', text: '#FFFFFF' },  /* D8  (orange) */
+                { min: 26.8, max: 31.6, bg: '#D04030', text: '#FFFFFF' },  /* D9  (red-orange) */
+                { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (dark red) */
             ];
             function getWtiColor(wti) {
                 const v = Number(wti) || 0;
