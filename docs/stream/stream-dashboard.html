@@ -1382,15 +1382,29 @@
                 const needleLen = radius + 8;
                 const needleBase = 12;
 
+                // Derive needle color from Benedictus palette to match arc position
+                const colorIdx = Math.min(pct * gaugeColors.length, gaugeColors.length - 1);
+                const cLow = gaugeColors[Math.floor(colorIdx)];
+                const cHigh = gaugeColors[Math.min(Math.ceil(colorIdx), gaugeColors.length - 1)];
+                const frac = colorIdx - Math.floor(colorIdx);
+                const nr = Math.round(cLow[0] + (cHigh[0] - cLow[0]) * frac);
+                const ng = Math.round(cLow[1] + (cHigh[1] - cLow[1]) * frac);
+                const nb = Math.round(cLow[2] + (cHigh[2] - cLow[2]) * frac);
+                const needleColor = `rgb(${nr},${ng},${nb})`;
+
                 ctx.save();
                 ctx.translate(centerX, centerY);
 
-                // Needle shadow
-                ctx.shadowColor = 'rgba(0,0,0,0.4)';
-                ctx.shadowBlur = 6;
+                // Strong drop shadow for depth (prevents blending with arc)
+                ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
 
-                // Needle
-                ctx.fillStyle = '#A60038';
+                // Needle — color matches its position on the gauge
+                ctx.fillStyle = needleColor;
+                ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 ctx.moveTo(
                     Math.cos(needleAngle) * needleLen,
@@ -1406,13 +1420,19 @@
                 );
                 ctx.closePath();
                 ctx.fill();
+                ctx.stroke();
 
-                // Center hub
+                // Center hub — matches needle color
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = '#A60038';
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.fillStyle = needleColor;
+                ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 ctx.arc(0, 0, 7, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.stroke();
                 ctx.fillStyle = '#0a1628';
                 ctx.beginPath();
                 ctx.arc(0, 0, 3, 0, Math.PI * 2);
