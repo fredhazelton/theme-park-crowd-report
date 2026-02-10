@@ -997,7 +997,31 @@
             labels = combined.map(c => c.label);
             const sortedData = combined.map(c => c.value);
             
-            const lollipopColor = '#A60038'; /* WTI / dark pink */
+            /* ── WTI Color Scale (universal, fixed 0–60 range) ──
+             * 10 steps: dark blue (quiet) → dark pink (busiest)
+             * From Figma brand palette. Scale is fixed so colors
+             * mean the same thing regardless of what subset is shown.
+             */
+            const WTI_SCALE_MAX = 60; /* WTI values above this get darkest pink */
+            const WTI_COLORS = [
+                { min: 0,  max: 6,  bg: '#0A2F8F', text: '#FFFFFF' },  /* Level 1 — quietest */
+                { min: 6,  max: 12, bg: '#305FD1', text: '#FFFFFF' },  /* Level 2 */
+                { min: 12, max: 18, bg: '#5A96EA', text: '#FFFFFF' },  /* Level 3 */
+                { min: 18, max: 24, bg: '#98C4F2', text: '#0a1628' },  /* Level 4 */
+                { min: 24, max: 30, bg: '#C1DDFC', text: '#0a1628' },  /* Level 5 */
+                { min: 30, max: 36, bg: '#FFE0E9', text: '#0a1628' },  /* Level 6 */
+                { min: 36, max: 42, bg: '#FFB1C9', text: '#0a1628' },  /* Level 7 */
+                { min: 42, max: 48, bg: '#FF81AC', text: '#0a1628' },  /* Level 8 */
+                { min: 48, max: 54, bg: '#CA2360', text: '#FFFFFF' },  /* Level 9 */
+                { min: 54, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* Level 10 — busiest */
+            ];
+            function getWtiColor(wti) {
+                const v = Number(wti) || 0;
+                for (const band of WTI_COLORS) {
+                    if (v >= band.min && v < band.max) return band;
+                }
+                return WTI_COLORS[WTI_COLORS.length - 1];
+            }
             
             const parkCount = parks.length;
             
@@ -1048,7 +1072,7 @@
                         },
                         y: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(166, 0, 56, 0.1)' },
+                            grid: { color: 'rgba(74, 144, 164, 0.1)' },
                             ticks: { display: false }
                         }
                     }
@@ -1063,12 +1087,14 @@
                         const stemBottom = yScale.getPixelForValue(0);
                         const nameGap = 18;
                         const lineHeight = 16;
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
                         ctx.lineWidth = 1;
                         ctx.setLineDash([2, 3]);
                         meta.data.forEach((bar, i) => {
                             const x = bar.x;
                             const y = bar.y;
+                            const value = chart.data.datasets[0].data[i];
+                            const colorBand = getWtiColor(value);
+                            ctx.strokeStyle = colorBand.bg + 'AA'; /* stem tinted to match head */
                             ctx.beginPath();
                             ctx.moveTo(x, stemBottom);
                             ctx.lineTo(x, y);
@@ -1080,13 +1106,14 @@
                             const y = bar.y;
                             const value = chart.data.datasets[0].data[i];
                             const valueText = (value != null && value !== '') ? String(Math.round(Number(value))) : '—';
-                            ctx.fillStyle = lollipopColor;
+                            const colorBand = getWtiColor(value);
+                            ctx.fillStyle = colorBand.bg;
                             ctx.beginPath();
                             ctx.arc(x, y, headRadius, 0, Math.PI * 2);
                             ctx.fill();
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
-                            ctx.fillStyle = 'rgba(233, 244, 255, 0.95)';
+                            ctx.fillStyle = colorBand.text;
                             ctx.font = 'bold 16px Inter, sans-serif';
                             ctx.fillText(valueText, x, y);
                             const parkName = chart.data.labels[i] || '';
