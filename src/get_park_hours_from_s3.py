@@ -226,6 +226,17 @@ def main() -> None:
         sys.exit(1)
 
     # ----- STEP 4: Write dimension_tables/dimparkhours.csv (atomic) -----
+    # Mark rows as official if they have real hours (not blank/default)
+    if "opening_time" in combined.columns:
+        combined["is_official"] = combined["opening_time"].apply(
+            lambda x: bool(pd.notna(x) and str(x).strip() and str(x).strip().lower() != "nan"
+                           and "1999" not in str(x))
+        )
+        n_official = combined["is_official"].sum()
+        logger.info(f"Marked {n_official:,} / {len(combined):,} rows as is_official=True")
+    else:
+        combined["is_official"] = False
+
     dim_dir.mkdir(parents=True, exist_ok=True)
     out_path = dim_dir / DIMPARKHOURS_NAME
     tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")

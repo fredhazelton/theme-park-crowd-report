@@ -320,7 +320,8 @@ def impute_park_hours(output_base: Path, logger: logging.Logger) -> int:
             closing_time_with_emh_or_party = i.closing_time_with_emh_or_party,
             emh_morning = i.emh_morning,
             emh_evening = i.emh_evening,
-            donor_date = CAST(i.donor_date AS VARCHAR)
+            donor_date = CAST(i.donor_date AS VARCHAR),
+            is_official = FALSE
         FROM imputed i
         WHERE p.park = i.park 
           AND CAST(p.date AS DATE) = i.target_date

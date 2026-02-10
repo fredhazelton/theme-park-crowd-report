@@ -363,18 +363,15 @@ def _get_park_hours(park_upper: str, target_date: date) -> tuple[str, str, str]:
     except Exception:
         close_hm = "23:00"
 
-    # Determine source: official vs expected.
-    # The imputation pipeline copies donor hours into opening_time for all dates,
-    # so we can't distinguish by column presence alone. Use date logic:
-    # - Past/today dates: hours are official (parks publish well in advance)
-    # - Future dates: hours are expected (from donor date projection)
-    # - Nearest-date fallback: always expected
+    # Determine source from is_official column (set by S3 sync = True, imputer = False)
     if is_nearest:
         hours_source = "expected"
-    elif target_date <= date.today():
-        hours_source = "official"
+    elif "is_official" in row.index:
+        is_off = row.get("is_official")
+        hours_source = "official" if (is_off is True or str(is_off).strip().lower() == "true") else "expected"
     else:
-        hours_source = "expected"
+        # Fallback if column doesn't exist yet
+        hours_source = "official" if target_date <= date.today() else "expected"
 
     return (open_hm, close_hm, hours_source)
 
