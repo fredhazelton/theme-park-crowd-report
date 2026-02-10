@@ -1048,9 +1048,17 @@
             
             const lollipopColor = '#A60038'; /* WTI / dark pink */
             
-            // Lock WTI chart to same width ratio as Daily Curve (2fr : 1fr)
+            // Auto-resize WTI chart based on number of parks
             const row2 = document.querySelector('.charts-row-2');
-            if (row2) row2.style.gridTemplateColumns = '2fr 1fr';
+            if (row2) {
+                if (parkCount <= 3) {
+                    row2.style.gridTemplateColumns = '1fr 1fr';  // Equal width for few parks
+                } else if (parkCount <= 5) {
+                    row2.style.gridTemplateColumns = '1.2fr 1fr'; // Slightly wider
+                } else {
+                    row2.style.gridTemplateColumns = '2fr 1fr';   // Full width for all parks
+                }
+            }
             
             const parkCount = parks.length;
             const barPctMin = 0.5;
