@@ -1394,6 +1394,7 @@ def get_distribution(park_code: str):
     """
     entity_code = request.args.get("entity_code", "").strip()
     date_str = request.args.get("date", "").strip()
+    prop_code = request.args.get("property", "").strip().lower()
     target_date: Optional[date] = None
     if date_str:
         try:
@@ -1486,7 +1487,13 @@ def get_distribution(park_code: str):
 
     park = _park_upper(park_code)
     if park == "ALL":
-        wti_values = WTI_DF["wti"].dropna().values
+        if prop_code and prop_code != "all":
+            # Filter WTI to parks belonging to this property
+            prop_parks = [code for code, info in PARK_INFO.items()
+                          if info.get("property", "").lower() == prop_code]
+            wti_values = WTI_DF.loc[WTI_DF["park_code"].isin(prop_parks), "wti"].dropna().values
+        else:
+            wti_values = WTI_DF["wti"].dropna().values
     else:
         wti_values = WTI_DF.loc[WTI_DF["park_code"] == park, "wti"].dropna().values
 
@@ -1506,7 +1513,15 @@ def get_distribution(park_code: str):
     today_value = None
     td = target_date or date.today()
     if park == "ALL":
-        day_vals = WTI_DF.loc[WTI_DF["park_date"] == td, "wti"].dropna()
+        if prop_code and prop_code != "all":
+            prop_park_codes = [code for code, info in PARK_INFO.items()
+                               if info.get("property", "").lower() == prop_code]
+            day_vals = WTI_DF.loc[
+                (WTI_DF["park_date"] == td) & (WTI_DF["park_code"].isin(prop_park_codes)),
+                "wti"
+            ].dropna()
+        else:
+            day_vals = WTI_DF.loc[WTI_DF["park_date"] == td, "wti"].dropna()
         if not day_vals.empty:
             today_value = round(float(day_vals.mean()), 1)
     else:
@@ -1514,7 +1529,12 @@ def get_distribution(park_code: str):
         if wti_row:
             today_value = round(wti_row["wti"], 1)
 
-    park_name = PARK_INFO.get(park, {}).get("name", park) if park != "ALL" else "All Parks"
+    if park == "ALL" and prop_code and prop_code != "all":
+        park_name = PROPERTY_NAMES.get(prop_code, prop_code.upper())
+    elif park != "ALL":
+        park_name = PARK_INFO.get(park, {}).get("name", park)
+    else:
+        park_name = "All Parks"
 
     return jsonify({
         "min": round(float(non_outliers.min()), 1) if len(non_outliers) > 0 else round(float(values.min()), 1),

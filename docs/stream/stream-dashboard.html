@@ -1243,9 +1243,13 @@
             const attraction = document.getElementById('attraction-filter').value;
             const selectedDate = getSelectedDateStr();
 
+            const property = document.getElementById('property-filter').value;
             let url = `${API_BASE}/distribution/${park}?date=${encodeURIComponent(selectedDate)}`;
             if (attraction && attraction !== 'all') {
                 url += '&entity_code=' + encodeURIComponent(attraction);
+            }
+            if (property && property !== 'all') {
+                url += '&property=' + encodeURIComponent(property);
             }
 
             try {
@@ -1260,11 +1264,17 @@
                     drawEmptyDistribution(ctx, canvas, d.error);
                     return;
                 }
+                // If API didn't find today_value, fall back to the KPI WTI
+                if (d.today_value == null) {
+                    const kpiVal = document.getElementById('kpi-avg').textContent;
+                    const parsed = parseFloat(kpiVal);
+                    if (!isNaN(parsed)) d.today_value = parsed;
+                }
                 drawGauge(ctx, canvas, d);
                 // Update subtitle
                 const sub = document.getElementById('distribution-subtitle');
                 const label = d.entity_name || park.toUpperCase();
-                sub.textContent = `${label} · ${d.n_days} days`;
+                sub.textContent = `${label} · ${d.n_days.toLocaleString()} days`;
             } catch (e) {
                 console.warn('Distribution load failed:', e);
                 drawEmptyDistribution(ctx, canvas, 'Load failed');
@@ -1405,47 +1415,47 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.fillStyle = '#e9f4ff';
-            ctx.font = 'bold 28px Inter, sans-serif';
-            ctx.fillText(displayVal, centerX, centerY + 6);
+            ctx.font = 'bold 36px Inter, sans-serif';
+            ctx.fillText(displayVal, centerX, centerY + 8);
 
-            // "min" label below
-            ctx.font = '10px Inter, sans-serif';
+            // "minutes" label below
+            ctx.font = '12px Inter, sans-serif';
             ctx.fillStyle = 'rgba(233, 244, 255, 0.5)';
-            ctx.fillText('minutes', centerX, centerY + 36);
+            ctx.fillText('minutes', centerX, centerY + 46);
 
             // ── Endpoint labels ──
             // Left: Cold January
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
-            ctx.font = '10px Inter, sans-serif';
+            ctx.font = '12px Inter, sans-serif';
             ctx.fillStyle = 'rgba(74, 144, 164, 0.9)';
             const leftLabelX = centerX - radius + 5;
-            const labelY = centerY + 10;
+            const labelY = centerY + 12;
             ctx.fillText('Cold', leftLabelX, labelY);
-            ctx.fillText('January', leftLabelX, labelY + 13);
+            ctx.fillText('January', leftLabelX, labelY + 15);
 
             // Right: New Year's Eve
             ctx.fillStyle = 'rgba(166, 0, 56, 0.9)';
             const rightLabelX = centerX + radius - 5;
             ctx.fillText("New Year's", rightLabelX, labelY);
-            ctx.fillText('Eve', rightLabelX, labelY + 13);
+            ctx.fillText('Eve', rightLabelX, labelY + 15);
 
             // ── Min/Max values at the ends ──
-            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.font = 'bold 13px Inter, sans-serif';
             ctx.fillStyle = 'rgba(233, 244, 255, 0.6)';
             ctx.textBaseline = 'bottom';
             ctx.textAlign = 'center';
-            ctx.fillText(Math.round(gaugeMin), centerX - radius, centerY - 4);
-            ctx.fillText(Math.round(gaugeMax), centerX + radius, centerY - 4);
+            ctx.fillText(Math.round(gaugeMin), centerX - radius, centerY - 6);
+            ctx.fillText(Math.round(gaugeMax), centerX + radius, centerY - 6);
 
             // ── Percentile label ──
             if (d.today_value != null) {
                 const pct = Math.max(0, Math.min(100, Math.round(((d.today_value - gaugeMin) / gaugeRange) * 100)));
-                ctx.font = '11px Inter, sans-serif';
+                ctx.font = '12px Inter, sans-serif';
                 ctx.fillStyle = 'rgba(233, 244, 255, 0.4)';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
-                ctx.fillText(`${pct}th percentile`, centerX, centerY + 50);
+                ctx.fillText(`${pct}th percentile`, centerX, centerY + 62);
             }
         }
         
