@@ -24,6 +24,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
+import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -277,11 +278,27 @@ def get_daily_wti(wti_df: pd.DataFrame, park_code: str, park_date: date) -> Opti
     if wti_df is None or wti_df.empty:
         return None
     
+    # Case-insensitive park code matching
+    park_upper = park_code.upper()
+    target_ts = pd.Timestamp(park_date)
+    
     # Filter by park and date
     park_data = wti_df[
-        (wti_df["park_code"] == park_code) &
-        (wti_df["park_date"] == park_date)
+        (wti_df["park_code"].str.upper() == park_upper) &
+        (wti_df["park_date"] == target_ts)
     ]
+    
+    # If no data for today, fall back to nearest date
+    if park_data.empty:
+        park_all = wti_df[wti_df["park_code"].str.upper() == park_upper].copy()
+        if park_all.empty:
+            return None
+        # Convert to numpy datetime64 for safe subtraction
+        dates = pd.to_datetime(park_all["park_date"]).values
+        diffs = np.abs(dates - np.datetime64(park_date))
+        idx = park_all.index[np.argmin(diffs)]
+        nearest_date = park_all.loc[idx, "park_date"]
+        park_data = park_all[park_all["park_date"] == nearest_date]
     
     if park_data.empty:
         return None
@@ -991,12 +1008,40 @@ def _build_daily_curve_from_curves(
 def _build_daily_curve_for_entity(
     output_base: Path, entity_code: str, start_date: date, end_date: date
 ) -> list[dict]:
-    """Build daily wait time curve for a single entity over a date range from forecast/backfill curves.
-    For each time_slot, average wait across all dates in range that have data.
+    """Build daily wait time curve for a single entity over a date range.
+    Uses V2 forecast parquet (all_forecasts.parquet) as primary source.
+    Falls back to individual CSV files if parquet not available.
     """
+    entity_upper = entity_code.strip().upper()
+    
+    # V2: Read from all_forecasts.parquet using DuckDB for speed
+    forecast_path = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
+    if forecast_path.exists():
+        try:
+            import duckdb
+            start_str = start_date.isoformat()
+            end_str = end_date.isoformat()
+            query = f"""
+                SELECT time_slot, AVG(predicted_actual) as avg_wait
+                FROM read_parquet('{forecast_path}')
+                WHERE entity_code = '{entity_upper}'
+                  AND park_date >= '{start_str}'
+                  AND park_date <= '{end_str}'
+                GROUP BY time_slot
+                ORDER BY time_slot
+            """
+            result = duckdb.sql(query).fetchall()
+            if result:
+                return [
+                    {"time_slot": str(row[0]), "avg_wait": round(float(row[1]), 1)}
+                    for row in result
+                ]
+        except Exception as e:
+            logger.warning("Forecast parquet read failed: %s", e)
+    
+    # Fallback: individual CSV files (legacy format)
     curves_dir = output_base / "curves" / "forecast"
     backfill_dir = output_base / "curves" / "backfill"
-    entity_upper = entity_code.strip().upper()
     slot_values: dict[str, list[float]] = {}
     current = start_date
     while current <= end_date:
@@ -1096,13 +1141,41 @@ def get_daily_curve(park_code: str):
     if entity_param:
         curve = _build_daily_curve_for_entity(output_base, entity_param, start_date, end_date)
     else:
-        # Park-level curve: from WTI or (single-day fallback) from all-entity curves
-        wti_df = load_wti_data(output_base)
-        if wti_df is not None and not wti_df.empty and "time_slot" in wti_df.columns:
-            curve = _build_daily_curve_from_wti(wti_df, pipeline_park, start_date, end_date)
-        if not curve and start_date == end_date:
-            entities_df = load_entity_metadata(output_base)
-            curve = _build_daily_curve_from_curves(output_base, pipeline_park, start_date, entities_df)
+        # Park-level curve: average across all entities from forecast parquet
+        forecast_path = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
+        if forecast_path.exists():
+            try:
+                import duckdb
+                # Get entity prefix for this park (e.g. MK -> MK%)
+                park_upper = pipeline_park.upper()
+                start_str = start_date.isoformat()
+                end_str = end_date.isoformat()
+                query = f"""
+                    SELECT time_slot, AVG(predicted_actual) as avg_wait
+                    FROM read_parquet('{forecast_path}')
+                    WHERE entity_code LIKE '{park_upper}%'
+                      AND park_date >= '{start_str}'
+                      AND park_date <= '{end_str}'
+                    GROUP BY time_slot
+                    ORDER BY time_slot
+                """
+                result = duckdb.sql(query).fetchall()
+                if result:
+                    curve = [
+                        {"time_slot": str(row[0]), "avg_wait": round(float(row[1]), 1)}
+                        for row in result
+                    ]
+            except Exception as e:
+                logger.warning("Park-level curve from forecast parquet failed: %s", e)
+        
+        # Fallback to WTI or legacy curves
+        if not curve:
+            wti_df = load_wti_data(output_base)
+            if wti_df is not None and not wti_df.empty and "time_slot" in wti_df.columns:
+                curve = _build_daily_curve_from_wti(wti_df, pipeline_park, start_date, end_date)
+            if not curve and start_date == end_date:
+                entities_df = load_entity_metadata(output_base)
+                curve = _build_daily_curve_from_curves(output_base, pipeline_park, start_date, entities_df)
 
     return jsonify({
         "curve": curve,
@@ -1242,12 +1315,17 @@ def get_stats(park_code: str):
             if time_match:
                 best_time = f"{time_match.group(1)} {time_match.group(2)}"
     
+    # Fall back to WTI when no live wait data
+    wti_val = daily_wti["wti"] if daily_wti else None
+    if avg_wait is None and wti_val is not None:
+        avg_wait = wti_val
+    
     return jsonify({
         "park_code": park_code,
         "date": today.isoformat(),
         "avg_wait": round(avg_wait, 1) if avg_wait is not None else None,
         "best_time": best_time,
-        "wti": daily_wti["wti"] if daily_wti else None,
+        "wti": round(wti_val, 1) if wti_val is not None else None,
     })
 
 
