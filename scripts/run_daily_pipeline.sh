@@ -162,6 +162,11 @@ acquire_pipeline_lock
 # Pipeline status file for dashboard
 $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" pipeline-start 2>/dev/null || true
 
+# Initialize run manifest for skip-if-unchanged cascade tracking
+if $SKIP_IF_UNCHANGED; then
+    $PYTHON scripts/pipeline_state.py start-run 2>/dev/null || true
+fi
+
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Daily pipeline started. Output base: $OUTPUT_BASE" >> "$LOG_FILE"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
@@ -277,55 +282,70 @@ fi
 
 # 5. Hybrid training V2 (Julia XGBoost with geo decay weights)
 # Uses DuckDB for matched pairs + Julia for training (with date_group_id, season, geo_decay)
+# Skip logic: only skip if no entities have new observations (checks entity_index.sqlite)
 if $SKIP_TRAINING; then
     log_info "=== Hybrid training V2 (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
+    $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record training false "explicitly skipped" 2>/dev/null || true
 elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check training 2>/dev/null; then
-    log_info "=== Hybrid training V2 (skipped - unchanged) ==="
+    log_info "=== Hybrid training V2 (skipped - no entities with new observations) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
+    $PYTHON scripts/pipeline_state.py record training false "no dirty entities" 2>/dev/null || true
 else
     if run_step "Hybrid training V2 (Julia + geo decay)" $PYTHON scripts/hybrid_pipeline_v2.py --skip-scoring; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
         $PYTHON scripts/pipeline_state.py update training 2>/dev/null || true
+        $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record training true "entities had new observations" 2>/dev/null || true
     else
         FAILED_ANY=true
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training failed 2>/dev/null || true
+        $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record training false "training failed" 2>/dev/null || true
         $STOP_ON_ERROR && exit 1
     fi
 fi
 
 # 6. Forecast
+# Skip logic: only skip if training was skipped this run (no new models = forecasts still valid)
 if $SKIP_FORECAST; then
     log_info "=== Forecast (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
+    $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record forecast false "explicitly skipped" 2>/dev/null || true
 elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check forecast 2>/dev/null; then
-    log_info "=== Forecast (skipped - unchanged) ==="
+    log_info "=== Forecast (skipped - training didn't run, forecasts still valid) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
+    $PYTHON scripts/pipeline_state.py record forecast false "training was skipped" 2>/dev/null || true
 else
     if run_step "Forecast (vectorized)" $PYTHON scripts/forecast_vectorized.py --days 730; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
         $PYTHON scripts/pipeline_state.py update forecast 2>/dev/null || true
+        $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record forecast true "training ran this run" 2>/dev/null || true
     else
         FAILED_ANY=true
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast failed 2>/dev/null || true
+        $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record forecast false "forecast failed" 2>/dev/null || true
         $STOP_ON_ERROR && exit 1
     fi
 fi
 
 # 7. WTI (simplified version that works with current data)
+# Skip logic: only skip if forecast was skipped this run (no new forecasts = WTI still valid)
 if $SKIP_WTI; then
     log_info "=== WTI (skipped) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti done 2>/dev/null || true
+    $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record wti false "explicitly skipped" 2>/dev/null || true
 elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check wti 2>/dev/null; then
-    log_info "=== WTI (skipped - unchanged) ==="
+    log_info "=== WTI (skipped - forecast didn't run, WTI still valid) ==="
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti done 2>/dev/null || true
+    $PYTHON scripts/pipeline_state.py record wti false "forecast was skipped" 2>/dev/null || true
 else
     if run_step "WTI" $PYTHON scripts/calculate_wti_simple.py --output-base "$OUTPUT_BASE"; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti done 2>/dev/null || true
         $PYTHON scripts/pipeline_state.py update wti 2>/dev/null || true
+        $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record wti true "forecast ran this run" 2>/dev/null || true
     else
         FAILED_ANY=true
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step wti failed 2>/dev/null || true
+        $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record wti false "wti failed" 2>/dev/null || true
         $STOP_ON_ERROR && exit 1
     fi
 fi

@@ -139,7 +139,7 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 ## Stage 2: Matched Pairs (V2)
 
 **Purpose:** Pair each ACTUAL observation with the closest POSTED observation within a 15-minute window, enriched with calendar features.
-##TODO: For historical observtions this only needs to be perfomred once. Once we generate pairs of POSTED and ACTUAL, we do not need to pair the same obs in the next run. Only new observations will need to be paired.
+**TODO:** For historical observations this only needs to be performed once. Once we generate pairs of POSTED and ACTUAL, we do not need to pair the same obs in the next run. Only new observations will need to be paired. (Currently, the full matched pairs are regenerated each run; incremental pairing is a future optimization.)
 
 
 **Location:** `/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs_v2.parquet`  
@@ -237,7 +237,7 @@ entity_code  park_date  actual_time  posted_time  date_group_id    season  geo_d
 | `early_stopping_rounds` | 20 | Early stopping patience |
 
 ### Training Logic
-##TODO - Note that training also only needs to be done on entities with new data - but the WHOLE dataset of observations must be retrained for that entity
+**Note:** Training currently retrains ALL eligible entities each run. The `--skip-if-unchanged` flag skips the entire training step if no entities have new data. Per-entity selective training (only retrain dirty entities) is a future optimization — the full dataset must be retrained for each entity since matched pairs include the full history.
 ```
 For each entity with ≥500 matched pairs:
     1. Load matched pairs for entity
@@ -727,13 +727,110 @@ All data is served via REST API at `http://localhost:8051`:
 
 ---
 
+## Skip-If-Unchanged Logic (Data-Driven Cascade)
+
+**Flag:** `--skip-if-unchanged` on `run_daily_pipeline.sh`  
+**Script:** `scripts/pipeline_state.py`  
+**State:** `state/pipeline_state.json` (persistent) + `state/run_manifest.json` (per-run)
+
+### Problem Solved
+
+Previously, skip decisions compared output file hashes/mtimes. This broke when
+training produced identical model files (same weights) — downstream steps saw
+"files unchanged" and skipped, even though new observations existed.
+
+### How It Works Now
+
+Skip decisions are driven by **data changes**, not output file comparisons:
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────┐
+│     ETL      │────▶│   Training   │────▶│   Forecast   │────▶│   WTI    │
+│              │     │              │     │              │     │          │
+│ Updates      │     │ Skip if NO   │     │ Skip if      │     │ Skip if  │
+│ entity_index │     │ dirty        │     │ training     │     │ forecast │
+│ .sqlite      │     │ entities     │     │ was skipped  │     │ was      │
+│              │     │              │     │ this run     │     │ skipped  │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────────┘
+                           │                     │                   │
+                     entity_index           run manifest         run manifest
+                     (data-driven)          (cascade)            (cascade)
+```
+
+### Decision Rules
+
+| Step | Skip When | Data Source |
+|------|-----------|-------------|
+| **Training** | No entities have `latest_observed_at > last_modeled_at` | `entity_index.sqlite` |
+| **Forecast** | Training did NOT run this pipeline run | `run_manifest.json` |
+| **WTI** | Forecast did NOT run this pipeline run | `run_manifest.json` |
+
+### Entity Index Tracking
+
+The `entity_index.sqlite` database (maintained by ETL) tracks per-entity:
+
+| Column | Purpose |
+|--------|---------|
+| `latest_observed_at` | Timestamp of newest observation from ETL |
+| `last_modeled_at` | Timestamp when we last trained a model for this entity |
+
+An entity is **dirty** (needs remodeling) when:
+- `last_modeled_at IS NULL` (never modeled), OR
+- `latest_observed_at > last_modeled_at` (new data since last model)
+
+After training completes, `hybrid_pipeline_v2.py` calls `mark_entity_modeled()`
+for each successfully trained entity, resetting their dirty state.
+
+### Run Manifest
+
+Each pipeline run creates `state/run_manifest.json` tracking which steps actually executed:
+
+```json
+{
+  "run_id": "2026-02-10T07:24:46",
+  "started_at": "2026-02-10T07:24:46",
+  "steps": {
+    "training": { "ran": true, "reason": "42 entities have new observations" },
+    "forecast": { "ran": true, "reason": "training ran this run" },
+    "wti":      { "ran": true, "reason": "forecast ran this run" }
+  }
+}
+```
+
+Downstream steps check the manifest: if the upstream step didn't run, they skip too.
+
+### CLI Commands
+
+```bash
+# Check dirty entities
+python3 scripts/pipeline_state.py dirty-entities
+
+# Check what a step would do
+python3 scripts/pipeline_state.py check training
+python3 scripts/pipeline_state.py check forecast
+python3 scripts/pipeline_state.py check wti
+
+# View current run manifest
+python3 scripts/pipeline_state.py show-manifest
+
+# Force full rebuild (clears all state + marks all entities dirty)
+python3 scripts/pipeline_state.py clear
+```
+
+### Without --skip-if-unchanged
+
+When the flag is NOT set (default), all steps always run unconditionally.
+The manifest and entity_index are still updated, but never consulted for skip decisions.
+
+---
+
 ## Re-scoring Triggers
 
 The following changes should trigger a re-scoring of predictions:
 
 1. **Park hours change** → Re-generate forecasts for affected dates
 2. **date_group_id assignment change** → Re-score historical + forecasts
-3. **Model retrain** → Re-score all predictions
+3. **Model retrain** → Re-score all predictions (handled automatically by skip logic)
 4. **New entity added** → Score new entity only
 
 ---

@@ -337,6 +337,28 @@ def step2_train_julia(logger) -> tuple[int, float]:
                 pass
     
     logger.info(f"  ⏱️  Julia training: {elapsed:.1f}s ({successful} models)")
+
+    # Mark all successfully trained entities in entity_index
+    # This resets their "dirty" state so they won't trigger unnecessary retraining
+    if successful > 0:
+        try:
+            _src = str(Path(__file__).resolve().parent.parent / "src")
+            if _src not in sys.path:
+                sys.path.insert(0, _src)
+            from processors.entity_index import mark_entity_modeled
+
+            entity_index_db = OUTPUT_BASE / "state" / "entity_index.sqlite"
+            # Find entities that actually have V2 models on disk
+            trained_entities = [
+                d.name for d in MODELS_DIR.iterdir()
+                if d.is_dir() and (d / "model_julia_v2.json").exists()
+            ]
+            for entity_code in trained_entities:
+                mark_entity_modeled(entity_code, entity_index_db)
+            logger.info(f"  Marked {len(trained_entities)} entities as modeled in entity_index")
+        except Exception as e:
+            logger.warning(f"  Failed to mark entities as modeled: {e}")
+
     return successful, elapsed
 
 

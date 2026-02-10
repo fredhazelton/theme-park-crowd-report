@@ -1,4 +1,4 @@
-# Pipeline State — Where We Are
+# Pipeline State - Where We Are
 
 Single reference for the current Theme Park pipeline setup (Linux, user **fred**). Updated when config, cron, or services change.
 
@@ -15,15 +15,15 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 | **Output base (data & logs)** | `/home/fred/TouringPlans.com Dropbox/fred hazelton/stats team/pipeline/hazeydata/theme-park-crowd-report` |
 | **Cron** | Single daily run at **6:00 AM Eastern** (`run_daily_pipeline.sh`) |
 | **Queue-times** | Continuous loop (every 5 min); **systemd service**, starts on boot |
-| **Dropbox** | Synced under fred’s home: `~/TouringPlans.com Dropbox/` |
+| **Dropbox** | Synced under fred's home: `~/TouringPlans.com Dropbox/` |
 
 ---
 
 ## 2. Config
 
 - **File:** `config/config.json`
-- **Important key:** `output_base` — all pipeline data and logs go under this path.
-- **Current value:**  
+- **Important key:** `output_base` - all pipeline data and logs go under this path.
+- **Current value:**
   `/home/fred/TouringPlans.com Dropbox/fred hazelton/stats team/pipeline/hazeydata/theme-park-crowd-report`
 - **AWS:** Scripts and cron use `~/.aws/credentials` and `~/.aws/config` (needed for S3 ETL and dimension fetches).
 - **DEV_MODE:** Set `DEV_MODE=true` (env) to use **repo/pipeline_dev** as output base and to filter ETL to 37 dev entities only. See `config/dev_config.py`. Shell (`scripts/common.sh`) and Python (`src/utils/paths.py`) both respect DEV_MODE. Run: `export DEV_MODE=true && ./scripts/run_daily_pipeline.sh` (use `--skip-dropbox-check` if output is not on Dropbox).
@@ -34,19 +34,20 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 
 ### 3.1 Daily pipeline (cron, 6:00 AM Eastern)
 
-- **What:** One cron job runs `scripts/run_daily_pipeline.sh`.
+- **What:** One cron job runs `scripts/run_daily_pipeline.sh --skip-dropbox-check --skip-if-unchanged`.
 - **Order:** S3 sync (wait_times + fastpass_times to `output_base/raw`) → ETL (incremental, sync-only: reads from `raw/` only) → Dimension fetches → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI.
-- **Runs as:** fred (your crontab).
+- **Runs as:** wilma (wilma's crontab).
 - **Log:** `output_base/logs/daily_pipeline_YYYY-MM-DD.log`
-- **Lock:** `state/daily_pipeline.lock` — only one run at a time. If the previous run is still in progress (e.g. still training), the next 6 AM run skips cleanly (exit 0) so it doesn’t kill or conflict with the other run.
+- **Lock:** `state/daily_pipeline.lock` — only one run at a time. If the previous run is still in progress (e.g. still training), the next 6 AM run skips cleanly (exit 0) so it doesn't kill or conflict with the other run.
 - **Training:** Uses **hybrid pipeline** (Julia XGBoost) — trains 141 models in ~67 seconds. See **docs/HYBRID_PIPELINE.md** and **docs/PIPELINE_TIMING_AND_PARALLELIZATION.md**.
+- **Skip-if-unchanged:** Data-driven cascade. Training skips only if no entities have new observations (entity_index.sqlite). Forecast skips only if training was skipped. WTI skips only if forecast was skipped. See **docs/PIPELINE_DATA_FLOW.md § Skip-If-Unchanged Logic**.
 
 ### 3.2 Queue-times loop (systemd, on boot + always)
 
 - **What:** Fetches wait times from queue-times.com every 5 minutes; writes to `output_base/staging/queue_times/`. Morning ETL later merges staging into `fact_tables/clean`.
 - **Service:** `queue-times-loop.service` (user fred, project dir = repo path).
 - **Starts:** Automatically on boot if you ran `sudo bash scripts/install_queue_times_service.sh`.
-- **Log (systemd):** `sudo journalctl -u queue-times-loop -f`  
+- **Log (systemd):** `sudo journalctl -u queue-times-loop -f`
   Optional file log: `output_base/logs/queue_times_loop.log` if started manually with redirect.
 
 ---
@@ -65,7 +66,7 @@ All under **output_base** unless noted.
 | `output_base/aggregates/` | posted_aggregates.parquet (for forecast) |
 | `output_base/models/` | Per-entity XGBoost (or mean) models |
 | `output_base/curves/forecast/` | Forecast curves (actual/posted predicted) |
-| `output_base/state/` | entity_index.sqlite, pipeline_status.json, daily_pipeline.lock (one run at a time), encoding_mappings.json, etc. |
+| `output_base/state/` | entity_index.sqlite, pipeline_state.json, run_manifest.json, pipeline_status.json, daily_pipeline.lock, encoding_mappings.json, etc. |
 | `output_base/raw/` | Synced S3 data: `raw/export/wait_times/`, `raw/export/fastpass_times/` (ETL reads from here only; sync-only, no S3 streaming). |
 | `output_base/reports/` | wait_time_db_report.md, etc. |
 
@@ -158,16 +159,16 @@ DASH_USER=admin DASH_PASSWORD=your-secret python dashboard/app.py
 
 ## 6. Other docs
 
-- **docs/DAILY_DOCUMENTATION_REVIEW.md** — End-of-day checklist to keep PIPELINE_STATE, README, and key docs in sync.
-- **LINUX_CRON_SETUP.md** — Cron options (five separate jobs vs single daily master), queue-times service, log paths.
-- **docs/REFRESH_READINESS.md** — Full refresh order, what’s in/out of cron, common gaps.
-- **scripts/README.md** — All scripts (run_daily_pipeline.sh, install_cron.sh, install_queue_times_service.sh, etc.).
+- **docs/DAILY_DOCUMENTATION_REVIEW.md** - End-of-day checklist to keep PIPELINE_STATE, README, and key docs in sync.
+- **LINUX_CRON_SETUP.md** - Cron options (five separate jobs vs single daily master), queue-times service, log paths.
+- **docs/REFRESH_READINESS.md** - Full refresh order, what's in/out of cron, common gaps.
+- **scripts/README.md** - All scripts (run_daily_pipeline.sh, install_cron.sh, install_queue_times_service.sh, etc.).
 
 ---
 
 ## 7. Changes from default
 
 - **Cron:** We use the **single daily master** at 6 AM (not the five separate jobs).
-- **Output base:** Set to **fred’s Dropbox** path under home (not `/media/fred/...`).
+- **Output base:** Set to **fred's Dropbox** path under home (not `/media/fred/...`).
 - **Queue-times:** Configured as a **systemd service** for user fred, starts on boot; unit file and install script are in `scripts/`.
 - **Wilma:** No theme-park cron or queue-times under wilma; everything runs as **fred**.
