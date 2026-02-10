@@ -1623,14 +1623,19 @@
                         const stemBottom = yScale.getPixelForValue(0);
                         const nameGap = 18;
                         const lineHeight = 16;
+                        // Check if a specific park is selected for highlighting
+                        const selectedPark = document.getElementById('park-filter').value;
+                        const parkCodes = chart.options.parks || [];
+                        const hasSelection = selectedPark && selectedPark !== 'all';
                         ctx.lineWidth = 1;
                         ctx.setLineDash([2, 3]);
                         meta.data.forEach((bar, i) => {
                             const x = bar.x;
                             const y = bar.y;
                             const value = chart.data.datasets[0].data[i];
+                            const isActive = !hasSelection || (parkCodes[i] && parkCodes[i].toLowerCase() === selectedPark.toLowerCase());
                             const colorBand = getWtiColor(value);
-                            ctx.strokeStyle = colorBand.bg + 'AA'; /* stem tinted to match head */
+                            ctx.strokeStyle = isActive ? colorBand.bg + 'AA' : 'rgba(255,255,255,0.12)';
                             ctx.beginPath();
                             ctx.moveTo(x, stemBottom);
                             ctx.lineTo(x, y);
@@ -1642,21 +1647,25 @@
                             const y = bar.y;
                             const value = chart.data.datasets[0].data[i];
                             const valueText = (value != null && value !== '') ? String(Math.round(Number(value))) : '—';
+                            const isActive = !hasSelection || (parkCodes[i] && parkCodes[i].toLowerCase() === selectedPark.toLowerCase());
                             const colorBand = getWtiColor(value);
-                            ctx.fillStyle = colorBand.bg;
+                            // Head circle
+                            ctx.fillStyle = isActive ? colorBand.bg : 'rgba(255,255,255,0.15)';
                             ctx.beginPath();
                             ctx.arc(x, y, headRadius, 0, Math.PI * 2);
                             ctx.fill();
+                            // Value text inside head
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
-                            ctx.fillStyle = colorBand.text;
+                            ctx.fillStyle = isActive ? colorBand.text : 'rgba(255,255,255,0.35)';
                             ctx.font = 'bold 16px Inter, sans-serif';
                             ctx.fillText(valueText, x, y);
+                            // Park name above
                             const parkName = chart.data.labels[i] || '';
                             const nameWords = (parkName + '').split(/\s+/).filter(Boolean);
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'bottom';
-                            ctx.fillStyle = 'rgba(233, 244, 255, 0.9)';
+                            ctx.fillStyle = isActive ? 'rgba(233, 244, 255, 0.9)' : 'rgba(233, 244, 255, 0.2)';
                             ctx.font = '14px Inter, sans-serif';
                             const blockBottom = y - headRadius - nameGap;
                             nameWords.forEach((word, wi) => {
