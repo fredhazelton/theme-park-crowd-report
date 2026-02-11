@@ -353,6 +353,13 @@
                 <label class="filter-label">Data</label>
                 <div id="data-info" style="font-size: 9px; color: var(--text-secondary);">Loading...</div>
             </div>
+            
+            <div id="attraction-image-section" class="filter-section" style="display: none; margin-top: 12px;">
+                <img id="attraction-image" src="" alt="" 
+                     style="width: 100%; border-radius: 6px; border: 1px solid var(--cyan-dim); opacity: 0; transition: opacity 0.4s ease;"
+                     onload="this.style.opacity='1'" 
+                     onerror="this.parentElement.style.display='none'">
+            </div>
         </aside>
         
         <main class="main-content">
@@ -2155,7 +2162,27 @@
             // Refresh the daily curve and distribution for the selected attraction
             loadDailyCurve();
             loadDistribution();
+            updateAttractionImage();
         });
+        
+        function updateAttractionImage() {
+            const sel = document.getElementById('attraction-filter');
+            const section = document.getElementById('attraction-image-section');
+            const img = document.getElementById('attraction-image');
+            const entityCode = sel.value;
+            
+            if (!entityCode || entityCode === 'all') {
+                section.style.display = 'none';
+                img.style.opacity = '0';
+                return;
+            }
+            
+            // Try loading the image for this entity code
+            const src = `images/attractions/${entityCode}.png`;
+            img.style.opacity = '0';
+            img.src = src;
+            section.style.display = 'block';
+        }
         
         function clearAllDateSelections() {
             // Clear all date preset buttons
