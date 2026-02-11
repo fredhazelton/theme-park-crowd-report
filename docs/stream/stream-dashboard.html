@@ -238,8 +238,8 @@
         .kpi-value.wti { 
             font-size: 24px; 
             font-weight: 700; 
-            color: var(--red); 
             margin: 4px 0; 
+            /* Color set dynamically by colorKpiByWti() */
         }
         .kpi-subtext { font-size: 9px; color: var(--text-secondary); }
         
@@ -484,6 +484,7 @@
                             const wtiValues = validStats.map(s => s.wti);
                             const avg = wtiValues.reduce((a, b) => a + b, 0) / wtiValues.length;
                             document.getElementById('kpi-avg').textContent = Math.round(avg);
+                            colorKpiByWti();
                             document.getElementById('kpi-max').textContent = Math.round(Math.max(...wtiValues));
                             document.getElementById('kpi-min').textContent = Math.round(Math.min(...wtiValues));
                         } else {
@@ -531,9 +532,11 @@
                 const isParkSelected = park !== 'all';
                 if (isParkSelected && stats.wti != null) {
                     document.getElementById('kpi-avg').textContent = Math.round(stats.wti);
+                    colorKpiByWti();
                 } else if (waitValues.length > 0) {
                     const avg = waitValues.reduce((a, b) => a + b, 0) / waitValues.length;
                     document.getElementById('kpi-avg').textContent = Math.round(avg);
+                    colorKpiByWti();
                 } else {
                     document.getElementById('kpi-avg').textContent = '--';
                 }
@@ -1606,6 +1609,15 @@
                     if (v >= band.min && v < band.max) return band;
                 }
                 return WTI_COLORS[WTI_COLORS.length - 1];
+            }
+
+            // Color the WTI KPI card value by Benedictus scale
+            function colorKpiByWti() {
+                const el = document.getElementById('kpi-avg');
+                const val = parseFloat(el.textContent);
+                if (isNaN(val)) { el.style.color = '#e9f4ff'; return; }
+                const band = getWtiColor(val);
+                el.style.color = band.bg;
             }
             
             const parkCount = parks.length;
