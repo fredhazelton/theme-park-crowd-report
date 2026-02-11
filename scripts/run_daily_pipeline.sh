@@ -225,6 +225,19 @@ else
     fi
 fi
 
+# 1b. Convert CSVs to Parquet (needed by WTI, forecasts, and posted aggregates)
+# Must run after ETL so new CSVs are included in the parquet files
+if $SKIP_ETL; then
+    log_info "=== CSV→Parquet conversion (skipped - ETL skipped) ==="
+else
+    if run_step "CSV→Parquet conversion" $PYTHON scripts/convert_to_parquet.py; then
+        :
+    else
+        FAILED_ANY=true
+        $STOP_ON_ERROR && exit 1
+    fi
+fi
+
 # 2. Dimension fetches
 if $SKIP_DIMENSIONS; then
     log_info "=== Dimension fetches (skipped) ==="
@@ -353,6 +366,16 @@ fi
 if $FAILED_ANY; then
     log_error "Daily pipeline finished with one or more failures. Check log: $LOG_FILE"
     exit 1
+fi
+
+# Restart dashboard API to pick up new data (WTI, fact tables, etc.)
+API_PID=$(pgrep -f "dashboard/api.py" 2>/dev/null | head -1)
+if [[ -n "$API_PID" ]]; then
+    log_info "Restarting dashboard API (PID $API_PID) to load new data..."
+    kill "$API_PID" 2>/dev/null || true
+    sleep 2
+    cd "$PROJECT_ROOT" && nohup "$PYTHON" dashboard/api.py >> "$OUTPUT_BASE/logs/api.log" 2>&1 &
+    log_info "Dashboard API restarted (new PID $!)"
 fi
 
 log_info "Daily pipeline completed successfully. Log: $LOG_FILE"
