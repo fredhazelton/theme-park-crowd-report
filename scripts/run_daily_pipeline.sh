@@ -293,6 +293,16 @@ else
     fi
 fi
 
+# 4b. Forecast Accuracy Evaluation (BEFORE new forecasts overwrite old ones)
+# Compares previous forecast against fresh actuals, archives current forecast
+log_info "=== Forecast accuracy evaluation ==="
+if run_step "Forecast accuracy evaluation" $PYTHON src/evaluate_forecast_accuracy.py --output-base "$OUTPUT_BASE" --run-date "$(date +%Y-%m-%d)"; then
+    log_info "Done: Forecast accuracy evaluation"
+else
+    log_info "WARNING: Forecast accuracy evaluation failed (non-fatal, continuing)"
+    # Non-fatal — don't stop the pipeline for accuracy tracking failures
+fi
+
 # 5. Hybrid training V2 (Julia XGBoost with geo decay weights)
 # Uses DuckDB for matched pairs + Julia for training (with date_group_id, season, geo_decay)
 # Skip logic: only skip if no entities have new observations (checks entity_index.sqlite)
