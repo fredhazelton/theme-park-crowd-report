@@ -456,6 +456,34 @@
             return `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
         }
 
+        /* ── WTI Color Scale (universal, decile-based) — used by KPI card + lollipops ── */
+        const WTI_COLORS = [
+            { min: 0,    max: 13.1, bg: '#0A2F8F', text: '#FFFFFF' },  /* D1 — quietest (dark blue) */
+            { min: 13.1, max: 15.7, bg: '#305FD1', text: '#FFFFFF' },  /* D2  (blue) */
+            { min: 15.7, max: 18.0, bg: '#5A96EA', text: '#FFFFFF' },  /* D3  (medium blue) */
+            { min: 18.0, max: 20.1, bg: '#98C4F2', text: '#1a1a2e' },  /* D4  (light blue) */
+            { min: 20.1, max: 21.8, bg: '#C1DDFC', text: '#1a1a2e' },  /* D5  (pale blue) */
+            { min: 21.8, max: 23.2, bg: '#FFE0E9', text: '#1a1a2e' },  /* D6  (pale pink) */
+            { min: 23.2, max: 24.8, bg: '#FFB1C9', text: '#1a1a2e' },  /* D7  (light pink) */
+            { min: 24.8, max: 26.8, bg: '#FF81AC', text: '#FFFFFF' },  /* D8  (medium pink) */
+            { min: 26.8, max: 31.6, bg: '#EB427B', text: '#FFFFFF' },  /* D9  (dark pink) */
+            { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (brand dark red) */
+        ];
+        function getWtiColor(wti) {
+            const v = Number(wti) || 0;
+            for (const band of WTI_COLORS) {
+                if (v >= band.min && v < band.max) return band;
+            }
+            return WTI_COLORS[WTI_COLORS.length - 1];
+        }
+        function colorKpiByWti() {
+            const el = document.getElementById('kpi-avg');
+            const val = parseFloat(el.textContent);
+            if (isNaN(val)) { el.style.color = '#e9f4ff'; return; }
+            const band = getWtiColor(val);
+            el.style.color = band.bg;
+        }
+
         async function loadData() {
             try {
                 const park = document.getElementById('park-filter').value;
@@ -1591,35 +1619,6 @@
              * Recalculate deciles only when the full dataset changes
              * significantly (e.g., new parks added).
              */
-            const WTI_COLORS = [
-                { min: 0,    max: 13.1, bg: '#0A2F8F', text: '#FFFFFF' },  /* D1 — quietest (dark blue) */
-                { min: 13.1, max: 15.7, bg: '#305FD1', text: '#FFFFFF' },  /* D2  (blue) */
-                { min: 15.7, max: 18.0, bg: '#5A96EA', text: '#FFFFFF' },  /* D3  (medium blue) */
-                { min: 18.0, max: 20.1, bg: '#98C4F2', text: '#1a1a2e' },  /* D4  (light blue) */
-                { min: 20.1, max: 21.8, bg: '#C1DDFC', text: '#1a1a2e' },  /* D5  (pale blue) */
-                { min: 21.8, max: 23.2, bg: '#FFE0E9', text: '#1a1a2e' },  /* D6  (pale pink) */
-                { min: 23.2, max: 24.8, bg: '#FFB1C9', text: '#1a1a2e' },  /* D7  (light pink) */
-                { min: 24.8, max: 26.8, bg: '#FF81AC', text: '#FFFFFF' },  /* D8  (medium pink) */
-                { min: 26.8, max: 31.6, bg: '#EB427B', text: '#FFFFFF' },  /* D9  (dark pink) */
-                { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (brand dark red) */
-            ];
-            function getWtiColor(wti) {
-                const v = Number(wti) || 0;
-                for (const band of WTI_COLORS) {
-                    if (v >= band.min && v < band.max) return band;
-                }
-                return WTI_COLORS[WTI_COLORS.length - 1];
-            }
-
-            // Color the WTI KPI card value by Benedictus scale
-            function colorKpiByWti() {
-                const el = document.getElementById('kpi-avg');
-                const val = parseFloat(el.textContent);
-                if (isNaN(val)) { el.style.color = '#e9f4ff'; return; }
-                const band = getWtiColor(val);
-                el.style.color = band.bg;
-            }
-            
             const parkCount = parks.length;
             
             // Auto-resize WTI chart based on number of parks
