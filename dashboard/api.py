@@ -575,13 +575,20 @@ def _curve_from_fact_tables(park_upper: str, target_date: date,
 
     # Bucket into 5-min slots using local park time
     df["slot_min"] = (df["observed_at_local"].dt.hour * 60 + df["observed_at_local"].dt.minute) // 5 * 5
-    agg = df.groupby("slot_min")["wait_time_minutes"].mean().reset_index()
+    agg = df.groupby("slot_min")["wait_time_minutes"].agg(["mean", "count"]).reset_index()
+    agg.columns = ["slot_min", "avg_wait", "n_obs"]
     agg = agg.sort_values("slot_min")
+
+    # For park-wide curves (no specific entity), require min 3 observations per bin
+    # to prevent single-ride outliers from spiking the average
+    min_obs = 1 if entity_code else 3
+    agg = agg[agg["n_obs"] >= min_obs]
 
     return [
         {
             "time_slot": f"{int(r['slot_min']) // 60:02d}:{int(r['slot_min']) % 60:02d}",
-            "avg_wait": round(float(r["wait_time_minutes"]), 1),
+            "avg_wait": round(float(r["avg_wait"]), 1),
+            "n_obs": int(r["n_obs"]),
         }
         for _, r in agg.iterrows()
     ]
