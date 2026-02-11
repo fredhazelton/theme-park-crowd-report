@@ -1414,54 +1414,41 @@ def get_distribution(park_code: str):
     # ------------------------------------------------------------------
     if entity_code:
         ec_upper = entity_code.upper()
-        # Scan fact_tables for last 90 days
         end_d = target_date or date.today()
-        start_d = end_d - timedelta(days=90)
+        end_s = end_d.isoformat()
 
-        daily_avgs: list[float] = []
-        today_value = None
-        current = start_d
-        while current <= end_d:
-            pc_lower = _park_upper(park_code).lower() if park_code.lower() != "all" else None
-            ym = current.strftime("%Y-%m")
-            date_s = current.strftime("%Y-%m-%d")
+        try:
+            import duckdb as _ddb
+            con = _ddb.connect()
+            parquet_dir = str(OUTPUT_BASE / "fact_tables" / "parquet")
 
-            # Find the correct CSV — need park code prefix
-            fact_dir = OUTPUT_BASE / "fact_tables" / "clean" / ym
-            if fact_dir.exists():
-                # Try exact park file first, then scan for entity across parks
-                csvs_to_check = []
-                if pc_lower:
-                    candidate = fact_dir / f"{pc_lower}_{date_s}.csv"
-                    if candidate.exists():
-                        csvs_to_check.append(candidate)
-                else:
-                    csvs_to_check = list(fact_dir.glob(f"*_{date_s}.csv"))
+            # Get daily averages for this entity across ALL history
+            result = con.execute(f"""
+                SELECT
+                    park_date,
+                    AVG(wait_time_minutes) as day_avg
+                FROM read_parquet('{parquet_dir}/*.parquet')
+                WHERE entity_code = '{ec_upper}'
+                AND wait_time_type = 'ACTUAL'
+                AND park_date <= '{end_s}'
+                AND wait_time_minutes > 0
+                GROUP BY park_date
+                ORDER BY park_date
+            """).fetchdf()
+            con.close()
 
-                for csv_path in csvs_to_check:
-                    try:
-                        df = pd.read_csv(csv_path, low_memory=False)
-                        mask = (
-                            (df["entity_code"].astype(str).str.upper().str.strip() == ec_upper)
-                            & (df["wait_time_type"].astype(str).str.upper() == "ACTUAL")
-                        )
-                        subset = df.loc[mask]
-                        if subset.empty:
-                            continue
-                        vals = pd.to_numeric(subset["wait_time_minutes"], errors="coerce").dropna()
-                        if vals.empty:
-                            continue
-                        day_avg = float(vals.mean())
-                        daily_avgs.append(day_avg)
-                        if current == (target_date or date.today()):
-                            today_value = round(day_avg, 1)
-                        break  # found data for this day
-                    except Exception:
-                        continue
-            current += timedelta(days=1)
+            if result.empty:
+                return jsonify({"error": f"No ACTUAL wait data for entity {ec_upper}"}), 404
 
-        if not daily_avgs:
-            return jsonify({"error": f"No ACTUAL wait data for entity {ec_upper} in last 90 days"}), 404
+            daily_avgs = result["day_avg"].tolist()
+            today_value = None
+            today_row = result[result["park_date"] == end_s]
+            if not today_row.empty:
+                today_value = round(float(today_row["day_avg"].iloc[0]), 1)
+
+        except Exception as e:
+            app.logger.error(f"DuckDB distribution query failed: {e}")
+            return jsonify({"error": f"Distribution query failed for {ec_upper}"}), 500
 
         values = np.array(daily_avgs)
         q1 = float(np.percentile(values, 25))
@@ -1481,12 +1468,11 @@ def get_distribution(park_code: str):
             "max": round(float(non_outliers.max()), 1) if len(non_outliers) > 0 else round(float(values.max()), 1),
             "outliers": sorted([round(float(o), 1) for o in outliers]),
             "today_value": today_value,
-            "today_date": (target_date or date.today()).isoformat(),
+            "today_date": end_d.isoformat(),
             "n_days": len(daily_avgs),
             "entity_name": _entity_name(ec_upper),
         })
 
-    # ------------------------------------------------------------------
     # Park-level distribution (WTI)
     # ------------------------------------------------------------------
     if WTI_DF.empty:
