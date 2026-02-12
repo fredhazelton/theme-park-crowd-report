@@ -66,7 +66,7 @@ All under **output_base** unless noted.
 | `output_base/aggregates/` | posted_aggregates.parquet (for forecast) |
 | `output_base/models/` | Per-entity XGBoost (or mean) models |
 | `output_base/curves/forecast/` | Forecast curves (actual/posted predicted) |
-| `output_base/state/` | entity_index.sqlite, pipeline_state.json, run_manifest.json, pipeline_status.json, daily_pipeline.lock, encoding_mappings.json, etc. |
+| `output_base/state/` | entity_index.sqlite, pipeline_state.json, run_manifest.json, pipeline_status.json, daily_pipeline.lock, encoding_mappings.json, **etl_last_run.json** (timestamp of last successful ETL; ETL only processes files modified since), processed_files.json, failed_files.json, dedupe.sqlite, etc. |
 | `output_base/raw/` | Synced S3 data: `raw/export/wait_times/`, `raw/export/fastpass_times/` (ETL reads from here only; sync-only, no S3 streaming). |
 | `output_base/reports/` | wait_time_db_report.md, etc. |
 
@@ -100,6 +100,8 @@ nohup ./scripts/run_daily_pipeline.sh >> "output_base/logs/daily_pipeline_$(date
 ```
 
 **S3 sync:** The pipeline runs `scripts/sync_s3_data.sh` before ETL to sync `wait_times` and `fastpass_times` from S3 into `output_base/raw/`. ETL is sync-only and always reads from `output_base/raw/` (no S3 streaming). Use `--skip-sync` only if you have already synced; ETL will still read from `raw/`.
+
+**ETL incremental:** ETL only processes files modified since the last successful run (`state/etl_last_run.json`). Reduces daily processing from ~36 files to ~5-7 (skips old 2013-2019 files that fail with "No columns to parse"). Use `--full-rebuild` to process all files.
 
 **Dropbox:** If `output_base` is under Dropbox, the pipeline force-quits Dropbox before starting (to avoid file locks / partial reads). It runs `dropbox stop` (or `pkill -TERM` if no CLI), waits up to 15s for exit, then proceeds. Dropbox stays stopped until you start it again (or next login if it auto-starts). Use `--skip-dropbox-check` to skip stopping Dropbox (e.g. if output is not on Dropbox).
 

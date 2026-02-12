@@ -87,6 +87,7 @@ S3_PRIORITY_PREFIX_FMT = "export/fastpass_times/{prop}/"
 LOCAL_SAMPLE_NAME = "wait_time_fact_table_sample.csv"
 PROCESSED_FILES_JSON = "processed_files.json"
 FAILED_FILES_JSON = "failed_files.json"
+ETL_LAST_RUN_JSON = "etl_last_run.json"
 DEDUPE_DB_NAME = "dedupe.sqlite"
 LOCK_FILE_NAME = "processing.lock"
 
@@ -214,6 +215,44 @@ def save_processed_files(state_file: Path, processed_files: Dict[str, str]) -> N
             json.dump(payload, f, indent=2)
     except Exception as e:
         logging.error(f"Error saving processed files: {e}")
+
+
+def load_etl_last_run(state_dir: Path) -> datetime:
+    """
+    Load timestamp of last successful ETL run.
+    Used to filter: only process files with mtime > last_run_time.
+    When file doesn't exist, returns 90 days ago to avoid re-processing old files (2013-2019)
+    that fail with "No columns to parse".
+    """
+    path = state_dir / ETL_LAST_RUN_JSON
+    if not path.exists():
+        cutoff = datetime.now(ZoneInfo("UTC")) - timedelta(days=90)
+        return cutoff
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            ts_str = data.get("completed_at", "")
+            if not ts_str:
+                return datetime.now(ZoneInfo("UTC")) - timedelta(days=90)
+            ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=ZoneInfo("UTC"))
+            return ts
+    except Exception as e:
+        logging.warning(f"Error loading etl_last_run: {e}. Using 90 days ago.")
+        return datetime.now(ZoneInfo("UTC")) - timedelta(days=90)
+
+
+def save_etl_last_run(state_dir: Path) -> None:
+    """Save timestamp of successful ETL completion."""
+    path = state_dir / ETL_LAST_RUN_JSON
+    state_dir.mkdir(parents=True, exist_ok=True)
+    payload = {"completed_at": datetime.now(ZoneInfo("UTC")).isoformat()}
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
+    except Exception as e:
+        logging.error(f"Error saving etl_last_run: {e}")
 
 
 # =============================================================================
@@ -796,6 +835,18 @@ def main() -> None:
         total = len(all_keys)
         logger.info(f"Total files found: {total}")
 
+        # ----- STEP 6b: Filter to files modified since last successful run -----
+        # Reduces daily processing from ~36 files to ~5-7 (only new/changed).
+        # Old files (2013-2019) that fail with "No columns to parse" are excluded.
+        skipped_since_last_run = 0
+        if not args.full_rebuild:
+            last_run = load_etl_last_run(dirs["state"])
+            before = len(all_keys)
+            all_keys = [(k, lm) for k, lm in all_keys if lm > last_run]
+            skipped_since_last_run = before - len(all_keys)
+            if skipped_since_last_run:
+                logger.info(f"Filtered to files modified since last run ({last_run.isoformat()[:19]}): {len(all_keys)} to process, {skipped_since_last_run} skipped")
+
         # ----- STEP 7: Filter to new/changed only (incremental) -----
         if not args.full_rebuild:
             new_keys: List[Tuple[str, datetime]] = []
@@ -891,6 +942,8 @@ def main() -> None:
         save_failed_files(dirs["state"], failed_files)
         if failed_files:
             logger.info(f"Failed files state saved: {len(failed_files)} entries")
+        save_etl_last_run(dirs["state"])
+        logger.info(f"ETL last run timestamp saved ({ETL_LAST_RUN_JSON})")
 
         # ----- STEP 12: Build complete summary -----
         logger.info("")
@@ -901,7 +954,8 @@ def main() -> None:
         logger.info(f"Sample CSV ....: {local_sample}")
         logger.info(f"Dedupe SQLite .: {dedupe_db}")
         skip_msg = f", {skipped_old_failed} old repeatedly-failed skipped" if skipped_old_failed else ""
-        logger.info(f"Files .........: {new_files_processed} new, {skipped_files} skipped{skip_msg}")
+        since_msg = f", {skipped_since_last_run} unchanged since last run" if skipped_since_last_run else ""
+        logger.info(f"Files .........: {new_files_processed} new, {skipped_files} skipped{since_msg}{skip_msg}")
         logger.info(f"Rows written ..: {kept_rows:,}")
         logger.info(f"File types ....: {file_type_stats}")
         logger.info("=" * 70)

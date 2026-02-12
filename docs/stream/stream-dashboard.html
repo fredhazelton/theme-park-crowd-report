@@ -657,9 +657,30 @@
                 ak: [
                     { entity_code: 'AK01', entity_name: 'Kilimanjaro Safaris' },
                     { entity_code: 'AK03', entity_name: 'Expedition Everest' }
+                ],
+                ioa: [
+                    { entity_code: 'IA01', entity_name: 'The Incredible Hulk Coaster' },
+                    { entity_code: 'IA02', entity_name: "Jurassic World VelociCoaster" },
+                    { entity_code: 'IA03', entity_name: 'Hagrid\'s Magical Creatures Motorbike Adventure' }
+                ],
+                ia: [
+                    { entity_code: 'IA01', entity_name: 'The Incredible Hulk Coaster' },
+                    { entity_code: 'IA02', entity_name: "Jurassic World VelociCoaster" },
+                    { entity_code: 'IA03', entity_name: 'Hagrid\'s Magical Creatures Motorbike Adventure' }
+                ],
+                usf: [
+                    { entity_code: 'UF01', entity_name: 'Hollywood Rip Ride Rockit' },
+                    { entity_code: 'UF02', entity_name: 'Revenge of the Mummy' },
+                    { entity_code: 'UF71', entity_name: 'Hagrid\'s Magical Creatures Motorbike Adventure' }
+                ],
+                uf: [
+                    { entity_code: 'UF01', entity_name: 'Hollywood Rip Ride Rockit' },
+                    { entity_code: 'UF02', entity_name: 'Revenge of the Mummy' },
+                    { entity_code: 'UF71', entity_name: 'Hagrid\'s Magical Creatures Motorbike Adventure' }
                 ]
             };
-            return fallbacks[park] || fallbacks.mk;
+            const key = (park || '').toLowerCase();
+            return fallbacks[key] || fallbacks.mk;
         }
 
         async function populateAttractions() {

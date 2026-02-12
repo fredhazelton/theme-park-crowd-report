@@ -61,6 +61,14 @@ PROPERTY_NAMES = {
     "tdr": "Tokyo Disney Resort",
 }
 
+# Map dashboard park codes (e.g. ioa, usf) to entity_code prefix (e.g. IA, UF)
+PARK_CODE_TO_PREFIX = {
+    "ioa": "IA", "usf": "UF", "ush": "UH", "uh": "UH",
+    "mk": "MK", "ep": "EP", "hs": "HS", "ak": "AK",
+    "dl": "DL", "ca": "CA", "eu": "EU",
+    "tdl": "TDL", "tds": "TDS",
+}
+
 # ---------------------------------------------------------------------------
 # Cached data – loaded once at startup
 # ---------------------------------------------------------------------------
@@ -73,6 +81,16 @@ CODE_TO_NAME: dict[str, str] = {}                  # entity_code (upper) → dis
 CODE_TO_SHORT: dict[str, str] = {}                 # entity_code (upper) → short_name
 FASTPASS_BOOTH_CODES: set[str] = set()             # entity codes that are fastpass/LL kiosks (not standby)
 PARK_HOURS_DF: pd.DataFrame = pd.DataFrame()      # dimparkhours.csv
+
+
+def _find_column(df: pd.DataFrame, candidates: list[str]) -> Optional[str]:
+    """Return first column name from candidates that exists in df, or None."""
+    if df is None or df.empty:
+        return None
+    for c in candidates:
+        if c in df.columns:
+            return c
+    return None
 
 
 def _load_startup_data():
@@ -101,10 +119,11 @@ def _load_startup_data():
         logger.warning("dimentity.csv not found at %s", dim_path)
 
     # 2b. Build set of fastpass booth entity codes (these are kiosks, not standby rides)
-    if not DIMENTITY_DF.empty and "fastpass_booth" in DIMENTITY_DF.columns:
+    _dim_code_col = _find_column(DIMENTITY_DF, ["code", "entity_code", "attraction_code"]) if not DIMENTITY_DF.empty else None
+    if not DIMENTITY_DF.empty and _dim_code_col and "fastpass_booth" in DIMENTITY_DF.columns:
         fp_mask = DIMENTITY_DF["fastpass_booth"].astype(str).str.strip().str.lower() == "true"
         FASTPASS_BOOTH_CODES = set(
-            DIMENTITY_DF.loc[fp_mask, "code"].astype(str).str.strip().str.upper()
+            DIMENTITY_DF.loc[fp_mask, _dim_code_col].astype(str).str.strip().str.upper()
         )
         logger.info("Identified %d fastpass booth entities (excluded from standby list)", len(FASTPASS_BOOTH_CODES))
 
@@ -120,17 +139,21 @@ def _load_startup_data():
             if short:
                 CODE_TO_SHORT[code] = short
 
-    # Fallback: dimentity.csv (fills gaps)
-    if not DIMENTITY_DF.empty and "code" in DIMENTITY_DF.columns:
+    # Fallback: dimentity.csv (fills gaps) — support multiple column name variations
+    if not DIMENTITY_DF.empty and _dim_code_col:
+        _dim_name_col = _find_column(DIMENTITY_DF, ["name", "entity_name", "short_name"])
+        _dim_short_col = _find_column(DIMENTITY_DF, ["short_name", "name", "entity_name"])
         for _, row in DIMENTITY_DF.iterrows():
-            code = str(row.get("code", "")).strip().upper()
-            if code and code not in CODE_TO_NAME:
-                name = str(row.get("name", "")).strip()
-                short = str(row.get("short_name", "")).strip()
-                if name:
-                    CODE_TO_NAME[code] = name
-                if short:
-                    CODE_TO_SHORT[code] = short
+            code = str(row.get(_dim_code_col, "")).strip().upper()
+            if code and code != "NAN":
+                if code not in CODE_TO_NAME and _dim_name_col:
+                    name = str(row.get(_dim_name_col, "")).strip()
+                    if name:
+                        CODE_TO_NAME[code] = name
+                if code not in CODE_TO_SHORT and _dim_short_col:
+                    short = str(row.get(_dim_short_col, "")).strip()
+                    if short:
+                        CODE_TO_SHORT[code] = short
 
     logger.info("Built name lookup for %d entity codes", len(CODE_TO_NAME))
 
@@ -201,21 +224,36 @@ def _trained_entities_for_park(park_code_upper: str) -> list[dict]:
     """Return [{entity_code, entity_name}] for active, has_wait_times, standby-only entities with trained models.
     
     Excludes fastpass booth / Lightning Lane kiosk entities (fastpass_booth=True in dimentity).
+    When hazeydata_entities is empty, falls back to trained models + dimentity for entity list.
     """
-    pc_lower = park_code_upper.lower()
-    mask = (
-        (ENTITIES_DF["park_code"] == pc_lower)
-        & ENTITIES_DF["is_active"]
-        & ENTITIES_DF["has_wait_times"]
-        & ENTITIES_DF["touringplans_code"].isin(TRAINED_CODES)
-        & ~ENTITIES_DF["touringplans_code"].isin(FASTPASS_BOOTH_CODES)
-    )
-    subset = ENTITIES_DF.loc[mask].copy()
-    results = []
-    for _, row in subset.iterrows():
-        code = row["touringplans_code"]
-        name = str(row["name"]).strip() if pd.notna(row.get("name")) else _entity_name(code)
-        results.append({"entity_code": code, "entity_name": name})
+    # Normalize park: e.g. ioa -> IA, usf -> UF
+    park_norm = PARK_CODE_TO_PREFIX.get(park_code_upper.lower(), park_code_upper)
+    prefix = park_norm if len(park_norm) >= 2 else park_code_upper
+
+    # Primary: hazeydata_entities
+    if not ENTITIES_DF.empty:
+        pc_lower = park_code_upper.lower()
+        mask = (
+            (ENTITIES_DF["park_code"] == pc_lower)
+            & ENTITIES_DF["is_active"]
+            & ENTITIES_DF["has_wait_times"]
+            & ENTITIES_DF["touringplans_code"].isin(TRAINED_CODES)
+            & ~ENTITIES_DF["touringplans_code"].isin(FASTPASS_BOOTH_CODES)
+        )
+        subset = ENTITIES_DF.loc[mask].copy()
+        results = []
+        for _, row in subset.iterrows():
+            code = row["touringplans_code"]
+            name = str(row["name"]).strip() if pd.notna(row.get("name")) and str(row.get("name")).strip() else _entity_name(code)
+            results.append({"entity_code": code, "entity_name": name})
+        results.sort(key=lambda x: x["entity_name"])
+        if results:
+            return results
+
+    # Fallback: trained models + dimentity (when hazeydata_entities missing or empty)
+    park_entity_codes = [c for c in TRAINED_CODES if c.startswith(prefix)]
+    park_entity_codes = [c for c in park_entity_codes if c not in FASTPASS_BOOTH_CODES]
+    results = [{"entity_code": c, "entity_name": _entity_name(c)} for c in sorted(park_entity_codes)]
     results.sort(key=lambda x: x["entity_name"])
     return results
 
@@ -1678,20 +1716,29 @@ def get_trend(park_code: str):
 
 @app.route("/api/debug/entity-table", methods=["GET"])
 def debug_entity_table():
-    if ENTITIES_DF.empty:
-        return jsonify({"error": "Entity table not loaded"})
-
-    sample = ENTITIES_DF.head(10)
-    return jsonify({
-        "columns": list(ENTITIES_DF.columns),
-        "row_count": len(ENTITIES_DF),
-        "active_with_wait_times": int(
-            ((ENTITIES_DF["is_active"]) & (ENTITIES_DF["has_wait_times"])).sum()
-        ),
-        "trained_model_count": len(TRAINED_CODES),
+    out = {
+        "hazeydata_entities": {
+            "loaded": not ENTITIES_DF.empty,
+            "row_count": len(ENTITIES_DF),
+            "columns": list(ENTITIES_DF.columns) if not ENTITIES_DF.empty else [],
+            "sample": ENTITIES_DF.head(5).to_dict(orient="records") if not ENTITIES_DF.empty else [],
+        },
+        "dimentity": {
+            "loaded": not DIMENTITY_DF.empty,
+            "row_count": len(DIMENTITY_DF),
+            "columns": list(DIMENTITY_DF.columns) if not DIMENTITY_DF.empty else [],
+            "code_col": _find_column(DIMENTITY_DF, ["code", "entity_code", "attraction_code"]) if not DIMENTITY_DF.empty else None,
+            "name_col": _find_column(DIMENTITY_DF, ["name", "entity_name", "short_name"]) if not DIMENTITY_DF.empty else None,
+            "sample": DIMENTITY_DF.head(5).to_dict(orient="records") if not DIMENTITY_DF.empty else [],
+        },
         "name_lookup_count": len(CODE_TO_NAME),
-        "sample_data": sample.to_dict(orient="records"),
-    })
+        "trained_model_count": len(TRAINED_CODES),
+    }
+    if not ENTITIES_DF.empty:
+        out["hazeydata_entities"]["active_with_wait_times"] = int(
+            ((ENTITIES_DF["is_active"]) & (ENTITIES_DF["has_wait_times"])).sum()
+        )
+    return jsonify(out)
 
 
 # =====================================================================

@@ -423,24 +423,17 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-- **[ETL: Only Process New Files Since Last Run]** — **PRIORITY**
-  The S3 ETL (`src/get_tp_wait_time_data_from_s3.py`) currently processes ~36 files every run, but only 5-7 are actually new. The rest are old files (2013-2019) that fail with "No columns to parse" errors. Now that the full historical load is done, we should only pull files modified since the last successful ETL run.
-  
-  **Implementation:**
-  - Track last successful ETL timestamp in `state/etl_last_run.json` (or similar)
-  - Filter S3 file list to only include files with `modified > last_run_time`
-  - Update timestamp after successful run
-  - Should reduce daily processing from 36 files → 5-7 files
-  
-  **Current behavior:** Logs show files like `fp_10_01_2013_06_35.csv` being re-attempted daily and failing.
-
-- **[Dashboard: Entity Names Not Displaying]** The attraction dropdown in the stream dashboard is showing entity codes (e.g., "IA01", "MK09") instead of full attraction names (e.g., "The Incredible Hulk Coaster", "Space Mountain"). The API endpoint `/api/entities/<park_code>` should be looking up names from `dimension_tables/dimentity.csv` using a code-to-name lookup dictionary, but names aren't appearing. Added debug endpoint `/api/debug/entity-table` to inspect the entity table structure. Need to verify: (1) What columns exist in dimentity.csv? (2) Is the name column populated? (3) Is the lookup dictionary being created correctly? Check API server logs and browser console for debugging info.
+- *(none)*
 
 ---
 
 ## Completed
 
 *(Bam-Bam: move items here when done; note what was done in the Log.)*
+
+- **[Dashboard: Entity Names Not Displaying]** Fixed in `dashboard/api.py` and `docs/stream/stream-dashboard.html`: (1) dimentity name lookup now supports multiple column name variations (`code`/`entity_code`/`attraction_code` for code; `name`/`entity_name`/`short_name` for name); (2) when hazeydata_entities doesn't exist or returns empty, API now falls back to trained models + dimentity for entity list (names from CODE_TO_NAME); (3) added park code mapping (ioa→IA, usf→UF) so dashboard codes work; (4) enhanced `/api/debug/entity-table` to show both hazeydata and dimentity structure; (5) added fallback entities for ioa/usf in stream dashboard with proper names (Hulk Coaster, etc.).
+
+- **[ETL: Only Process New Files Since Last Run]** Implemented in `src/get_tp_wait_time_data_from_s3.py`: added `state/etl_last_run.json` to track last successful ETL timestamp; filter file list to only files with `mtime > last_run_time` (skips old 2013-2019 files that fail with "No columns to parse"); default 90 days ago when file doesn't exist; `--full-rebuild` bypasses; should reduce daily processing from ~36 files to ~5-7.
 
 - **[Pipeline: Dev Subset Filter (DEV_MODE)]** Implemented DEV_MODE per step-by-step guide: `config/dev_config.py` (DEV_MODE, DEV_ENTITIES, should_process_entity, get_dev_output_base); `src/utils/paths.py` uses pipeline_dev when DEV_MODE=true; ETL filters to DEV_ENTITIES during row processing and in merge_yesterday_queue_times; `scripts/common.sh` get_output_base returns repo/pipeline_dev when DEV_MODE=true. Run: `export DEV_MODE=true && ./scripts/run_daily_pipeline.sh` (use `--skip-dropbox-check` if not on Dropbox). Full pipeline run on this machine stopped at S3 sync (no AWS CLI) and ETL (no pandas in default Python); output base and local source correctly pointed to pipeline_dev.
 
@@ -465,6 +458,8 @@ python src/build_dimensions.py               # Dimensions
 | 2026-02-05 08:17 | Wilma | **ETL Efficiency Task:** Added priority task to only process S3 files since last ETL run. Currently processing 36 files/day when only 5-7 are new. Old 2013-2019 files keep failing with empty data errors. Fred confirmed full historical load is done — incremental mode is the way forward. |
 | 2026-02-05 09:12 | Wilma | **Dev Subset Filter Task:** Added priority task to create DEV_MODE that filters to 37 representative entities (2 standby + 2 priority per park across 10 parks). Small enough to iterate fast, broad enough to catch issues. Bam-Bam can use Cursor's Remote-SSH extension to connect directly to wilma-server and browse pipeline files. |
 | 2026-02-05 09:24 | Bam-Bam | **DEV_MODE implemented.** Created config/dev_config.py; integrated into paths.py and scripts/common.sh so output_base = repo/pipeline_dev when DEV_MODE=true; added entity filter in ETL (standby + fastpass + merge_yesterday_queue_times). Ran pipeline with DEV_MODE=true: shell and Python correctly used pipeline_dev (ETL log showed "Output: .../pipeline_dev", "Local source: .../pipeline_dev/raw"). Run failed on this machine at S3 sync (aws not found) and ETL (ModuleNotFoundError: pandas). On a box with AWS CLI + Python venv with deps, use: `export DEV_MODE=true && ./scripts/run_daily_pipeline.sh --skip-dropbox-check`. Task moved to Completed. |
+| 2026-02-09 | Bam-Bam | **ETL: Only process new files since last run.** Implemented per Wilma's priority task. Added `state/etl_last_run.json` (timestamp of last successful ETL); filter all_keys to only files with mtime > last_run_time before processing; default 90 days ago when file doesn't exist (avoids old 2013-2019 files on first incremental run); save timestamp after successful completion. `--full-rebuild` bypasses; should reduce daily processing from ~36 files to ~5-7. Task moved to Completed. |
+| 2026-02-04 | Bam-Bam | **Dashboard: Entity names not displaying.** Fixed attraction dropdown showing codes instead of names. API: (1) dimentity lookup supports multiple column name variations; (2) fallback when hazeydata_entities empty: use trained models + dimentity for entity list; (3) park code mapping (ioa→IA, usf→UF); (4) improved debug endpoint. Stream dashboard: fallback entities for ioa/ia/usf/uf with proper names. Task moved to Completed. |
 
 ---
 
