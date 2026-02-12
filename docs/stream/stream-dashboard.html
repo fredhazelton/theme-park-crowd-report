@@ -355,7 +355,7 @@
             </div>
             
             <div id="attraction-image-section" class="filter-section" style="display: none; margin-top: 12px;">
-                <img id="attraction-image" src="" alt="" crossorigin="anonymous"
+                <img id="attraction-image" src="" alt="" 
                      style="width: 100%; border-radius: 6px; border: 1px solid var(--cyan-dim); opacity: 0; transition: opacity 0.4s ease;"
                      onload="this.style.opacity='1'" 
                      onerror="this.parentElement.style.display='none'">
@@ -859,58 +859,11 @@
                 lineGrad.addColorStop(stop, `rgba(${rgb}, 1)`);
             }
 
-            // ── Attraction image fill plugin ──
-            // Draws the ride image clipped to the area under the curve
-            const attrImg = document.getElementById('attraction-image');
-            const hasAttrImage = attrImg && attrImg.complete && attrImg.naturalWidth > 0 && attrImg.style.opacity !== '0';
-            
-            const imageFillPlugin = {
-                id: 'imageFill',
-                beforeDatasetsDraw(chart) {
-                    if (!hasAttrImage) return;
-                    const ds = chart.data.datasets[0];
-                    const meta = chart.getDatasetMeta(0);
-                    if (!meta.data.length) return;
-                    
-                    const { ctx: c, chartArea: { left, right, top, bottom } } = chart;
-                    const points = meta.data;
-                    
-                    c.save();
-                    
-                    // Build clip path: line across data points, then down to bottom
-                    c.beginPath();
-                    c.moveTo(points[0].x, points[0].y);
-                    for (let i = 1; i < points.length; i++) {
-                        c.lineTo(points[i].x, points[i].y);
-                    }
-                    c.lineTo(points[points.length - 1].x, bottom);
-                    c.lineTo(points[0].x, bottom);
-                    c.closePath();
-                    c.clip();
-                    
-                    // Draw image scaled to cover the chart area
-                    const aW = right - left;
-                    const aH = bottom - top;
-                    const scale = Math.max(aW / attrImg.naturalWidth, aH / attrImg.naturalHeight);
-                    const iw = attrImg.naturalWidth * scale;
-                    const ih = attrImg.naturalHeight * scale;
-                    try {
-                        c.drawImage(attrImg, left + (aW - iw) / 2, top + (aH - ih) / 2, iw, ih);
-                    } catch (e) { /* CORS fallback */ }
-                    
-                    // Subtle dark overlay for readability
-                    c.fillStyle = 'rgba(10, 22, 40, 0.3)';
-                    c.fillRect(left, top, aW, aH);
-                    
-                    c.restore();
-                }
-            };
-
             const datasets = [{
                 label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                 data: values,
                 borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : lineGrad,
-                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : (hasAttrImage ? 'transparent' : fillGrad),
+                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : fillGrad,
                 fill: true,
                 tension: 0.3,
                 pointRadius: values.length > 40 ? 0 : 2,
@@ -986,7 +939,6 @@
                     labels: labels,
                     datasets: datasets
                 },
-                plugins: [imageFillPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
