@@ -859,67 +859,78 @@
                 lineGrad.addColorStop(stop, `rgba(${rgb}, 1)`);
             }
 
-            // ── Attraction image fill: old-school negative-space technique ──
+            // ── Attraction image fill: negative-space technique ──
+            // Fetch image as blob (avoids all CORS canvas issues), then:
             // 1. Paint ride image across full chart area
             // 2. Paint background color over everything ABOVE the curve
-            // Result: image is only visible under the curve — no clipping/CORS needed
-            const attrImg = document.getElementById('attraction-image');
-            const hasAttrImage = attrImg && attrImg.complete && attrImg.naturalWidth > 0 && attrImg.style.opacity !== '0';
-            const BG_COLOR = '#0f1923'; // dashboard background
+            const BG_COLOR = '#0f1923';
+            let _rideImg = null; // will be set async
+            
+            // Load ride image as blob URL (same-origin, no CORS tainting)
+            const attrImgEl = document.getElementById('attraction-image');
+            if (attrImgEl && attrImgEl.src && attrImgEl.style.opacity !== '0' && attrImgEl.src.startsWith('http')) {
+                fetch(attrImgEl.src).then(r => r.blob()).then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const img = new Image();
+                    img.onload = () => {
+                        _rideImg = img;
+                        // Redraw chart with image
+                        if (charts.timeSeries) charts.timeSeries.update();
+                    };
+                    img.src = blobUrl;
+                }).catch(() => {});
+            }
             
             const imageFillPlugin = {
                 id: 'imageFill',
                 beforeDatasetsDraw(chart) {
-                    if (!hasAttrImage) return;
-                    const { ctx: c, chartArea: { left, right, top, bottom } } = chart;
+                    if (!_rideImg) return;
+                    const { ctx: c, chartArea } = chart;
+                    if (!chartArea) return;
+                    const { left, right, top, bottom } = chartArea;
                     const aW = right - left;
                     const aH = bottom - top;
                     
                     c.save();
-                    // Restrict drawing to chart area only
                     c.beginPath();
                     c.rect(left, top, aW, aH);
                     c.clip();
                     
-                    // Draw ride image scaled to cover
-                    const scale = Math.max(aW / attrImg.naturalWidth, aH / attrImg.naturalHeight);
-                    const iw = attrImg.naturalWidth * scale;
-                    const ih = attrImg.naturalHeight * scale;
-                    c.drawImage(attrImg, left + (aW - iw) / 2, top + (aH - ih) / 2, iw, ih);
+                    // Draw ride image scaled to cover chart area
+                    const scale = Math.max(aW / _rideImg.naturalWidth, aH / _rideImg.naturalHeight);
+                    const iw = _rideImg.naturalWidth * scale;
+                    const ih = _rideImg.naturalHeight * scale;
+                    c.drawImage(_rideImg, left + (aW - iw) / 2, top + (aH - ih) / 2, iw, ih);
                     
-                    // Slight darkening for readability
+                    // Darken slightly for readability
                     c.fillStyle = 'rgba(10, 22, 40, 0.3)';
                     c.fillRect(left, top, aW, aH);
-                    
                     c.restore();
                 },
                 afterDatasetsDraw(chart) {
-                    if (!hasAttrImage) return;
+                    if (!_rideImg) return;
                     const meta = chart.getDatasetMeta(0);
                     if (!meta.data.length) return;
-                    
-                    const { ctx: c, chartArea: { left, right, top, bottom } } = chart;
+                    const { ctx: c, chartArea } = chart;
+                    if (!chartArea) return;
+                    const { left, right, top, bottom } = chartArea;
                     const points = meta.data;
                     
                     c.save();
-                    // Restrict to chart area
                     c.beginPath();
                     c.rect(left, top, right - left, bottom - top);
                     c.clip();
                     
-                    // Build negative-space path: everything ABOVE the curve
+                    // Negative space: fill everything ABOVE the curve with background
                     c.beginPath();
-                    c.moveTo(left, top);           // top-left corner
-                    c.lineTo(right, top);           // top-right corner  
-                    c.lineTo(right, points[points.length - 1].y); // down to last point
-                    // Trace curve backwards (right to left)
-                    for (let i = points.length - 1; i >= 0; i--) {
+                    c.moveTo(left, top);
+                    c.lineTo(right, top);
+                    c.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+                    for (let i = points.length - 2; i >= 0; i--) {
                         c.lineTo(points[i].x, points[i].y);
                     }
-                    c.lineTo(left, top);            // back to top-left
+                    c.lineTo(left, top);
                     c.closePath();
-                    
-                    // Fill negative space with background color — hides image above curve
                     c.fillStyle = BG_COLOR;
                     c.fill();
                     c.restore();
@@ -930,7 +941,7 @@
                 label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                 data: values,
                 borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : lineGrad,
-                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : (hasAttrImage ? 'transparent' : fillGrad),
+                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : fillGrad,
                 fill: true,
                 tension: 0.3,
                 pointRadius: values.length > 40 ? 0 : 2,
