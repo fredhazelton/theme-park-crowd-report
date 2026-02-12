@@ -449,42 +449,7 @@ python src/build_dimensions.py               # Dimensions
   
   **S3 schema:** `object_type, object_code, object_name, start_date, finish_date`
 
-- **[Discord Bot: Wire /crowd to Real Forecast Data]** — **PRIORITY**
-  The Discord bot (`/home/wilma/tpcr-discord-bot/bot.py`) is working with demo data. Wire it to real pipeline forecast data.
-  
-  **What needs to happen:**
-  1. Read forecast data from `/mnt/data/pipeline/` (parquet files)
-  2. Parse the `date` parameter (handle "tomorrow", "feb-15", "2026-02-20", etc.)
-  3. Load WTI for the requested park+date from `wti/wti.parquet`
-  4. Load entity-level forecasts from `curves/forecast/{entity_code}_{date}.csv`
-  5. Calculate headliner waits and find lowest-wait attractions
-  6. Return real data in the existing embed format
-  
-  **Data sources (on wilma-server):**
-  - WTI: `/mnt/data/pipeline/wti/wti.parquet` — park-level wait time index per date/time_slot
-  - Forecasts: `/mnt/data/pipeline/curves/forecast/{entity_code}_{date}.csv` — per-entity predicted waits
-  - Entity names: `/mnt/data/pipeline/dimension_tables/dimentity.csv` — code→name mapping
-  - Entity index: `/mnt/data/pipeline/state/entity_index.sqlite` — which entities are active (STANDBY status)
-  
-  **API alternative:** Could also read via the dashboard API at `http://localhost:8051/api` if that's easier. Available endpoints:
-  - `/api/stats/{park}` — WTI and averages
-  - `/api/forecast/{park}` — forecast curves
-  - `/api/daily-curve/{park}?date=YYYY-MM-DD` — daily wait curve
-  - `/api/entities/{park}` — entity list with names
-  
-  **Date parsing hints:**
-  - "tomorrow" → tomorrow's date
-  - "feb-15" or "february 15" → 2026-02-15
-  - "2026-02-20" → as-is
-  - Use `dateutil.parser` or `dateparser` library for fuzzy parsing
-  
-  **Also needed:**
-  - Add a systemd user service so the bot survives reboots
-  - Service file: `~/.config/systemd/user/tpcr-discord-bot.service`
-  - Model: `ExecStart=/usr/bin/python3 /home/wilma/tpcr-discord-bot/bot.py`
-  - Enable with `systemctl --user enable tpcr-discord-bot`
-
-- **[ETL: Only Process New Files Since Last Run]** — **PRIORITY**
+- **[ETL: Only Process New Files Since Last Run]** — **PRIORITY #2**
   The S3 ETL (`src/get_tp_wait_time_data_from_s3.py`) currently processes ~36 files every run, but only 5-7 are actually new. The rest are old files (2013-2019) that fail with "No columns to parse" errors. Now that the full historical load is done, we should only pull files modified since the last successful ETL run.
   
   **Implementation:**
