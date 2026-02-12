@@ -423,6 +423,67 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+- **[Pipeline: Closures Module — Operating Calendar]** — **HIGH PRIORITY**
+  Build a closures module that tracks attraction closures (temporary + permanent) so closed attractions are excluded from forecasts and WTI calculations. **This directly impacts WTI accuracy.**
+  
+  **Full spec:** `docs/CLOSURES_MODULE_SPEC.md` — READ THIS FIRST, it has everything.
+  
+  **TL;DR:**
+  1. `src/get_closures_from_s3.py` — Download closure CSVs from `s3://touringplans_stats/export/closures/`
+  2. `src/build_operating_calendar.py` — Combine temporary closures + `extinct_on` from dimentity into a single operating calendar
+  3. Output: `operating_calendar/operating_calendar.parquet` with schema `(entity_code, park_date, is_operating)`
+  4. Pipeline position: after Dimensions, before Impute Hours
+  
+  **Key design rules:**
+  - No null dates — use sentinel values (`1900-01-01` for unknown start, `9999-12-31` for unknown end)
+  - DuckDB + Parquet only (per ARCHITECTURE.md)
+  - Entity not in closures data = assume operating
+  - Must handle multiple closure windows per entity
+  
+  **Downstream integration (after this module works):**
+  - Training: `WHERE is_operating = TRUE`
+  - Forecasting: skip entities where `is_operating = FALSE`
+  - WTI: only average operating entities
+  
+  **S3 files:** `current_wdw_closures.csv`, `current_dlr_closures.csv`, `current_uor_closures.csv`, `current_tdr_closures.csv`, `current_ush_closures.csv`
+  
+  **S3 schema:** `object_type, object_code, object_name, start_date, finish_date`
+
+- **[Discord Bot: Wire /crowd to Real Forecast Data]** — **PRIORITY**
+  The Discord bot (`/home/wilma/tpcr-discord-bot/bot.py`) is working with demo data. Wire it to real pipeline forecast data.
+  
+  **What needs to happen:**
+  1. Read forecast data from `/mnt/data/pipeline/` (parquet files)
+  2. Parse the `date` parameter (handle "tomorrow", "feb-15", "2026-02-20", etc.)
+  3. Load WTI for the requested park+date from `wti/wti.parquet`
+  4. Load entity-level forecasts from `curves/forecast/{entity_code}_{date}.csv`
+  5. Calculate headliner waits and find lowest-wait attractions
+  6. Return real data in the existing embed format
+  
+  **Data sources (on wilma-server):**
+  - WTI: `/mnt/data/pipeline/wti/wti.parquet` — park-level wait time index per date/time_slot
+  - Forecasts: `/mnt/data/pipeline/curves/forecast/{entity_code}_{date}.csv` — per-entity predicted waits
+  - Entity names: `/mnt/data/pipeline/dimension_tables/dimentity.csv` — code→name mapping
+  - Entity index: `/mnt/data/pipeline/state/entity_index.sqlite` — which entities are active (STANDBY status)
+  
+  **API alternative:** Could also read via the dashboard API at `http://localhost:8051/api` if that's easier. Available endpoints:
+  - `/api/stats/{park}` — WTI and averages
+  - `/api/forecast/{park}` — forecast curves
+  - `/api/daily-curve/{park}?date=YYYY-MM-DD` — daily wait curve
+  - `/api/entities/{park}` — entity list with names
+  
+  **Date parsing hints:**
+  - "tomorrow" → tomorrow's date
+  - "feb-15" or "february 15" → 2026-02-15
+  - "2026-02-20" → as-is
+  - Use `dateutil.parser` or `dateparser` library for fuzzy parsing
+  
+  **Also needed:**
+  - Add a systemd user service so the bot survives reboots
+  - Service file: `~/.config/systemd/user/tpcr-discord-bot.service`
+  - Model: `ExecStart=/usr/bin/python3 /home/wilma/tpcr-discord-bot/bot.py`
+  - Enable with `systemctl --user enable tpcr-discord-bot`
+
 - **[ETL: Only Process New Files Since Last Run]** — **PRIORITY**
   The S3 ETL (`src/get_tp_wait_time_data_from_s3.py`) currently processes ~36 files every run, but only 5-7 are actually new. The rest are old files (2013-2019) that fail with "No columns to parse" errors. Now that the full historical load is done, we should only pull files modified since the last successful ETL run.
   
