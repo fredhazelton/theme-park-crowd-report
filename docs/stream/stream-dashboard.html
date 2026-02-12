@@ -876,7 +876,27 @@
                 canvasEl.style.backgroundImage = '';
             }
             
-            const imageFillPlugin = {}; // kept empty so chart registration doesn't break
+            // Mask the image outside the plot area (axes, title padding)
+            const imageFillPlugin = {
+                id: 'imageFill',
+                beforeDraw(chart) {
+                    if (!hasRideImage) return;
+                    const { ctx: c, chartArea, width, height } = chart;
+                    if (!chartArea) return;
+                    const { left, right, top, bottom } = chartArea;
+                    c.save();
+                    c.fillStyle = BG_COLOR;
+                    // Top strip (above plot area)
+                    c.fillRect(0, 0, width, top);
+                    // Bottom strip (below plot area — x-axis labels)
+                    c.fillRect(0, bottom, width, height - bottom);
+                    // Left strip (y-axis area)
+                    c.fillRect(0, top, left, bottom - top);
+                    // Right strip
+                    c.fillRect(right, top, width - right, bottom - top);
+                    c.restore();
+                }
+            };
 
             const datasets = [{
                 label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
