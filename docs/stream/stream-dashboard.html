@@ -860,46 +860,68 @@
             }
 
             // ── Attraction image fill plugin ──
-            // Draws the ride image clipped to the area under the curve
+            // Pre-render image to data URL to avoid CORS canvas tainting
             const attrImg = document.getElementById('attraction-image');
-            const hasAttrImage = attrImg && attrImg.complete && attrImg.naturalWidth > 0 && attrImg.style.opacity !== '0';
+            let rideImageDataUrl = null;
+            if (attrImg && attrImg.complete && attrImg.naturalWidth > 0 && attrImg.style.opacity !== '0') {
+                try {
+                    const tmp = document.createElement('canvas');
+                    tmp.width = attrImg.naturalWidth;
+                    tmp.height = attrImg.naturalHeight;
+                    const tCtx = tmp.getContext('2d');
+                    tCtx.drawImage(attrImg, 0, 0);
+                    rideImageDataUrl = tmp.toDataURL(); // test CORS now, not during chart draw
+                } catch (e) { rideImageDataUrl = null; /* CORS blocked */ }
+            }
             
             const imageFillPlugin = {
                 id: 'imageFill',
-                beforeDatasetsDraw(chart) {
-                    if (!hasAttrImage) return;
-                    const ds = chart.data.datasets[0];
+                _rideImg: null,
+                afterInit(chart) {
+                    if (!rideImageDataUrl) return;
+                    this._rideImg = new Image();
+                    this._rideImg.src = rideImageDataUrl;
+                },
+                afterDatasetsDraw(chart) {
+                    if (!this._rideImg || !this._rideImg.complete) return;
                     const meta = chart.getDatasetMeta(0);
                     if (!meta.data.length) return;
                     
                     const { ctx: c, chartArea: { left, right, top, bottom } } = chart;
                     const points = meta.data;
+                    const img = this._rideImg;
                     
                     c.save();
                     
-                    // Build clip path: line across data points, then down to bottom
+                    // Build clip path following the curve, then close along the bottom
                     c.beginPath();
+                    // Use the bezier control points for smooth clip matching the curve
                     c.moveTo(points[0].x, points[0].y);
                     for (let i = 1; i < points.length; i++) {
-                        c.lineTo(points[i].x, points[i].y);
+                        const prev = points[i - 1];
+                        const cur = points[i];
+                        // Chart.js stores bezier control points
+                        if (prev.options && typeof prev.options.tension !== 'undefined' && prev.cp2 && cur.cp1) {
+                            c.bezierCurveTo(prev.cp2.x, prev.cp2.y, cur.cp1.x, cur.cp1.y, cur.x, cur.y);
+                        } else {
+                            c.lineTo(cur.x, cur.y);
+                        }
                     }
                     c.lineTo(points[points.length - 1].x, bottom);
                     c.lineTo(points[0].x, bottom);
                     c.closePath();
                     c.clip();
                     
-                    // Draw image scaled to cover the chart area
+                    // Draw ride image scaled to cover the chart area
                     const aW = right - left;
                     const aH = bottom - top;
-                    const scale = Math.max(aW / attrImg.naturalWidth, aH / attrImg.naturalHeight);
-                    const iw = attrImg.naturalWidth * scale;
-                    const ih = attrImg.naturalHeight * scale;
-                    try {
-                        c.drawImage(attrImg, left + (aW - iw) / 2, top + (aH - ih) / 2, iw, ih);
-                    } catch (e) { /* CORS fallback */ }
+                    const scale = Math.max(aW / img.naturalWidth, aH / img.naturalHeight);
+                    const iw = img.naturalWidth * scale;
+                    const ih = img.naturalHeight * scale;
+                    c.drawImage(img, left + (aW - iw) / 2, top + (aH - ih) / 2, iw, ih);
                     
-                    // Subtle dark overlay for readability
-                    c.fillStyle = 'rgba(10, 22, 40, 0.3)';
+                    // Light overlay so line/labels stay readable
+                    c.fillStyle = 'rgba(10, 22, 40, 0.25)';
                     c.fillRect(left, top, aW, aH);
                     
                     c.restore();
@@ -910,7 +932,7 @@
                 label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                 data: values,
                 borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : lineGrad,
-                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : (hasAttrImage ? 'transparent' : fillGrad),
+                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : fillGrad,
                 fill: true,
                 tension: 0.3,
                 pointRadius: values.length > 40 ? 0 : 2,
