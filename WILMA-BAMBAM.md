@@ -423,7 +423,45 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-- *(none)*
+- **[Pipeline: Wire Operating Calendar into Training/Forecasting/WTI]** — **HIGH PRIORITY**
+  The operating calendar (`operating_calendar/operating_calendar.parquet`) is built but not yet used downstream. Wire it in:
+  
+  **1. Training** (`src/training.py` or wherever batch training happens):
+  - Join on `operating_calendar` and filter: `WHERE is_operating = TRUE`
+  - Don't train on observations from days when an entity was closed (those are 0/missing and corrupt the model)
+  
+  **2. Forecasting** (`src/forecasting.py` or equivalent):
+  - Only produce forecasts for entity+date combos where `is_operating = TRUE`
+  - If an entity is closed for a date range, skip it — no forecast row generated
+  - The model is already trained; this just skips prediction for closed days
+  
+  **3. WTI calculation** (`src/build_wti.py` or equivalent):
+  - Only average entities where `is_operating = TRUE` for that park_date
+  - This is the most important one — a closed headliner dragging WTI down gives wrong crowd levels
+  
+  **Key design rule:** If operating_calendar.parquet is missing or a query fails, **assume all entities are operating** (graceful fallback, don't break the pipeline).
+  
+  **Test:** After wiring, check that a known-closed entity (pick one from raw_closures) has no forecast rows during its closure window, and WTI for that park/date excludes it.
+
+- **[Pipeline: Post-Run Validation & Alerting]** — **PRIORITY**
+  Add a validation step that runs AFTER the full pipeline completes. It should check for data quality issues and flag them prominently.
+  
+  **Checks to implement:**
+  1. **Forecast coverage:** Does today+1 have forecast curves for all active parks? If any park is missing forecasts for tomorrow, that's a RED flag.
+  2. **WTI anomaly detection:** Flag any date where WTI jumps >30% from its neighbors (e.g., yesterday=22, today=15, tomorrow=22 → flag today). Simple rolling comparison is fine.
+  3. **Entity coverage:** Compare entities with trained models vs entities in dimentity that are not extinct. Flag any non-extinct entity missing a model.
+  4. **Forecast date range:** Verify forecasts extend at least 7 days into the future. If the max forecast date is < today+7, flag it.
+  
+  **Output:**
+  - Write results to `pipeline_validation/validation_report.json` (machine-readable)
+  - Write a human-readable summary to `pipeline_validation/validation_report.txt`
+  - Exit code: 0 if all pass, 1 if any RED flags (so the pipeline runner can alert)
+  
+  **Where in pipeline:** After ALL steps complete (last thing in `run_daily_pipeline.sh`)
+  
+  **Script location:** `src/validate_pipeline_output.py`
+  
+  This is how we catch data issues at the pipeline level instead of discovering them when someone queries the Discord bot.
 
 ---
 

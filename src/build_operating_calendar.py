@@ -103,9 +103,9 @@ def main() -> None:
     parquet_path = out_dir / "operating_calendar.parquet"
     csv_path = out_dir / "operating_calendar.csv"
 
-    if parquet_path.exists() and not args.force:
-        logger.info("Output already exists (use --force to overwrite): %s", parquet_path)
-        sys.exit(0)
+    # Always rebuild — closures can change daily. --force kept for back-compat.
+    if parquet_path.exists():
+        logger.info("Overwriting existing calendar: %s", parquet_path)
 
     con = duckdb.connect()
     dim_str = str(dim_path).replace("\\", "/")
