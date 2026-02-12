@@ -355,7 +355,7 @@
             </div>
             
             <div id="attraction-image-section" class="filter-section" style="display: none; margin-top: 12px;">
-                <img id="attraction-image" src="" alt="" 
+                <img id="attraction-image" src="" alt="" crossorigin="anonymous"
                      style="width: 100%; border-radius: 6px; border: 1px solid var(--cyan-dim); opacity: 0; transition: opacity 0.4s ease;"
                      onload="this.style.opacity='1'" 
                      onerror="this.parentElement.style.display='none'">
@@ -859,11 +859,34 @@
                 lineGrad.addColorStop(stop, `rgba(${rgb}, 1)`);
             }
 
+            // ── Attraction image as area fill (if loaded) ──
+            let imageFill = null;
+            const attrImg = document.getElementById('attraction-image');
+            if (attrImg && attrImg.complete && attrImg.naturalWidth > 0 && attrImg.style.opacity !== '0') {
+                try {
+                    const cW = canvasEl.width || canvasEl.clientWidth;
+                    const cH = canvasEl.height || canvasEl.clientHeight;
+                    const offscreen = document.createElement('canvas');
+                    offscreen.width = cW;
+                    offscreen.height = cH;
+                    const oCtx = offscreen.getContext('2d');
+                    // Draw image scaled to cover
+                    const scale = Math.max(cW / attrImg.naturalWidth, cH / attrImg.naturalHeight);
+                    const iw = attrImg.naturalWidth * scale;
+                    const ih = attrImg.naturalHeight * scale;
+                    oCtx.drawImage(attrImg, (cW - iw) / 2, (cH - ih) / 2, iw, ih);
+                    // Dark overlay for chart readability
+                    oCtx.fillStyle = 'rgba(10, 22, 40, 0.4)';
+                    oCtx.fillRect(0, 0, cW, cH);
+                    imageFill = ctx.createPattern(offscreen, 'no-repeat');
+                } catch (e) { /* CORS or other — fall back to gradient */ }
+            }
+
             const datasets = [{
                 label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                 data: values,
                 borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : lineGrad,
-                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : fillGrad,
+                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : (imageFill || fillGrad),
                 fill: true,
                 tension: 0.3,
                 pointRadius: values.length > 40 ? 0 : 2,

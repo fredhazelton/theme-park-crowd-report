@@ -197,6 +197,45 @@ const SAMPLE_DATA =
         // Create chart
         const ctx = document.getElementById('waitTimeChart').getContext('2d');
         
+        // Load attraction image as pattern fill for the area chart
+        let areaFill = 'rgba(116, 185, 255, 0.5)'; // fallback
+        
+        const attractionImg = document.querySelector('.attraction-image img, [data-attraction-image]');
+        const imgUrl = attractionImg ? attractionImg.src : null;
+        
+        if (imgUrl) {
+            const patternImg = new Image();
+            patternImg.crossOrigin = 'anonymous';
+            patternImg.src = imgUrl;
+            await new Promise((resolve) => {
+                patternImg.onload = resolve;
+                patternImg.onerror = resolve;
+                setTimeout(resolve, 2000); // timeout fallback
+            });
+            if (patternImg.complete && patternImg.naturalWidth > 0) {
+                // Scale image to fill the chart area
+                const chartCanvas = document.getElementById('waitTimeChart');
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = chartCanvas.width;
+                tempCanvas.height = chartCanvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Draw image scaled to cover chart, with a dark overlay for readability
+                const scale = Math.max(tempCanvas.width / patternImg.width, tempCanvas.height / patternImg.height);
+                const w = patternImg.width * scale;
+                const h = patternImg.height * scale;
+                const x = (tempCanvas.width - w) / 2;
+                const y = (tempCanvas.height - h) / 2;
+                tempCtx.drawImage(patternImg, x, y, w, h);
+                
+                // Add semi-transparent overlay so the curve line stays readable
+                tempCtx.fillStyle = 'rgba(26, 26, 46, 0.35)';
+                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                
+                areaFill = ctx.createPattern(tempCanvas, 'no-repeat');
+            }
+        }
+        
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -205,7 +244,7 @@ const SAMPLE_DATA =
                         label: 'Predicted Actual',
                         data: predictedData,
                         fill: true,
-                        backgroundColor: 'rgba(116, 185, 255, 0.5)',
+                        backgroundColor: areaFill,
                         borderColor: '#74b9ff',
                         borderWidth: 2,
                         tension: 0.4,
