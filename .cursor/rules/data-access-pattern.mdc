@@ -1,0 +1,59 @@
+---
+description: MANDATORY data access pattern — always use DuckDB + Parquet, never CSV loops
+alwaysApply: true
+---
+
+# Data Access: DuckDB + Parquet ONLY
+
+## The Rule
+
+ALL bulk data access in this project MUST use **DuckDB reading from Parquet files**.
+
+```python
+import duckdb
+con = duckdb.connect()
+parquet_dir = output_base / "fact_tables" / "parquet"
+
+df = con.execute(f"""
+    SELECT entity_code, observed_at_ts, park_date, wait_time_minutes, wait_time_type
+    FROM read_parquet('{parquet_dir}/*.parquet')
+    WHERE entity_code = 'MK01'
+""").fetchdf()
+con.close()
+```
+
+## NEVER Do These
+
+- ❌ `load_entity_data()` from `entity_index.py` — DEPRECATED, reads CSVs one at a time
+- ❌ `add_features()` from `features.py` — designed for CSV DataFrames, not bulk ops
+- ❌ Looping over entities calling any per-entity data loader
+- ❌ `pd.read_csv()` on fact_tables CSVs
+- ❌ Globbing CSV files
+
+## Rolling/Window Features
+
+Use DuckDB window functions, NOT pandas `.rolling()`:
+
+```sql
+AVG(wait_time_minutes) OVER (
+    PARTITION BY entity_code, park_date 
+    ORDER BY observed_at_ts
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+) as rolling_mean_30m
+```
+
+## Memory: Chunk Large Operations
+
+Server has 62GB RAM. For > 30M rows, chunk by park prefix:
+
+```python
+parks = sorted(set(e[:2].upper() for e in entities))
+for park in parks:
+    chunk_entities = [e for e in entities if e[:2].upper() == park]
+    # Process chunk...
+```
+
+## Reference
+
+- Canonical pattern: `scripts/hybrid_pipeline_v2.py`
+- Full guide: `docs/ARCHITECTURE.md`

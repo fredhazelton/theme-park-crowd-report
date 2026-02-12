@@ -491,6 +491,11 @@ def load_entity_data(
     """
     Load all fact rows for a specific entity by reading only relevant park-date CSVs.
     
+    ⚠️  DEPRECATED for new code. Use DuckDB + Parquet instead:
+        con = duckdb.connect()
+        df = con.execute(f"SELECT * FROM read_parquet('{parquet_dir}/*.parquet') WHERE entity_code = '{code}'").fetchdf()
+    See docs/ARCHITECTURE.md for the correct pattern.
+    
     Since each entity belongs to exactly one park (derived from entity_code prefix),
     we only need to scan CSVs for that park.
     

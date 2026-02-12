@@ -109,8 +109,11 @@ def prepare_training_data(
     df: pd.DataFrame,
     include_posted: bool = True,
     target_wait_type: str = "ACTUAL",
+    use_synthetic: bool = False,
+    entity_code: str = "",
+    output_base: Optional[Path] = None,
     logger: Optional[logging.Logger] = None,
-) -> Tuple[pd.DataFrame, pd.Series, list[str]]:
+) -> Tuple[pd.DataFrame, pd.Series, list[str], Optional[pd.Series]]:
     """
     Prepare training data: select features and target.
     
@@ -118,16 +121,79 @@ def prepare_training_data(
         df: DataFrame with features and encoded categoricals
         include_posted: If True, include POSTED wait_time_minutes as feature (only for STANDBY queues)
         target_wait_type: Target wait time type - "ACTUAL" for standby queues, "PRIORITY" for priority queues
+        use_synthetic: If True, load and include synthetic actuals (default: False)
+        entity_code: Entity code (required when use_synthetic=True)
+        output_base: Pipeline output base directory (required when use_synthetic=True)
         logger: Optional logger
     
     Returns:
-        Tuple of (X, y, feature_names)
+        Tuple of (X, y, feature_names, sample_weight)
+        sample_weight is None when use_synthetic=False, otherwise contains weights for real vs synthetic data
     """
     # Filter to target wait times (ACTUAL for standby, PRIORITY for priority queues)
     df_target = df[df["wait_time_type"] == target_wait_type].copy()
     
     if df_target.empty:
         raise ValueError(f"No {target_wait_type} wait times found in data")
+    
+    # Add sample weights column (default: all real data gets weight 1.0)
+    df_target["sample_weight"] = 1.0
+    
+    # Load and append synthetic actuals if requested
+    if use_synthetic and target_wait_type == "ACTUAL":
+        if not entity_code or not output_base:
+            raise ValueError("entity_code and output_base required when use_synthetic=True")
+        
+        synthetic_path = output_base / "synthetic_actuals" / f"{entity_code}.parquet"
+        if synthetic_path.exists():
+            try:
+                synthetic_df = pd.read_parquet(synthetic_path)
+                
+                if len(synthetic_df) > 0:
+                    # Map synthetic data to match df_target format
+                    synthetic_mapped = pd.DataFrame({
+                        "entity_code": synthetic_df["entity_code"],
+                        "observed_at": synthetic_df["observed_at"],
+                        "wait_time_type": "ACTUAL",  # Treat as ACTUAL for modeling
+                        "observed_wait_time": synthetic_df["synthetic_actual"],
+                        "park_date": synthetic_df["park_date"],
+                        "sample_weight": 1.0,  # Synthetic data gets weight 1.0 (real gets 5.0 later)
+                    })
+                    
+                    # Add any other columns from df_target that might exist
+                    for col in df_target.columns:
+                        if col not in synthetic_mapped.columns and col in ["pred_mins_since_6am", "pred_dategroupid", "pred_season", "pred_season_year", "park_code"]:
+                            # For missing features, we'd need to re-run add_features on synthetic data
+                            # For now, fill with reasonable defaults
+                            if col == "pred_mins_since_6am":
+                                # Try to derive from observed_at
+                                try:
+                                    synthetic_dt = pd.to_datetime(synthetic_mapped["observed_at"])
+                                    synthetic_mapped[col] = (synthetic_dt.dt.hour * 60 + synthetic_dt.dt.minute - 6*60).clip(lower=0)
+                                except:
+                                    synthetic_mapped[col] = 0
+                            else:
+                                synthetic_mapped[col] = "" if col in ["pred_dategroupid", "pred_season", "park_code"] else 0
+                    
+                    # Set proper sample weights: real=5.0, synthetic=1.0
+                    df_target["sample_weight"] = 5.0  # Real data gets higher weight
+                    synthetic_mapped["sample_weight"] = 1.0  # Synthetic data gets lower weight
+                    
+                    # Append synthetic data
+                    df_target = pd.concat([df_target, synthetic_mapped], ignore_index=True)
+                    
+                    if logger:
+                        logger.info(f"Added {len(synthetic_mapped)} synthetic actuals (weight=1.0) to {len(df_target) - len(synthetic_mapped)} real actuals (weight=5.0)")
+                        
+            except Exception as e:
+                if logger:
+                    logger.warning(f"Failed to load synthetic actuals from {synthetic_path}: {e}")
+        else:
+            if logger:
+                logger.info(f"No synthetic actuals file found: {synthetic_path}")
+    elif use_synthetic and target_wait_type != "ACTUAL":
+        if logger:
+            logger.warning("use_synthetic=True ignored for non-ACTUAL target types")
     
     # For PRIORITY queues, there's no POSTED equivalent - disable include_posted
     if target_wait_type == "PRIORITY":
@@ -217,14 +283,17 @@ def prepare_training_data(
     if not available_features:
         raise ValueError("No features available for training")
     
-    # Extract X and y
+    # Extract X, y, and sample weights
     X = df_target[available_features].copy()
     y = df_target["observed_wait_time"].copy()
+    sample_weights = df_target["sample_weight"].copy() if use_synthetic else None
     
     # Drop rows with null target
     mask = y.notna()
     X = X[mask].copy()
     y = y[mask].copy()
+    if sample_weights is not None:
+        sample_weights = sample_weights[mask].copy()
     
     if len(X) == 0:
         raise ValueError("No valid training examples after filtering nulls")
@@ -251,8 +320,13 @@ def prepare_training_data(
         logger.info(f"Prepared {len(X)} training examples with {len(available_features)} features")
         if include_posted:
             logger.info(f"  - POSTED coverage: {(X['posted_wait_time'].notna().sum() / len(X) * 100):.1f}%")
+        if use_synthetic and sample_weights is not None:
+            real_count = (sample_weights > 1).sum()
+            synthetic_count = (sample_weights == 1).sum()
+            logger.info(f"  - Real examples: {real_count} (weight=5.0)")
+            logger.info(f"  - Synthetic examples: {synthetic_count} (weight=1.0)")
     
-    return X, y, available_features
+    return X, y, available_features, sample_weights
 
 
 def split_by_date(
@@ -306,6 +380,8 @@ def train_xgb_model(
     y_val: pd.Series,
     params: Optional[Dict] = None,
     early_stopping_rounds: Optional[int] = EARLY_STOPPING_ROUNDS,
+    sample_weight_train: Optional[pd.Series] = None,
+    sample_weight_val: Optional[pd.Series] = None,
     logger: Optional[logging.Logger] = None,
 ) -> xgb.XGBRegressor:
     """
@@ -318,6 +394,8 @@ def train_xgb_model(
         y_val: Validation target
         params: XGBoost parameters (default: DEFAULT_XGB_PARAMS)
         early_stopping_rounds: Early stopping rounds
+        sample_weight_train: Optional sample weights for training data
+        sample_weight_val: Optional sample weights for validation data
         logger: Optional logger
     
     Returns:
@@ -330,8 +408,8 @@ def train_xgb_model(
         params = DEFAULT_XGB_PARAMS.copy()
     
     # Create DMatrix for XGBoost
-    dtrain = xgb.DMatrix(X_train, label=y_train)
-    dval = xgb.DMatrix(X_val, label=y_val)
+    dtrain = xgb.DMatrix(X_train, label=y_train, weight=sample_weight_train)
+    dval = xgb.DMatrix(X_val, label=y_val, weight=sample_weight_val)
     
     # Train model (Julia legacy: no early stopping, full num_round)
     num_round = params.get("n_estimators", 2000)
@@ -620,6 +698,7 @@ def train_entity_model(
     val_ratio: float = 0.15,
     xgb_params: Optional[Dict] = None,
     target_wait_type: str = "ACTUAL",
+    use_synthetic: bool = False,
     logger: Optional[logging.Logger] = None,
 ) -> Tuple[Dict[str, xgb.XGBRegressor], Dict[str, Dict[str, float]]]:
     """
@@ -633,6 +712,7 @@ def train_entity_model(
         val_ratio: Validation set proportion (default: 0.15)
         xgb_params: Optional XGBoost parameters
         target_wait_type: Target wait time type - "ACTUAL" for standby queues, "PRIORITY" for priority queues
+        use_synthetic: If True, include synthetic actuals with sample weighting (default: False)
         logger: Optional logger
     
     Returns:
@@ -669,28 +749,39 @@ def train_entity_model(
             if logger:
                 logger.info("Training with-POSTED model...")
             
-            X_train, y_train, feature_names = prepare_training_data(
+            X_train, y_train, feature_names, weight_train = prepare_training_data(
                 train_df,
                 include_posted=True,
                 target_wait_type=target_wait_type,
+                use_synthetic=use_synthetic,
+                entity_code=entity_code,
+                output_base=output_base,
                 logger=logger,
             )
-            X_val, y_val, _ = prepare_training_data(
+            X_val, y_val, _, weight_val = prepare_training_data(
                 val_df,
                 include_posted=True,
                 target_wait_type=target_wait_type,
+                use_synthetic=use_synthetic,
+                entity_code=entity_code,
+                output_base=output_base,
                 logger=logger,
             )
-            X_test, y_test, _ = prepare_training_data(
+            X_test, y_test, _, weight_test = prepare_training_data(
                 test_df,
                 include_posted=True,
                 target_wait_type=target_wait_type,
+                use_synthetic=use_synthetic,
+                entity_code=entity_code,
+                output_base=output_base,
                 logger=logger,
             )
             
             model_with = train_xgb_model(
                 X_train, y_train, X_val, y_val,
                 params=xgb_params,
+                sample_weight_train=weight_train,
+                sample_weight_val=weight_val,
                 logger=logger,
             )
             
@@ -728,28 +819,39 @@ def train_entity_model(
         if logger:
             logger.info("Training without-POSTED model...")
         
-        X_train, y_train, feature_names = prepare_training_data(
+        X_train, y_train, feature_names, weight_train = prepare_training_data(
             train_df,
             include_posted=False,
             target_wait_type=target_wait_type,
+            use_synthetic=use_synthetic,
+            entity_code=entity_code,
+            output_base=output_base,
             logger=logger,
         )
-        X_val, y_val, _ = prepare_training_data(
+        X_val, y_val, _, weight_val = prepare_training_data(
             val_df,
             include_posted=False,
             target_wait_type=target_wait_type,
+            use_synthetic=use_synthetic,
+            entity_code=entity_code,
+            output_base=output_base,
             logger=logger,
         )
-        X_test, y_test, _ = prepare_training_data(
+        X_test, y_test, _, weight_test = prepare_training_data(
             test_df,
             include_posted=False,
             target_wait_type=target_wait_type,
+            use_synthetic=use_synthetic,
+            entity_code=entity_code,
+            output_base=output_base,
             logger=logger,
         )
         
         model_without = train_xgb_model(
             X_train, y_train, X_val, y_val,
             params=xgb_params,
+            sample_weight_train=weight_train,
+            sample_weight_val=weight_val,
             logger=logger,
         )
         
