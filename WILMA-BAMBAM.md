@@ -423,7 +423,31 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-- *(none)*
+- **[Pipeline: Closures Module — Operating Calendar]** — **HIGH PRIORITY**
+  Build a closures module that tracks attraction closures (temporary + permanent) so closed attractions are excluded from forecasts and WTI calculations. **This directly impacts WTI accuracy.**
+  
+  **Full spec:** `docs/CLOSURES_MODULE_SPEC.md` — READ THIS FIRST, it has everything.
+  
+  **TL;DR:**
+  1. `src/get_closures_from_s3.py` — Download closure CSVs from `s3://touringplans_stats/export/closures/`
+  2. `src/build_operating_calendar.py` — Combine temporary closures + `extinct_on` from dimentity into a single operating calendar
+  3. Output: `operating_calendar/operating_calendar.parquet` with schema `(entity_code, park_date, is_operating)`
+  4. Pipeline position: after Dimensions, before Impute Hours
+  
+  **Key design rules:**
+  - No null dates — use sentinel values (`1900-01-01` for unknown start, `9999-12-31` for unknown end)
+  - DuckDB + Parquet only (per ARCHITECTURE.md)
+  - Entity not in closures data = assume operating
+  - Must handle multiple closure windows per entity
+  
+  **Downstream integration (after this module works):**
+  - Training: `WHERE is_operating = TRUE`
+  - Forecasting: skip entities where `is_operating = FALSE`
+  - WTI: only average operating entities
+  
+  **S3 files:** `current_wdw_closures.csv`, `current_dlr_closures.csv`, `current_uor_closures.csv`, `current_tdr_closures.csv`, `current_ush_closures.csv`
+  
+  **S3 schema:** `object_type, object_code, object_name, start_date, finish_date`
 
 ---
 
