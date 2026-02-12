@@ -25,6 +25,7 @@ OUTPUT_BASE=""
 STOP_ON_ERROR=true
 SKIP_ETL=false
 SKIP_DIMENSIONS=false
+SKIP_CLOSURES=false
 SKIP_AGGREGATES=false
 SKIP_REPORT=false
 SKIP_TRAINING=false
@@ -51,6 +52,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --skip-dimensions)
             SKIP_DIMENSIONS=true
+            shift
+            ;;
+        --skip-closures)
+            SKIP_CLOSURES=true
             shift
             ;;
         --skip-aggregates)
@@ -99,6 +104,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --no-stop-on-error    Continue on step failure; log and exit 1 at end"
             echo "  --skip-etl             Skip main ETL"
             echo "  --skip-dimensions      Skip dimension fetches"
+            echo "  --skip-closures        Skip closures module (get_closures + operating calendar)"
             echo "  --skip-aggregates      Skip posted aggregates build"
             echo "  --skip-report           Skip wait time DB report"
             echo "  --skip-training        Skip batch training"
@@ -249,6 +255,28 @@ else
         FAILED_ANY=true
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step dimensions failed 2>/dev/null || true
         $STOP_ON_ERROR && exit 1
+    fi
+fi
+
+# 2a. Closures module (get_closures from S3 + build operating calendar)
+# Runs after dimensions (needs dimentity); before posted aggregates
+if $SKIP_CLOSURES || $SKIP_DIMENSIONS; then
+    log_info "=== Closures module (skipped) ==="
+else
+    if run_step "Closures: get_closures from S3" $PYTHON src/get_closures_from_s3.py --output-base "$OUTPUT_BASE"; then
+        if run_step "Closures: build operating calendar" $PYTHON src/build_operating_calendar.py --output-base "$OUTPUT_BASE"; then
+            :
+        else
+            FAILED_ANY=true
+            $STOP_ON_ERROR && exit 1
+        fi
+    else
+        FAILED_ANY=true
+        # Non-fatal: downstream can run without operating calendar (assume all operating)
+        log_info "WARNING: Closures module failed; continuing (operating calendar may be stale/missing)"
+        if $STOP_ON_ERROR; then
+            exit 1
+        fi
     fi
 fi
 

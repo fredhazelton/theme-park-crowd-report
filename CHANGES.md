@@ -4,6 +4,30 @@ This document tracks significant changes to the Theme Park Wait Time Data Pipeli
 
 ## Recent Changes
 
+### Closures Module (2026-02-04)
+
+**Added** (`src/get_closures_from_s3.py`):
+- Downloads closure CSVs from `s3://touringplans_stats/export/closures/` to `raw_closures/`
+- Files: current_wdw_closures.csv, current_dlr_closures.csv, current_uor_closures.csv, current_tdr_closures.csv, current_ush_closures.csv
+- Retry logic, atomic writes; continues if files missing (downstream handles empty)
+
+**Added** (`src/build_operating_calendar.py`):
+- Combines dimentity `extinct_on` (permanent) + temporary closures into operating calendar
+- Output: `operating_calendar/operating_calendar.parquet` (entity_code, park_date, is_operating)
+- Date range: today - 30 days to today + 365 days (configurable via `--start-date`, `--end-date`)
+- Sentinel dates: 1900-01-01, 9999-12-31; entity not in closures = operating; multiple closure windows = union
+
+**Changed** (`scripts/run_daily_pipeline.sh`):
+- Closures step inserted after Dimensions, before Impute Hours
+- `--skip-closures` bypasses; non-fatal on failure (continues)
+
+**Changed** (`docs/PIPELINE_STATE.md`):
+- Pipeline order updated; raw_closures/, operating_calendar/ paths documented
+
+**Downstream:** Training, forecast, WTI can filter by `is_operating` — spec in `docs/CLOSURES_MODULE_SPEC.md`; integration not yet wired.
+
+---
+
 ### WTI Status Update (2026-02-07)
 
 **Status** (`wti/wti.csv`):

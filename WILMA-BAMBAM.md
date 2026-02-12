@@ -423,37 +423,15 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-- **[Pipeline: Closures Module — Operating Calendar]** — **HIGH PRIORITY**
-  Build a closures module that tracks attraction closures (temporary + permanent) so closed attractions are excluded from forecasts and WTI calculations. **This directly impacts WTI accuracy.**
-  
-  **Full spec:** `docs/CLOSURES_MODULE_SPEC.md` — READ THIS FIRST, it has everything.
-  
-  **TL;DR:**
-  1. `src/get_closures_from_s3.py` — Download closure CSVs from `s3://touringplans_stats/export/closures/`
-  2. `src/build_operating_calendar.py` — Combine temporary closures + `extinct_on` from dimentity into a single operating calendar
-  3. Output: `operating_calendar/operating_calendar.parquet` with schema `(entity_code, park_date, is_operating)`
-  4. Pipeline position: after Dimensions, before Impute Hours
-  
-  **Key design rules:**
-  - No null dates — use sentinel values (`1900-01-01` for unknown start, `9999-12-31` for unknown end)
-  - DuckDB + Parquet only (per ARCHITECTURE.md)
-  - Entity not in closures data = assume operating
-  - Must handle multiple closure windows per entity
-  
-  **Downstream integration (after this module works):**
-  - Training: `WHERE is_operating = TRUE`
-  - Forecasting: skip entities where `is_operating = FALSE`
-  - WTI: only average operating entities
-  
-  **S3 files:** `current_wdw_closures.csv`, `current_dlr_closures.csv`, `current_uor_closures.csv`, `current_tdr_closures.csv`, `current_ush_closures.csv`
-  
-  **S3 schema:** `object_type, object_code, object_name, start_date, finish_date`
+- *(none)*
 
 ---
 
 ## Completed
 
 *(Bam-Bam: move items here when done; note what was done in the Log.)*
+
+- **[Pipeline: Closures Module — Operating Calendar]** Implemented per `docs/CLOSURES_MODULE_SPEC.md`: (1) `src/get_closures_from_s3.py` — downloads closure CSVs from `s3://touringplans_stats/export/closures/` to `raw_closures/`; (2) `src/build_operating_calendar.py` — combines dimentity `extinct_on` + temporary closures into `operating_calendar/operating_calendar.parquet` (entity_code, park_date, is_operating); (3) integrated into `run_daily_pipeline.sh` after Dimensions, before Impute Hours; (4) `--skip-closures` bypasses; (5) PIPELINE_STATE updated. **Downstream integration** (training, forecast, WTI filter by is_operating) is spec'd but not yet wired — operating calendar is produced and ready for use.
 
 - **[Dashboard: Entity Names Not Displaying]** Fixed in `dashboard/api.py` and `docs/stream/stream-dashboard.html`: (1) dimentity name lookup now supports multiple column name variations (`code`/`entity_code`/`attraction_code` for code; `name`/`entity_name`/`short_name` for name); (2) when hazeydata_entities doesn't exist or returns empty, API now falls back to trained models + dimentity for entity list (names from CODE_TO_NAME); (3) added park code mapping (ioa→IA, usf→UF) so dashboard codes work; (4) enhanced `/api/debug/entity-table` to show both hazeydata and dimentity structure; (5) added fallback entities for ioa/usf in stream dashboard with proper names (Hulk Coaster, etc.).
 
@@ -483,6 +461,7 @@ python src/build_dimensions.py               # Dimensions
 | 2026-02-05 09:12 | Wilma | **Dev Subset Filter Task:** Added priority task to create DEV_MODE that filters to 37 representative entities (2 standby + 2 priority per park across 10 parks). Small enough to iterate fast, broad enough to catch issues. Bam-Bam can use Cursor's Remote-SSH extension to connect directly to wilma-server and browse pipeline files. |
 | 2026-02-05 09:24 | Bam-Bam | **DEV_MODE implemented.** Created config/dev_config.py; integrated into paths.py and scripts/common.sh so output_base = repo/pipeline_dev when DEV_MODE=true; added entity filter in ETL (standby + fastpass + merge_yesterday_queue_times). Ran pipeline with DEV_MODE=true: shell and Python correctly used pipeline_dev (ETL log showed "Output: .../pipeline_dev", "Local source: .../pipeline_dev/raw"). Run failed on this machine at S3 sync (aws not found) and ETL (ModuleNotFoundError: pandas). On a box with AWS CLI + Python venv with deps, use: `export DEV_MODE=true && ./scripts/run_daily_pipeline.sh --skip-dropbox-check`. Task moved to Completed. |
 | 2026-02-09 | Bam-Bam | **ETL: Only process new files since last run.** Implemented per Wilma's priority task. Added `state/etl_last_run.json` (timestamp of last successful ETL); filter all_keys to only files with mtime > last_run_time before processing; default 90 days ago when file doesn't exist (avoids old 2013-2019 files on first incremental run); save timestamp after successful completion. `--full-rebuild` bypasses; should reduce daily processing from ~36 files to ~5-7. Task moved to Completed. |
+| 2026-02-04 | Bam-Bam | **Closures Module:** Implemented `get_closures_from_s3.py` and `build_operating_calendar.py` per spec. Pipeline integration: runs after Dimensions, before Impute Hours. Output: operating_calendar.parquet. Downstream integration (training/forecast/WTI filter by is_operating) not yet wired — calendar ready for use. Task moved to Completed. |
 | 2026-02-04 | Bam-Bam | **Dashboard: Entity names not displaying.** Fixed attraction dropdown showing codes instead of names. API: (1) dimentity lookup supports multiple column name variations; (2) fallback when hazeydata_entities empty: use trained models + dimentity for entity list; (3) park code mapping (ioa→IA, usf→UF); (4) improved debug endpoint. Stream dashboard: fallback entities for ioa/ia/usf/uf with proper names. Task moved to Completed. |
 
 ---

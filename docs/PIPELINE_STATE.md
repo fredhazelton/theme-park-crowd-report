@@ -35,7 +35,7 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 ### 3.1 Daily pipeline (cron, 6:00 AM Eastern)
 
 - **What:** One cron job runs `scripts/run_daily_pipeline.sh --skip-dropbox-check --skip-if-unchanged`.
-- **Order:** S3 sync (wait_times + fastpass_times to `output_base/raw`) → ETL (incremental, sync-only: reads from `raw/` only) → Dimension fetches → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI.
+- **Order:** S3 sync (wait_times + fastpass_times to `output_base/raw`) → ETL (incremental, sync-only: reads from `raw/` only) → Dimension fetches → **Closures** (get_closures from S3 + build operating calendar) → Impute park hours → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI.
 - **Runs as:** wilma (wilma's crontab).
 - **Log:** `output_base/logs/daily_pipeline_YYYY-MM-DD.log`
 - **Lock:** `state/daily_pipeline.lock` — only one run at a time. If the previous run is still in progress (e.g. still training), the next 6 AM run skips cleanly (exit 0) so it doesn't kill or conflict with the other run.
@@ -61,6 +61,8 @@ All under **output_base** unless noted.
 | `output_base/` | Root for all pipeline data (see config) |
 | `output_base/logs/` | Pipeline logs (daily pipeline, queue_times_loop, etc.) |
 | `output_base/dimension_tables/` | dimentity, dimparkhours, dimdategroupid, dimseason, etc. |
+| `output_base/raw_closures/` | Closure CSVs from S3 (current_wdw_closures.csv, etc.); input for operating calendar |
+| `output_base/operating_calendar/` | operating_calendar.parquet (entity_code, park_date, is_operating); used by training, forecast, WTI |
 | `output_base/fact_tables/clean/` | Cleaned wait time fact CSVs (by date) |
 | `output_base/staging/queue_times/` | Queue-times fetcher output (before ETL merge) |
 | `output_base/aggregates/` | posted_aggregates.parquet (for forecast) |
