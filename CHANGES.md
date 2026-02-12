@@ -4,6 +4,24 @@ This document tracks significant changes to the Theme Park Wait Time Data Pipeli
 
 ## Recent Changes
 
+### Operating Calendar + Validation (2026-02-04)
+
+**Operating calendar wiring:**
+- **Training** (`hybrid_pipeline_v2.py`): Matched pairs filtered by `is_operating = TRUE`; graceful fallback if operating_calendar.parquet missing.
+- **Forecasting** (`forecast_vectorized.py`): Only generates forecasts for operating entity-dates; filters time grid per entity.
+- **WTI** (`calculate_wti_simple.py`): Historical and forecast WTI exclude closed entities via JOIN on operating calendar.
+- Added `--output-base` to hybrid_pipeline and forecast_vectorized.
+
+**Post-run validation** (`src/validate_pipeline_output.py`):
+- Forecast coverage: today+1 has forecasts for all active parks.
+- WTI anomaly: flag dates where WTI jumps >30% from neighbors.
+- Entity coverage: flag non-extinct entities lacking models (>50 missing).
+- Forecast date range: forecasts extend ≥7 days.
+- Output: `pipeline_validation/validation_report.json` and `.txt`; exit 1 on any RED flag.
+- Integrated into `run_daily_pipeline.sh` after all steps; `--skip-validation` bypasses.
+
+---
+
 ### Closures Module (2026-02-04)
 
 **Added** (`src/get_closures_from_s3.py`):

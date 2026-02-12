@@ -31,6 +31,7 @@ SKIP_REPORT=false
 SKIP_TRAINING=false
 SKIP_FORECAST=false
 SKIP_WTI=false
+SKIP_VALIDATION=false
 SKIP_DROPBOX_CHECK=false
 SKIP_SYNC=false
 SKIP_IF_UNCHANGED=false
@@ -78,6 +79,10 @@ while [[ $# -gt 0 ]]; do
             SKIP_WTI=true
             shift
             ;;
+        --skip-validation)
+            SKIP_VALIDATION=true
+            shift
+            ;;
         --skip-dropbox-check)
             SKIP_DROPBOX_CHECK=true
             shift
@@ -110,6 +115,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-training        Skip batch training"
             echo "  --skip-forecast        Skip forecast generation"
             echo "  --skip-wti             Skip WTI calculation"
+            echo "  --skip-validation      Skip post-run validation"
             echo "  --skip-dropbox-check   Do not force-quit Dropbox (use if output_base is not on Dropbox)"
             echo "  --skip-sync             Skip S3 sync (use existing local raw data)"
             echo "  --skip-if-unchanged    Skip training/forecast/WTI if data hasn't changed (fast incremental mode)"
@@ -343,7 +349,7 @@ elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check training 2>/d
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
     $PYTHON scripts/pipeline_state.py record training false "no dirty entities" 2>/dev/null || true
 else
-    if run_step "Hybrid training V2 (Julia + geo decay)" $PYTHON scripts/hybrid_pipeline_v2.py --skip-scoring; then
+    if run_step "Hybrid training V2 (Julia + geo decay)" $PYTHON scripts/hybrid_pipeline_v2.py --output-base "$OUTPUT_BASE" --skip-scoring; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
         $PYTHON scripts/pipeline_state.py update training 2>/dev/null || true
         $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record training true "entities had new observations" 2>/dev/null || true
@@ -366,7 +372,7 @@ elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check forecast 2>/d
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
     $PYTHON scripts/pipeline_state.py record forecast false "training was skipped" 2>/dev/null || true
 else
-    if run_step "Forecast (vectorized)" $PYTHON scripts/forecast_vectorized.py --days 730; then
+    if run_step "Forecast (vectorized)" $PYTHON scripts/forecast_vectorized.py --output-base "$OUTPUT_BASE" --days 730; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
         $PYTHON scripts/pipeline_state.py update forecast 2>/dev/null || true
         $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record forecast true "training ran this run" 2>/dev/null || true
@@ -404,6 +410,19 @@ fi
 if $FAILED_ANY; then
     log_error "Daily pipeline finished with one or more failures. Check log: $LOG_FILE"
     exit 1
+fi
+
+# Post-run validation (data quality checks)
+if $SKIP_VALIDATION; then
+    log_info "=== Pipeline validation (skipped) ==="
+else
+    log_info "=== Pipeline validation ==="
+    if $PYTHON src/validate_pipeline_output.py --output-base "$OUTPUT_BASE"; then
+        log_info "Validation: PASS"
+    else
+        log_error "Validation: FAIL (see pipeline_validation/validation_report.txt)"
+        exit 1
+    fi
 fi
 
 # Restart dashboard API to pick up new data (WTI, fact tables, etc.)

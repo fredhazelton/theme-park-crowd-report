@@ -39,9 +39,10 @@ FORECAST_DIR = OUTPUT_BASE / "curves" / "forecast_parquet"
 LOGS_DIR = OUTPUT_BASE / "logs"
 
 
-def setup_logging():
-    LOGS_DIR.mkdir(parents=True, exist_ok=True)
-    log_file = LOGS_DIR / f"forecast_vectorized_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+def setup_logging(log_dir: Path | None = None):
+    log_dir = log_dir or LOGS_DIR
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = log_dir / f"forecast_vectorized_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
     
     logging.basicConfig(
         level=logging.INFO,
@@ -98,9 +99,9 @@ def generate_time_grid(start_date: date, end_date: date, date_features: dict, pa
 
 def forecast_entity(args) -> tuple:
     """Generate forecast for single entity using V2 model."""
-    (entity_code, time_grid, models_dir, fallback_ratio, 
+    (entity_code, time_grid, models_dir, fallback_ratio,
      agg_lookup, park_hours_lookup) = args
-    
+
     try:
         df = time_grid.copy()
         df['entity_code'] = entity_code
@@ -172,50 +173,73 @@ def forecast_entity(args) -> tuple:
 
 def main():
     parser = argparse.ArgumentParser(description="Vectorized forecast generation (V2)")
+    parser.add_argument("--output-base", type=Path, default=OUTPUT_BASE, help="Pipeline output base")
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS, help="Parallel workers")
     parser.add_argument("--days", type=int, default=730, help="Days to forecast")
     parser.add_argument("--max-entities", type=int, help="Limit entities (testing)")
     args = parser.parse_args()
-    
-    logger = setup_logging()
-    
+
+    output_base = Path(args.output_base).resolve()
+    models_dir = output_base / "models"
+    forecast_dir = output_base / "curves" / "forecast_parquet"
+
+    logger = setup_logging(output_base / "logs")
+
     logger.info("=" * 60)
     logger.info("VECTORIZED FORECAST GENERATION (V2)")
     logger.info("=" * 60)
-    
+
     start_time = time.time()
-    
+
     # Date range
     start_date = date.today() + timedelta(days=1)
     end_date = start_date + timedelta(days=args.days)
-    
+
+    logger.info(f"Output base: {output_base}")
     logger.info(f"Date range: {start_date} to {end_date} ({args.days} days)")
     logger.info(f"Workers: {args.workers}")
-    
+
     import duckdb
     con = duckdb.connect()
+
+    # Load operating calendar (graceful fallback: assume all operating if missing)
+    oc_path = output_base / "operating_calendar" / "operating_calendar.parquet"
+    operating_set = set()
+    if oc_path.exists():
+        try:
+            oc_df = pd.read_parquet(oc_path)
+            oc_df = oc_df[oc_df["is_operating"] == True]
+            operating_set = set(
+                zip(oc_df["entity_code"].astype(str).str.upper(), pd.to_datetime(oc_df["park_date"]).dt.date)
+            )
+            logger.info(f"Operating calendar: {len(operating_set):,} operating entity-dates")
+        except Exception as e:
+            logger.warning(f"Could not load operating calendar: {e}; assuming all operating")
+    else:
+        logger.info("Operating calendar not found; assuming all entities operating")
     
     # Load encodings from matched pairs
     logger.info("Loading encodings from matched pairs...")
-    
+    matched_pairs_path = str((output_base / "matched_pairs" / "all_pairs_v2.parquet").resolve())
+
     # date_group_id encodings
-    dgid_enc = con.execute("""
+    dgid_enc = con.execute(f"""
         SELECT DISTINCT date_group_id, date_group_id_encoded
-        FROM read_parquet('/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs_v2.parquet')
+        FROM read_parquet('{matched_pairs_path}')
     """).fetchdf()
     dgid_to_encoded = dict(zip(dgid_enc['date_group_id'], dgid_enc['date_group_id_encoded']))
     
     # season encodings
-    season_enc = con.execute("""
+    season_enc = con.execute(f"""
         SELECT DISTINCT season, season_encoded
-        FROM read_parquet('/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs_v2.parquet')
+        FROM read_parquet('{matched_pairs_path}')
     """).fetchdf()
     season_to_encoded = dict(zip(season_enc['season'], season_enc['season_encoded']))
     
     # season_year encodings
-    sy_enc = con.execute("""
+    sy_enc = con.execute(f"""
         SELECT DISTINCT season_year, season_year_encoded
-        FROM read_parquet('/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs_v2.parquet')
+        FROM read_parquet('{matched_pairs_path}')
     """).fetchdf()
     sy_to_encoded = dict(zip(sy_enc['season_year'], sy_enc['season_year_encoded']))
     
@@ -225,14 +249,15 @@ def main():
     
     # Load date features (date_group_id + season)
     logger.info("Loading date features...")
-    date_features_df = con.execute("""
+    dim_dir = str((output_base / "dimension_tables").resolve())
+    date_features_df = con.execute(f"""
         SELECT 
             CAST(d.park_date AS DATE) as park_date,
             d.date_group_id,
             s.season,
             s.season_year
-        FROM read_csv_auto('/home/wilma/hazeydata/pipeline/dimension_tables/dimdategroupid.csv') d
-        JOIN read_csv_auto('/home/wilma/hazeydata/pipeline/dimension_tables/dimseason.csv') s
+        FROM read_csv_auto('{dim_dir}/dimdategroupid.csv') d
+        JOIN read_csv_auto('{dim_dir}/dimseason.csv') s
             ON d.park_date = s.park_date
     """).fetchdf()
     
@@ -255,13 +280,13 @@ def main():
     
     # Load park hours
     logger.info("Loading park hours...")
-    park_hours_df = con.execute("""
+    park_hours_df = con.execute(f"""
         SELECT 
             park,
             CAST(date AS DATE) as park_date,
             EXTRACT(HOUR FROM CAST(opening_time AS TIMESTAMP)) * 60 + 
             EXTRACT(MINUTE FROM CAST(opening_time AS TIMESTAMP)) as opening_mins
-        FROM read_csv_auto('/home/wilma/hazeydata/pipeline/dimension_tables/dimparkhours.csv')
+        FROM read_csv_auto('{dim_dir}/dimparkhours.csv')
         WHERE opening_time IS NOT NULL
     """).fetchdf()
     
@@ -273,9 +298,10 @@ def main():
     
     # Load model aggregates for posted_time estimates and fallback
     logger.info("Loading model aggregates...")
-    agg_df = con.execute("""
+    agg_path = str((output_base / "aggregates" / "model_aggregates.parquet").resolve())
+    agg_df = con.execute(f"""
         SELECT entity_code, date_group_id, time_slot, wait_median
-        FROM read_parquet('/home/wilma/hazeydata/pipeline/aggregates/model_aggregates.parquet')
+        FROM read_parquet('{agg_path}')
         WHERE wait_median IS NOT NULL
     """).fetchdf()
     agg_df = agg_df.set_index(['entity_code', 'date_group_id', 'time_slot'])
@@ -284,9 +310,10 @@ def main():
     
     # Get entity list
     logger.info("Getting entity list...")
-    entity_list = con.execute("""
+    parquet_path = str((output_base / "fact_tables" / "parquet").resolve())
+    entity_list = con.execute(f"""
         SELECT DISTINCT entity_code
-        FROM read_parquet('/home/wilma/hazeydata/pipeline/fact_tables/parquet/*.parquet')
+        FROM read_parquet('{parquet_path}/*.parquet')
         WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
     """).fetchdf()['entity_code'].tolist()
     
@@ -294,7 +321,7 @@ def main():
     
     # Count models
     entities_with_models = set()
-    for d in MODELS_DIR.iterdir():
+    for d in models_dir.iterdir():
         if d.is_dir() and (d / "model_julia_v2.json").exists():
             entities_with_models.add(d.name)
     
@@ -306,15 +333,25 @@ def main():
     
     # Generate time grid
     logger.info("Generating time grid...")
-    time_grid = generate_time_grid(start_date, end_date, date_features, park_hours_lookup)
-    logger.info(f"  Grid: {len(time_grid):,} time slots")
-    
+    time_grid_full = generate_time_grid(start_date, end_date, date_features, park_hours_lookup)
+    logger.info(f"  Grid: {len(time_grid_full):,} time slots")
+
+    # Filter time grid per entity by operating calendar
+    def get_entity_time_grid(entity_code: str):
+        if not operating_set:
+            return time_grid_full
+        ec_upper = str(entity_code).upper()
+        entity_dates = {d for (ec, d) in operating_set if ec == ec_upper}
+        if not entity_dates:
+            return time_grid_full  # entity not in calendar = assume operating
+        return time_grid_full[time_grid_full["park_date"].isin(entity_dates)]
+
     # Process entities
     logger.info("Generating forecasts...")
-    FORECAST_DIR.mkdir(parents=True, exist_ok=True)
-    
+    forecast_dir.mkdir(parents=True, exist_ok=True)
+
     work_items = [
-        (entity, time_grid, MODELS_DIR, DEFAULT_FALLBACK_RATIO, agg_lookup, park_hours_lookup)
+        (entity, get_entity_time_grid(entity), models_dir, DEFAULT_FALLBACK_RATIO, agg_lookup, park_hours_lookup)
         for entity in entities
     ]
     
@@ -345,8 +382,8 @@ def main():
     logger.info("Combining forecasts...")
     if all_forecasts:
         combined = pd.concat(all_forecasts, ignore_index=True)
-        
-        output_file = FORECAST_DIR / "all_forecasts.parquet"
+
+        output_file = forecast_dir / "all_forecasts.parquet"
         combined.to_parquet(output_file, index=False)
         
         # Stats

@@ -56,59 +56,84 @@ def main():
     
     wti_dir = output_base / "wti"
     wti_dir.mkdir(parents=True, exist_ok=True)
-    
+
     con = duckdb.connect()
-    
+
+    # Operating calendar: filter to is_operating=TRUE; graceful fallback if missing
+    oc_path = output_base / "operating_calendar" / "operating_calendar.parquet"
+    use_oc = oc_path.exists()
+    if use_oc:
+        logger.info(f"Using operating calendar: {oc_path}")
+    else:
+        logger.info("Operating calendar not found; assuming all entities operating")
+
+    oc_str = str(oc_path.resolve()).replace("\\", "/")
+    parquet_str = str((output_base / "fact_tables" / "parquet").resolve()).replace("\\", "/")
+
     results = []
-    
+
     # =========================================================================
     # HISTORICAL WTI (from fact tables)
     # =========================================================================
     if not args.forecast_only:
         logger.info("Computing historical WTI from fact tables...")
-        
-        # Compute WTI per park per date using ACTUAL (preferred) or POSTED
-        historical_wti = con.execute(f"""
+
+        fact_join_oc = f"""
+            FROM read_parquet('{parquet_str}/*.parquet') f
+            JOIN read_parquet('{oc_str}') oc
+                ON f.entity_code = oc.entity_code
+                AND CAST(f.park_date AS DATE) = CAST(oc.park_date AS DATE)
+            WHERE f.wait_time_minutes > 0
+              AND oc.is_operating = TRUE
+        """ if use_oc else f"""
+            FROM read_parquet('{parquet_str}/*.parquet')
+            WHERE wait_time_minutes > 0
+        """
+        fact_cols = "f.entity_code, UPPER(LEFT(f.entity_code, 2)) as park_code, CAST(f.park_date AS DATE) as park_date, f.wait_time_type, f.wait_time_minutes" if use_oc else "UPPER(LEFT(entity_code, 2)) as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes"
+
+        historical_sql = f"""
             WITH fact_data AS (
-                SELECT 
-                    UPPER(LEFT(entity_code, 2)) as park_code,
-                    CAST(park_date AS DATE) as park_date,
-                    entity_code,
-                    wait_time_type,
-                    wait_time_minutes
-                FROM read_parquet('{output_base}/fact_tables/parquet/*.parquet')
-                WHERE wait_time_minutes > 0
+                SELECT {fact_cols}
+                {fact_join_oc}
             ),
-            -- Prefer ACTUAL, fall back to POSTED
             daily_entity_avg AS (
                 SELECT 
-                    park_code,
-                    park_date,
-                    entity_code,
-                    -- Use ACTUAL if available, else POSTED
+                    park_code, park_date, entity_code,
                     COALESCE(
                         AVG(CASE WHEN wait_time_type = 'ACTUAL' THEN wait_time_minutes END),
                         AVG(CASE WHEN wait_time_type = 'POSTED' THEN wait_time_minutes END)
                     ) as entity_avg,
-                    CASE 
-                        WHEN COUNT(CASE WHEN wait_time_type = 'ACTUAL' THEN 1 END) > 0 
-                        THEN 'actual'
-                        ELSE 'posted'
-                    END as wait_type_used
+                    CASE WHEN COUNT(CASE WHEN wait_time_type = 'ACTUAL' THEN 1 END) > 0 THEN 'actual' ELSE 'posted' END as wait_type_used
                 FROM fact_data
                 GROUP BY park_code, park_date, entity_code
             )
-            SELECT 
-                park_code,
-                park_date,
-                ROUND(AVG(entity_avg), 1) as wti,
-                COUNT(DISTINCT entity_code) as n_entities,
-                'historical' as source
+            SELECT park_code, park_date, ROUND(AVG(entity_avg), 1) as wti, COUNT(DISTINCT entity_code) as n_entities, 'historical' as source
             FROM daily_entity_avg
             WHERE entity_avg IS NOT NULL
             GROUP BY park_code, park_date
             ORDER BY park_code, park_date
-        """).fetchdf()
+        """
+        try:
+            historical_wti = con.execute(historical_sql).fetchdf()
+        except Exception as e:
+            logger.warning(f"Operating calendar query failed (fallback to no filter): {e}")
+            historical_wti = con.execute(f"""
+                WITH fact_data AS (
+                    SELECT UPPER(LEFT(entity_code, 2)) as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes
+                    FROM read_parquet('{parquet_str}/*.parquet')
+                    WHERE wait_time_minutes > 0
+                ),
+                daily_entity_avg AS (
+                    SELECT park_code, park_date, entity_code,
+                        COALESCE(AVG(CASE WHEN wait_time_type = 'ACTUAL' THEN wait_time_minutes END), AVG(CASE WHEN wait_time_type = 'POSTED' THEN wait_time_minutes END)) as entity_avg,
+                        CASE WHEN COUNT(CASE WHEN wait_time_type = 'ACTUAL' THEN 1 END) > 0 THEN 'actual' ELSE 'posted' END as wait_type_used
+                    FROM fact_data
+                    GROUP BY park_code, park_date, entity_code
+                )
+                SELECT park_code, park_date, ROUND(AVG(entity_avg), 1) as wti, COUNT(DISTINCT entity_code) as n_entities, 'historical' as source
+                FROM daily_entity_avg WHERE entity_avg IS NOT NULL
+                GROUP BY park_code, park_date ORDER BY park_code, park_date
+            """).fetchdf()
         
         logger.info(f"  Historical WTI: {len(historical_wti):,} park-dates")
         results.append(historical_wti)
@@ -118,22 +143,52 @@ def main():
     # =========================================================================
     if not args.historical_only:
         forecast_file = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
-        
+        forecast_str = str(forecast_file.resolve()).replace("\\", "/")
+
         if forecast_file.exists():
             logger.info("Computing forecast WTI from predictions...")
-            
-            forecast_wti = con.execute(f"""
-                SELECT 
-                    UPPER(LEFT(entity_code, 2)) as park_code,
-                    park_date,
-                    ROUND(AVG(predicted_actual), 1) as wti,
-                    COUNT(DISTINCT entity_code) as n_entities,
-                    'forecast' as source
-                FROM read_parquet('{forecast_file}')
-                WHERE predicted_actual > 0
-                GROUP BY park_code, park_date
-                ORDER BY park_code, park_date
-            """).fetchdf()
+
+            if use_oc:
+                forecast_sql = f"""
+                    SELECT 
+                        UPPER(LEFT(f.entity_code, 2)) as park_code,
+                        f.park_date,
+                        ROUND(AVG(f.predicted_actual), 1) as wti,
+                        COUNT(DISTINCT f.entity_code) as n_entities,
+                        'forecast' as source
+                    FROM read_parquet('{forecast_str}') f
+                    JOIN read_parquet('{oc_str}') oc
+                        ON f.entity_code = oc.entity_code
+                        AND CAST(f.park_date AS DATE) = CAST(oc.park_date AS DATE)
+                    WHERE f.predicted_actual > 0
+                      AND oc.is_operating = TRUE
+                    GROUP BY park_code, park_date
+                    ORDER BY park_code, park_date
+                """
+            else:
+                forecast_sql = f"""
+                    SELECT 
+                        UPPER(LEFT(entity_code, 2)) as park_code,
+                        park_date,
+                        ROUND(AVG(predicted_actual), 1) as wti,
+                        COUNT(DISTINCT entity_code) as n_entities,
+                        'forecast' as source
+                    FROM read_parquet('{forecast_str}')
+                    WHERE predicted_actual > 0
+                    GROUP BY park_code, park_date
+                    ORDER BY park_code, park_date
+                """
+            try:
+                forecast_wti = con.execute(forecast_sql).fetchdf()
+            except Exception as e:
+                logger.warning(f"Forecast WTI with operating calendar failed (fallback): {e}")
+                forecast_wti = con.execute(f"""
+                    SELECT UPPER(LEFT(entity_code, 2)) as park_code, park_date,
+                        ROUND(AVG(predicted_actual), 1) as wti, COUNT(DISTINCT entity_code) as n_entities, 'forecast' as source
+                    FROM read_parquet('{forecast_str}')
+                    WHERE predicted_actual > 0
+                    GROUP BY park_code, park_date ORDER BY park_code, park_date
+                """).fetchdf()
             
             logger.info(f"  Forecast WTI: {len(forecast_wti):,} park-dates")
             results.append(forecast_wti)

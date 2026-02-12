@@ -34,7 +34,7 @@ DEFAULT_FALLBACK_RATIO = 0.82
 GEO_DECAY_HALFLIFE_DAYS = 730  # 2 years
 EASTERN = ZoneInfo("America/New_York")
 
-# Paths
+# Paths (defaults; overridden by --output-base in main)
 OUTPUT_BASE = Path("/home/wilma/hazeydata/pipeline")
 PARQUET_DIR = OUTPUT_BASE / "fact_tables" / "parquet"
 DIMENSION_DIR = OUTPUT_BASE / "dimension_tables"
@@ -48,9 +48,10 @@ JULIA_TRAIN_SCRIPT = PROJECT_ROOT / "julia-ml" / "train_v2.jl"
 JULIA_BIN = Path.home() / "julia-1.10.2" / "bin" / "julia"
 
 
-def setup_logging():
-    LOGS_DIR.mkdir(parents=True, exist_ok=True)
-    log_file = LOGS_DIR / f"hybrid_pipeline_v2_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+def setup_logging(log_dir: Path | None = None):
+    log_dir = log_dir or LOGS_DIR
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = log_dir / f"hybrid_pipeline_v2_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
     
     logging.basicConfig(
         level=logging.INFO,
@@ -63,20 +64,26 @@ def setup_logging():
     return logging.getLogger(__name__)
 
 
-def step1_create_matched_pairs(logger) -> int:
+def step1_create_matched_pairs(logger, output_base: Path | None = None) -> int:
     """Use DuckDB to create all matched pairs with improved features."""
+    base = output_base or OUTPUT_BASE
+    parquet_dir = base / "fact_tables" / "parquet"
+    dim_dir = base / "dimension_tables"
+    matched_dir = base / "matched_pairs"
+    oc_path = base / "operating_calendar" / "operating_calendar.parquet"
+
     logger.info("=" * 60)
     logger.info("STEP 1: MATCHED PAIRS V2 (Python/DuckDB)")
     logger.info("=" * 60)
-    
+
     start = time.time()
     con = duckdb.connect()
-    
+
     # Paths for dimension tables
-    dategroupid_path = DIMENSION_DIR / "dimdategroupid.csv"
-    season_path = DIMENSION_DIR / "dimseason.csv"
-    parkhours_path = DIMENSION_DIR / "dimparkhours.csv"
-    
+    dategroupid_path = dim_dir / "dimdategroupid.csv"
+    season_path = dim_dir / "dimseason.csv"
+    parkhours_path = dim_dir / "dimparkhours.csv"
+
     if not dategroupid_path.exists():
         logger.error(f"dimdategroupid.csv not found: {dategroupid_path}")
         return 0
@@ -85,35 +92,64 @@ def step1_create_matched_pairs(logger) -> int:
         return 0
     if not parkhours_path.exists():
         logger.warning(f"dimparkhours.csv not found: {parkhours_path} - mins_since_open will be NULL")
-    
+
+    # Operating calendar: filter to is_operating=TRUE; graceful fallback if missing
+    use_operating_calendar = oc_path.exists()
+    if use_operating_calendar:
+        logger.info(f"Using operating calendar: {oc_path} (excluding closed entity-dates)")
+    else:
+        logger.info("Operating calendar not found; assuming all entities operating")
+
+    oc_str = str(oc_path).replace("\\", "/")
+    parquet_str = str(parquet_dir).replace("\\", "/")
+
+    # Optional filter for operating calendar
+    if use_operating_calendar:
+        operating_filter = f"""
+        operating AS (
+            SELECT entity_code, CAST(park_date AS DATE) as park_date
+            FROM read_parquet('{oc_str}')
+            WHERE is_operating = TRUE
+        ),
+        """
+        actual_filter = "AND EXISTS (SELECT 1 FROM operating o WHERE o.entity_code = a.entity_code AND o.park_date = CAST(a.park_date AS DATE))"
+        posted_filter = "AND EXISTS (SELECT 1 FROM operating o WHERE o.entity_code = p.entity_code AND o.park_date = CAST(p.park_date AS DATE))"
+    else:
+        operating_filter = ""
+        actual_filter = ""
+        posted_filter = ""
+
     # Calculate reference date for geo decay
     today = date.today()
-    
+
     # Match ACTUAL with closest POSTED within 15-minute window
     # Join with dimension tables for date_group_id, season, season_year
     query = f"""
-        WITH actual AS (
+        WITH {operating_filter}
+        actual AS (
             SELECT 
-                entity_code,
-                observed_at,
-                observed_at_ts,
-                park_date,
-                wait_time_minutes as actual_time
-            FROM read_parquet('{PARQUET_DIR}/*.parquet')
-            WHERE wait_time_type = 'ACTUAL'
-              AND wait_time_minutes IS NOT NULL
-              AND wait_time_minutes > 0
+                a.entity_code,
+                a.observed_at,
+                a.observed_at_ts,
+                a.park_date,
+                a.wait_time_minutes as actual_time
+            FROM read_parquet('{parquet_str}/*.parquet') a
+            WHERE a.wait_time_type = 'ACTUAL'
+              AND a.wait_time_minutes IS NOT NULL
+              AND a.wait_time_minutes > 0
+              {actual_filter}
         ),
         posted AS (
             SELECT 
-                entity_code,
-                observed_at_ts,
-                park_date,
-                wait_time_minutes as posted_time
-            FROM read_parquet('{PARQUET_DIR}/*.parquet')
-            WHERE wait_time_type = 'POSTED'
-              AND wait_time_minutes IS NOT NULL
-              AND wait_time_minutes > 0
+                p.entity_code,
+                p.observed_at_ts,
+                p.park_date,
+                p.wait_time_minutes as posted_time
+            FROM read_parquet('{parquet_str}/*.parquet') p
+            WHERE p.wait_time_type = 'POSTED'
+              AND p.wait_time_minutes IS NOT NULL
+              AND p.wait_time_minutes > 0
+              {posted_filter}
         ),
         dategroupid AS (
             SELECT 
@@ -242,14 +278,14 @@ def step1_create_matched_pairs(logger) -> int:
         'season': season_mapping,
         'season_year': sy_mapping,
     }
-    encodings_path = OUTPUT_BASE / "state" / "encoding_mappings.json"
+    encodings_path = base / "state" / "encoding_mappings.json"
     encodings_path.parent.mkdir(parents=True, exist_ok=True)
     with open(encodings_path, 'w') as f:
         json.dump(encodings, f, indent=2)
     logger.info(f"  Saved encodings to: {encodings_path}")
     
     # Save to parquet
-    output_path = MATCHED_PAIRS_DIR / "all_pairs_v2.parquet"
+    output_path = matched_dir / "all_pairs_v2.parquet"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(output_path, index=False)
     
@@ -275,7 +311,7 @@ def step1_create_matched_pairs(logger) -> int:
     fallback_ratios = dict(zip(ratio_df['entity_code'], ratio_df['fallback_ratio']))
     fallback_ratios['__global__'] = global_ratio
     
-    ratios_path = OUTPUT_BASE / "state" / "fallback_ratios.json"
+    ratios_path = base / "state" / "fallback_ratios.json"
     with open(ratios_path, 'w') as f:
         json.dump(fallback_ratios, f, indent=2)
     logger.info(f"  Global fallback ratio: {global_ratio:.3f}")
@@ -404,26 +440,30 @@ def step3_score_historical(logger) -> int:
 
 def main():
     parser = argparse.ArgumentParser(description="Hybrid Pipeline V2")
+    parser.add_argument("--output-base", type=Path, default=OUTPUT_BASE, help="Pipeline output base")
     parser.add_argument("--skip-pairs", action="store_true", help="Skip matched pairs generation")
     parser.add_argument("--skip-training", action="store_true", help="Skip model training")
     parser.add_argument("--skip-scoring", action="store_true", help="Skip historical scoring")
     args = parser.parse_args()
-    
-    logger = setup_logging()
-    
+
+    output_base = args.output_base.resolve()
+
+    logger = setup_logging(output_base / "logs")
+
     logger.info("=" * 60)
     logger.info("HYBRID PIPELINE V2")
     logger.info("=" * 60)
+    logger.info(f"Output base: {output_base}")
     logger.info(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     logger.info(f"Features: posted_time, mins_since_6am, hour_of_day, date_group_id, season, season_year")
     logger.info(f"Weights: geo_decay (half-life={GEO_DECAY_HALFLIFE_DAYS} days)")
     logger.info("")
-    
+
     total_start = time.time()
-    
+
     # Step 1: Matched pairs
     if not args.skip_pairs:
-        n_pairs = step1_create_matched_pairs(logger)
+        n_pairs = step1_create_matched_pairs(logger, output_base)
     else:
         logger.info("Skipping matched pairs generation")
         n_pairs = 0
