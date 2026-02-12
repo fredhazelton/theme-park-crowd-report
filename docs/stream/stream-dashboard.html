@@ -859,52 +859,95 @@
                 lineGrad.addColorStop(stop, `rgba(${rgb}, 1)`);
             }
 
-            // ── Attraction image fill: CSS background + negative-space dataset ──
-            // Set ride image as CSS background on chart container.
-            // Add a second "mask" dataset filled from curve to top with background color.
-            // Image shows through only below the curve. Pure Chart.js, no canvas hacks.
+            // ── Attraction image fill: negative-space technique ──
+            // Fetch image as blob (avoids all CORS canvas issues), then:
+            // 1. Paint ride image across full chart area
+            // 2. Paint background color over everything ABOVE the curve
             const BG_COLOR = '#0f1923';
-            const attrImgEl = document.getElementById('attraction-image');
-            const hasRideImage = attrImgEl && attrImgEl.complete && attrImgEl.naturalWidth > 0 
-                                 && attrImgEl.style.opacity !== '0' && attrImgEl.src;
+            let _rideImg = null; // will be set async
             
-            if (hasRideImage) {
-                canvasEl.parentElement.style.backgroundImage = `url(${attrImgEl.src})`;
-                canvasEl.parentElement.style.backgroundSize = 'cover';
-                canvasEl.parentElement.style.backgroundPosition = 'center';
-            } else {
-                canvasEl.parentElement.style.backgroundImage = '';
+            // Load ride image as blob URL (same-origin, no CORS tainting)
+            const attrImgEl = document.getElementById('attraction-image');
+            if (attrImgEl && attrImgEl.src && attrImgEl.style.opacity !== '0' && attrImgEl.src.startsWith('http')) {
+                fetch(attrImgEl.src).then(r => r.blob()).then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const img = new Image();
+                    img.onload = () => {
+                        _rideImg = img;
+                        // Redraw chart with image
+                        if (charts.timeSeries) charts.timeSeries.update();
+                    };
+                    img.src = blobUrl;
+                }).catch(() => {});
             }
             
-            const imageFillPlugin = {}; // kept empty so chart registration doesn't break
+            const imageFillPlugin = {
+                id: 'imageFill',
+                beforeDatasetsDraw(chart) {
+                    if (!_rideImg) return;
+                    const { ctx: c, chartArea } = chart;
+                    if (!chartArea) return;
+                    const { left, right, top, bottom } = chartArea;
+                    const aW = right - left;
+                    const aH = bottom - top;
+                    
+                    c.save();
+                    c.beginPath();
+                    c.rect(left, top, aW, aH);
+                    c.clip();
+                    
+                    // Draw ride image scaled to cover chart area
+                    const scale = Math.max(aW / _rideImg.naturalWidth, aH / _rideImg.naturalHeight);
+                    const iw = _rideImg.naturalWidth * scale;
+                    const ih = _rideImg.naturalHeight * scale;
+                    c.drawImage(_rideImg, left + (aW - iw) / 2, top + (aH - ih) / 2, iw, ih);
+                    
+                    // Darken slightly for readability
+                    c.fillStyle = 'rgba(10, 22, 40, 0.3)';
+                    c.fillRect(left, top, aW, aH);
+                    c.restore();
+                },
+                afterDatasetsDraw(chart) {
+                    if (!_rideImg) return;
+                    const meta = chart.getDatasetMeta(0);
+                    if (!meta.data.length) return;
+                    const { ctx: c, chartArea } = chart;
+                    if (!chartArea) return;
+                    const { left, right, top, bottom } = chartArea;
+                    const points = meta.data;
+                    
+                    c.save();
+                    c.beginPath();
+                    c.rect(left, top, right - left, bottom - top);
+                    c.clip();
+                    
+                    // Negative space: fill everything ABOVE the curve with background
+                    c.beginPath();
+                    c.moveTo(left, top);
+                    c.lineTo(right, top);
+                    c.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+                    for (let i = points.length - 2; i >= 0; i--) {
+                        c.lineTo(points[i].x, points[i].y);
+                    }
+                    c.lineTo(left, top);
+                    c.closePath();
+                    c.fillStyle = BG_COLOR;
+                    c.fill();
+                    c.restore();
+                }
+            };
 
             const datasets = [{
                 label: isPlaceholder ? 'Placeholder (min)' : 'Avg actual wait (min)',
                 data: values,
                 borderColor: isPlaceholder ? 'rgba(74, 144, 164, 0.5)' : lineGrad,
-                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : (hasRideImage ? 'transparent' : fillGrad),
-                fill: hasRideImage ? false : true,
+                backgroundColor: isPlaceholder ? 'rgba(74, 144, 164, 0.15)' : fillGrad,
+                fill: true,
                 tension: 0.3,
                 pointRadius: values.length > 40 ? 0 : 2,
                 pointBackgroundColor: isPlaceholder ? '#4a90a4' : lineGrad,
                 pointBorderColor: isPlaceholder ? '#4a90a4' : lineGrad,
-                order: 1,
             }];
-            
-            // Negative-space mask: fills from curve UP to top with background color
-            if (hasRideImage && !isPlaceholder) {
-                datasets.push({
-                    label: '_mask',
-                    data: values,
-                    borderColor: 'transparent',
-                    backgroundColor: BG_COLOR,
-                    fill: 'end',  // fill from this line to the top of the chart
-                    tension: 0.3,
-                    pointRadius: 0,
-                    pointHitRadius: 0,
-                    order: 2,
-                });
-            }
             // ── Smart label picker: peaks, valleys, and periodic labels ──
             function pickLabelIndices(values) {
                 if (!values || values.length < 3) return [];
@@ -987,7 +1030,6 @@
                             bodyColor: '#e9f4ff',
                             borderColor: 'rgba(74, 144, 164, 0.4)',
                             borderWidth: 1,
-                            filter: (item) => item.dataset.label !== '_mask',
                             callbacks: {
                                 title: (items) => items[0] ? items[0].label : '',
                                 label: (item) => `${Math.round(item.parsed.y)} min avg wait`
