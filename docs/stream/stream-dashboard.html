@@ -869,11 +869,11 @@
                                  && attrImgEl.style.opacity !== '0' && attrImgEl.src;
             
             if (hasRideImage) {
-                canvasEl.parentElement.style.backgroundImage = `url(${attrImgEl.src})`;
-                canvasEl.parentElement.style.backgroundSize = 'cover';
-                canvasEl.parentElement.style.backgroundPosition = 'center';
+                canvasEl.style.backgroundImage = `url(${attrImgEl.src})`;
+                canvasEl.style.backgroundSize = 'cover';
+                canvasEl.style.backgroundPosition = 'center';
             } else {
-                canvasEl.parentElement.style.backgroundImage = '';
+                canvasEl.style.backgroundImage = '';
             }
             
             const imageFillPlugin = {}; // kept empty so chart registration doesn't break
