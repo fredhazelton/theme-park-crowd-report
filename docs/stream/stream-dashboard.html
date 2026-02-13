@@ -1759,7 +1759,7 @@
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             ctx.fillStyle = isActive ? colorBand.text : 'rgba(255,255,255,0.35)';
-                            ctx.font = 'bold 14px Inter, sans-serif';
+                            ctx.font = 'bold 16px Inter, sans-serif';
                             ctx.fillText(valueText, x, y);
                             // Park name above
                             const parkName = chart.data.labels[i] || '';
@@ -1767,10 +1767,10 @@
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'bottom';
                             ctx.fillStyle = isActive ? 'rgba(233, 244, 255, 0.9)' : 'rgba(233, 244, 255, 0.2)';
-                            ctx.font = '11px Inter, sans-serif';
+                            ctx.font = '9px Inter, sans-serif';
                             const blockBottom = y - headRadius - nameGap;
                             nameWords.forEach((word, wi) => {
-                                ctx.fillText(word, x, blockBottom - (nameWords.length - 1 - wi) * lineHeight);
+                                ctx.fillText(word, x, blockBottom - (nameWords.length - 1 - wi) * 12);
                             });
                         });
                     }
