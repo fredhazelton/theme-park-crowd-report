@@ -162,8 +162,8 @@ def main():
                         AND CAST(f.park_date AS DATE) = CAST(oc.park_date AS DATE)
                     WHERE f.predicted_actual > 0
                       AND oc.is_operating = TRUE
-                    GROUP BY park_code, park_date
-                    ORDER BY park_code, park_date
+                    GROUP BY UPPER(LEFT(f.entity_code, 2)), f.park_date
+                    ORDER BY park_code, f.park_date
                 """
             else:
                 forecast_sql = f"""
