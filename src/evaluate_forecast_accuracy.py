@@ -223,8 +223,10 @@ def evaluate_accuracy(
             SELECT
                 entity_code,
                 park_date,
-                -- Bucket observed_at_ts into 5-min slots
-                TIME_BUCKET(INTERVAL '5 minutes', observed_at_ts::TIMESTAMP)::TIME as time_slot,
+                -- Round to nearest 5-min slot (not floor)
+                -- Add 2.5 min then floor to 5-min boundary = round to nearest
+                TIME_BUCKET(INTERVAL '5 minutes', 
+                    (observed_at_ts::TIMESTAMP + INTERVAL '2 minutes 30 seconds'))::TIME as time_slot,
                 AVG(wait_time_minutes) as actual_wait,
                 COUNT(*) as n_obs
             FROM read_parquet(['{parquet_glob}'])
