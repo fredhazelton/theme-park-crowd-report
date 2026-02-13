@@ -1210,7 +1210,7 @@
             const sub = document.getElementById('chart1-subtitle');
             const property = document.getElementById('property-filter').value;
             const level = property === 'all' ? 'property' : 'park';
-            sub.textContent = `Avg wait by ${level} · ${datasets.length} ${level}${datasets.length !== 1 ? 's' : ''}`;
+            sub.textContent = `Avg wait by ${level} · ${datasets.length} ${level === 'property' ? (datasets.length !== 1 ? 'properties' : 'property') : (datasets.length !== 1 ? 'parks' : 'park')}`;
         }
 
         /** Average multiple park curves into one combined curve */
