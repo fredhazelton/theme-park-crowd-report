@@ -63,11 +63,17 @@ def main():
     # Handles multi-char prefixes: USH→UH, TDL→TD, TDS→TD
     # Everything else uses first 2 alpha chars
     def park_code_sql(col="entity_code"):
-        """Return SQL CASE expression that maps entity_code to canonical park_code."""
+        """Return SQL CASE expression that maps entity_code to canonical park_code.
+        
+        Handles 3-char prefixes that would otherwise be truncated to 2 chars:
+        - USH* → UH (Universal Studios Hollywood, alternate prefix)
+        - TDL* → TDL (Tokyo Disneyland, kept as 3-char)
+        - TDS* → TDS (Tokyo DisneySea, kept as 3-char)
+        """
         return f"""CASE
             WHEN {col} LIKE 'USH%' THEN 'UH'
-            WHEN {col} LIKE 'TDL%' THEN 'TD'
-            WHEN {col} LIKE 'TDS%' THEN 'TD'
+            WHEN {col} LIKE 'TDL%' THEN 'TDL'
+            WHEN {col} LIKE 'TDS%' THEN 'TDS'
             ELSE UPPER(LEFT({col}, 2))
         END"""
 
