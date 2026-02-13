@@ -50,7 +50,8 @@ PARK_INFO = {
     "UF": {"name": "Universal Studios Florida",   "property": "uor"},
     "EU": {"name": "Epic Universe",               "property": "uor"},
     "UH": {"name": "Universal Studios Hollywood", "property": "ush"},
-    "TD": {"name": "Tokyo Disney Resort",         "property": "tdr"},
+    "TDL": {"name": "Tokyo Disneyland",             "property": "tdr"},
+    "TDS": {"name": "Tokyo DisneySea",              "property": "tdr"},
 }
 
 PROPERTY_NAMES = {
@@ -632,6 +633,61 @@ def _curve_from_fact_tables(park_upper: str, target_date: date,
     ]
 
 
+def _curve_from_synthetic_actuals(park_upper: str, target_date: date,
+                                   entity_code: Optional[str] = None) -> list[dict]:
+    """Build curve from synthetic_actuals parquet files for a historical date.
+    
+    Synthetic actuals are POSTED observations converted to estimated ACTUAL waits
+    using the trained conversion model. Much denser than raw ACTUAL observations.
+    """
+    date_str = target_date.strftime("%Y-%m-%d")
+    synth_dir = OUTPUT_BASE / "synthetic_actuals"
+    if not synth_dir.exists():
+        return []
+    
+    try:
+        # Build glob pattern for entity files
+        if entity_code:
+            pattern = str(synth_dir / f"{entity_code.upper()}.parquet")
+        else:
+            pattern = str(synth_dir / f"{park_upper}*.parquet")
+        
+        con = duckdb.connect()
+        # Check if files exist
+        files = con.execute(f"SELECT * FROM glob('{pattern}')").fetchall()
+        if not files:
+            con.close()
+            return []
+        
+        query = f"""
+            SELECT 
+                strftime(observed_at::TIMESTAMP, '%H:%M') as time_slot,
+                AVG(synthetic_actual) as avg_wait,
+                COUNT(*) as n_obs
+            FROM '{pattern}'
+            WHERE park_date = '{date_str}'
+              AND synthetic_actual > 0
+              AND synthetic_actual < 300
+            GROUP BY time_slot
+            ORDER BY time_slot
+        """
+        rows = con.execute(query).fetchall()
+        con.close()
+        
+        if not rows:
+            return []
+        
+        # For park-wide curves, require min 3 observations per slot
+        min_obs = 1 if entity_code else 3
+        return [
+            {"time_slot": r[0], "avg_wait": round(float(r[1]), 1), "n_obs": int(r[2])}
+            for r in rows if r[2] >= min_obs
+        ]
+    except Exception as e:
+        logger.warning("Synthetic actuals curve failed for %s on %s: %s", park_upper, date_str, e)
+        return []
+
+
 def _build_daily_curve(park_upper: str, start_d: date, end_d: date,
                         entity_code: Optional[str] = None,
                         wait_type: str = "actual") -> list[dict]:
@@ -639,8 +695,9 @@ def _build_daily_curve(park_upper: str, start_d: date, end_d: date,
     Unified daily curve builder:
       - Future dates (>= FORECAST_START) → all_forecasts.parquet (predicted_actual)
       - Historical dates → fact_tables CSVs (filtered by wait_type)
-      - For wait_type="actual": uses ACTUAL observations where available,
-        then fills gaps with model predictions (forecasts / model_aggregates).
+      - For wait_type="actual": uses synthetic actuals (dense) as primary source,
+        with raw ACTUAL observations taking priority where available,
+        then fills remaining gaps with model predictions.
       - For wait_type="posted": uses POSTED observations directly.
     Results are filtered to park operating hours ± 1h buffer.
     """
@@ -654,35 +711,41 @@ def _build_daily_curve(park_upper: str, start_d: date, end_d: date,
         fact_curve = _curve_from_fact_tables(park_upper, start_d, entity_code, wait_type=wait_type)
 
         if wait_type == "actual":
-            # For "actual" mode: use ACTUAL observations where we have them,
-            # fill gaps with model predictions (predicted_actual values).
-            # Priority: model_aggregates (date-group matched, has proper curves)
-            # then forecasts as fallback.
+            # For "actual" mode, data priority:
+            #   1. Raw ACTUAL observations (ground truth, sparse)
+            #   2. Synthetic actuals (POSTED→ACTUAL conversion, dense)
+            #   3. Model predictions (forecasts/aggregates, fills remaining gaps)
+            
+            # Get synthetic actuals (dense coverage from POSTED data)
+            synth_curve = _curve_from_synthetic_actuals(park_upper, start_d, entity_code)
+            
+            # Get model predictions as final fallback
             prediction_curve = _curve_from_model_aggregates(park_upper, start_d, entity_code)
             if not prediction_curve:
                 prediction_curve = _curve_from_forecasts(park_upper, start_d, end_d, entity_code)
 
-            if fact_curve and prediction_curve:
-                # Merge: actual observations take priority, predictions fill gaps
-                actual_slots = {pt["time_slot"]: pt["avg_wait"] for pt in fact_curve}
-                merged = []
+            # Merge layers: raw actual > synthetic actual > model prediction
+            # Start with predictions as base layer
+            merged_slots = {}
+            if prediction_curve:
                 for pt in prediction_curve:
-                    ts = pt["time_slot"]
-                    if ts in actual_slots:
-                        merged.append({"time_slot": ts, "avg_wait": actual_slots[ts]})
-                    else:
-                        merged.append(pt)
-                # Also include any actual slots not in predictions
-                pred_slots = {pt["time_slot"] for pt in prediction_curve}
+                    merged_slots[pt["time_slot"]] = pt["avg_wait"]
+            # Overlay synthetic actuals (better than predictions)
+            if synth_curve:
+                for pt in synth_curve:
+                    merged_slots[pt["time_slot"]] = pt["avg_wait"]
+            # Overlay raw actuals (best available — ground truth)
+            if fact_curve:
                 for pt in fact_curve:
-                    if pt["time_slot"] not in pred_slots:
-                        merged.append(pt)
-                merged.sort(key=lambda p: p["time_slot"])
-                curve = merged
+                    merged_slots[pt["time_slot"]] = pt["avg_wait"]
+            
+            if merged_slots:
+                curve = [
+                    {"time_slot": ts, "avg_wait": avg}
+                    for ts, avg in sorted(merged_slots.items())
+                ]
             elif fact_curve:
                 curve = fact_curve
-            elif prediction_curve:
-                curve = prediction_curve
         else:
             # "posted" mode: just use the POSTED observations directly
             curve = fact_curve

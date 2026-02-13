@@ -337,6 +337,18 @@ else
     # Non-fatal — don't stop the pipeline for accuracy tracking failures
 fi
 
+# 4c. Synthetic Actuals Generation
+# Applies trained POSTED→ACTUAL conversion model to all historical POSTED observations.
+# Output: synthetic_actuals/{entity_code}.parquet — used by dashboard curve display.
+# NOTE: NOT used for training yet. Training integration planned for later.
+log_info "=== Synthetic actuals generation ==="
+if run_step "Synthetic actuals generation" $PYTHON scripts/generate_synthetic_actuals.py --output-base "$OUTPUT_BASE"; then
+    log_info "Done: Synthetic actuals generation"
+else
+    log_info "WARNING: Synthetic actuals generation failed (non-fatal, continuing)"
+    # Non-fatal — dashboard falls back to raw actuals if synthetic unavailable
+fi
+
 # 5. Hybrid training V2 (Julia XGBoost with geo decay weights)
 # Uses DuckDB for matched pairs + Julia for training (with date_group_id, season, geo_decay)
 # Skip logic: only skip if no entities have new observations (checks entity_index.sqlite)
