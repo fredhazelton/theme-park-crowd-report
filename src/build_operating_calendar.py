@@ -164,9 +164,9 @@ def main() -> None:
     # Permanent: closed if park_date >= extinct_on
     # Temporary: closed if park_date in [closure_start, closure_end] for ANY closure
     # Combined: operating = permanent_operating AND temporary_operating
-    calendar = con.execute("""
+    calendar = con.execute(f"""
         WITH date_range AS (
-            SELECT unnest(generate_series(DATE ?::DATE, DATE ?::DATE, INTERVAL '1 day'))::DATE as park_date
+            SELECT unnest(generate_series(DATE '{start_date}'::DATE, DATE '{end_date}'::DATE, INTERVAL '1 day'))::DATE as park_date
         ),
         entity_dates AS (
             SELECT e.entity_code, d.park_date
@@ -194,7 +194,7 @@ def main() -> None:
             LEFT JOIN temp_closed t ON p.entity_code = t.entity_code AND p.park_date = t.park_date
         )
         SELECT entity_code, park_date, is_operating FROM combined ORDER BY entity_code, park_date
-    """, [start_date, end_date]).fetchdf()
+    """).fetchdf()
 
     logger.info("Calendar: %d rows", len(calendar))
 
