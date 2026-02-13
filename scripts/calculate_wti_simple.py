@@ -59,6 +59,18 @@ def main():
 
     con = duckdb.connect()
 
+    # SQL expression to derive park_code from entity_code
+    # Handles multi-char prefixes: USH→UH, TDL→TD, TDS→TD
+    # Everything else uses first 2 alpha chars
+    def park_code_sql(col="entity_code"):
+        """Return SQL CASE expression that maps entity_code to canonical park_code."""
+        return f"""CASE
+            WHEN {col} LIKE 'USH%' THEN 'UH'
+            WHEN {col} LIKE 'TDL%' THEN 'TD'
+            WHEN {col} LIKE 'TDS%' THEN 'TD'
+            ELSE UPPER(LEFT({col}, 2))
+        END"""
+
     # Operating calendar: filter to is_operating=TRUE; graceful fallback if missing
     oc_path = output_base / "operating_calendar" / "operating_calendar.parquet"
     use_oc = oc_path.exists()
@@ -71,6 +83,10 @@ def main():
     parquet_str = str((output_base / "fact_tables" / "parquet").resolve()).replace("\\", "/")
 
     results = []
+
+    # Pre-compute park_code SQL expressions for use in all queries
+    pc_f = park_code_sql("f.entity_code")
+    pc_bare = park_code_sql("entity_code")
 
     # =========================================================================
     # HISTORICAL WTI (from fact tables)
@@ -89,7 +105,7 @@ def main():
             FROM read_parquet('{parquet_str}/*.parquet')
             WHERE wait_time_minutes > 0
         """
-        fact_cols = "f.entity_code, UPPER(LEFT(f.entity_code, 2)) as park_code, CAST(f.park_date AS DATE) as park_date, f.wait_time_type, f.wait_time_minutes" if use_oc else "UPPER(LEFT(entity_code, 2)) as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes"
+        fact_cols = f"f.entity_code, {pc_f} as park_code, CAST(f.park_date AS DATE) as park_date, f.wait_time_type, f.wait_time_minutes" if use_oc else f"{pc_bare} as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes"
 
         historical_sql = f"""
             WITH fact_data AS (
@@ -119,7 +135,7 @@ def main():
             logger.warning(f"Operating calendar query failed (fallback to no filter): {e}")
             historical_wti = con.execute(f"""
                 WITH fact_data AS (
-                    SELECT UPPER(LEFT(entity_code, 2)) as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes
+                    SELECT {pc_bare} as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_minutes > 0
                 ),
@@ -151,7 +167,7 @@ def main():
             if use_oc:
                 forecast_sql = f"""
                     SELECT 
-                        UPPER(LEFT(f.entity_code, 2)) as park_code,
+                        {pc_f} as park_code,
                         f.park_date,
                         ROUND(AVG(f.predicted_actual), 1) as wti,
                         COUNT(DISTINCT f.entity_code) as n_entities,
@@ -162,20 +178,20 @@ def main():
                         AND CAST(f.park_date AS DATE) = CAST(oc.park_date AS DATE)
                     WHERE f.predicted_actual > 0
                       AND oc.is_operating = TRUE
-                    GROUP BY UPPER(LEFT(f.entity_code, 2)), f.park_date
+                    GROUP BY {pc_f}, f.park_date
                     ORDER BY park_code, f.park_date
                 """
             else:
                 forecast_sql = f"""
                     SELECT 
-                        UPPER(LEFT(entity_code, 2)) as park_code,
+                        {pc_bare} as park_code,
                         park_date,
                         ROUND(AVG(predicted_actual), 1) as wti,
                         COUNT(DISTINCT entity_code) as n_entities,
                         'forecast' as source
                     FROM read_parquet('{forecast_str}')
                     WHERE predicted_actual > 0
-                    GROUP BY park_code, park_date
+                    GROUP BY {pc_bare}, park_date
                     ORDER BY park_code, park_date
                 """
             try:
@@ -183,11 +199,11 @@ def main():
             except Exception as e:
                 logger.warning(f"Forecast WTI with operating calendar failed (fallback): {e}")
                 forecast_wti = con.execute(f"""
-                    SELECT UPPER(LEFT(entity_code, 2)) as park_code, park_date,
+                    SELECT {pc_bare} as park_code, park_date,
                         ROUND(AVG(predicted_actual), 1) as wti, COUNT(DISTINCT entity_code) as n_entities, 'forecast' as source
                     FROM read_parquet('{forecast_str}')
                     WHERE predicted_actual > 0
-                    GROUP BY park_code, park_date ORDER BY park_code, park_date
+                    GROUP BY {pc_bare}, park_date ORDER BY park_code, park_date
                 """).fetchdf()
             
             logger.info(f"  Forecast WTI: {len(forecast_wti):,} park-dates")
