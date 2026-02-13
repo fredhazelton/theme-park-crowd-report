@@ -164,6 +164,24 @@ def archive_forecast(output_base: str, con: duckdb.DuckDBPyConnection, run_date:
     
     size_mb = os.path.getsize(archive_path) / 1024 / 1024
     log.info("Archived forecast for %s (next 14 days): %.1f MB", run_date, size_mb)
+    
+    # Also archive WTI predictions for these dates
+    wti_path = os.path.join(output_base, "wti", "wti.parquet")
+    wti_archive_path = os.path.join(output_base, "accuracy", "archive", f"wti_{run_date}.parquet")
+    if os.path.exists(wti_path) and not os.path.exists(wti_archive_path):
+        try:
+            con.execute(f"""
+                COPY (
+                    SELECT park_code, park_date, wti, source,
+                           '{run_date}' as wti_made_date
+                    FROM read_parquet('{wti_path}')
+                    WHERE source = 'forecast'
+                    AND park_date <= '{cutoff}'
+                ) TO '{wti_archive_path}' (FORMAT PARQUET, COMPRESSION ZSTD)
+            """)
+            log.info("Archived WTI forecast for %s", run_date)
+        except Exception as e:
+            log.warning("Failed to archive WTI: %s", e)
 
 
 def evaluate_accuracy(
@@ -304,40 +322,66 @@ def evaluate_accuracy(
              entity_df["mape"].mean())
     
     # === WTI LEVEL ===
-    # Compare forecast WTI vs actual WTI
+    # Compare ARCHIVED forecast WTI vs current historical WTI
+    # The archived WTI contains what we predicted; historical WTI is computed from actuals
     wti_path = os.path.join(output_base, "wti", "wti.parquet")
-    if os.path.exists(wti_path):
-        wti_df = con.execute(f"""
-            WITH forecast_wti AS (
-                SELECT park_code, park_date::VARCHAR as park_date, wti as forecast_wti
-                FROM read_parquet('{wti_path}')
-                WHERE source = 'forecast' AND park_date::VARCHAR IN ('{date_list}')
-            ),
-            actual_wti AS (
-                SELECT park_code, park_date::VARCHAR as park_date, wti as actual_wti
-                FROM read_parquet('{wti_path}')
-                WHERE source = 'historical' AND park_date::VARCHAR IN ('{date_list}')
-            )
-            SELECT
-                f.park_code,
-                f.park_date,
-                f.forecast_wti,
-                a.actual_wti,
-                (f.forecast_wti - a.actual_wti) as wti_error,
-                ABS(f.forecast_wti - a.actual_wti) as wti_abs_error,
-                '{run_date}' as evaluation_date
-            FROM forecast_wti f
-            INNER JOIN actual_wti a
-                ON f.park_code = a.park_code AND f.park_date = a.park_date
-        """).fetchdf()
+    wti_archive_dir = os.path.join(output_base, "accuracy", "archive")
+    wti_archives = sorted([
+        os.path.join(wti_archive_dir, f)
+        for f in os.listdir(wti_archive_dir)
+        if f.startswith("wti_") and f.endswith(".parquet")
+    ]) if os.path.exists(wti_archive_dir) else []
+    
+    wti_df = None
+    if wti_archives and os.path.exists(wti_path):
+        # Use the archived WTI made before the earliest eval date
+        earliest_eval = min(eval_dates)
+        valid_wti_archives = [
+            f for f in wti_archives
+            if os.path.basename(f).replace("wti_", "").replace(".parquet", "") < earliest_eval
+        ]
+        wti_archive = valid_wti_archives[-1] if valid_wti_archives else wti_archives[0]
+        log.info("Using archived WTI: %s", os.path.basename(wti_archive))
         
-        if not wti_df.empty:
-            log.info("WTI accuracy: %d park-dates, avg WTI error=%.1f min",
-                     len(wti_df), wti_df["wti_abs_error"].mean())
-        else:
+        try:
+            wti_df = con.execute(f"""
+                WITH forecast_wti AS (
+                    SELECT park_code, park_date::VARCHAR as park_date, wti as forecast_wti,
+                           wti_made_date
+                    FROM read_parquet('{wti_archive}')
+                    WHERE park_date::VARCHAR IN ('{date_list}')
+                ),
+                actual_wti AS (
+                    SELECT park_code, park_date::VARCHAR as park_date, wti as actual_wti
+                    FROM read_parquet('{wti_path}')
+                    WHERE source = 'historical' AND park_date::VARCHAR IN ('{date_list}')
+                )
+                SELECT
+                    f.park_code,
+                    f.park_date,
+                    f.forecast_wti,
+                    a.actual_wti,
+                    f.wti_made_date,
+                    (f.forecast_wti - a.actual_wti) as wti_error,
+                    ABS(f.forecast_wti - a.actual_wti) as wti_abs_error,
+                    '{run_date}' as evaluation_date
+                FROM forecast_wti f
+                INNER JOIN actual_wti a
+                    ON f.park_code = a.park_code AND f.park_date = a.park_date
+            """).fetchdf()
+            
+            if not wti_df.empty:
+                log.info("WTI accuracy: %d park-dates, avg WTI abs error=%.1f",
+                         len(wti_df), wti_df["wti_abs_error"].mean())
+            else:
+                log.info("No WTI forecast-vs-actual matches found for eval dates")
+                wti_df = None
+        except Exception as e:
+            log.warning("WTI accuracy computation failed: %s", e)
             wti_df = None
     else:
-        wti_df = None
+        if not wti_archives:
+            log.info("No archived WTI files yet — WTI accuracy will start tomorrow")
     
     return slot_df, entity_df, wti_df
 
