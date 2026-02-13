@@ -336,6 +336,16 @@ def main():
     time_grid_full = generate_time_grid(start_date, end_date, date_features, park_hours_lookup)
     logger.info(f"  Grid: {len(time_grid_full):,} time slots")
 
+    # Build set of ALL entities in operating calendar (regardless of operating status)
+    all_calendar_entities = set()
+    if oc_path.exists():
+        try:
+            oc_all = pd.read_parquet(oc_path, columns=["entity_code"])
+            all_calendar_entities = set(oc_all["entity_code"].astype(str).str.upper().unique())
+            logger.info(f"Operating calendar covers {len(all_calendar_entities)} entities")
+        except Exception as e:
+            logger.warning(f"Could not load entity list from operating calendar: {e}")
+
     # Filter time grid per entity by operating calendar
     def get_entity_time_grid(entity_code: str):
         if not operating_set:
@@ -343,17 +353,28 @@ def main():
         ec_upper = str(entity_code).upper()
         entity_dates = {d for (ec, d) in operating_set if ec == ec_upper}
         if not entity_dates:
-            return time_grid_full  # entity not in calendar = assume operating
+            if ec_upper in all_calendar_entities:
+                return None  # entity is in calendar but has NO operating dates = extinct/fully closed
+            return time_grid_full  # entity not in calendar at all = assume operating
         return time_grid_full[time_grid_full["park_date"].isin(entity_dates)]
 
     # Process entities
     logger.info("Generating forecasts...")
     forecast_dir.mkdir(parents=True, exist_ok=True)
 
-    work_items = [
-        (entity, get_entity_time_grid(entity), models_dir, DEFAULT_FALLBACK_RATIO, agg_lookup, park_hours_lookup)
-        for entity in entities
-    ]
+    # Build work items, skipping extinct/fully-closed entities
+    work_items = []
+    skipped_extinct = 0
+    for entity in entities:
+        grid = get_entity_time_grid(entity)
+        if grid is None or (hasattr(grid, '__len__') and len(grid) == 0):
+            skipped_extinct += 1
+            continue
+        work_items.append(
+            (entity, grid, models_dir, DEFAULT_FALLBACK_RATIO, agg_lookup, park_hours_lookup)
+        )
+    if skipped_extinct:
+        logger.info(f"Skipped {skipped_extinct} extinct/closed entities (no operating dates)")
     
     all_forecasts = []
     successful = 0
