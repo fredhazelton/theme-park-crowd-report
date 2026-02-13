@@ -56,29 +56,41 @@ def get_evaluation_dates(output_base: str, con: duckdb.DuckDBPyConnection) -> li
     """
     Determine which forecast dates now have actuals available.
     
-    We look at the current forecast file and find dates that:
-    - Were forecasted (exist in all_forecasts.parquet)
+    We look at ARCHIVED forecasts (not the current one) to find dates that:
+    - Were predicted ahead of time (exist in archived forecast parquets)
     - Now have actual observations in the fact tables
     - Haven't been evaluated yet (not in existing accuracy table)
     """
-    forecast_path = os.path.join(output_base, "curves", "forecast_parquet", "all_forecasts.parquet")
-    if not os.path.exists(forecast_path):
-        log.warning("No forecast file found at %s", forecast_path)
+    archive_dir = os.path.join(output_base, "accuracy", "archive")
+    if not os.path.exists(archive_dir):
+        log.warning("No archive directory found at %s", archive_dir)
         return []
     
-    # Get the forecast date range (typically tomorrow through 2 years out)
+    archive_files = sorted([
+        os.path.join(archive_dir, f)
+        for f in os.listdir(archive_dir)
+        if f.startswith("forecast_") and f.endswith(".parquet")
+    ])
+    
+    if not archive_files:
+        log.warning("No archived forecasts found")
+        return []
+    
+    # Get all dates that appear in ANY archived forecast
+    archive_glob = "', '".join(archive_files)
     forecast_dates = con.execute(f"""
-        SELECT DISTINCT park_date 
-        FROM read_parquet('{forecast_path}')
+        SELECT DISTINCT park_date::VARCHAR as park_date
+        FROM read_parquet(['{archive_glob}'])
         ORDER BY park_date
-        LIMIT 30
     """).fetchdf()["park_date"].tolist()
     
     if not forecast_dates:
         return []
     
+    log.info("Archived forecasts cover %d unique dates (%s to %s)", 
+             len(forecast_dates), forecast_dates[0], forecast_dates[-1])
+    
     # Find which of these dates now have actual data
-    # We check the most recent fact table parquet files
     fact_dir = os.path.join(output_base, "fact_tables", "parquet")
     recent_parquets = sorted([
         os.path.join(fact_dir, f) 
@@ -94,22 +106,24 @@ def get_evaluation_dates(output_base: str, con: duckdb.DuckDBPyConnection) -> li
     
     # Dates with actual data
     actual_dates = con.execute(f"""
-        SELECT DISTINCT park_date
+        SELECT DISTINCT park_date::VARCHAR as park_date
         FROM read_parquet(['{parquet_glob}'])
         WHERE wait_time_type = 'ACTUAL'
-        AND park_date >= '{forecast_dates[0]}'
+        AND park_date::VARCHAR >= '{forecast_dates[0]}'
     """).fetchdf()["park_date"].tolist()
     
-    # Filter: only dates that appear in BOTH forecast and actuals
+    # Filter: only dates that appear in BOTH archived forecasts and actuals
     eval_dates = sorted(set(str(d) for d in forecast_dates) & set(str(d) for d in actual_dates))
+    
+    log.info("Dates with both forecast and actuals: %d", len(eval_dates))
     
     # Exclude dates already evaluated
     accuracy_path = os.path.join(output_base, "accuracy", "entity_daily_accuracy.parquet")
     if os.path.exists(accuracy_path):
         already_done = con.execute(f"""
-            SELECT DISTINCT target_date 
+            SELECT DISTINCT park_date::VARCHAR as park_date
             FROM read_parquet('{accuracy_path}')
-        """).fetchdf()["target_date"].astype(str).tolist()
+        """).fetchdf()["park_date"].astype(str).tolist()
         eval_dates = [d for d in eval_dates if d not in already_done]
     
     return eval_dates
@@ -181,9 +195,14 @@ def evaluate_accuracy(
         log.warning("No archived forecasts found — first run. Archiving current forecast.")
         return None, None, None
     
-    # Use the most recent archive that was made BEFORE these eval dates
+    # Use the most recent archive that was made BEFORE the earliest eval date
     # (i.e., the forecast that was predicting these dates ahead of time)
-    forecast_archive = archive_files[-1]  # Most recent archive
+    earliest_eval = min(eval_dates)
+    valid_archives = [
+        f for f in archive_files 
+        if os.path.basename(f).replace("forecast_", "").replace(".parquet", "") < earliest_eval
+    ]
+    forecast_archive = valid_archives[-1] if valid_archives else archive_files[0]
     log.info("Using archived forecast: %s", os.path.basename(forecast_archive))
     
     # Load fact tables for eval dates
