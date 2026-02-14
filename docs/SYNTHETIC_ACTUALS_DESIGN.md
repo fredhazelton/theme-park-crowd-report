@@ -158,7 +158,17 @@ Average POSTED overestimation found: **9.0 minutes**.
 - `synthetic_actuals/{entity_code}.parquet` — Per-entity synthetic actuals
 - `synthetic_actuals/generation_summary.json` — Run summary
 
-### Phase 3: TODO
+### Phase 3: TODO (Target: February 19, 2026)
+- Collecting baseline accuracy data Feb 12-18 (current method without synthetic actuals)
+- On Feb 19: integrate synthetic actuals into daily pipeline
 - A/B comparison: retrain entity models with vs without synthetic actuals
-- Measure forecast accuracy improvement on held-out dates
+- Measure forecast accuracy improvement against baseline
 - Production toggle in `hybrid_pipeline_v2.py`
+
+### Pre-Synthetic Baseline Fixes (2026-02-14)
+Before switching to synthetic actuals, we fixed several issues in the current pipeline:
+1. **FastPass/Lightning Lane filter:** 134 `fastpass_booth=TRUE` entities were being modeled as standby waits. Added `dimentity.csv` join + filter to forecast, training, and aggregate builder.
+2. **Aggregate fallback applies ratio:** Was using raw posted median as predicted actual (over-predicts). Now applies `posted_median × entity_ratio` to convert posted → actual estimate.
+3. **Default posted estimate:** Changed from 30 → 5 minutes for entities with zero aggregate data (sparse entities are low-wait).
+
+These fixes establish a cleaner baseline for the Feb 19 synthetic actuals comparison.

@@ -373,6 +373,11 @@ XGBoost supports this with `objective='reg:quantileerror'` and `quantile_alpha` 
 - **Entity name display:** All entity-related logging includes short names from dimentity (e.g., "AK03 - Greeting Trails") for improved readability.
 - **Quantile regression:** Optional for v2; mean regression is the base.
 
+**Implemented (2026-02-14):**
+- **FastPass/Lightning Lane entity filter:** `fastpass_booth = TRUE` entities (134 Lightning Lane return time trackers) are now excluded from forecast, training (matched pairs), and aggregate building. These are NOT standby wait times. Filter implemented via `dimentity.csv` JOIN in `forecast_vectorized.py`, `hybrid_pipeline_v2.py`, and `build_model_aggregates.py`.
+- **Aggregate fallback applies posted-to-actual ratio:** For entities without trained models, the aggregate lookup returns a historical posted median. This is now multiplied by the entity fallback ratio (or global ratio 0.678) to estimate actual wait time. Previously the raw posted median was used as-is, which systematically over-predicted.
+- **Default posted estimate:** Changed from 30 to 5 minutes for entities with zero aggregate data. Entities this sparse are obscure, low-traffic attractions.
+
 **Open / to decide when we implement:**
 - **Ingesting TouringPlans “closed” / operating_status:** We do not capture it yet. Design fact or a companion feed to support null when closed.
 - **Detecting “0 when closed” from queue-times:** Check API for `is_open` or similar; if absent, define an inference rule (e.g. 0 during known closed hours) and document.
