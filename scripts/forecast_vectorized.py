@@ -30,7 +30,7 @@ except ImportError:
 # Constants
 DEFAULT_WORKERS = 8
 SLOTS_PER_DAY = 288  # 5-minute intervals
-DEFAULT_FALLBACK_RATIO = 0.82
+DEFAULT_FALLBACK_RATIO = 0.678  # Fallback if ratios file missing; overridden by state/fallback_ratios.json
 
 # Paths
 OUTPUT_BASE = Path("/home/wilma/hazeydata/pipeline")
@@ -352,6 +352,19 @@ def main():
             entities_with_models.add(d.name)
     
     logger.info(f"Total entities: {len(entity_list)} ({len(entities_with_models)} with V2 models)")
+
+    # Load dynamic fallback ratios (per-entity + global)
+    import json
+    ratios_path = output_base / "state" / "fallback_ratios.json"
+    if ratios_path.exists():
+        with open(ratios_path) as f:
+            fallback_ratios = json.load(f)
+        global_ratio = fallback_ratios.pop("__global__", DEFAULT_FALLBACK_RATIO)
+        logger.info(f"Loaded fallback ratios: {len(fallback_ratios)} per-entity, global={global_ratio:.3f}")
+    else:
+        fallback_ratios = {}
+        global_ratio = DEFAULT_FALLBACK_RATIO
+        logger.warning(f"No fallback_ratios.json found, using default {global_ratio}")
     
     entities = sorted(entity_list)
     if args.max_entities:
@@ -396,8 +409,9 @@ def main():
         if grid is None or (hasattr(grid, '__len__') and len(grid) == 0):
             skipped_extinct += 1
             continue
+        entity_ratio = fallback_ratios.get(entity, global_ratio)
         work_items.append(
-            (entity, grid, models_dir, DEFAULT_FALLBACK_RATIO, agg_lookup, park_hours_lookup, entity_p95_cap.get(entity))
+            (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, entity_p95_cap.get(entity))
         )
     if skipped_extinct:
         logger.info(f"Skipped {skipped_extinct} extinct/closed entities (no operating dates)")
