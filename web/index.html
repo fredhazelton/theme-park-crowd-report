@@ -25,7 +25,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20260214b">
 </head>
 <body>
     <!-- Hero -->
@@ -39,13 +39,12 @@
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#parks">Parks</a>
-                <a href="subscribe.html">Premium</a>
                 <a href="https://discord.gg/Bz89uXrD" class="btn btn-sm" target="_blank">Join Discord</a>
             </div>
         </nav>
         <div class="hero-content">
             <h1>Know Before You Go</h1>
-            <p class="hero-sub">ML-powered crowd predictions for every Disney &amp; Universal park. See which days are busy, which are empty, and plan the perfect trip.</p>
+            <p class="hero-sub">The only crowd predictor that tells you what wait times <em>will actually be</em> — not just what the parks post. Powered by ML models trained on millions of historical observations.</p>
             <div class="hero-cta">
                 <a href="https://discord.gg/Bz89uXrD" class="btn btn-primary" target="_blank">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
@@ -53,7 +52,63 @@
                 </a>
                 <a href="#features" class="btn btn-outline">Learn More</a>
             </div>
-            <p class="hero-note">Free • Alpha access • 12 parks and counting</p>
+            <p class="hero-note">🎉 Everything free during alpha • 13 parks and counting</p>
+        </div>
+    </section>
+
+    <!-- Park Ticker -->
+    <div class="park-ticker-wrap">
+        <div class="park-ticker">
+            <span>🏰 Magic Kingdom</span>
+            <span>🌐 EPCOT</span>
+            <span>🎬 Hollywood Studios</span>
+            <span>🦁 Animal Kingdom</span>
+            <span>🎠 Disneyland</span>
+            <span>🎢 California Adventure</span>
+            <span>🦈 Universal Studios Florida</span>
+            <span>🏝️ Islands of Adventure</span>
+            <span>🌟 Epic Universe</span>
+            <span>🎬 Universal Hollywood</span>
+            <span>🗼 Tokyo Disneyland</span>
+            <span>⛩️ Tokyo DisneySea</span>
+            <span>🐆 Busch Gardens Tampa</span>
+            <!-- duplicate set for seamless loop -->
+            <span>🏰 Magic Kingdom</span>
+            <span>🌐 EPCOT</span>
+            <span>🎬 Hollywood Studios</span>
+            <span>🦁 Animal Kingdom</span>
+            <span>🎠 Disneyland</span>
+            <span>🎢 California Adventure</span>
+            <span>🦈 Universal Studios Florida</span>
+            <span>🏝️ Islands of Adventure</span>
+            <span>🌟 Epic Universe</span>
+            <span>🎬 Universal Hollywood</span>
+            <span>🗼 Tokyo Disneyland</span>
+            <span>⛩️ Tokyo DisneySea</span>
+            <span>🐆 Busch Gardens Tampa</span>
+        </div>
+    </div>
+
+    <!-- Bot Preview -->
+    <section class="bot-preview">
+        <h2>See It In Action</h2>
+        <p class="section-sub">Real Discord commands. Real predictions. Instant answers.</p>
+        <div class="preview-grid">
+            <div class="preview-card">
+                <div class="preview-label">/today</div>
+                <img src="assets/screenshot-today.png" alt="All parks overview showing WTI crowd levels" loading="lazy">
+                <p>All parks at a glance — one command, every morning.</p>
+            </div>
+            <div class="preview-card">
+                <div class="preview-label">/now</div>
+                <img src="assets/screenshot-now.png" alt="Live wait times for Magic Kingdom" loading="lazy">
+                <p>Live estimated actual wait times — not what Disney posts.</p>
+            </div>
+            <div class="preview-card">
+                <div class="preview-label">/crowd</div>
+                <img src="assets/screenshot-crowd.png" alt="Crowd forecast for a specific park" loading="lazy">
+                <p>Detailed forecast for any park, any date.</p>
+            </div>
         </div>
     </section>
 
@@ -179,7 +234,7 @@
             </div>
             <div class="footer-links">
                 <a href="https://discord.gg/Bz89uXrD" target="_blank">Discord</a>
-                <a href="https://x.com/DisneyStatsWhiz" target="_blank">Twitter</a>
+                <a href="https://twitter.com/hazeydata" target="_blank">Twitter</a>
                 <a href="mailto:fred@hazeydata.ai">Contact</a>
             </div>
             <p class="footer-copy">© 2026 hazeydata.ai</p>

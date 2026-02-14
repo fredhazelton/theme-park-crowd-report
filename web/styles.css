@@ -193,6 +193,119 @@ body {
     margin-top: 1rem;
 }
 
+/* Park Ticker */
+.park-ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    padding: 0 0 3rem;
+    background: var(--bg-dark);
+    margin-top: -2rem;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.park-ticker {
+    display: flex;
+    gap: 2.5rem;
+    animation: ticker-scroll 40s linear infinite;
+    width: max-content;
+}
+
+.park-ticker span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.park-ticker:hover span {
+    opacity: 1;
+}
+
+.park-ticker:hover {
+    animation-play-state: paused;
+}
+
+@keyframes ticker-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Bot Preview */
+.bot-preview {
+    padding: 4rem 2rem 5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.bot-preview h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.section-sub {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    margin-bottom: 2.5rem;
+}
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    text-align: center;
+}
+
+.preview-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.preview-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--mid-blue);
+}
+
+.preview-label {
+    display: inline-block;
+    background: var(--deep-blue);
+    color: var(--text-primary);
+    font-family: monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+}
+
+.preview-card img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.preview-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .preview-grid {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+}
+
 /* Features */
 .features {
     padding: 6rem 2rem;
