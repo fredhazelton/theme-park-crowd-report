@@ -321,6 +321,7 @@ def main():
     
     # Compute per-entity p95 posted wait cap from historical data
     logger.info("Computing per-entity historical p95 caps...")
+    parquet_path = str((output_base / "fact_tables" / "parquet").resolve())
     p95_df = con.execute(f"""
         SELECT entity_code,
                PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY wait_time_minutes) as p95_posted,
