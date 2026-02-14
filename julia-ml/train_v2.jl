@@ -52,7 +52,12 @@ function train_single_entity_v2(entity_code::String, matched_df::DataFrame, mode
         Float32.(entity_df.season_year_encoded),
     ))
     y = Float32.(entity_df.actual_time)
-    weights = Float32.(entity_df.geo_decay_weight)
+    
+    # Compute geo decay weights at training time: 0.5^(days_old / 730)
+    today_date = Dates.today()
+    park_dates = Date.(string.(entity_df.park_date))
+    days_old = Float32.(Dates.value.(today_date .- park_dates))
+    weights = Float32.(0.5 .^ (days_old ./ 730.0))
     
     # Remove invalid rows
     valid = .!isnan.(y) .& (y .> 0) .& .!isnan.(weights)
@@ -167,10 +172,10 @@ function main()
     matched_df = DataFrame(Parquet2.Dataset(matched_pairs_path))
     println("  Loaded $(nrow(matched_df)) pairs in $(round(time() - load_start, digits=1))s")
     
-    # Check for required columns
+    # Check for required columns (geo_decay_weight computed at training time from park_date)
     required_cols = [:posted_time, :mins_since_6am, :mins_since_open, :hour_of_day, 
                      :date_group_id_encoded, :season_encoded, :season_year_encoded,
-                     :geo_decay_weight, :actual_time, :entity_code]
+                     :park_date, :actual_time, :entity_code]
     
     missing_cols = [c for c in required_cols if !(String(c) in names(matched_df))]
     if !isempty(missing_cols)

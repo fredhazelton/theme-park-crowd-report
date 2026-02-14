@@ -64,16 +64,23 @@ def setup_logging(log_dir: Path | None = None):
     return logging.getLogger(__name__)
 
 
-def step1_create_matched_pairs(logger, output_base: Path | None = None) -> int:
-    """Use DuckDB to create all matched pairs with improved features."""
+def step1_create_matched_pairs(logger, output_base: Path | None = None, full_rebuild: bool = False) -> int:
+    """Create matched pairs incrementally. Only pairs new ACTUAL observations; appends to existing file.
+    
+    Geo decay weights are NOT stored in pairs (computed at training time instead).
+    On first run (no existing pairs file), does a full build.
+    Use --full-pairs to force a complete rebuild.
+    """
     base = output_base or OUTPUT_BASE
     parquet_dir = base / "fact_tables" / "parquet"
     dim_dir = base / "dimension_tables"
     matched_dir = base / "matched_pairs"
     oc_path = base / "operating_calendar" / "operating_calendar.parquet"
+    state_dir = base / "state"
+    pairs_state_path = state_dir / "matched_pairs_state.json"
 
     logger.info("=" * 60)
-    logger.info("STEP 1: MATCHED PAIRS V2 (Python/DuckDB)")
+    logger.info("STEP 1: MATCHED PAIRS V2 (Incremental)")
     logger.info("=" * 60)
 
     start = time.time()
@@ -119,11 +126,35 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None) -> int:
         actual_filter = ""
         posted_filter = ""
 
-    # Calculate reference date for geo decay
-    today = date.today()
+    # Determine incremental vs full rebuild
+    output_path = matched_dir / "all_pairs_v2.parquet"
+    existing_pairs = None
+    last_paired_at = None
+
+    if not full_rebuild and output_path.exists() and pairs_state_path.exists():
+        try:
+            with open(pairs_state_path) as f:
+                pairs_state = json.load(f)
+            last_paired_at = pairs_state.get("last_paired_at")
+            if last_paired_at:
+                logger.info(f"  Incremental mode: pairing ACTUALs observed after {last_paired_at}")
+        except Exception as e:
+            logger.warning(f"  Could not read pairs state ({e}), doing full rebuild")
+    elif full_rebuild:
+        logger.info("  Full rebuild requested (--full-pairs)")
+
+    if last_paired_at:
+        # Incremental: only pair new ACTUALs, restrict POSTED to same park_dates
+        actual_time_filter = f"AND a.observed_at > '{last_paired_at}'"
+        # We'll join POSTED only for park_dates that have new ACTUALs (handled in query)
+        mode = "incremental"
+    else:
+        actual_time_filter = ""
+        mode = "full"
 
     # Match ACTUAL with closest POSTED within 15-minute window
     # Join with dimension tables for date_group_id, season, season_year
+    # NOTE: geo_decay_weight is NOT computed here — it's computed at training time
     query = f"""
         WITH {operating_filter}
         actual AS (
@@ -138,6 +169,7 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None) -> int:
               AND a.wait_time_minutes IS NOT NULL
               AND a.wait_time_minutes > 0
               {actual_filter}
+              {actual_time_filter}
         ),
         posted AS (
             SELECT 
@@ -214,9 +246,7 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None) -> int:
                 s.season,
                 s.season_year,
                 ph.open_hour,
-                ph.open_minute,
-                -- Geo decay: 0.5^(days_since / 730)
-                POWER(0.5, (DATE '{today}' - CAST(bm.park_date AS DATE))::DOUBLE / {GEO_DECAY_HALFLIFE_DAYS}.0) as geo_decay_weight
+                ph.open_minute
             FROM best_match bm
             LEFT JOIN dategroupid dg ON bm.park_date = dg.park_date
             LEFT JOIN season s ON bm.park_date = s.park_date
@@ -234,7 +264,6 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None) -> int:
             date_group_id,
             season,
             season_year,
-            geo_decay_weight,
             -- Time features
             EXTRACT(HOUR FROM observed_at_ts) as hour_of_day,
             (EXTRACT(HOUR FROM observed_at_ts) - 6) * 60 + EXTRACT(MINUTE FROM observed_at_ts) as mins_since_6am,
@@ -250,49 +279,93 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None) -> int:
           AND season IS NOT NULL
     """
     
-    logger.info("Running DuckDB match query with dimension joins...")
-    df = con.execute(query).fetchdf()
-    logger.info(f"  Created {len(df):,} matched pairs")
-    
-    # Label encode categorical features
-    logger.info("  Label encoding categorical features...")
-    
-    # date_group_id encoding
-    dg_categories = df['date_group_id'].unique()
-    dg_mapping = {cat: idx for idx, cat in enumerate(sorted(dg_categories))}
-    df['date_group_id_encoded'] = df['date_group_id'].map(dg_mapping)
-    
-    # season encoding
-    season_categories = df['season'].unique()
-    season_mapping = {cat: idx for idx, cat in enumerate(sorted(season_categories))}
-    df['season_encoded'] = df['season'].map(season_mapping)
-    
-    # season_year encoding
-    sy_categories = df['season_year'].unique()
-    sy_mapping = {cat: idx for idx, cat in enumerate(sorted(sy_categories))}
-    df['season_year_encoded'] = df['season_year'].map(sy_mapping)
-    
-    # Save encodings for inference
+    logger.info(f"  Running DuckDB match query ({mode})...")
+    new_df = con.execute(query).fetchdf()
+    logger.info(f"  New matched pairs: {len(new_df):,}")
+
+    # Load existing encoding mappings (extend rather than rebuild)
+    encodings_path = state_dir / "encoding_mappings.json"
+    if encodings_path.exists():
+        with open(encodings_path) as f:
+            encodings = json.load(f)
+        dg_mapping = encodings.get("date_group_id", {})
+        season_mapping = encodings.get("season", {})
+        sy_mapping = encodings.get("season_year", {})
+    else:
+        dg_mapping = {}
+        season_mapping = {}
+        sy_mapping = {}
+
+    def extend_encoding(existing: dict, new_values) -> dict:
+        """Add new categories to an encoding mapping, preserving existing assignments."""
+        mapping = dict(existing)  # copy
+        next_idx = max(mapping.values(), default=-1) + 1
+        for val in sorted(set(str(v) for v in new_values)):
+            if val not in mapping:
+                mapping[val] = next_idx
+                next_idx += 1
+        return mapping
+
+    if len(new_df) > 0:
+        # Extend encodings with any new categories from new pairs
+        dg_mapping = extend_encoding(dg_mapping, new_df['date_group_id'].dropna().unique())
+        season_mapping = extend_encoding(season_mapping, new_df['season'].dropna().unique())
+        sy_mapping = extend_encoding(sy_mapping, new_df['season_year'].dropna().unique())
+
+        # Encode new pairs
+        new_df['date_group_id_encoded'] = new_df['date_group_id'].astype(str).map(dg_mapping)
+        new_df['season_encoded'] = new_df['season'].astype(str).map(season_mapping)
+        new_df['season_year_encoded'] = new_df['season_year'].astype(str).map(sy_mapping)
+
+    # Save updated encodings
     encodings = {
         'date_group_id': dg_mapping,
         'season': season_mapping,
         'season_year': sy_mapping,
     }
-    encodings_path = base / "state" / "encoding_mappings.json"
     encodings_path.parent.mkdir(parents=True, exist_ok=True)
     with open(encodings_path, 'w') as f:
         json.dump(encodings, f, indent=2)
-    logger.info(f"  Saved encodings to: {encodings_path}")
-    
-    # Save to parquet
-    output_path = matched_dir / "all_pairs_v2.parquet"
+
+    # Merge with existing pairs (incremental) or write fresh (full)
+    if mode == "incremental" and output_path.exists() and len(new_df) > 0:
+        existing_df = pd.read_parquet(output_path)
+        # Drop geo_decay_weight from old pairs if present (migrating to training-time computation)
+        if 'geo_decay_weight' in existing_df.columns:
+            existing_df = existing_df.drop(columns=['geo_decay_weight'])
+            logger.info("  Migrated: dropped geo_decay_weight from existing pairs (now computed at training time)")
+        all_df = pd.concat([existing_df, new_df], ignore_index=True)
+        logger.info(f"  Appended: {len(existing_df):,} existing + {len(new_df):,} new = {len(all_df):,} total")
+    elif mode == "incremental" and len(new_df) == 0:
+        # No new pairs — keep existing file as-is
+        logger.info("  No new pairs to append")
+        # Still need to load existing for fallback ratio computation
+        all_df = pd.read_parquet(output_path)
+        if 'geo_decay_weight' in all_df.columns:
+            all_df = all_df.drop(columns=['geo_decay_weight'])
+            all_df.to_parquet(output_path, index=False)
+            logger.info("  Migrated: dropped geo_decay_weight from existing pairs")
+    else:
+        all_df = new_df
+        logger.info(f"  Full build: {len(all_df):,} pairs")
+
+    # Save pairs
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(output_path, index=False)
-    
+    if len(new_df) > 0 or not output_path.exists():
+        all_df.to_parquet(output_path, index=False)
+
+    # Save pairing state (max observed_at from ALL data for next incremental run)
+    max_observed_at = str(all_df['observed_at'].max()) if len(all_df) > 0 else last_paired_at
+    if max_observed_at:
+        state_dir.mkdir(parents=True, exist_ok=True)
+        with open(pairs_state_path, 'w') as f:
+            json.dump({"last_paired_at": max_observed_at, "total_pairs": len(all_df)}, f, indent=2)
+
     elapsed = time.time() - start
-    # Calculate dynamic fallback ratios per entity
+
+    # Calculate dynamic fallback ratios from full cumulative pairs
     logger.info("  Computing dynamic fallback ratios...")
-    ratio_df = df.groupby('entity_code').agg(
+    ratio_df = all_df.groupby('entity_code').agg(
         actual_sum=('actual_time', 'sum'),
         posted_sum=('posted_time', 'sum'),
         count=('actual_time', 'count')
@@ -320,11 +393,11 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None) -> int:
     
     logger.info(f"  Saved to: {output_path}")
     logger.info(f"  Features: posted_time, mins_since_6am, mins_since_open, hour_of_day, date_group_id, season, season_year")
-    logger.info(f"  Weights: geo_decay_weight (half-life={GEO_DECAY_HALFLIFE_DAYS} days)")
-    logger.info(f"  ⏱️  Matched pairs: {elapsed:.1f}s")
+    logger.info(f"  Geo decay: computed at training time (half-life={GEO_DECAY_HALFLIFE_DAYS} days)")
+    logger.info(f"  ⏱️  Matched pairs ({mode}): {elapsed:.1f}s")
     
     con.close()
-    return len(df)
+    return len(all_df)
 
 
 def step2_train_julia(logger) -> tuple[int, float]:
@@ -466,6 +539,7 @@ def main():
     parser = argparse.ArgumentParser(description="Hybrid Pipeline V2")
     parser.add_argument("--output-base", type=Path, default=OUTPUT_BASE, help="Pipeline output base")
     parser.add_argument("--skip-pairs", action="store_true", help="Skip matched pairs generation")
+    parser.add_argument("--full-pairs", action="store_true", help="Force full rebuild of matched pairs (ignore incremental state)")
     parser.add_argument("--skip-training", action="store_true", help="Skip model training")
     parser.add_argument("--skip-scoring", action="store_true", help="Skip historical scoring")
     args = parser.parse_args()
@@ -487,7 +561,7 @@ def main():
 
     # Step 1: Matched pairs
     if not args.skip_pairs:
-        n_pairs = step1_create_matched_pairs(logger, output_base)
+        n_pairs = step1_create_matched_pairs(logger, output_base, full_rebuild=args.full_pairs)
     else:
         logger.info("Skipping matched pairs generation")
         n_pairs = 0
