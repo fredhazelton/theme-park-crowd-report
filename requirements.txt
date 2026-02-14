@@ -8,6 +8,9 @@ pyarrow>=14.0.0
 # HTTP requests for API access
 requests>=2.31.0
 
+# Stripe Premium subscriptions
+stripe>=8.0.0
+
 # Dashboard API (stream dashboard)
 flask>=3.0.0
 flask-cors>=4.0.0

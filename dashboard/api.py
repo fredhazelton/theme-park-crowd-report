@@ -1777,6 +1777,77 @@ def get_trend(park_code: str):
 
 # ----- Debug -----
 
+# ----- Stripe Premium -----
+
+@app.route("/api/create-checkout-session", methods=["POST"])
+def create_checkout_session():
+    """Create a Stripe Checkout Session for TPCR Premium subscription."""
+    try:
+        import stripe
+        from dashboard import stripe_handler
+    except ImportError:
+        return jsonify({"error": "Stripe not configured"}), 500
+
+    secret = os.environ.get("STRIPE_SECRET_KEY")
+    price_id = os.environ.get("STRIPE_PRICE_ID")
+    site_base = os.environ.get("SITE_BASE_URL", "https://hazeydata.ai").rstrip("/")
+
+    if not secret or not price_id:
+        logger.warning("STRIPE_SECRET_KEY or STRIPE_PRICE_ID not set")
+        return jsonify({"error": "Checkout not configured"}), 500
+
+    stripe.api_key = secret
+
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            line_items=[{"price": price_id, "quantity": 1}],
+            success_url=f"{site_base}/subscribe-success.html?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{site_base}/subscribe.html",
+            custom_fields=[{
+                "key": "discord_username",
+                "label": {"type": "custom", "custom": "Discord username (e.g. fred or fred#1234)"},
+                "type": "text",
+            }],
+            allow_promotion_codes=True,
+        )
+        return jsonify({"url": session.url})
+    except Exception as e:
+        logger.exception("Stripe checkout session create failed")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/webhooks/stripe", methods=["POST"])
+def stripe_webhook():
+    """Handle Stripe webhook events (payment, subscription)."""
+    try:
+        import stripe
+        from dashboard import stripe_handler
+    except ImportError:
+        return jsonify({"error": "Stripe not configured"}), 500
+
+    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
+    if not webhook_secret:
+        logger.warning("STRIPE_WEBHOOK_SECRET not set")
+        return jsonify({"error": "Webhook not configured"}), 500
+
+    payload = request.get_data()
+    sig_header = request.headers.get("Stripe-Signature", "")
+
+    try:
+        stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
+        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+    except ValueError as e:
+        logger.warning("Stripe webhook invalid payload: %s", e)
+        return jsonify({"error": "Invalid payload"}), 400
+    except stripe.SignatureVerificationError as e:
+        logger.warning("Stripe webhook signature verification failed: %s", e)
+        return jsonify({"error": "Invalid signature"}), 400
+
+    stripe_handler.handle_stripe_event(event)
+    return jsonify({"received": True}), 200
+
+
 @app.route("/api/debug/entity-table", methods=["GET"])
 def debug_entity_table():
     out = {

@@ -423,7 +423,9 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-### 🚨 PRIORITY: Stripe Premium Subscription Integration
+- *(Stripe task moved to Completed — see below)*
+
+### ~~PRIORITY: Stripe Premium Subscription Integration~~ ✅ DONE
 
 **Goal:** Enable paid premium subscriptions from day one of launch. Users pay on hazeydata.ai → get Discord premium role automatically.
 
@@ -588,6 +590,8 @@ PREMIUM_ROLE_ID=<create this role>
 
 - **[S3 Sync Test]** Run the new S3 sync-only routine and verify it's working. Let me know the results!
 
+- **[Stripe Premium Subscription Integration]** Implemented full flow: (1) `web/subscribe.html` — premium landing page with Stripe Checkout button; (2) `web/subscribe-success.html` — thank-you page; (3) `dashboard/api.py` — `POST /api/create-checkout-session` and `POST /api/webhooks/stripe`; (4) `dashboard/stripe_handler.py` — webhook logic for checkout.session.completed, customer.subscription.deleted/updated, invoice.payment_failed; Discord role add/remove via API; JSON store for subscription mapping; (5) `tpcr-discord-bot/bot.py` — `has_premium_role()`, `max_forecast_days()`, `premium_teaser_message()` for 90-day/1-year unlock; (6) `docs/STRIPE_PREMIUM_SETUP.md` — setup guide. Credentials in ~/.env on wilma-server. Test with Stripe test mode (card 4242...).
+
 ---
 
 ## Log
@@ -609,6 +613,7 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-04 | Bam-Bam | **Closures Module:** Implemented `get_closures_from_s3.py` and `build_operating_calendar.py` per spec. Pipeline integration: runs after Dimensions, before Impute Hours. Output: operating_calendar.parquet. Downstream integration (training/forecast/WTI filter by is_operating) not yet wired — calendar ready for use. Task moved to Completed. |
 | 2026-02-04 | Bam-Bam | **Operating calendar + validation:** Wired operating calendar into training, forecasting, WTI (filter by is_operating=TRUE; graceful fallback if missing). Created validate_pipeline_output.py; integrated into run_daily_pipeline.sh. Both tasks moved to Completed. |
 | 2026-02-04 | Bam-Bam | **Dashboard: Entity names not displaying.** Fixed attraction dropdown showing codes instead of names. API: (1) dimentity lookup supports multiple column name variations; (2) fallback when hazeydata_entities empty: use trained models + dimentity for entity list; (3) park code mapping (ioa→IA, usf→UF); (4) improved debug endpoint. Stream dashboard: fallback entities for ioa/ia/usf/uf with proper names. Task moved to Completed. |
+| 2026-02-05 | Bam-Bam | **Stripe Premium Subscription Integration:** Implemented full flow per spec. Created web/subscribe.html, subscribe-success.html; dashboard/api.py (create-checkout-session, webhooks/stripe); dashboard/stripe_handler.py (webhook logic, Discord role add/remove); tpcr-discord-bot/bot.py (has_premium_role, max_forecast_days, premium_teaser_message); docs/STRIPE_PREMIUM_SETUP.md. Add credentials to ~/.env on wilma-server. Test with Stripe test mode. Task moved to Completed. |
 
 ---
 

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPCR Premium | Theme Park Crowd Report</title>
+    <meta name="description" content="Unlock 90-day and 1-year crowd forecasts, ride-by-ride predictions, and extended best-day finder.">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+    <meta name="theme-color" content="#0a1628">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .subscribe-hero { padding: 6rem 2rem 4rem; text-align: center; }
+        .subscribe-hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 1rem; }
+        .subscribe-hero p { color: var(--text-secondary); max-width: 560px; margin: 0 auto 2rem; }
+        .premium-features { max-width: 500px; margin: 0 auto 2.5rem; text-align: left; }
+        .premium-features li { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; color: var(--text-secondary); }
+        .premium-features li::before { content: "✓"; color: var(--hot-pink); font-weight: 700; }
+        .subscribe-cta { margin-top: 2rem; }
+        .subscribe-cta .btn { font-size: 1.1rem; padding: 1rem 2rem; }
+        .subscribe-note { font-size: 0.85rem; color: var(--text-muted); margin-top: 1.5rem; }
+        .subscribe-note a { color: var(--mid-blue); }
+    </style>
+</head>
+<body>
+    <section class="hero subscribe-hero">
+        <div class="hero-bg"></div>
+        <nav class="nav">
+            <div class="nav-logo">
+                <a href="index.html"><img src="assets/icon.jpg" alt="TPCR" class="nav-icon"></a>
+                <span class="nav-title">Crowd Report</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html#features">Features</a>
+                <a href="https://discord.gg/Bz89uXrD" class="btn btn-sm" target="_blank">Join Discord</a>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <h1>TPCR Premium</h1>
+            <p>Unlock extended forecasts and ride-by-ride predictions. $10/month — cancel anytime.</p>
+            <ul class="premium-features">
+                <li>90-day crowd forecasts (free = 7 days)</li>
+                <li>1-year outlook for long-term planning</li>
+                <li>Ride-by-ride predictions for every attraction</li>
+                <li>Best-day finder extended range</li>
+                <li>Priority support in Discord</li>
+            </ul>
+            <div class="subscribe-cta">
+                <button id="checkout-btn" class="btn btn-primary">
+                    Subscribe for $10/month
+                </button>
+            </div>
+            <p class="subscribe-note">
+                You'll enter your Discord username during checkout. Join our <a href="https://discord.gg/Bz89uXrD" target="_blank">Discord</a> first if you haven't already.
+            </p>
+        </div>
+    </section>
+    <script>
+        // For cross-origin API (e.g. api.hazeydata.ai), set before load: window.API_BASE = 'https://api.hazeydata.ai';
+        (function() {
+            var API_BASE = window.API_BASE || '/api';
+            var btn = document.getElementById('checkout-btn');
+            btn.addEventListener('click', function() {
+                btn.disabled = true;
+                btn.textContent = 'Redirecting to checkout…';
+                fetch(API_BASE + '/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.url) {
+                        window.location.href = data.url;
+                    } else {
+                        throw new Error(data.error || 'Failed to create checkout session');
+                    }
+                })
+                .catch(function(err) {
+                    btn.disabled = false;
+                    btn.textContent = 'Subscribe for $10/month';
+                    alert('Could not start checkout. Please try again or contact support.');
+                    console.error(err);
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
