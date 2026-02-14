@@ -90,6 +90,7 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None, full_reb
     dategroupid_path = dim_dir / "dimdategroupid.csv"
     season_path = dim_dir / "dimseason.csv"
     parkhours_path = dim_dir / "dimparkhours.csv"
+    entity_path = dim_dir / "dimentity.csv"
 
     if not dategroupid_path.exists():
         logger.error(f"dimdategroupid.csv not found: {dategroupid_path}")
@@ -99,6 +100,8 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None, full_reb
         return 0
     if not parkhours_path.exists():
         logger.warning(f"dimparkhours.csv not found: {parkhours_path} - mins_since_open will be NULL")
+    if not entity_path.exists():
+        logger.warning(f"dimentity.csv not found: {entity_path} - cannot filter fastpass_booth entities")
 
     # Operating calendar: filter to is_operating=TRUE; graceful fallback if missing
     use_operating_calendar = oc_path.exists()
@@ -155,8 +158,15 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None, full_reb
     # Match ACTUAL with closest POSTED within 15-minute window
     # Join with dimension tables for date_group_id, season, season_year
     # NOTE: geo_decay_weight is NOT computed here — it's computed at training time
+    # Filter out fastpass_booth entities (Lightning Lane return times, not standby waits)
+    entity_filter_str = str(entity_path).replace("\\", "/")
     query = f"""
         WITH {operating_filter}
+        valid_entities AS (
+            SELECT code as entity_code
+            FROM read_csv_auto('{entity_filter_str}')
+            WHERE fastpass_booth = FALSE
+        ),
         actual AS (
             SELECT 
                 a.entity_code,
@@ -165,6 +175,7 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None, full_reb
                 a.park_date,
                 a.wait_time_minutes as actual_time
             FROM read_parquet('{parquet_str}/*.parquet') a
+            INNER JOIN valid_entities ve ON a.entity_code = ve.entity_code
             WHERE a.wait_time_type = 'ACTUAL'
               AND a.wait_time_minutes IS NOT NULL
               AND a.wait_time_minutes > 0
@@ -178,6 +189,7 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None, full_reb
                 p.park_date,
                 p.wait_time_minutes as posted_time
             FROM read_parquet('{parquet_str}/*.parquet') p
+            INNER JOIN valid_entities ve ON p.entity_code = ve.entity_code
             WHERE p.wait_time_type = 'POSTED'
               AND p.wait_time_minutes IS NOT NULL
               AND p.wait_time_minutes > 0

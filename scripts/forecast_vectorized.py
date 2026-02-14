@@ -109,7 +109,7 @@ def forecast_entity(args) -> tuple:
         # Get estimated posted_time from aggregates for each row
         def get_posted_estimate(row):
             key = (entity_code, row['date_group_id'], row['time_slot_15min'])
-            return agg_lookup.get(key, 30.0)  # Default 30 if no data
+            return agg_lookup.get(key, 5.0)  # Default 5 if no data (sparse entities are low-wait)
         
         df['posted_time'] = df.apply(get_posted_estimate, axis=1)
         
@@ -167,12 +167,13 @@ def forecast_entity(args) -> tuple:
             df['predicted_actual'] = np.round(predictions).astype(int)
             df['prediction_method'] = method_label
         else:
-            # No model - use aggregate-based fallback
+            # No model - use aggregate posted median × ratio to estimate actual
             def get_fallback(row):
                 key = (entity_code, row['date_group_id'], row['time_slot_15min'])
                 if key in agg_lookup:
-                    return agg_lookup[key], 'aggregate'
-                # Ultimate fallback: posted estimate × ratio
+                    # Aggregate median is a POSTED time — apply ratio to convert to predicted actual
+                    return agg_lookup[key] * fallback_ratio, 'aggregate'
+                # Ultimate fallback: default posted estimate × ratio
                 return row['posted_time'] * fallback_ratio, 'fallback_ratio'
             
             results = df.apply(get_fallback, axis=1)
@@ -352,14 +353,19 @@ def main():
     entity_p95_cap = dict(zip(p95_df['entity_code'], p95_df['p95_posted']))
     logger.info(f"  Computed p95 caps for {len(entity_p95_cap)} entities")
     
-    # Get entity list
+    # Get entity list (exclude fastpass_booth / Lightning Lane entities)
     logger.info("Getting entity list...")
     parquet_path = str((output_base / "fact_tables" / "parquet").resolve())
+    dim_entity_path = str((output_base / "dimension_tables" / "dimentity.csv").resolve())
     entity_list = con.execute(f"""
-        SELECT DISTINCT entity_code
-        FROM read_parquet('{parquet_path}/*.parquet')
-        WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
+        SELECT DISTINCT f.entity_code
+        FROM read_parquet('{parquet_path}/*.parquet') f
+        INNER JOIN read_csv_auto('{dim_entity_path}') d ON f.entity_code = d.code
+        WHERE f.wait_time_type = 'POSTED' 
+          AND f.wait_time_minutes > 0
+          AND d.fastpass_booth = FALSE
     """).fetchdf()['entity_code'].tolist()
+    logger.info(f"  Excluded FastPass/Lightning Lane booth entities (fastpass_booth=TRUE)")
     
     con.close()
     

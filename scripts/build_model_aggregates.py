@@ -77,6 +77,7 @@ def build_model_aggregates(output_base: Path, logger: logging.Logger) -> int:
     
     output_file = agg_dir / "model_aggregates.parquet"
     dim_dategroupid_file = dim_dir / "dimdategroupid.csv"
+    dim_entity_file = dim_dir / "dimentity.csv"
     
     # Check inputs
     if not parquet_dir.exists():
@@ -106,7 +107,7 @@ def build_model_aggregates(output_base: Path, logger: logging.Logger) -> int:
     file_count = con.execute(f"SELECT COUNT(*) FROM glob('{parquet_glob}')").fetchone()[0]
     logger.info(f"Found {file_count} monthly parquet files")
     
-    # Load dimension table
+    # Load dimension tables
     logger.info("Loading dimdategroupid...")
     con.execute(f"""
         CREATE TABLE dimdategroupid AS 
@@ -114,6 +115,13 @@ def build_model_aggregates(output_base: Path, logger: logging.Logger) -> int:
             CAST(park_date AS DATE) as park_date,
             date_group_id
         FROM read_csv_auto('{dim_dategroupid_file}')
+    """)
+    
+    logger.info("Loading dimentity (for fastpass_booth filter)...")
+    con.execute(f"""
+        CREATE TABLE dimentity AS 
+        SELECT code as entity_code, fastpass_booth
+        FROM read_csv_auto('{dim_entity_file}')
     """)
     
     # Build aggregates with 15-minute time slots
@@ -148,9 +156,11 @@ def build_model_aggregates(output_base: Path, logger: logging.Logger) -> int:
                 MAX(CAST(f.park_date AS DATE)) as max_park_date
             FROM read_parquet('{parquet_glob}') f
             LEFT JOIN dimdategroupid d ON CAST(f.park_date AS DATE) = d.park_date
+            INNER JOIN dimentity e ON f.entity_code = e.entity_code
             WHERE f.wait_time_type = 'POSTED'
               AND f.wait_time_minutes IS NOT NULL
               AND f.wait_time_minutes > 0
+              AND e.fastpass_booth = FALSE
             GROUP BY 
                 f.entity_code, 
                 d.date_group_id, 
