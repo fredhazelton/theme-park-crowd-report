@@ -36,21 +36,30 @@ The daily cron runs at **6:00 AM ET** via `run_daily_pipeline.sh`.
 2. ✅ **Aggregates** — Switched to `build_posted_aggregates_fast.py` (reads 202 parquet files, not 50K CSVs)
 3. ✅ **Forecast** — Switched to `forecast_vectorized.py` (159M predictions in 8 min)
 
-### Full Pipeline Timing (Production)
+### Fixes Applied (2026-02-14) — Incremental Pipeline
+1. ✅ **Operating calendar** — Was only covering 30 days. Now auto-detects earliest observation (2009). Daily runs use incremental refresh (recent window only).
+2. ✅ **Matched pairs** — Now incremental. Only new ACTUALs are paired and appended. Historical pairs untouched. ~6s vs ~102s.
+3. ✅ **Training** — Now only retrains dirty entities (new data since last training). Extinct entities (e.g. MK04/Splash Mountain) never retrain.
+4. ✅ **Geo decay** — Moved from pairs file to Julia training time. Pairs are static facts; weights are always fresh at training time.
+5. ✅ **Encoding mappings** — Extended incrementally (new categories get next ID, existing preserved).
+
+### Full Pipeline Timing (Production — Updated 2026-02-14)
 
 | Step | Script | Time |
 |------|--------|------|
 | S3 Sync | `sync_s3_data.sh` | ~10s |
 | ETL | (incremental) | ~1 min |
 | Dimensions | (incremental) | ~30s |
+| Operating Calendar | `build_operating_calendar.py` | ~9s (incremental) |
 | **Impute Park Hours** | `impute_park_hours.py` | **~1s** |
 | Aggregates | `build_posted_aggregates_fast.py` | **7s** |
 | Report | | ~1s |
-| Training | `hybrid_pipeline_v2.py` | **80s** |
-| Forecast | `forecast_vectorized.py` | **8 min** |
+| Matched Pairs | `hybrid_pipeline_v2.py` | **~6s** (incremental) |
+| Training | `hybrid_pipeline_v2.py` → Julia | **~10-30s** (dirty only) |
+| Forecast | `forecast_vectorized.py` | **~8 min** |
 | **TOTAL** | | **~10-12 min** |
 
-*Previously took 8+ hours before optimizations.*
+*Previously took 8+ hours before optimizations. Training step reduced from ~100s (full) to ~10-30s (incremental).*
 
 ---
 
@@ -139,7 +148,8 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 ## Stage 2: Matched Pairs (V2)
 
 **Purpose:** Pair each ACTUAL observation with the closest POSTED observation within a 15-minute window, enriched with calendar features.
-**TODO:** For historical observations this only needs to be performed once. Once we generate pairs of POSTED and ACTUAL, we do not need to pair the same obs in the next run. Only new observations will need to be paired. (Currently, the full matched pairs are regenerated each run; incremental pairing is a future optimization.)
+
+**Incremental:** ✅ Only new ACTUAL observations are paired each run and appended to the existing file. Historical pairs are never recomputed. State tracked in `state/matched_pairs_state.json`. Use `--full-pairs` to force a complete rebuild.
 
 
 **Location:** `/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs_v2.parquet`  
@@ -152,8 +162,8 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 3. Select the POSTED with smallest time difference (best temporal match)
 4. Join with `dimdategroupid` and `dimseason` for calendar features
 5. Join with `dimparkhours` for park opening time
-6. Calculate geo decay weight based on observation age
-6. Label-encode categorical features
+6. Label-encode categorical features (encodings extended incrementally via `state/encoding_mappings.json`)
+7. Append new pairs to existing `all_pairs_v2.parquet`
 
 ### Columns
 
@@ -170,12 +180,13 @@ entity_code               observed_at  park_date wait_time_type  wait_time_minut
 | `season_encoded` | int | Label-encoded season |
 | `season_year` | string | Season + year (e.g., "WINTER_2025") |
 | `season_year_encoded` | int | Label-encoded season_year |
-| `geo_decay_weight` | float | Training weight: `0.5^(days_old / 730)` |
 | `hour_of_day` | int | Hour (0-23) |
 | `mins_since_6am` | int | Minutes since 6 AM |
 | `mins_since_open` | int | Minutes since park opened (from dimparkhours) |
 
-### Geo Decay Weight Formula
+### Geo Decay Weight
+
+**Not stored in pairs.** Computed at training time in Julia from `park_date`:
 
 ```
 geo_decay_weight = 0.5^(days_since_observed / 730)
@@ -187,19 +198,21 @@ geo_decay_weight = 0.5^(days_since_observed / 730)
 - 2-year-old data: weight = 0.50
 - 4-year-old data: weight = 0.25
 
+Rationale: Pairs are static facts (this ACTUAL matched this POSTED). Geo decay is a training concern — the weight should reflect recency at training time, not pairing time.
+
 ### Sample Data
 
 ```
-entity_code  park_date  actual_time  posted_time  date_group_id    season  geo_decay_weight
-       MK01 2024-01-15           50           60  JAN_WEEK3_MON    WINTER             0.71
-       MK01 2025-11-28           45           35   THANKSGIVING  THANKSGIVING         0.93
-       AK07 2023-07-04           72           65     JULY_4TH   SUMMER_PEAK          0.52
+entity_code  park_date  actual_time  posted_time  date_group_id    season
+       MK01 2024-01-15           50           60  JAN_WEEK3_MON    WINTER
+       MK01 2025-11-28           45           35   THANKSGIVING  THANKSGIVING
+       AK07 2023-07-04           72           65     JULY_4TH   SUMMER_PEAK
 ```
 
 ### Statistics
 
-- **Total pairs:** 2,393,511
-- **Entities with 500+ pairs:** 141 (eligible for model training)
+- **Total pairs:** ~2.4 million (cumulative, grows daily)
+- **Entities with 500+ pairs:** ~142 (eligible for model training)
 
 ---
 
@@ -237,33 +250,51 @@ entity_code  park_date  actual_time  posted_time  date_group_id    season  geo_d
 | `early_stopping_rounds` | 20 | Early stopping patience |
 
 ### Training Logic
-**Note:** Training currently retrains ALL eligible entities each run. The `--skip-if-unchanged` flag skips the entire training step if no entities have new data. Per-entity selective training (only retrain dirty entities) is a future optimization — the full dataset must be retrained for each entity since matched pairs include the full history.
+
+**Incremental:** ✅ Only entities with new data since last training are retrained.
+
 ```
-For each entity with ≥500 matched pairs:
-    1. Load matched pairs for entity
-    2. Split 85% train / 15% validation (chronological)
-    3. Apply geo_decay_weight as sample weights
-    4. Train XGBoost regressor with early stopping
-    5. Save model as JSON with metadata
+1. Python queries entity_index.sqlite for dirty entities 
+   (latest_observed_at > last_modeled_at)
+2. Writes dirty entity codes to state/entities_to_train.txt
+3. Julia loads all pairs, intersects (eligible ≥500 pairs) ∩ (dirty) 
+4. For each entity in that intersection:
+    a. Load matched pairs for entity
+    b. Compute geo_decay_weight from park_date (fresh, relative to today)
+    c. Split 85% train / 15% validation (chronological)
+    d. Apply geo_decay_weight as sample weights
+    e. Train XGBoost regressor with early stopping
+    f. Save model as JSON with metadata
+5. Python marks retrained entities as modeled (last_modeled_at = now)
 ```
 
-### Performance (V2) — Tested 2026-02-07
+**Retraining trigger:** Any new observation → retrain. No minimum new-data threshold. One new pair is enough.
+
+**Eligibility gate:** Entity must have ≥500 total matched pairs (cumulative across all history). Entities below this use the dynamic fallback ratio.
+
+### Performance (V2) — Updated 2026-02-14
 
 | Metric | Value |
 |--------|-------|
-| Entities trained | 141 |
-| Training time | 83 seconds |
-| Average MAE | 7.89 minutes |
-| Uses geo decay | ✅ Yes |
+| Total eligible entities | ~142 |
+| Average MAE | ~8.0 minutes |
+| Uses geo decay | ✅ Yes (computed at training time) |
 
-### Full Pipeline Timing (V2)
+### Pipeline Timing
 
+**Daily incremental (typical):**
+| Step | Time | Notes |
+|------|------|-------|
+| Matched Pairs | ~6s | Only new ACTUALs |
+| Training | ~10-30s | Only dirty entities |
+
+**Full rebuild (`--full-pairs`):**
 | Step | Time | Output |
 |------|------|--------|
-| Matched Pairs (DuckDB) | 78s | 2,393,511 pairs |
-| Training (Julia) | 97s | 141 models |
-| Scoring (Python) | 179s | 89,942,244 predictions |
-| **Total** | **354s (~5.9 min)** | ✅ |
+| Matched Pairs (DuckDB) | ~102s | ~2.4M pairs |
+| Training (Julia) | ~93s | ~142 models |
+| Scoring (Python) | ~180s | ~90M predictions |
+| **Total** | **~6 min** | ✅ |
 
 ### Model Versioning
 
