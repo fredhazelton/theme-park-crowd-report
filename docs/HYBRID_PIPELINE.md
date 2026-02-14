@@ -1,7 +1,8 @@
-# Hybrid Pipeline - Best of Both Worlds
+# Hybrid Pipeline V2 - Incremental & Cumulative
 
 **Created:** 2026-02-07  
-**Status:** Production (daily cron)
+**Updated:** 2026-02-14 (incremental pairs, training, operating calendar)  
+**Status:** Production (daily cron at 6am ET)
 
 ---
 
@@ -15,163 +16,155 @@ The hybrid pipeline uses the fastest tool for each step:
 | **Training** | Julia + XGBoost.jl | 2-3x faster than Python XGBoost |
 | **Scoring** | Python | Loads any XGBoost format, integrates with API |
 
-**Total training time: ~2.5 minutes** (was 10+ minutes with Python-only, 75+ minutes before optimizations)
+---
+
+## Core Principles (Updated 2026-02-14)
+
+**Everything is incremental and cumulative:**
+- **Matched pairs:** Only pair new ACTUAL observations; append to existing file
+- **Training:** Only retrain entities with new data since last training
+- **Operating calendar:** Only refresh recent window; historical dates are stable
+- **Geo decay weights:** Computed at training time (not stored in pairs)
+
+**Retraining trigger:** Any new observation for an entity → retrain. No minimum count threshold beyond the 500-pair eligibility gate. One new pair is enough.
 
 ---
 
-## Performance Comparison
+## Performance
 
-| Approach | Matched Pairs | Training | Total |
-|----------|---------------|----------|-------|
-| **Legacy (sequential Python)** | N/A | 75+ min | 75+ min |
-| **Fast Python (parallel)** | 78s | ~10 min | ~12 min |
-| **Hybrid (Julia)** | 78s | 67s | **~2.5 min** |
+### Daily Incremental Run (typical)
+| Step | Time | Notes |
+|------|------|-------|
+| Matched Pairs | ~6s | Only pairs new ACTUALs |
+| Training | ~10-30s | Only dirty entities (~20-30 active) |
+| **Total** | **~30-60s** | |
+
+### Full Rebuild (first run or `--full-pairs`)
+| Step | Time | Notes |
+|------|------|-------|
+| Matched Pairs | ~102s | All 2.4M pairs from scratch |
+| Training | ~93s | All 142 eligible entities |
+| **Total** | **~4 min** | |
 
 ---
 
 ## Usage
 
-### Full Pipeline
+### Full Pipeline (daily cron)
 ```bash
 cd ~/theme-park-crowd-report
-.venv/bin/python scripts/hybrid_pipeline.py
+.venv/bin/python scripts/hybrid_pipeline_v2.py --output-base /mnt/data/pipeline --skip-scoring
 ```
 
-### Skip Steps (if already done)
+### Force Full Rebuild
 ```bash
-# Skip matched pairs (use cached)
-.venv/bin/python scripts/hybrid_pipeline.py --skip-pairs
+# Rebuild all matched pairs from scratch
+.venv/bin/python scripts/hybrid_pipeline_v2.py --full-pairs
 
-# Skip scoring (training only)
-.venv/bin/python scripts/hybrid_pipeline.py --skip-scoring
-
-# Training only (skip both)
-.venv/bin/python scripts/hybrid_pipeline.py --skip-pairs --skip-scoring
+# Skip specific steps
+.venv/bin/python scripts/hybrid_pipeline_v2.py --skip-pairs --skip-scoring
 ```
 
-### Scoring Hours
-```bash
-# Score last 48 hours instead of default 24
-.venv/bin/python scripts/hybrid_pipeline.py --score-hours 48
-```
+---
+
+## How It Works
+
+### Step 1: Matched Pairs (Incremental)
+
+**Script:** `scripts/hybrid_pipeline_v2.py` → `step1_create_matched_pairs()`
+
+**First run:** Full rebuild — scans all parquet, pairs all ACTUALs with closest POSTED within 15-minute window.
+
+**Subsequent runs:** Reads `state/matched_pairs_state.json` for `last_paired_at` timestamp. Only queries ACTUALs with `observed_at > last_paired_at`. Appends new pairs to existing `all_pairs_v2.parquet`.
+
+**Encoding consistency:** Label encodings for `date_group_id`, `season`, `season_year` are loaded from `state/encoding_mappings.json` and extended (not rebuilt) with any new categories.
+
+**Output:** `matched_pairs/all_pairs_v2.parquet` (cumulative, append-only)
+
+**Key: No geo_decay_weight in pairs.** Pairs are static facts (this ACTUAL matched this POSTED at this time). Geo decay is a training concern, not a pairing concern.
+
+### Step 2: Training (Incremental)
+
+**Script:** `julia-ml/train_v2.jl` (called from `hybrid_pipeline_v2.py`)
+
+**Dirty entity detection:**
+1. Python queries `state/entity_index.sqlite` for entities where `latest_observed_at > last_modeled_at`
+2. Writes dirty entity codes to `state/entities_to_train.txt`
+3. Julia reads this file and intersects with eligible entities (≥500 pairs)
+4. Only the intersection gets retrained
+
+**Geo decay at training time:** Julia computes `weight = 0.5^(days_old / 730)` from `park_date` relative to today. Weights are always fresh.
+
+**After training:** Python calls `mark_entity_modeled()` to set `last_modeled_at = now()` for each trained entity. They won't retrain until new data arrives.
+
+**Output:** `models/{entity_code}/model_julia_v2.json` + `metadata_julia_v2.json`
+
+### Step 3: Scoring (unchanged)
+
+Python loads trained models and scores recent POSTED observations.  
+Falls back to dynamic ratio (from `state/fallback_ratios.json`) for entities without models.
+
+---
+
+## Operating Calendar
+
+**Script:** `src/build_operating_calendar.py`
+
+**Purpose:** Tracks which entity-dates are operating (not permanently extinct or temporarily closed). Used by matched pairs to exclude closed entity-dates.
+
+**Incremental mode (default):** Refreshes `today - 7 days` to `today + 365 days`. Merges with existing calendar. Historical dates are stable.
+
+**Full rebuild:** `--full` flag or first run. Auto-detects earliest observation in fact tables.
+
+**Sources:**
+- `dimentity.csv` → `extinct_on` dates (permanent closures)
+- `raw_closures/*.csv` → temporary closures
+
+**Output:** `operating_calendar/operating_calendar.parquet` (~11M rows covering 2009 to 2027)
+
+---
+
+## State Files
+
+| File | Purpose |
+|------|---------|
+| `state/entity_index.sqlite` | Tracks per-entity latest observation + last modeled timestamp |
+| `state/matched_pairs_state.json` | `last_paired_at` for incremental pairing |
+| `state/encoding_mappings.json` | Label encodings for categorical features |
+| `state/fallback_ratios.json` | Dynamic ACTUAL/POSTED ratios per entity |
+| `state/entities_to_train.txt` | Dirty entity list passed to Julia |
+
+---
+
+## Entity Eligibility
+
+An entity gets a trained model when:
+1. ✅ Exists in `dimentity.csv` (has TouringPlans S3 mapping)
+2. ✅ Has ≥500 matched pairs (cumulative across all history)
+3. ✅ Has new data since last training (dirty check)
+
+Currently ~142 entities qualify. ~400+ use the fallback ratio instead.
 
 ---
 
 ## Integration with Daily Pipeline
 
-The daily cron (`run_daily_pipeline.sh`) calls the hybrid pipeline for training:
+Step 5 in `run_daily_pipeline.sh`:
 
-```bash
-# Step 5 in run_daily_pipeline.sh
-run_step "Hybrid training (Julia)" $PYTHON scripts/hybrid_pipeline.py --skip-scoring
+```
+ETL → Dimensions → Closures/Operating Calendar → Aggregates → Report → TRAINING → Forecast → WTI
 ```
 
-Full daily pipeline order:
-1. ETL sync (S3 → Parquet)
-2. Dimensions
-3. Posted Aggregates
-4. Report
-5. **Hybrid Training** ← Julia XGBoost
-6. Forecast
-7. WTI Calculation
-
----
-
-## Design Decision: Full Retrain Daily
-
-At 2.5 minutes for a complete training run, **incremental model updates aren't worth the complexity**.
-
-The daily cron does a full retrain every morning:
-- Fresh matched pairs from all historical data
-- All 141 models rebuilt from scratch
-- No stale model drift, no incremental edge cases
-
-**Simple > Clever** when the simple approach takes under 3 minutes.
-
----
-
-## Why Julia is So Fast
-
-The 67-second training time (vs 10+ minutes in Python) comes from several factors:
-
-| Factor | Python XGBoost | Julia XGBoost |
-|--------|----------------|---------------|
-| **GIL** | Global Interpreter Lock blocks true parallelism | No GIL — real parallel execution |
-| **Compilation** | Interpreted with C extension calls | JIT-compiles to native code |
-| **XGBoost bindings** | scikit-learn wrapper adds overhead | Direct libxgboost bindings |
-| **Loop overhead** | Python loops are slow | Loops run at C speed |
-
-**The hybrid approach:** Each language does what it's best at:
-- **Python/DuckDB** → SQL heavy-lifting (vectorized joins across 120M rows)
-- **Julia/XGBoost.jl** → Training (parallel model fitting with no GIL)
-- **Python** → Scoring & API (ecosystem integration)
-
-This is why 141 models train in 67 seconds — Julia bypasses all the Python overhead and trains models truly in parallel.
-
----
-
-## Technical Details
-
-### Step 1: Matched Pairs (Python/DuckDB)
-
-DuckDB runs a vectorized SQL query that:
-1. Finds all ACTUAL observations
-2. Finds all POSTED observations
-3. Joins within 15-minute windows by entity + park_date
-4. Picks the closest POSTED for each ACTUAL
-5. Adds time-based features (hour, day_of_week, etc.)
-
-**Output:** `/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs.parquet`
-
-**Time:** ~78 seconds for 2.4M matched pairs
-
-### Step 2: Training (Julia/XGBoost.jl)
-
-Julia loads the matched pairs parquet and trains one XGBoost model per entity:
-- Minimum 500 observations required
-- 85/15 train/validation split (chronological)
-- Early stopping after 20 rounds without improvement
-- Max 500 trees, depth 6, learning rate 0.1
-
-**Output:** `/home/wilma/hazeydata/pipeline/models/{entity}/model_julia.json`
-
-**Time:** ~67 seconds for 141 models (0.48s per entity)
-
-### Step 3: Scoring (Python)
-
-Python loads trained models and scores recent POSTED observations:
-- Gets POSTED data from last N hours
-- Loads model (Julia or Python format - both work)
-- Predicts ACTUAL wait time
-- Falls back to 82% ratio for entities without models
-
-**Output:** Predictions served via API at `localhost:8051`
-
----
-
-## Files
-
-| File | Purpose |
-|------|---------|
-| `scripts/hybrid_pipeline.py` | Main orchestrator |
-| `julia-ml/train_only.jl` | Julia training script |
-| `julia-ml/Project.toml` | Julia dependencies |
-| `scripts/score_fast.py` | Python scoring |
+The `--skip-if-unchanged` flag checks `pipeline_state.py` which queries dirty entity count. Training is skipped only if zero entities have new observations.
 
 ---
 
 ## Julia Setup
 
-Julia 1.10.2 installed at `~/julia-1.10.2/bin/julia`
+Julia 1.10.2 at `~/julia-1.10.2/bin/julia`
 
-Dependencies (managed via Project.toml):
-- DataFrames
-- Parquet2
-- XGBoost
-- JSON3
-- OrderedCollections
+Dependencies (Project.toml): DataFrames, Parquet2, XGBoost, JSON3, OrderedCollections, Dates
 
-To update Julia packages:
 ```bash
 cd ~/theme-park-crowd-report/julia-ml
 ~/julia-1.10.2/bin/julia --project=. -e 'using Pkg; Pkg.update()'
@@ -179,34 +172,20 @@ cd ~/theme-park-crowd-report/julia-ml
 
 ---
 
-## Model Compatibility
-
-Julia XGBoost saves models as JSON (`model_julia.json`). Python XGBoost can load these directly:
-
-```python
-import xgboost as xgb
-model = xgb.XGBRegressor()
-model.load_model("model_julia.json")  # Works!
-```
-
-Both model formats are interchangeable for scoring.
-
----
-
 ## Monitoring
 
-Logs saved to: `/home/wilma/hazeydata/pipeline/logs/hybrid_pipeline_*.log`
+Logs: `/mnt/data/pipeline/logs/hybrid_pipeline_v2_*.log`
 
 Dashboard API health: `curl http://localhost:8051/api/health`
 
-Training results summary printed at end:
-```
-============================================================
-HYBRID PIPELINE COMPLETE
-============================================================
-  Matched pairs: 2,393,511
-  Models trained: 141
-  Predictions: 12,345
-  ⏱️  Total time: 160.5s
-============================================================
-```
+---
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `scripts/hybrid_pipeline_v2.py` | Main orchestrator (pairs + training + scoring) |
+| `julia-ml/train_v2.jl` | Julia training (XGBoost with geo decay) |
+| `src/build_operating_calendar.py` | Operating calendar (incremental) |
+| `src/processors/entity_index.py` | Entity dirty tracking (SQLite) |
+| `scripts/pipeline_state.py` | Skip-if-unchanged logic |
