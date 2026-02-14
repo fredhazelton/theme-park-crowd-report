@@ -179,11 +179,26 @@ function main()
         return 0, 0.0
     end
     
+    # Check for entity filter file (dirty entities from Python/entity_index)
+    entity_filter_path = "/home/wilma/hazeydata/pipeline/state/entities_to_train.txt"
+    
     # Get entities with enough data
     entity_counts = combine(groupby(matched_df, :entity_code), nrow => :count)
-    entities_to_train = filter(row -> row.count >= min_obs, entity_counts).entity_code
+    eligible_entities = filter(row -> row.count >= min_obs, entity_counts).entity_code
     
-    println("\nEntities to train: $(length(entities_to_train))")
+    if isfile(entity_filter_path)
+        # Only train entities that are both eligible (≥500 pairs) AND dirty (new data)
+        dirty_entities = Set(strip.(readlines(entity_filter_path)))
+        entities_to_train = filter(e -> e in dirty_entities, eligible_entities)
+        println("\nEligible entities (≥$(min_obs) pairs): $(length(eligible_entities))")
+        println("Dirty entities (new data): $(length(dirty_entities))")
+        println("Entities to train (eligible ∩ dirty): $(length(entities_to_train))")
+    else
+        # No filter file = train all eligible (backward compat / full retrain)
+        entities_to_train = eligible_entities
+        println("\nNo entity filter file — training all eligible entities")
+        println("Entities to train: $(length(entities_to_train))")
+    end
     
     # Train models
     println("\n" * "=" ^ 60)

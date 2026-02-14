@@ -344,6 +344,30 @@ def step2_train_julia(logger) -> tuple[int, float]:
     else:
         script_to_run = JULIA_TRAIN_SCRIPT
     
+    # Write dirty entity list for Julia (only entities with new data since last training)
+    try:
+        _src = str(Path(__file__).resolve().parent.parent / "src")
+        if _src not in sys.path:
+            sys.path.insert(0, _src)
+        from processors.entity_index import get_entities_needing_modeling
+        
+        entity_index_db = OUTPUT_BASE / "state" / "entity_index.sqlite"
+        entity_filter_path = OUTPUT_BASE / "state" / "entities_to_train.txt"
+        
+        if entity_index_db.exists():
+            dirty = get_entities_needing_modeling(entity_index_db, logger=logger)
+            dirty_codes = [row[0] for row in dirty]
+            entity_filter_path.parent.mkdir(parents=True, exist_ok=True)
+            entity_filter_path.write_text("\n".join(dirty_codes) + "\n")
+            logger.info(f"  Dirty entities (new data since last training): {len(dirty_codes)}")
+        else:
+            # No index = train everything (filter file won't exist)
+            if entity_filter_path.exists():
+                entity_filter_path.unlink()
+            logger.info("  No entity index found — Julia will train all eligible entities")
+    except Exception as e:
+        logger.warning(f"  Could not write entity filter (Julia will train all): {e}")
+    
     start = time.time()
     
     # Run Julia training with 4 threads

@@ -82,7 +82,27 @@ def main() -> None:
     logger = setup_logging(log_dir)
 
     today = date.today()
-    start_date = args.start_date or (today - timedelta(days=30)).isoformat()
+
+    # Default start: earliest observation in fact tables (full history)
+    if args.start_date:
+        start_date = args.start_date
+    else:
+        parquet_dir = base / "fact_tables" / "parquet"
+        if parquet_dir.exists() and list(parquet_dir.glob("*.parquet")):
+            pq_str = str(parquet_dir).replace("\\", "/")
+            _con = duckdb.connect()
+            earliest = _con.execute(
+                f"SELECT MIN(park_date) FROM read_parquet('{pq_str}/*.parquet')"
+            ).fetchone()[0]
+            _con.close()
+            if earliest:
+                start_date = str(earliest)[:10]
+                logger.info("Auto-detected earliest observation: %s", start_date)
+            else:
+                start_date = (today - timedelta(days=30)).isoformat()
+        else:
+            start_date = (today - timedelta(days=30)).isoformat()
+
     end_date = args.end_date or (today + timedelta(days=365)).isoformat()
 
     logger.info("=" * 60)
