@@ -143,7 +143,7 @@ def _load_startup_data():
     # Fallback: dimentity.csv (fills gaps) — support multiple column name variations
     if not DIMENTITY_DF.empty and _dim_code_col:
         _dim_name_col = _find_column(DIMENTITY_DF, ["name", "entity_name", "short_name"])
-        _dim_short_col = _find_column(DIMENTITY_DF, ["short_name", "name", "entity_name"])
+        _dim_short_col = _find_column(DIMENTITY_DF, ["display_name", "short_name", "name", "entity_name"])
         for _, row in DIMENTITY_DF.iterrows():
             code = str(row.get(_dim_code_col, "")).strip().upper()
             if code and code != "NAN":

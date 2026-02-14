@@ -57,7 +57,7 @@ def get_entity_short_name(
                     break
             
             short_name_col = None
-            for col in ["short_name", "name", "entity_name"]:
+            for col in ["display_name", "short_name", "name", "entity_name"]:
                 if col in df.columns:
                     short_name_col = col
                     break

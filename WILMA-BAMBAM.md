@@ -425,6 +425,49 @@ python src/build_dimensions.py               # Dimensions
 
 - *(Stripe task moved to Completed — see below)*
 
+### NEW: Two-Stage Model Fallback — Entity-Specific Ratio Tier
+
+**Date:** Feb 14, 2026  
+**Priority:** Medium — next pipeline improvement after current fixes stabilize  
+**Context:** The global XGBoost live inference model fails on low-popularity rides (railroads, people-movers) because their posted-to-actual ratios are extreme and the global model can't capture entity-specific behavior. Example: MK49 (Railroad Fantasyland) has a 0.596 ratio, median actual 6 min — but the global model predicts 18 min for posted 30.
+
+**Current flow:** Full Julia model (≥500 pairs) → Global XGBoost (everything else)  
+**New flow:** Full Julia model (≥500 pairs) → **Entity-specific ratio (100-499 pairs)** → Global XGBoost (<100 pairs)
+
+**What to implement:**
+
+1. **At training time** (in the pipeline, probably `hybrid_pipeline_v2.py` or a new script):
+   - For entities with 100-499 matched pairs, compute and store `entity_ratio = AVG(actual_time / posted_time)`
+   - Save to a JSON or CSV file at `/mnt/data/pipeline/models/_live_inference/entity_ratios.json`
+   - Format: `{"MK49": 0.596, "MK48": 0.659, ...}` (entity_code → ratio)
+   - Currently 54 entities fall in this tier
+
+2. **In `src/processors/live_inference.py`** — modify the `predict()` method:
+   - Load entity_ratios.json at init alongside the XGBoost model
+   - Prediction logic:
+     ```
+     if entity has full XGBoost model features → use model (current behavior)
+     elif entity in entity_ratios → return posted_time × entity_ratio
+     else → use global model (current behavior)
+     ```
+   - Return `method: 'entity_ratio'` in the prediction dict for this tier
+
+3. **In the Discord bot** (`/home/wilma/tpcr-discord-bot/bot.py`):
+   - No changes needed — it already calls `live_inference_model.predict()` which will automatically use the right tier
+
+**Entity counts (current data):**
+- 165 entities → full model (≥500 pairs)
+- 54 entities → entity ratio (100-499 pairs) ← NEW TIER
+- 53 entities → global model (<100 pairs)
+
+**Validation:** After implementing, test with these known entities:
+- MK49 (Railroad Fantasyland): ratio 0.596, posted 30 → should predict ~18 (vs global's 18... actually similar here, but at posted 40 → should be ~24 vs global's 27)
+- MK48 (Railroad Frontierland): ratio 0.659
+- DL13 (Disneyland Monorail): ratio 1.194 (actual > posted!)
+- IA10: ratio 0.588
+
+**Wilma will verify** the predictions improve after implementation.
+
 ### ~~PRIORITY: Stripe Premium Subscription Integration~~ ✅ DONE
 
 **Goal:** Enable paid premium subscriptions from day one of launch. Users pay on hazeydata.ai → get Discord premium role automatically.
