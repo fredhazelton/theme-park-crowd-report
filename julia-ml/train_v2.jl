@@ -18,7 +18,9 @@ using Statistics
 using OrderedCollections
 
 const DEFAULT_MIN_OBS = 500
+const LITE_MIN_OBS = 100
 const MODEL_LABEL = "XGBOOST_BASE_MODEL"
+const LITE_MODEL_LABEL = "XGBOOST_LITE_MODEL"
 
 # Feature columns in order - must match Python
 const FEATURE_COLS_V2 = [
@@ -29,6 +31,14 @@ const FEATURE_COLS_V2 = [
     :date_group_id_encoded,
     :season_encoded,
     :season_year_encoded,
+]
+
+# Lite features: no calendar features, works for new entities with <1 year of data
+const FEATURE_COLS_LITE = [
+    :posted_time,
+    :mins_since_6am,
+    :mins_since_open,
+    :hour_of_day,
 ]
 
 """Train XGBoost model for a single entity with geo decay weights."""
@@ -132,6 +142,95 @@ function train_single_entity_v2(entity_code::String, matched_df::DataFrame, mode
         ),
         "backend" => "Julia XGBoost.jl",
         "version" => "v2",
+    )
+    open(joinpath(model_dir, "metadata_julia_v2.json"), "w") do f
+        JSON3.write(f, metadata)
+    end
+    
+    return train_end, mae
+end
+
+"""Train lite XGBoost model for new entities — no calendar features, no geo decay."""
+function train_single_entity_lite(entity_code::String, matched_df::DataFrame, models_dir::String, min_samples::Int)
+    entity_df = filter(row -> row.entity_code == entity_code, matched_df)
+    
+    if nrow(entity_df) < min_samples
+        return nothing, "Not enough samples ($(nrow(entity_df)))"
+    end
+    
+    # Lite features only: posted_time, mins_since_6am, mins_since_open, hour_of_day
+    mins_since_open = coalesce.(entity_df.mins_since_open, 0.0)
+    X = Matrix{Float32}(hcat(
+        Float32.(entity_df.posted_time),
+        Float32.(entity_df.mins_since_6am),
+        Float32.(mins_since_open),
+        Float32.(entity_df.hour_of_day),
+    ))
+    y = Float32.(entity_df.actual_time)
+    
+    # No geo decay — all data is fresh for new entities
+    # Equal weights
+    valid = .!isnan.(y) .& (y .> 0)
+    X = X[valid, :]
+    y = y[valid]
+    
+    if length(y) < min_samples
+        return nothing, "Not enough valid samples ($(length(y)))"
+    end
+    
+    n = length(y)
+    train_end = floor(Int, n * 0.85)
+    
+    X_train, y_train = X[1:train_end, :], y[1:train_end]
+    X_val, y_val = X[train_end+1:end, :], y[train_end+1:end]
+    
+    dtrain = DMatrix(X_train, label=y_train)
+    dval = DMatrix(X_val, label=y_val)
+    watchlist = OrderedDict("train" => dtrain, "eval" => dval)
+    
+    bst = xgboost(dtrain;
+                  num_round=2000,
+                  watchlist=watchlist,
+                  max_depth=6,      # Shallower — less data to learn from
+                  eta=0.1,
+                  min_child_weight=3,  # More conservative with less data
+                  subsample=0.8,
+                  colsample_bytree=0.8,
+                  objective="reg:squarederror",
+                  seed=42,
+                  early_stopping_rounds=20,
+                  verbosity=0)
+    
+    y_pred = XGBoost.predict(bst, dval)
+    mae = mean(abs.(y_val .- y_pred))
+    
+    # Save as the same model file — forecast code picks it up automatically
+    model_dir = joinpath(models_dir, entity_code)
+    mkpath(model_dir)
+    model_path = joinpath(model_dir, "model_julia_v2.json")
+    XGBoost.save(bst, model_path)
+    
+    metadata = Dict(
+        "model_label" => LITE_MODEL_LABEL,
+        "entity_code" => entity_code,
+        "trained_at" => Dates.format(now(Dates.UTC), "yyyy-mm-ddTHH:MM:SS"),
+        "n_samples" => train_end,
+        "n_val" => n - train_end,
+        "mae" => mae,
+        "features" => string.(FEATURE_COLS_LITE),
+        "uses_geo_decay_weights" => false,
+        "hyperparameters" => Dict(
+            "num_round" => 2000,
+            "max_depth" => 6,
+            "eta" => 0.1,
+            "min_child_weight" => 3,
+            "subsample" => 0.8,
+            "colsample_bytree" => 0.8,
+            "objective" => "reg:squarederror",
+            "early_stopping_rounds" => 20,
+        ),
+        "backend" => "Julia XGBoost.jl",
+        "version" => "lite",
     )
     open(joinpath(model_dir, "metadata_julia_v2.json"), "w") do f
         JSON3.write(f, metadata)
@@ -247,6 +346,65 @@ function main()
     println("Training time: $(round(elapsed, digits=1))s")
     println("Per entity: $(round(elapsed / max(1, length(entities_to_train)), digits=2))s")
     println("Models saved to: $models_dir")
+    
+    # ================================================================
+    # LITE MODELS: entities with 100-499 pairs (no calendar features, no geo decay)
+    # For new parks/entities without a full year of seasonal data
+    # ================================================================
+    trained_v2 = Set(entities_to_train)  # Already have full models
+    lite_eligible = filter(row -> row.count >= LITE_MIN_OBS && row.count < min_obs, entity_counts).entity_code
+    # Also include entities with 500+ pairs that DON'T already have a V2 model on disk
+    # (they might not be dirty but could benefit from a lite model if they've never been trained)
+    
+    if isfile(entity_filter_path)
+        dirty_entities_set = Set(strip.(readlines(entity_filter_path)))
+        lite_to_train = filter(e -> (e in dirty_entities_set) && !(e in trained_v2), lite_eligible)
+    else
+        lite_to_train = filter(e -> !(e in trained_v2), lite_eligible)
+    end
+    
+    # Don't overwrite existing V2 models with lite models
+    lite_to_train = filter(e -> !isfile(joinpath(models_dir, e, "model_julia_v2.json")) || 
+                                 (e in (isfile(entity_filter_path) ? dirty_entities_set : Set())), lite_to_train)
+    
+    if !isempty(lite_to_train)
+        println("\n" * "=" ^ 60)
+        println("TRAINING $(length(lite_to_train)) LITE MODELS ($(LITE_MIN_OBS)-$(min_obs-1) pairs)")
+        println("=" ^ 60)
+        println("Features: $(join(string.(FEATURE_COLS_LITE), ", "))")
+        println("No geo decay, no calendar features")
+        
+        lite_start = time()
+        lite_successful = 0
+        lite_failed = 0
+        lite_total_mae = 0.0
+        
+        for (i, entity) in enumerate(lite_to_train)
+            result, msg = train_single_entity_lite(entity, matched_df, models_dir, 50)
+            
+            if result !== nothing
+                lite_successful += 1
+                lite_total_mae += msg
+            else
+                lite_failed += 1
+            end
+        end
+        
+        lite_elapsed = time() - lite_start
+        
+        println("\n" * "=" ^ 60)
+        println("LITE TRAINING COMPLETE")
+        println("=" ^ 60)
+        println("Model: $LITE_MODEL_LABEL")
+        println("Successful: $lite_successful")
+        println("Failed: $lite_failed")
+        if lite_successful > 0
+            println("Avg MAE: $(round(lite_total_mae / lite_successful, digits=2)) minutes")
+        end
+        println("Lite training time: $(round(lite_elapsed, digits=1))s")
+        
+        successful += lite_successful
+    end
     
     return successful, elapsed
 end

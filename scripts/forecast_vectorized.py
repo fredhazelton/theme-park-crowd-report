@@ -131,23 +131,41 @@ def forecast_entity(args) -> tuple:
         model_path = models_dir / entity_code / "model_julia_v2.json"
         
         if model_path.exists():
-            # Load V2 model
+            # Load model and detect type from metadata
             model = xgb.XGBRegressor()
             model.load_model(str(model_path))
             
-            # V2 features
-            feature_cols = [
-                'posted_time', 'mins_since_6am', 'mins_since_open', 
-                'hour_of_day', 'date_group_id_encoded', 
-                'season_encoded', 'season_year_encoded'
-            ]
+            # Check metadata to determine feature set (lite vs full)
+            import json as _json
+            metadata_path = models_dir / entity_code / "metadata_julia_v2.json"
+            is_lite = False
+            if metadata_path.exists():
+                try:
+                    with open(metadata_path) as _mf:
+                        meta = _json.load(_mf)
+                    is_lite = meta.get("model_label") == "XGBOOST_LITE_MODEL" or meta.get("version") == "lite"
+                except Exception:
+                    pass
+            
+            if is_lite:
+                # Lite model: 4 features only
+                feature_cols = ['posted_time', 'mins_since_6am', 'mins_since_open', 'hour_of_day']
+                method_label = 'model_lite'
+            else:
+                # Full V2 model: 7 features
+                feature_cols = [
+                    'posted_time', 'mins_since_6am', 'mins_since_open', 
+                    'hour_of_day', 'date_group_id_encoded', 
+                    'season_encoded', 'season_year_encoded'
+                ]
+                method_label = 'model_v2'
             
             X = df[feature_cols].values.astype(np.float32)
             predictions = model.predict(X)
             predictions = np.clip(predictions, 0, 300)
             
             df['predicted_actual'] = np.round(predictions).astype(int)
-            df['prediction_method'] = 'model_v2'
+            df['prediction_method'] = method_label
         else:
             # No model - use aggregate-based fallback
             def get_fallback(row):
