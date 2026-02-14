@@ -423,7 +423,148 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-- *(none)*
+### 🚨 PRIORITY: Stripe Premium Subscription Integration
+
+**Goal:** Enable paid premium subscriptions from day one of launch. Users pay on hazeydata.ai → get Discord premium role automatically.
+
+**Architecture: Option B — Custom on hazeydata.ai**
+- Stripe Checkout embedded on hazeydata.ai
+- Webhook hits our bot → assigns Discord premium role
+- No middleman cut (just Stripe's 2.9% + 30¢)
+- Full control, on-brand
+
+---
+
+#### What Needs to Be Built
+
+**1. Stripe Setup**
+- Create Stripe account for hazeydata.ai (Fred will do this)
+- Create a Product + Price in Stripe:
+  - **TPCR Premium** — $7-10/mo (recurring)
+  - Optional: annual plan at discount ($70-100/yr)
+- Get API keys (publishable + secret)
+- Set up webhook endpoint URL
+
+**2. Subscribe Page on hazeydata.ai (`/subscribe` or `/premium`)**
+- Clean page explaining what premium gets you:
+  - ✅ 90-day crowd forecasts (free = 7 days)
+  - ✅ 1-year outlook
+  - ✅ Ride-by-ride predictions
+  - ✅ Best-day finder extended range
+  - ✅ Priority support
+- "Subscribe" button → Stripe Checkout session
+- User provides email + Discord username during checkout
+- On success → redirect to thank-you page with Discord invite
+
+**3. Webhook Endpoint (add to `dashboard/api.py` or separate service)**
+- `POST /api/webhooks/stripe` — receives Stripe events
+- Handle these events:
+  - `checkout.session.completed` → assign Discord premium role
+  - `customer.subscription.deleted` → remove Discord premium role
+  - `customer.subscription.updated` → handle plan changes
+  - `invoice.payment_failed` → grace period, then remove role
+- Verify webhook signature (Stripe signing secret)
+- Store subscription mapping: `stripe_customer_id ↔ discord_user_id`
+
+**4. Discord Role Management**
+- Create "Premium" role in Discord server (if not exists)
+- Bot needs `manage_roles` permission (already has admin)
+- Webhook handler calls Discord API to add/remove role:
+  ```python
+  # Add role
+  requests.put(
+      f"https://discord.com/api/guilds/{GUILD_ID}/members/{discord_user_id}/roles/{PREMIUM_ROLE_ID}",
+      headers={"Authorization": f"Bot {BOT_TOKEN}"}
+  )
+  ```
+
+**5. Bot Premium Check (already partially built)**
+- The bot already has premium teaser logic (locked 90-day, 1-year in `/best-day`)
+- Update the check to verify the user has the Premium Discord role
+- If they have the role → unlock extended forecasts
+- If not → show teaser + link to `/subscribe`
+
+**6. Database / State (lightweight)**
+- SQLite or JSON file mapping:
+  ```
+  stripe_customer_id | discord_username | discord_user_id | subscription_status | created_at
+  ```
+- Needed so webhook can find the right Discord user to assign/remove role
+- Discord username collected during Stripe Checkout (custom field or metadata)
+
+---
+
+#### Flow
+
+```
+User clicks "Subscribe" on hazeydata.ai
+    ↓
+Stripe Checkout (hosted by Stripe — handles payment, card, etc.)
+    ↓
+User enters: email, card, Discord username
+    ↓
+Payment succeeds → Stripe fires webhook
+    ↓
+Our webhook endpoint receives event
+    ↓
+Looks up Discord user by username → gets user ID
+    ↓
+Assigns "Premium" role via Discord API
+    ↓
+User sees premium features unlocked in Discord bot
+```
+
+#### Cancellation Flow
+```
+User cancels in Stripe customer portal (or payment fails)
+    ↓
+Stripe fires subscription.deleted / payment_failed webhook
+    ↓
+Our webhook removes "Premium" role
+    ↓
+Bot shows free tier / teaser again
+```
+
+---
+
+#### Files to Create/Modify
+
+| File | Action | Purpose |
+|------|--------|---------|
+| `web/subscribe.html` (or `/premium`) | **Create** | Premium landing/checkout page |
+| `web/subscribe-success.html` | **Create** | Post-payment thank you page |
+| `dashboard/api.py` | **Modify** | Add `/api/webhooks/stripe` endpoint |
+| `dashboard/stripe_handler.py` | **Create** | Stripe webhook logic, role management |
+| `tpcr-discord-bot/bot.py` | **Modify** | Update premium check to use Discord role |
+| `.env` | **Modify** | Add `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `PREMIUM_ROLE_ID` |
+
+#### Dependencies
+```
+pip install stripe
+```
+
+#### Environment Variables Needed
+```
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRICE_ID=price_...          # Monthly premium price
+DISCORD_GUILD_ID=1471374656253591695
+PREMIUM_ROLE_ID=<create this role>
+```
+
+---
+
+#### Pricing (Fred to confirm)
+- **Monthly:** $7/mo or $10/mo
+- **Annual:** $70/yr or $100/yr (discount for commitment)
+- **Free tier stays:** `/today`, `/crowd` (7 days), `/best-day` (7 days), `/ping`, `/about`
+
+#### Notes
+- Use Stripe's hosted checkout — don't build a custom payment form (PCI compliance headache)
+- Stripe Customer Portal for self-service cancellation (reduces support burden)
+- Start with monthly only if annual adds complexity — can add later
+- Fred: create Stripe account at https://dashboard.stripe.com/register
 
 ---
 
