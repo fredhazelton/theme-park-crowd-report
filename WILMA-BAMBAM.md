@@ -423,7 +423,130 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-- *(Stripe task moved to Completed — see below)*
+---
+
+### 🔴 LAUNCH BLOCKER: Wire year-view.html to Real API Data
+
+**Date:** Feb 15, 2026
+**Priority:** CRITICAL — blocking alpha launch
+**Context:** The interactive year heatmap at `hazeydata.ai/year-view.html` currently uses client-side generated sample data. It needs to fetch real forecast data from our API.
+
+**Problem:** The dashboard API runs on wilma-server:8051 (internal). The year-view page is served from Cloudflare Pages (hazeydata.ai). Browser can't call wilma-server directly — needs a public API endpoint.
+
+**Options (pick the best):**
+1. **Cloudflare Worker proxy** — A lightweight Worker at `hazeydata.ai/api/*` that proxies to wilma-server (requires cloudflared tunnel or public IP)
+2. **cloudflared tunnel** — Expose the dashboard API through Cloudflare Tunnel (e.g., `api.hazeydata.ai` → localhost:8051)
+3. **Static JSON export** — Pipeline generates a JSON file per park, deploy to Cloudflare Pages alongside the HTML. No live API needed. Refreshes daily with pipeline.
+
+**I recommend option 3 for alpha launch** — simplest, no infrastructure to maintain, and the data only changes daily anyway. The pipeline can export `year-view-data/MK.json`, `year-view-data/EP.json`, etc.
+
+**JSON schema per park:**
+```json
+{
+  "park_code": "MK",
+  "park_name": "Magic Kingdom",
+  "generated": "2026-02-15",
+  "days": [
+    {"date": "2026-02-15", "wti": 22.5},
+    {"date": "2026-02-16", "wti": 19.7},
+    ...
+  ]
+}
+```
+
+**What to implement:**
+1. **New script:** `scripts/export_year_view_data.py` — reads wti.parquet, exports 365-day JSON per park
+2. **Add to pipeline:** Run after WTI calculation step
+3. **Update year-view.html:** Replace `generateSampleData()` with `fetch('/year-view-data/${parkCode}.json')`
+4. **Deploy:** Push JSONs + updated HTML to hazeydata.ai repo, wrangler deploy
+
+**Files to modify:**
+- NEW: `scripts/export_year_view_data.py`
+- `/home/wilma/hazeydata.ai/year-view.html` — replace sample data with fetch
+- Pipeline script (add export step after WTI)
+
+---
+
+### 🔴 LAUNCH BLOCKER: Fix Park Code Mismatch in WTI Archives
+
+**Date:** Feb 15, 2026
+**Priority:** HIGH — breaks WTI accuracy tracking
+**Context:** The WTI accuracy comparison fails to match some parks because archived forecast WTI uses different park codes than historical WTI.
+
+**Archive codes:** `TD`, `US` (old/wrong)
+**Actual codes:** `TDL`, `TDS` (correct)
+
+Also `BB` (Busch Gardens?) appears in archives but has no historical match.
+
+**Fix:** Find where the archive WTI gets its park_code from and ensure it uses the same `park_code_sql()` CASE expression as `calculate_wti_simple.py`. The issue is likely in the forecast parquet having old entity prefixes that map differently.
+
+**Files to check:**
+- `src/evaluate_forecast_accuracy.py` — the `archive_forecast()` function  
+- `scripts/calculate_wti_simple.py` — the `park_code_sql()` function (this is correct)
+- The source forecast parquet: `/home/wilma/hazeydata/pipeline/curves/forecast_parquet/all_forecasts.parquet` — check entity_code prefixes
+
+---
+
+### 🟡 Year-View: Best Weeks + Busiest Weeks
+
+**Date:** Feb 15, 2026
+**Priority:** Medium — before public launch
+**Context:** Fred wants the year-view to show "Best weeks to visit" and "Busiest weeks to avoid" instead of individual best days. For a year-long view, weeks are more actionable for trip planning.
+
+**What to implement:**
+1. In year-view.html, replace `renderBestDays()` with `renderBestWeeks()`
+2. Group data into ISO weeks, compute average WTI per week
+3. Show top 5 lowest-WTI weeks ("Best weeks") and top 5 highest ("Busiest weeks")
+4. Format: "Week of Sep 7 — Avg WTI 16 (Short waits)"
+
+---
+
+### NEW: Per-Park WTI Distributions for Color Scaling
+
+**Date:** Feb 15, 2026  
+**Priority:** HIGH — affects all visual surfaces (Discord bot, stream dashboard, web dashboard)  
+**Context:** Fred decided all Benedictus color scaling should be **per-park, not absolute**. A "red" day at Magic Kingdom means "busy for Magic Kingdom" — not "busy compared to other parks." The color answers "is today unusual for THIS park?" Each park has its own WTI distribution, and the Benedictus gradient should stretch across that park's range.
+
+**What to implement:**
+
+1. **In the WTI calculation step** (`calculate_wti_simple.py` or a new post-WTI script):
+   - For each park, compute WTI percentiles from ALL historical WTI data (not just the current forecast)
+   - Output: `state/park_wti_distributions.json`
+   - Schema:
+   ```json
+   {
+     "MK": {"p5": 15.2, "p25": 19.1, "median": 23.4, "p75": 28.7, "p95": 38.1, "min": 8.0, "max": 55.0},
+     "EP": {"p5": 18.0, "p25": 22.3, "median": 26.1, "p75": 31.5, "p95": 42.0, "min": 10.0, "max": 60.0},
+     ...
+   }
+   ```
+   - Include ALL 12 parks (MK, EP, HS, AK, DL, CA, UF, IA, EU, UH, TDL, TDS)
+   - Use historical actuals where available, forecasted WTI where not
+
+2. **Add API endpoint** in `dashboard/api.py`:
+   - `GET /api/park-wti-distributions` → returns the JSON
+   - Stream dashboard + web dashboard fetch from this
+
+3. **Benedictus color mapping rule** (document in `PIPELINE_DATA_FLOW.md`):
+   - p5 → Deep blue (#0A2F8F — ghost town for this park)
+   - median → Lavender/white (#D2C8DC — normal day)
+   - p95 → Deep red (#A60038 — avoid if you can)
+   - Full gradient interpolated between these anchors
+   - Values below p5 or above p95 still get the extreme colors (don't clip)
+
+4. **Update stream dashboard** to consume the distributions:
+   - KPI cards, lollipop chart, daily curve, trend analysis, Wait Gauge — ALL should use per-park scaling
+   - Fetch distributions from API at load, use park's own percentiles for color mapping
+
+**Files to modify:**
+- `scripts/calculate_wti_simple.py` — add distribution computation
+- `dashboard/api.py` — add endpoint
+- `docs/PIPELINE_DATA_FLOW.md` — document the new paradigm
+- Stream dashboard HTML/JS files — update color mapping
+
+**Key principle from Fred:** "I only care whether it's a low WTI day at Magic Kingdom compared to what it normally is at Magic Kingdom." The distributions are stable with years of data — recalculate every pipeline run (it's just percentiles, very fast).
+
+---
 
 ### NEW: Two-Stage Model Fallback — Entity-Specific Ratio Tier
 
