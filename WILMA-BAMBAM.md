@@ -425,11 +425,15 @@ python src/build_dimensions.py               # Dimensions
 
 ---
 
-### 🔴 LAUNCH BLOCKER: Wire year-view.html to Real API Data
+### ~~LAUNCH BLOCKER: Wire year-view.html to Real API Data~~ ✅ DONE (Wilma, Feb 15)
+
+Implemented Option 3 (static JSON export). Pipeline exports `year-view-data/{PARK}.json` daily.
+year-view.html fetches real data. All 12 parks live on hazeydata.ai.
+
+**~~Original context below for reference:~~**
 
 **Date:** Feb 15, 2026
-**Priority:** CRITICAL — blocking alpha launch
-**Context:** The interactive year heatmap at `hazeydata.ai/year-view.html` currently uses client-side generated sample data. It needs to fetch real forecast data from our API.
+**Context:** The interactive year heatmap at `hazeydata.ai/year-view.html` now uses real WTI forecast data from static JSON files.
 
 **Problem:** The dashboard API runs on wilma-server:8051 (internal). The year-view page is served from Cloudflare Pages (hazeydata.ai). Browser can't call wilma-server directly — needs a public API endpoint.
 
