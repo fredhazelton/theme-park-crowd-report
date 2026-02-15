@@ -516,10 +516,44 @@ Export script enriches JSON with ride-level data from forecast curves.
 **Distribution JSON schema (already generated):**
 ```json
 {
+  "ALL": {"p5": 13.0, "p25": 17.7, "median": 21.5, "p75": 25.1, "p95": 31.8, "min": 5.0, "max": 85.0, "n_days": 6076},
   "MK": {"p5": 11.0, "p25": 15.5, "median": 18.8, "p75": 22.3, "p95": 28.4, "min": 5.0, "max": 85.0, "n_days": 5935},
   ...
 }
 ```
+
+---
+
+### 🔴 Dual Color Mode: Absolute vs Per-Park in Dashboard
+
+**Date:** Feb 15, 2026
+**Priority:** HIGH — Fred noticed this live on stream
+**Context:** When "All Parks" is selected, the lollipop chart uses per-park colors, which makes EU at WTI 41 show as light blue (because 41 is low *for EU*). Confusing when comparing parks side-by-side.
+
+**Rule:**
+- **All Parks lollipop chart** → Use `distributions["ALL"]` (global/absolute scale) — comparing parks needs a common baseline
+- **Single park selected** (KPIs, gauge, trend) → Use `distributions[parkCode]` (per-park) — "is today unusual for THIS park?"
+
+**Implementation:**
+- `distributions.json` now includes an `"ALL"` entry (p5=13, median=21.5, p95=31.8)
+- In the lollipop chart render function: when showing all parks, use ALL distribution for colors
+- When a single park is selected: use per-park distribution (current behavior)
+- Same Benedictus gradient, just different anchors
+
+---
+
+### 🟡 Trend Analysis Z-Score Fix for "All Parks" Mode
+
+**Date:** Feb 15, 2026
+**Priority:** Medium — cosmetic but misleading
+**Context:** The "All Parks" trend shows +1.05 std devs above average. This is inflated because newer parks (EU avg WTI 43.8, opened Apr 2025) weren't in the historical seasonal baseline. The seasonal mean was computed from years when only 6-8 parks existed.
+
+**Fix options (pick one):**
+1. When computing z-scores in "All Parks" mode, compute z-scores **per park first**, then average the z-scores (not the raw WTIs). This cancels out the park-mix effect.
+2. Only include parks that existed for the full date_group_id history.
+3. Weight parks equally regardless of when they were added.
+
+**Note:** Per-park trend (e.g. just MK) is already accurate — this only affects "All Parks" mode.
 
 ---
 
