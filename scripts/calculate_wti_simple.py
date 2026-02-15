@@ -220,6 +220,58 @@ def main():
     con.close()
     
     # =========================================================================
+    # ADAPTIVE BIAS CORRECTION (forecast WTI only)
+    # =========================================================================
+    # Compare recent archived forecast WTI vs actual historical WTI to compute
+    # a rolling correction factor. As models improve, correction shrinks to zero.
+    if not args.historical_only and len(results) >= 1:
+        wti_accuracy_path = output_base / "accuracy" / "wti_accuracy.parquet"
+        if wti_accuracy_path.exists():
+            try:
+                bias_con = duckdb.connect()
+                # Use last 14 days of WTI accuracy data for rolling correction
+                bias_row = bias_con.execute(f"""
+                    SELECT 
+                        AVG(wti_error) as avg_bias,
+                        COUNT(*) as n_obs,
+                        COUNT(DISTINCT park_date) as n_dates
+                    FROM read_parquet('{wti_accuracy_path}')
+                    WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
+                """).fetchone()
+                bias_con.close()
+                
+                avg_bias = bias_row[0]  # negative = underpredicting
+                n_obs = bias_row[1]
+                n_dates = bias_row[2]
+                
+                if avg_bias is not None and n_dates >= 2:
+                    # Correction = negative of the bias (if we underpredict by 10, add 10)
+                    correction = -avg_bias
+                    
+                    # Apply correction to forecast WTI dataframes only
+                    before_avg = None
+                    after_avg = None
+                    for i, df in enumerate(results):
+                        mask = df['source'] == 'forecast'
+                        if mask.any():
+                            before_avg = df.loc[mask, 'wti'].mean()
+                            results[i].loc[mask, 'wti'] = (df.loc[mask, 'wti'] + correction).round(1)
+                            # Floor at 5 — WTI shouldn't go below a reasonable minimum
+                            results[i].loc[mask, 'wti'] = results[i].loc[mask, 'wti'].clip(lower=5.0)
+                            after_avg = results[i].loc[mask, 'wti'].mean()
+                    
+                    logger.info(f"  Bias correction applied: {correction:+.1f} WTI points")
+                    logger.info(f"    Based on {n_obs} park-date observations over {n_dates} days")
+                    logger.info(f"    Historical bias: {avg_bias:.1f} (negative = underpredicting)")
+                    logger.info(f"    Forecast WTI avg: {before_avg:.1f} → {after_avg:.1f}")
+                else:
+                    logger.info(f"  Bias correction: insufficient data ({n_dates} dates, need ≥2). Skipping.")
+            except Exception as e:
+                logger.warning(f"  Bias correction failed (non-fatal): {e}")
+        else:
+            logger.info("  Bias correction: no wti_accuracy.parquet yet. Will activate once accuracy data accumulates.")
+
+    # =========================================================================
     # COMBINE AND SAVE
     # =========================================================================
     if results:
