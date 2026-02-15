@@ -448,6 +448,30 @@ def generate_summary(output_base: str, con: duckdb.DuckDBPyConnection):
         FROM read_parquet('{entity_path}')
     """).fetchdf().to_dict(orient="records")[0]
     
+    # Add WTI-level accuracy if available
+    wti_path = os.path.join(accuracy_dir, "wti_accuracy.parquet")
+    if os.path.exists(wti_path):
+        try:
+            wti_summary = con.execute(f"""
+                SELECT
+                    COUNT(*) as wti_park_dates_evaluated,
+                    COUNT(DISTINCT park_date) as wti_dates_evaluated,
+                    AVG(wti_abs_error) as wti_mae,
+                    AVG(wti_error) as wti_bias,
+                    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY wti_abs_error) as wti_median_ae,
+                    MIN(park_date) as wti_first_eval_date,
+                    MAX(park_date) as wti_last_eval_date
+                FROM read_parquet('{wti_path}')
+            """).fetchdf().to_dict(orient="records")[0]
+            summary.update(wti_summary)
+            log.info("WTI Summary: MAE=%.1f | bias=%.1f | median=%.1f | %d park-dates",
+                     wti_summary.get("wti_mae", 0) or 0,
+                     wti_summary.get("wti_bias", 0) or 0,
+                     wti_summary.get("wti_median_ae", 0) or 0,
+                     wti_summary.get("wti_park_dates_evaluated", 0) or 0)
+        except Exception as e:
+            log.warning("Failed to add WTI summary: %s", e)
+    
     summary_path = os.path.join(accuracy_dir, "accuracy_summary.json")
     with open(summary_path, "w") as f:
         json.dump(summary, f, indent=2, default=str)
