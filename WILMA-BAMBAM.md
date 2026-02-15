@@ -524,7 +524,7 @@ Export script enriches JSON with ride-level data from forecast curves.
 
 ---
 
-### 🔴 Dual Color Mode: Absolute vs Per-Park in Dashboard
+### ~~Dual Color Mode: Absolute vs Per-Park in Dashboard~~ ✅ DONE (Bam-Bam, Feb 2026)
 
 **Date:** Feb 15, 2026
 **Priority:** HIGH — Fred noticed this live on stream
@@ -534,11 +534,10 @@ Export script enriches JSON with ride-level data from forecast curves.
 - **All Parks lollipop chart** → Use `distributions["ALL"]` (global/absolute scale) — comparing parks needs a common baseline
 - **Single park selected** (KPIs, gauge, trend) → Use `distributions[parkCode]` (per-park) — "is today unusual for THIS park?"
 
-**Implementation:**
-- `distributions.json` now includes an `"ALL"` entry (p5=13, median=21.5, p95=31.8)
-- In the lollipop chart render function: when showing all parks, use ALL distribution for colors
-- When a single park is selected: use per-park distribution (current behavior)
-- Same Benedictus gradient, just different anchors
+**Implementation (done):**
+- `compute_park_wti_distributions.py` now outputs `"ALL"` entry (global percentiles across all parks)
+- Lollipop chart uses `getWtiColor(value, 'ALL')` for all bars — common baseline when comparing parks
+- KPI card already uses per-park when a single park is selected (`park !== 'all'`)
 
 ---
 
@@ -777,6 +776,7 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-04 | Bam-Bam | **Dashboard: Entity names not displaying.** Fixed attraction dropdown showing codes instead of names. API: (1) dimentity lookup supports multiple column name variations; (2) fallback when hazeydata_entities empty: use trained models + dimentity for entity list; (3) park code mapping (ioa→IA, usf→UF); (4) improved debug endpoint. Stream dashboard: fallback entities for ioa/ia/usf/uf with proper names. Task moved to Completed. |
 | 2026-02-05 | Bam-Bam | **Stripe Premium Subscription Integration:** Implemented full flow per spec. Created web/subscribe.html, subscribe-success.html; dashboard/api.py (create-checkout-session, webhooks/stripe); dashboard/stripe_handler.py (webhook logic, Discord role add/remove); tpcr-discord-bot/bot.py (has_premium_role, max_forecast_days, premium_teaser_message); docs/STRIPE_PREMIUM_SETUP.md. Add credentials to ~/.env on wilma-server. Test with Stripe test mode. Task moved to Completed. |
 | 2026-02-16 | Bam-Bam | **Per-park WTI distributions:** Added GET /api/park-wti-distributions; stream dashboard fetches at init, uses per-park percentiles for KPI + lollipop colors (p5→deep blue, p25→blue, median→lavender, p75→pink, p95→red). Fallback to absolute scale when distributions unavailable. Documented in PIPELINE_DATA_FLOW. Task moved to Completed. |
+| 2026-02-16 | Bam-Bam | **Dual Color Mode (lollipop):** Per Wilma's fix: lollipop chart now uses `distributions["ALL"]` for colors when comparing all parks (common baseline). Added "ALL" entry to `compute_park_wti_distributions.py`. KPI/gauge/trend already use per-park when single park selected. Task moved to Completed. |
 
 ---
 

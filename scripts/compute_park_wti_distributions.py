@@ -57,14 +57,43 @@ def main():
         ORDER BY park_code
     """).fetchdf()
 
-    con.close()
-
     if df.empty:
         log.error("No historical WTI data found")
+        con.close()
         return 1
 
-    # Build the output dict
-    distributions = {}
+    # Compute global "ALL" distribution for all-parks comparison (lollipop chart)
+    all_df = con.execute(f"""
+        SELECT
+            COUNT(*) as n_days,
+            ROUND(MIN(wti), 1) as min,
+            ROUND(PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY wti), 1) as p5,
+            ROUND(PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY wti), 1) as p25,
+            ROUND(PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY wti), 1) as median,
+            ROUND(PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY wti), 1) as p75,
+            ROUND(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY wti), 1) as p95,
+            ROUND(MAX(wti), 1) as max
+        FROM read_parquet('{WTI_PATH}')
+        WHERE source = 'historical'
+    """).fetchdf()
+    con.close()
+
+    all_row = all_df.iloc[0]
+
+    # Build the output dict (ALL first for lollipop chart)
+    distributions = {
+        "ALL": {
+            "p5": float(all_row["p5"]),
+            "p25": float(all_row["p25"]),
+            "median": float(all_row["median"]),
+            "p75": float(all_row["p75"]),
+            "p95": float(all_row["p95"]),
+            "min": float(all_row["min"]),
+            "max": float(all_row["max"]),
+            "n_days": int(all_row["n_days"]),
+        }
+    }
+    log.info("  ALL: p5=%.1f  median=%.1f  p95=%.1f  (n=%d days)", all_row["p5"], all_row["median"], all_row["p95"], all_row["n_days"])
     for _, row in df.iterrows():
         park = row["park_code"]
         distributions[park] = {

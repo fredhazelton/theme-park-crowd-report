@@ -1790,8 +1790,7 @@
                             const value = chart.data.datasets[0].data[i];
                             const parkCode = parkCodes[i] || null;
                             const isActive = !hasSelection || (parkCode && parkCode.toLowerCase() === selectedPark.toLowerCase());
-                            const colorBand = getWtiColor(value, parkCode);
-                            ctx.strokeStyle = isActive ? colorBand.bg + 'AA' : 'rgba(255,255,255,0.12)';
+                            const colorBand = getWtiColor(value, 'ALL'); // All-parks lollipop uses global scale for comparison
                             ctx.beginPath();
                             ctx.moveTo(x, stemBottom);
                             ctx.lineTo(x, y);
@@ -1805,7 +1804,7 @@
                             const parkCode = parkCodes[i] || null;
                             const valueText = (value != null && value !== '') ? String(Math.round(Number(value))) : '—';
                             const isActive = !hasSelection || (parkCode && parkCode.toLowerCase() === selectedPark.toLowerCase());
-                            const colorBand = getWtiColor(value, parkCode);
+                            const colorBand = getWtiColor(value, 'ALL'); // All-parks lollipop uses global scale for comparison
                             // Head circle
                             ctx.fillStyle = isActive ? colorBand.bg : 'rgba(255,255,255,0.15)';
                             ctx.beginPath();
