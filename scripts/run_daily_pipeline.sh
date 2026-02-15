@@ -419,6 +419,27 @@ else
     fi
 fi
 
+# Export year-view data for hazeydata.ai and deploy
+log_info "=== Export year-view data ==="
+if $PYTHON scripts/export_year_view_data.py; then
+    log_info "Year-view data exported, deploying to Cloudflare Pages..."
+    (
+        cd /home/wilma/hazeydata.ai && \
+        git add -A && \
+        git diff --cached --quiet || \
+        (git commit -m "Daily year-view data update $(date +%Y-%m-%d)" && \
+         git push origin master && \
+         source <(grep -v '#' ~/.env | grep '=' | sed 's/^/export /') && \
+         CLOUDFLARE_API_TOKEN=$CLOUDFLARE_PAGES_TOKEN \
+         CLOUDFLARE_ACCOUNT_ID=0ec71dc83a3e7f8559be115fa548902e \
+         npx wrangler pages deploy . --project-name hazeydata --branch master)
+    ) >> "$OUTPUT_BASE/logs/year_view_deploy.log" 2>&1 && \
+    log_info "Year-view deployed to hazeydata.ai" || \
+    log_info "Year-view deploy skipped or failed (non-fatal)"
+else
+    log_info "Year-view export failed (non-fatal)"
+fi
+
 if $FAILED_ANY; then
     log_error "Daily pipeline finished with one or more failures. Check log: $LOG_FILE"
     exit 1
