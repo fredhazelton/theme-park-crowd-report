@@ -471,23 +471,13 @@ year-view.html fetches real data. All 12 parks live on hazeydata.ai.
 
 ---
 
-### 🔴 LAUNCH BLOCKER: Fix Park Code Mismatch in WTI Archives
+### ~~LAUNCH BLOCKER: Fix Park Code Mismatch in WTI Archives~~ ✅ FIXED (Wilma, Feb 15)
 
-**Date:** Feb 15, 2026
-**Priority:** HIGH — breaks WTI accuracy tracking
-**Context:** The WTI accuracy comparison fails to match some parks because archived forecast WTI uses different park codes than historical WTI.
+**Root cause:** The Feb 13 WTI archive was created before the `park_code_sql()` fix was applied to forecast WTI. It had `TD` (combined TDL/TDS) and `US` (placeholder with constant WTI 25.0). Archives from Feb 14 onward already have correct codes.
 
-**Archive codes:** `TD`, `US` (old/wrong)
-**Actual codes:** `TDL`, `TDS` (correct)
+**Fix applied:** Removed `TD` and `US` rows from the Feb 13 archive (can't meaningfully split `TD` into TDL/TDS retroactively). Future archives are correct.
 
-Also `BB` (Busch Gardens?) appears in archives but has no historical match.
-
-**Fix:** Find where the archive WTI gets its park_code from and ensure it uses the same `park_code_sql()` CASE expression as `calculate_wti_simple.py`. The issue is likely in the forecast parquet having old entity prefixes that map differently.
-
-**Files to check:**
-- `src/evaluate_forecast_accuracy.py` — the `archive_forecast()` function  
-- `scripts/calculate_wti_simple.py` — the `park_code_sql()` function (this is correct)
-- The source forecast parquet: `/home/wilma/hazeydata/pipeline/curves/forecast_parquet/all_forecasts.parquet` — check entity_code prefixes
+**BB = Blizzard Beach** (water park), not Busch Gardens. It's in both forecast and historical WTI — no mismatch, just a minor park. Appears in both sides so join works fine.
 
 ---
 
