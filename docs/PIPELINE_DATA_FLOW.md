@@ -1,7 +1,7 @@
 # Pipeline Data Flow - Complete Documentation
 
 **Created:** 2026-02-07  
-**Updated:** 2026-02-09 (V2 models, aggregates, imputation, WTI fix)  
+**Updated:** 2026-02-14 (docs-check hourly job)  
 **Author:** Wilma
 
 ---
@@ -60,6 +60,12 @@ The daily cron runs at **6:00 AM ET** via `run_daily_pipeline.sh`.
 | **TOTAL** | | **~10-12 min** |
 
 *Previously took 8+ hours before optimizations. Training step reduced from ~100s (full) to ~10-30s (incremental).*
+
+### Other Scheduled Jobs
+
+| Job | Script | Schedule | Purpose |
+|-----|--------|----------|---------|
+| **Docs check** | `check_docs_for_instructions.sh` | Hourly (minute 0) | Pulls git, checks WILMA-BAMBAM.md Active Items for changes; logs when new instructions detected. Survives reboot (cron). Install: `scripts/install_docs_check_cron.sh` |
 
 ---
 
@@ -726,6 +732,8 @@ All data is served via REST API at `http://localhost:8051`:
 ```
 
 **Total time:** ~10-12 minutes
+
+**Other cron job:** Docs check runs hourly (`check_docs_for_instructions.sh`). See PIPELINE_STATE § 3.3.
 
 | Step | Time |
 |------|------|

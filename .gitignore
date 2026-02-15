@@ -71,6 +71,9 @@ temp/**
 # Logs live only under output_base/logs; ignore repo-root logs/ if created by mistake
 logs/
 
+# Docs-check state (hash of Active Items for change detection)
+state/
+
 # Julia
 julia/Manifest.toml
 *.jl.cov

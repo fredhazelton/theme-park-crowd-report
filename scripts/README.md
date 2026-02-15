@@ -454,6 +454,19 @@ Install/remove cron jobs equivalent to Windows scheduled tasks.
 ./scripts/install_cron.sh --remove
 ```
 
+### `check_docs_for_instructions.sh` and `install_docs_check_cron.sh`
+
+Hourly job that pulls latest from git and checks WILMA-BAMBAM.md Active Items for changes. Logs when new instructions are detected. Cron survives reboot.
+
+```bash
+# Install hourly docs-check job
+./scripts/install_docs_check_cron.sh
+
+# Preview / remove
+./scripts/install_docs_check_cron.sh --show
+./scripts/install_docs_check_cron.sh --remove
+```
+
 ### `install_queue_times_service.sh`
 
 Install or remove the queue-times loop as a systemd service (starts on boot).

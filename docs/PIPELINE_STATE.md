@@ -13,7 +13,7 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 | **User** | fred |
 | **Repo** | `/home/fred/Desktop/theme-park-crowd-report` |
 | **Output base (data & logs)** | `/home/fred/TouringPlans.com Dropbox/fred hazelton/stats team/pipeline/hazeydata/theme-park-crowd-report` |
-| **Cron** | Single daily run at **6:00 AM Eastern** (`run_daily_pipeline.sh`) |
+| **Cron** | Single daily run at **6:00 AM Eastern** (`run_daily_pipeline.sh`); **hourly** docs check (`check_docs_for_instructions.sh`) |
 | **Queue-times** | Continuous loop (every 5 min); **systemd service**, starts on boot |
 | **Dropbox** | Synced under fred's home: `~/TouringPlans.com Dropbox/` |
 
@@ -50,6 +50,15 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 - **Log (systemd):** `sudo journalctl -u queue-times-loop -f`
   Optional file log: `output_base/logs/queue_times_loop.log` if started manually with redirect.
 
+### 3.3 Docs check (cron, hourly, survives reboot)
+
+- **What:** Pulls latest from git, checks WILMA-BAMBAM.md Active Items for changes. Logs when new instructions detected.
+- **Script:** `scripts/check_docs_for_instructions.sh`
+- **Schedule:** Every hour at minute 0 (cron). Cron daemon starts on boot, so job runs after reboot.
+- **Install:** `bash scripts/install_docs_check_cron.sh` (adds to current user's crontab)
+- **Log:** `output_base/logs/docs_check.log` (or `repo/logs/docs_check.log` if output_base unavailable)
+- **State:** `repo/state/docs_check_last_hash` — hash of Active Items for change detection
+
 ---
 
 ## 4. Key paths
@@ -59,7 +68,7 @@ All under **output_base** unless noted.
 | Path | Purpose |
 |------|--------|
 | `output_base/` | Root for all pipeline data (see config) |
-| `output_base/logs/` | Pipeline logs (daily pipeline, queue_times_loop, etc.) |
+| `output_base/logs/` | Pipeline logs (daily pipeline, queue_times_loop, docs_check, etc.) |
 | `output_base/dimension_tables/` | dimentity, dimparkhours, dimdategroupid, dimseason, etc. |
 | `output_base/raw_closures/` | Closure CSVs from S3 (current_wdw_closures.csv, etc.); input for operating calendar |
 | `output_base/operating_calendar/` | operating_calendar.parquet (entity_code, park_date, is_operating); used by training, forecast, WTI |
@@ -91,6 +100,22 @@ bash scripts/install_cron.sh --remove
 
 # Preview what would be installed
 bash scripts/install_cron.sh --show
+```
+
+### Docs check (hourly, survives reboot)
+
+```bash
+# Install hourly docs-check job (WILMA-BAMBAM.md Active Items)
+bash scripts/install_docs_check_cron.sh
+
+# Preview
+bash scripts/install_docs_check_cron.sh --show
+
+# Remove
+bash scripts/install_docs_check_cron.sh --remove
+
+# View log
+tail -f output_base/logs/docs_check.log
 ```
 
 ### Manual daily run
@@ -167,7 +192,7 @@ DASH_USER=admin DASH_PASSWORD=your-secret python dashboard/app.py
 - **docs/DAILY_DOCUMENTATION_REVIEW.md** - End-of-day checklist to keep PIPELINE_STATE, README, and key docs in sync.
 - **LINUX_CRON_SETUP.md** - Cron options (five separate jobs vs single daily master), queue-times service, log paths.
 - **docs/REFRESH_READINESS.md** - Full refresh order, what's in/out of cron, common gaps.
-- **scripts/README.md** - All scripts (run_daily_pipeline.sh, install_cron.sh, install_queue_times_service.sh, etc.).
+- **scripts/README.md** - All scripts (run_daily_pipeline.sh, install_cron.sh, install_docs_check_cron.sh, install_queue_times_service.sh, etc.).
 
 ---
 
