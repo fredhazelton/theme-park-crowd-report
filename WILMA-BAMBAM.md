@@ -489,50 +489,49 @@ Export script enriches JSON with ride-level data from forecast curves.
 
 ---
 
-### NEW: Per-Park WTI Distributions for Color Scaling
+### Per-Park WTI Distributions for Color Scaling — IN PROGRESS
 
 **Date:** Feb 15, 2026  
 **Priority:** HIGH — affects all visual surfaces (Discord bot, stream dashboard, web dashboard)  
-**Context:** Fred decided all Benedictus color scaling should be **per-park, not absolute**. A "red" day at Magic Kingdom means "busy for Magic Kingdom" — not "busy compared to other parks." The color answers "is today unusual for THIS park?" Each park has its own WTI distribution, and the Benedictus gradient should stretch across that park's range.
+**Context:** Fred decided all Benedictus color scaling should be **per-park, not absolute**. A "red" day at Magic Kingdom means "busy for Magic Kingdom" — not "busy compared to other parks."
 
-**What to implement:**
+#### ✅ DONE (Wilma, Feb 15):
+1. **Distribution computation script:** `scripts/compute_park_wti_distributions.py`
+   - Computes p5/p25/median/p75/p95/min/max from ALL historical WTI data per park
+   - 12 parks, thousands of days each (e.g. MK: 5,935 days)
+   - Output: `/mnt/data/pipeline/state/park_wti_distributions.json`
+   - Also copies to `hazeydata.ai/year-view-data/distributions.json` for web
 
-1. **In the WTI calculation step** (`calculate_wti_simple.py` or a new post-WTI script):
-   - For each park, compute WTI percentiles from ALL historical WTI data (not just the current forecast)
-   - Output: `state/park_wti_distributions.json`
-   - Schema:
-   ```json
-   {
-     "MK": {"p5": 15.2, "p25": 19.1, "median": 23.4, "p75": 28.7, "p95": 38.1, "min": 8.0, "max": 55.0},
-     "EP": {"p5": 18.0, "p25": 22.3, "median": 26.1, "p75": 31.5, "p95": 42.0, "min": 10.0, "max": 60.0},
-     ...
-   }
-   ```
-   - Include ALL 12 parks (MK, EP, HS, AK, DL, CA, UF, IA, EU, UH, TDL, TDS)
-   - Use historical actuals where available, forecasted WTI where not
+2. **Year-view page updated:** `hazeydata.ai/year-view.html` now uses per-park distributions
+   - Fetches distributions.json at page load
+   - Color mapping: p5→deep blue, p25→blue, median→lavender, p75→pink, p95→deep red
+   - WTI descriptions also relative to park distribution
+   - Fallback to linear if distributions unavailable
 
-2. **Add API endpoint** in `dashboard/api.py`:
-   - `GET /api/park-wti-distributions` → returns the JSON
-   - Stream dashboard + web dashboard fetch from this
+#### 🔴 Bam-Bam TODO:
+1. **Add API endpoint** in `dashboard/api.py`:
+   - `GET /api/park-wti-distributions` → read and return `state/park_wti_distributions.json`
+   
+2. **Update stream dashboard** to use distributions:
+   - Fetch distributions from API at load
+   - KPI cards, lollipop chart, daily curve, Wait Gauge — use per-park percentiles for color
+   - Same Benedictus color mapping rule:
+     - p5 → Deep blue (#0A2F8F)
+     - p25 → Blue (#3C78D2)
+     - median → Lavender (#D2C8DC)
+     - p75 → Pink (#F58CAF)
+     - p95 → Deep red (#A60038)
+     - beyond p95 → Extreme dark (#50001E)
 
-3. **Benedictus color mapping rule** (document in `PIPELINE_DATA_FLOW.md`):
-   - p5 → Deep blue (#0A2F8F — ghost town for this park)
-   - median → Lavender/white (#D2C8DC — normal day)
-   - p95 → Deep red (#A60038 — avoid if you can)
-   - Full gradient interpolated between these anchors
-   - Values below p5 or above p95 still get the extreme colors (don't clip)
+3. **Document** in `docs/PIPELINE_DATA_FLOW.md`
 
-4. **Update stream dashboard** to consume the distributions:
-   - KPI cards, lollipop chart, daily curve, trend analysis, Wait Gauge — ALL should use per-park scaling
-   - Fetch distributions from API at load, use park's own percentiles for color mapping
-
-**Files to modify:**
-- `scripts/calculate_wti_simple.py` — add distribution computation
-- `dashboard/api.py` — add endpoint
-- `docs/PIPELINE_DATA_FLOW.md` — document the new paradigm
-- Stream dashboard HTML/JS files — update color mapping
-
-**Key principle from Fred:** "I only care whether it's a low WTI day at Magic Kingdom compared to what it normally is at Magic Kingdom." The distributions are stable with years of data — recalculate every pipeline run (it's just percentiles, very fast).
+**Distribution JSON schema (already generated):**
+```json
+{
+  "MK": {"p5": 11.0, "p25": 15.5, "median": 18.8, "p75": 22.3, "p95": 28.4, "min": 5.0, "max": 85.0, "n_days": 5935},
+  ...
+}
+```
 
 ---
 
