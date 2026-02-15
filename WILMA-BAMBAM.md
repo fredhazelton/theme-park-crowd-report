@@ -542,19 +542,6 @@ Export script enriches JSON with ride-level data from forecast curves.
 
 ---
 
-### 🟡 Trend Analysis Z-Score Fix for "All Parks" Mode
-
-**Date:** Feb 15, 2026
-**Priority:** Medium — cosmetic but misleading
-**Context:** The "All Parks" trend shows +1.05 std devs above average. This is inflated because newer parks (EU avg WTI 43.8, opened Apr 2025) weren't in the historical seasonal baseline. The seasonal mean was computed from years when only 6-8 parks existed.
-
-**Fix options (pick one):**
-1. When computing z-scores in "All Parks" mode, compute z-scores **per park first**, then average the z-scores (not the raw WTIs). This cancels out the park-mix effect.
-2. Only include parks that existed for the full date_group_id history.
-3. Weight parks equally regardless of when they were added.
-
-**Note:** Per-park trend (e.g. just MK) is already accurate — this only affects "All Parks" mode.
-
 ---
 
 ### NEW: Two-Stage Model Fallback — Entity-Specific Ratio Tier
