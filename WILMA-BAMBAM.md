@@ -489,7 +489,7 @@ Export script enriches JSON with ride-level data from forecast curves.
 
 ---
 
-### Per-Park WTI Distributions for Color Scaling — IN PROGRESS
+### Per-Park WTI Distributions for Color Scaling — ✅ DONE
 
 **Date:** Feb 15, 2026  
 **Priority:** HIGH — affects all visual surfaces (Discord bot, stream dashboard, web dashboard)  
@@ -508,22 +508,10 @@ Export script enriches JSON with ride-level data from forecast curves.
    - WTI descriptions also relative to park distribution
    - Fallback to linear if distributions unavailable
 
-#### 🔴 Bam-Bam TODO:
-1. **Add API endpoint** in `dashboard/api.py`:
-   - `GET /api/park-wti-distributions` → read and return `state/park_wti_distributions.json`
-   
-2. **Update stream dashboard** to use distributions:
-   - Fetch distributions from API at load
-   - KPI cards, lollipop chart, daily curve, Wait Gauge — use per-park percentiles for color
-   - Same Benedictus color mapping rule:
-     - p5 → Deep blue (#0A2F8F)
-     - p25 → Blue (#3C78D2)
-     - median → Lavender (#D2C8DC)
-     - p75 → Pink (#F58CAF)
-     - p95 → Deep red (#A60038)
-     - beyond p95 → Extreme dark (#50001E)
-
-3. **Document** in `docs/PIPELINE_DATA_FLOW.md`
+#### ✅ Bam-Bam DONE (Feb 2026):
+1. **API endpoint** `GET /api/park-wti-distributions` in `dashboard/api.py` — reads from `state/park_wti_distributions.json` (or `/mnt/data/pipeline/state/` fallback)
+2. **Stream dashboard** — fetches distributions at init; KPI card and WTI lollipops use per-park percentiles for Benedictus colors; fallback to absolute scale when distributions unavailable
+3. **Documented** in `docs/PIPELINE_DATA_FLOW.md`
 
 **Distribution JSON schema (already generated):**
 ```json
@@ -767,6 +755,7 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-04 | Bam-Bam | **Operating calendar + validation:** Wired operating calendar into training, forecasting, WTI (filter by is_operating=TRUE; graceful fallback if missing). Created validate_pipeline_output.py; integrated into run_daily_pipeline.sh. Both tasks moved to Completed. |
 | 2026-02-04 | Bam-Bam | **Dashboard: Entity names not displaying.** Fixed attraction dropdown showing codes instead of names. API: (1) dimentity lookup supports multiple column name variations; (2) fallback when hazeydata_entities empty: use trained models + dimentity for entity list; (3) park code mapping (ioa→IA, usf→UF); (4) improved debug endpoint. Stream dashboard: fallback entities for ioa/ia/usf/uf with proper names. Task moved to Completed. |
 | 2026-02-05 | Bam-Bam | **Stripe Premium Subscription Integration:** Implemented full flow per spec. Created web/subscribe.html, subscribe-success.html; dashboard/api.py (create-checkout-session, webhooks/stripe); dashboard/stripe_handler.py (webhook logic, Discord role add/remove); tpcr-discord-bot/bot.py (has_premium_role, max_forecast_days, premium_teaser_message); docs/STRIPE_PREMIUM_SETUP.md. Add credentials to ~/.env on wilma-server. Test with Stripe test mode. Task moved to Completed. |
+| 2026-02-16 | Bam-Bam | **Per-park WTI distributions:** Added GET /api/park-wti-distributions; stream dashboard fetches at init, uses per-park percentiles for KPI + lollipop colors (p5→deep blue, p25→blue, median→lavender, p75→pink, p95→red). Fallback to absolute scale when distributions unavailable. Documented in PIPELINE_DATA_FLOW. Task moved to Completed. |
 
 ---
 

@@ -828,6 +828,27 @@ def health():
     return jsonify({"status": "ok", "timestamp": datetime.now().isoformat()})
 
 
+@app.route("/api/park-wti-distributions", methods=["GET"])
+def get_park_wti_distributions():
+    """
+    Return per-park WTI distributions (p5, p25, median, p75, p95, min, max, n_days).
+    Used for per-park Benedictus color scaling — "red" means busy FOR that park.
+    """
+    paths = [
+        OUTPUT_BASE / "state" / "park_wti_distributions.json",
+        Path("/mnt/data/pipeline/state/park_wti_distributions.json"),
+    ]
+    for p in paths:
+        if p.exists():
+            try:
+                with open(p, "r") as f:
+                    data = json.load(f)
+                return jsonify(data)
+            except Exception as e:
+                logger.warning("Could not read park_wti_distributions: %s", e)
+    return jsonify({}), 404
+
+
 @app.route("/api/park-hours", methods=["GET"])
 def get_park_hours():
     """

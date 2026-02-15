@@ -454,6 +454,20 @@
         
         let dashboardData = null;
         let charts = {};
+        let parkWtiDistributions = {};  // Per-park p5/p25/median/p75/p95 for Benedictus color scaling
+        
+        /** Fetch per-park WTI distributions at load. Fallback to absolute scale if unavailable. */
+        async function loadParkWtiDistributions() {
+            try {
+                const res = await fetch(`${API_BASE}/park-wti-distributions`);
+                if (res.ok) {
+                    parkWtiDistributions = await res.json();
+                    console.log('Loaded per-park WTI distributions for', Object.keys(parkWtiDistributions).length, 'parks');
+                }
+            } catch (e) {
+                console.warn('Could not load park WTI distributions, using absolute scale:', e);
+            }
+        }
         
         /** Get the selected date string (YYYY-MM-DD) from the date picker, or today if empty. */
         function getSelectedDateStr() {
@@ -463,31 +477,71 @@
             return `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
         }
 
-        /* ── WTI Color Scale (universal, decile-based) — used by KPI card + lollipops ── */
-        const WTI_COLORS = [
-            { min: 0,    max: 13.1, bg: '#0A2F8F', text: '#FFFFFF' },  /* D1 — quietest (dark blue) */
-            { min: 13.1, max: 15.7, bg: '#305FD1', text: '#FFFFFF' },  /* D2  (blue) */
-            { min: 15.7, max: 18.0, bg: '#5A96EA', text: '#FFFFFF' },  /* D3  (medium blue) */
-            { min: 18.0, max: 20.1, bg: '#98C4F2', text: '#1a1a2e' },  /* D4  (light blue) */
-            { min: 20.1, max: 21.8, bg: '#C1DDFC', text: '#1a1a2e' },  /* D5  (pale blue) */
-            { min: 21.8, max: 23.2, bg: '#FFE0E9', text: '#1a1a2e' },  /* D6  (pale pink) */
-            { min: 23.2, max: 24.8, bg: '#FFB1C9', text: '#1a1a2e' },  /* D7  (light pink) */
-            { min: 24.8, max: 26.8, bg: '#FF81AC', text: '#FFFFFF' },  /* D8  (medium pink) */
-            { min: 26.8, max: 31.6, bg: '#EB427B', text: '#FFFFFF' },  /* D9  (dark pink) */
-            { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },  /* D10 — busiest (brand dark red) */
+        /* ── WTI Color Scale ──
+         * Per-park (preferred): p5→deep blue, p25→blue, median→lavender, p75→pink, p95→red, beyond→extreme dark
+         * Fallback: absolute decile-based scale when distributions unavailable
+         */
+        const WTI_COLORS_ABSOLUTE = [
+            { min: 0,    max: 13.1, bg: '#0A2F8F', text: '#FFFFFF' },
+            { min: 13.1, max: 15.7, bg: '#305FD1', text: '#FFFFFF' },
+            { min: 15.7, max: 18.0, bg: '#5A96EA', text: '#FFFFFF' },
+            { min: 18.0, max: 20.1, bg: '#98C4F2', text: '#1a1a2e' },
+            { min: 20.1, max: 21.8, bg: '#C1DDFC', text: '#1a1a2e' },
+            { min: 21.8, max: 23.2, bg: '#FFE0E9', text: '#1a1a2e' },
+            { min: 23.2, max: 24.8, bg: '#FFB1C9', text: '#1a1a2e' },
+            { min: 24.8, max: 26.8, bg: '#FF81AC', text: '#FFFFFF' },
+            { min: 26.8, max: 31.6, bg: '#EB427B', text: '#FFFFFF' },
+            { min: 31.6, max: Infinity, bg: '#A60038', text: '#FFFFFF' },
         ];
-        function getWtiColor(wti) {
+        const BENEDICTUS_PER_PARK = [
+            { t: 0,    bg: '#0A2F8F', text: '#FFFFFF' },  /* below p5 deep blue */
+            { t: 0.05, bg: '#0A2F8F', text: '#FFFFFF' },  /* p5 */
+            { t: 0.25, bg: '#3C78D2', text: '#FFFFFF' },  /* p25 blue */
+            { t: 0.5,  bg: '#D2C8DC', text: '#1a1a2e' },  /* median lavender */
+            { t: 0.75, bg: '#F58CAF', text: '#1a1a2e' },  /* p75 pink */
+            { t: 0.95, bg: '#A60038', text: '#FFFFFF' },  /* p95 deep red */
+            { t: 1,    bg: '#50001E', text: '#FFFFFF' },  /* beyond extreme dark */
+        ];
+        function getWtiColor(wti, parkCode) {
             const v = Number(wti) || 0;
-            for (const band of WTI_COLORS) {
+            const dist = parkCode && parkWtiDistributions[parkCode];
+            if (dist && dist.p5 != null && dist.p95 != null) {
+                const mn = dist.min, mx = dist.max;
+                let t;  // percentile in [0,1] for color mapping
+                if (v <= dist.p5)      t = 0.05 * Math.max(0, (v - mn) / (dist.p5 - mn || 1));
+                else if (v <= dist.p25) t = 0.05 + 0.20 * (v - dist.p5) / (dist.p25 - dist.p5 || 1);
+                else if (v <= dist.median) t = 0.25 + 0.25 * (v - dist.p25) / (dist.median - dist.p25 || 1);
+                else if (v <= dist.p75) t = 0.5 + 0.25 * (v - dist.median) / (dist.p75 - dist.median || 1);
+                else if (v <= dist.p95) t = 0.75 + 0.20 * (v - dist.p75) / (dist.p95 - dist.p75 || 1);
+                else t = 0.95 + 0.05 * Math.min(1, (v - dist.p95) / (mx - dist.p95 || 1));
+                t = Math.max(0, Math.min(1, t));
+                for (let i = 0; i < BENEDICTUS_PER_PARK.length - 1; i++) {
+                    const a = BENEDICTUS_PER_PARK[i];
+                    const b = BENEDICTUS_PER_PARK[i + 1];
+                    if (t <= b.t) {
+                        const f = (b.t - a.t) ? (t - a.t) / (b.t - a.t) : 1;
+                        return { bg: interpolateHex(a.bg, b.bg, f), text: a.text };
+                    }
+                }
+                return BENEDICTUS_PER_PARK[BENEDICTUS_PER_PARK.length - 1];
+            }
+            for (const band of WTI_COLORS_ABSOLUTE) {
                 if (v >= band.min && v < band.max) return band;
             }
-            return WTI_COLORS[WTI_COLORS.length - 1];
+            return WTI_COLORS_ABSOLUTE[WTI_COLORS_ABSOLUTE.length - 1];
         }
-        function colorKpiByWti() {
+        function interpolateHex(a, b, f) {
+            const r1 = parseInt(a.slice(1,3), 16), g1 = parseInt(a.slice(3,5), 16), b1 = parseInt(a.slice(5,7), 16);
+            const r2 = parseInt(b.slice(1,3), 16), g2 = parseInt(b.slice(3,5), 16), b2 = parseInt(b.slice(5,7), 16);
+            const r = Math.round(r1 + (r2 - r1) * f), g = Math.round(g1 + (g2 - g1) * f), bl = Math.round(b1 + (b2 - b1) * f);
+            return '#' + [r,g,bl].map(x => Math.max(0, Math.min(255, x)).toString(16).padStart(2,'0')).join('');
+        }
+        function colorKpiByWti(parkCode) {
             const el = document.getElementById('kpi-avg');
             const val = parseFloat(el.textContent);
             if (isNaN(val)) { el.style.color = '#e9f4ff'; return; }
-            const band = getWtiColor(val);
+            const park = parkCode || document.getElementById('park-filter').value;
+            const band = getWtiColor(val, park !== 'all' ? park : null);
             el.style.color = band.bg;
         }
 
@@ -1734,8 +1788,9 @@
                             const x = bar.x;
                             const y = bar.y;
                             const value = chart.data.datasets[0].data[i];
-                            const isActive = !hasSelection || (parkCodes[i] && parkCodes[i].toLowerCase() === selectedPark.toLowerCase());
-                            const colorBand = getWtiColor(value);
+                            const parkCode = parkCodes[i] || null;
+                            const isActive = !hasSelection || (parkCode && parkCode.toLowerCase() === selectedPark.toLowerCase());
+                            const colorBand = getWtiColor(value, parkCode);
                             ctx.strokeStyle = isActive ? colorBand.bg + 'AA' : 'rgba(255,255,255,0.12)';
                             ctx.beginPath();
                             ctx.moveTo(x, stemBottom);
@@ -1747,9 +1802,10 @@
                             const x = bar.x;
                             const y = bar.y;
                             const value = chart.data.datasets[0].data[i];
+                            const parkCode = parkCodes[i] || null;
                             const valueText = (value != null && value !== '') ? String(Math.round(Number(value))) : '—';
-                            const isActive = !hasSelection || (parkCodes[i] && parkCodes[i].toLowerCase() === selectedPark.toLowerCase());
-                            const colorBand = getWtiColor(value);
+                            const isActive = !hasSelection || (parkCode && parkCode.toLowerCase() === selectedPark.toLowerCase());
+                            const colorBand = getWtiColor(value, parkCode);
                             // Head circle
                             ctx.fillStyle = isActive ? colorBand.bg : 'rgba(255,255,255,0.15)';
                             ctx.beginPath();
@@ -2284,6 +2340,7 @@
         
         // Initialize on start
         (async function init() {
+            await loadParkWtiDistributions();
             // Default date picker to today
             const today = new Date();
             const y = today.getFullYear(), m = String(today.getMonth() + 1).padStart(2, '0'), d = String(today.getDate()).padStart(2, '0');
