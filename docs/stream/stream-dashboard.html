@@ -1021,16 +1021,53 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(10, 22, 40, 0.9)',
+                            backgroundColor: 'rgba(10, 22, 40, 0.95)',
                             titleColor: '#e9f4ff',
                             bodyColor: '#e9f4ff',
                             borderColor: 'rgba(74, 144, 164, 0.4)',
                             borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            titleFont: { size: 13, weight: 'bold' },
+                            bodyFont: { size: 12 },
                             callbacks: {
-                                title: (items) => items[0] ? items[0].label : '',
-                                label: (item) => `${Math.round(item.parsed.y)} min avg wait`
+                                title: (items) => {
+                                    if (!items[0]) return '';
+                                    // Format time_slot (HH:MM:SS or HH:MM) to readable time
+                                    const slot = items[0].label || '';
+                                    const parts = slot.split(':');
+                                    if (parts.length >= 2) {
+                                        let h = parseInt(parts[0], 10);
+                                        const m = parts[1];
+                                        const ampm = h >= 12 ? 'PM' : 'AM';
+                                        if (h > 12) h -= 12;
+                                        if (h === 0) h = 12;
+                                        return `${h}:${m} ${ampm}`;
+                                    }
+                                    return slot;
+                                },
+                                label: (item) => {
+                                    const val = Math.round(item.parsed.y);
+                                    const lines = [`Average Wait: ${val} min`];
+                                    // Add context vs peak
+                                    const allVals = item.dataset.data.filter(v => v != null && v > 0);
+                                    if (allVals.length > 0) {
+                                        const peak = Math.round(Math.max(...allVals));
+                                        if (val === peak) {
+                                            lines.push('⬆ Peak of the day');
+                                        } else {
+                                            const pct = Math.round((val / peak) * 100);
+                                            lines.push(`${pct}% of peak (${peak} min)`);
+                                        }
+                                    }
+                                    return lines;
+                                }
                             }
                         }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
                     },
                     scales: {
                         x: {
