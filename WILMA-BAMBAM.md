@@ -487,17 +487,11 @@ Also `BB` (Busch Gardens?) appears in archives but has no historical match.
 
 ---
 
-### 🟡 Year-View: Best Weeks + Busiest Weeks
+### ~~Year-View: Best Weeks + Busiest Weeks~~ ✅ DONE (Wilma, Feb 15)
 
-**Date:** Feb 15, 2026
-**Priority:** Medium — before public launch
-**Context:** Fred wants the year-view to show "Best weeks to visit" and "Busiest weeks to avoid" instead of individual best days. For a year-long view, weeks are more actionable for trip planning.
-
-**What to implement:**
-1. In year-view.html, replace `renderBestDays()` with `renderBestWeeks()`
-2. Group data into ISO weeks, compute average WTI per week
-3. Show top 5 lowest-WTI weeks ("Best weeks") and top 5 highest ("Busiest weeks")
-4. Format: "Week of Sep 7 — Avg WTI 16 (Short waits)"
+Implemented best weeks (WTI + description) and busiest weeks (headliner ride peak waits).
+Busiest weeks now show top-3 headliner rides with predicted peak waits — much more actionable.
+Export script enriches JSON with ride-level data from forecast curves.
 
 ---
 
