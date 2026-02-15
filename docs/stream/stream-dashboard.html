@@ -1819,6 +1819,9 @@
                         const selectedPark = document.getElementById('park-filter').value;
                         const parkCodes = chart.options.parks || [];
                         const hasSelection = selectedPark && selectedPark !== 'all';
+                        // Cross-park view → absolute scale (null parkCode)
+                        // Single-park view → per-park distribution scale
+                        const usePerPark = hasSelection;
                         ctx.lineWidth = 1;
                         ctx.setLineDash([2, 3]);
                         meta.data.forEach((bar, i) => {
@@ -1827,7 +1830,8 @@
                             const value = chart.data.datasets[0].data[i];
                             const parkCode = parkCodes[i] || null;
                             const isActive = !hasSelection || (parkCode && parkCode.toLowerCase() === selectedPark.toLowerCase());
-                            const colorBand = getWtiColor(value, 'ALL'); // All-parks lollipop uses global scale for comparison
+                            const colorBand = getWtiColor(value, usePerPark ? parkCode : 'ALL');
+                            ctx.strokeStyle = isActive ? colorBand.bg + 'AA' : 'rgba(255,255,255,0.12)';
                             ctx.beginPath();
                             ctx.moveTo(x, stemBottom);
                             ctx.lineTo(x, y);
@@ -1841,7 +1845,7 @@
                             const parkCode = parkCodes[i] || null;
                             const valueText = (value != null && value !== '') ? String(Math.round(Number(value))) : '—';
                             const isActive = !hasSelection || (parkCode && parkCode.toLowerCase() === selectedPark.toLowerCase());
-                            const colorBand = getWtiColor(value, 'ALL'); // All-parks lollipop uses global scale for comparison
+                            const colorBand = getWtiColor(value, usePerPark ? parkCode : 'ALL');
                             // Head circle
                             ctx.fillStyle = isActive ? colorBand.bg : 'rgba(255,255,255,0.15)';
                             ctx.beginPath();
