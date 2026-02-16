@@ -146,10 +146,7 @@ body {
 .hero-bg {
     position: absolute;
     inset: 0;
-    background: 
-        radial-gradient(ellipse at 20% 50%, rgba(10, 47, 143, 0.4) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 50%, rgba(166, 0, 56, 0.2) 0%, transparent 60%),
-        radial-gradient(ellipse at 50% 0%, rgba(60, 120, 210, 0.15) 0%, transparent 50%);
+    background: url('assets/waves-bg.jpg') center center / cover no-repeat;
     z-index: 0;
 }
 
