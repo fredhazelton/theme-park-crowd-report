@@ -434,6 +434,10 @@ else
     fi
 fi
 
+# Generate landing page chart (MK 7-day)
+log_info "=== Generate landing page chart ==="
+$PYTHON scripts/generate_landing_chart.py || log_info "Landing chart generation failed (non-fatal)"
+
 # Export year-view data for hazeydata.ai and deploy
 log_info "=== Export year-view data ==="
 if $PYTHON scripts/export_year_view_data.py; then
