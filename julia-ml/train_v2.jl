@@ -41,8 +41,8 @@ const FEATURE_COLS_LITE = [
     :hour_of_day,
 ]
 
-"""Train XGBoost model for a single entity with geo decay weights."""
-function train_single_entity_v2(entity_code::String, matched_df::DataFrame, models_dir::String, min_samples::Int)
+"""Train XGBoost model for a single entity with geo decay weights and optional synthetic balance."""
+function train_single_entity_v2(entity_code::String, matched_df::DataFrame, models_dir::String, min_samples::Int, use_synthetic::Bool=false)
     # Filter for this entity
     entity_df = filter(row -> row.entity_code == entity_code, matched_df)
     
@@ -67,7 +67,25 @@ function train_single_entity_v2(entity_code::String, matched_df::DataFrame, mode
     today_date = Dates.today()
     park_dates = Date.(string.(entity_df.park_date))
     days_old = Float32.(Dates.value.(today_date .- park_dates))
-    weights = Float32.(0.5 .^ (days_old ./ 730.0))
+    geo_weights = Float32.(0.5 .^ (days_old ./ 730.0))
+    
+    # Apply uniform weighting if using synthetic data
+    if use_synthetic && "is_synthetic" in names(entity_df)
+        is_synthetic = entity_df.is_synthetic
+        n_real = sum(.!is_synthetic)
+        n_synthetic = sum(is_synthetic)
+        
+        # Uniform ratio: Real = 3.5x, Synthetic = 1.0x (both get geo_decay)
+        # Real observations: weight = 3.5 × geo_decay_weight
+        # Synthetic observations: weight = 1.0 × geo_decay_weight
+        weights = geo_weights .* ifelse.(is_synthetic, 1.0f0, 3.5f0)
+        
+        if n_real > 0 && n_synthetic > 0
+            println("  Entity $entity_code: $n_real real (3.5x weight), $n_synthetic synthetic (1.0x weight)")
+        end
+    else
+        weights = geo_weights
+    end
     
     # Remove invalid rows
     valid = .!isnan.(y) .& (y .> 0) .& .!isnan.(weights)
@@ -240,11 +258,17 @@ function train_single_entity_lite(entity_code::String, matched_df::DataFrame, mo
 end
 
 function main()
-    # Try V2 pairs first, fallback to V1
+    # Try combined pairs first (real + synthetic), then V2, then V1
+    combined_pairs = "/home/wilma/hazeydata/pipeline/matched_pairs/combined_pairs_v2.parquet"
     matched_pairs_v2 = "/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs_v2.parquet"
     matched_pairs_v1 = "/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs.parquet"
     
-    if isfile(matched_pairs_v2)
+    use_synthetic = false
+    if isfile(combined_pairs)
+        matched_pairs_path = combined_pairs
+        use_synthetic = true
+        println("Using combined pairs (real + synthetic) with balanced weighting")
+    elseif isfile(matched_pairs_v2)
         matched_pairs_path = matched_pairs_v2
         println("Using V2 matched pairs with geo_decay weights")
     elseif isfile(matched_pairs_v1)
@@ -275,6 +299,10 @@ function main()
     required_cols = [:posted_time, :mins_since_6am, :mins_since_open, :hour_of_day, 
                      :date_group_id_encoded, :season_encoded, :season_year_encoded,
                      :park_date, :actual_time, :entity_code]
+    
+    if use_synthetic
+        push!(required_cols, :is_synthetic)
+    end
     
     missing_cols = [c for c in required_cols if !(String(c) in names(matched_df))]
     if !isempty(missing_cols)
@@ -315,7 +343,7 @@ function main()
     total_mae = 0.0
     
     for (i, entity) in enumerate(entities_to_train)
-        result, msg = train_single_entity_v2(entity, matched_df, models_dir, 100)
+        result, msg = train_single_entity_v2(entity, matched_df, models_dir, 100, use_synthetic)
         
         if result !== nothing
             successful += 1
@@ -338,6 +366,14 @@ function main()
     println("TRAINING V2 COMPLETE")
     println("=" ^ 60)
     println("Model: $MODEL_LABEL")
+    if use_synthetic
+        real_count = sum(.!matched_df.is_synthetic)
+        synthetic_count = sum(matched_df.is_synthetic)
+        println("Training data: $(size(matched_df, 1)) total ($real_count real + $synthetic_count synthetic)")
+        println("Synthetic weighting: Applied to balance real vs synthetic observations")
+    else
+        println("Training data: $(size(matched_df, 1)) real observations only")
+    end
     println("Successful: $successful")
     println("Failed: $failed")
     if successful > 0

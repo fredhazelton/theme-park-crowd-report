@@ -35,6 +35,7 @@ SKIP_VALIDATION=false
 SKIP_DROPBOX_CHECK=false
 SKIP_SYNC=false
 SKIP_IF_UNCHANGED=false
+USE_SYNTHETIC=false
 PARK=""
 
 while [[ $# -gt 0 ]]; do
@@ -95,6 +96,10 @@ while [[ $# -gt 0 ]]; do
             SKIP_IF_UNCHANGED=true
             shift
             ;;
+        --use-synthetic)
+            USE_SYNTHETIC=true
+            shift
+            ;;
         --park)
             PARK="$2"
             shift 2
@@ -119,6 +124,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-dropbox-check   Do not force-quit Dropbox (use if output_base is not on Dropbox)"
             echo "  --skip-sync             Skip S3 sync (use existing local raw data)"
             echo "  --skip-if-unchanged    Skip training/forecast/WTI if data hasn't changed (fast incremental mode)"
+            echo "  --use-synthetic        Include synthetic actuals in training (balances real vs synthetic data)"
             echo "  --park PARK            Run training, forecast, and WTI for one park only (e.g. MK, EP, AK, BB)"
             exit 0
             ;;
@@ -361,7 +367,16 @@ elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check training 2>/d
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
     $PYTHON scripts/pipeline_state.py record training false "no dirty entities" 2>/dev/null || true
 else
-    if run_step "Hybrid training V2 (Julia + geo decay)" $PYTHON scripts/hybrid_pipeline_v2.py --output-base "$OUTPUT_BASE" --skip-scoring; then
+    # Build training command with synthetic flag if requested
+    TRAINING_CMD="$PYTHON scripts/hybrid_pipeline_v2.py --output-base $OUTPUT_BASE --skip-scoring"
+    if $USE_SYNTHETIC; then
+        TRAINING_CMD="$TRAINING_CMD --use-synthetic"
+        TRAINING_DESC="Hybrid training V2 (Julia + geo decay + synthetic actuals)"
+    else
+        TRAINING_DESC="Hybrid training V2 (Julia + geo decay)"
+    fi
+    
+    if run_step "$TRAINING_DESC" $TRAINING_CMD; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
         $PYTHON scripts/pipeline_state.py update training 2>/dev/null || true
         $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record training true "entities had new observations" 2>/dev/null || true

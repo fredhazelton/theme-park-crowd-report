@@ -412,10 +412,13 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None, full_reb
     return len(all_df)
 
 
-def step2_train_julia(logger) -> tuple[int, float]:
+def step2_train_julia(logger, use_synthetic: bool = False) -> tuple[int, float]:
     """Run Julia XGBoost training with geo decay weights."""
     logger.info("=" * 60)
-    logger.info("STEP 2: TRAINING V2 (Julia/XGBoost.jl + geo decay)")
+    if use_synthetic:
+        logger.info("STEP 2: TRAINING V2 (Julia/XGBoost.jl + geo decay + synthetic actuals)")
+    else:
+        logger.info("STEP 2: TRAINING V2 (Julia/XGBoost.jl + geo decay)")
     logger.info("=" * 60)
     
     if not JULIA_TRAIN_SCRIPT.exists():
@@ -428,6 +431,52 @@ def step2_train_julia(logger) -> tuple[int, float]:
         script_to_run = fallback_script
     else:
         script_to_run = JULIA_TRAIN_SCRIPT
+    
+    # Combine real and synthetic pairs if requested
+    if use_synthetic:
+        logger.info("  Combining real and synthetic pairs for training...")
+        real_pairs_path = MATCHED_PAIRS_DIR / "all_pairs_v2.parquet"
+        synthetic_pairs_path = MATCHED_PAIRS_DIR / "synthetic_pairs_v2.parquet"
+        combined_pairs_path = MATCHED_PAIRS_DIR / "combined_pairs_v2.parquet"
+        
+        if not real_pairs_path.exists():
+            logger.error(f"Real pairs not found: {real_pairs_path}")
+            return 0, 0.0
+            
+        if not synthetic_pairs_path.exists():
+            logger.error(f"Synthetic pairs not found: {synthetic_pairs_path}")
+            logger.error("Run build_synthetic_pairs.py first")
+            return 0, 0.0
+        
+        # Load and combine pairs
+        real_df = pd.read_parquet(real_pairs_path)
+        synthetic_df = pd.read_parquet(synthetic_pairs_path)
+        
+        # Add is_synthetic column to real pairs
+        real_df['is_synthetic'] = False
+        
+        # Ensure columns match exactly
+        real_columns = set(real_df.columns)
+        synthetic_columns = set(synthetic_df.columns)
+        
+        if real_columns != synthetic_columns:
+            logger.error(f"Column mismatch between real and synthetic pairs!")
+            logger.error(f"Real: {sorted(real_columns)}")
+            logger.error(f"Synthetic: {sorted(synthetic_columns)}")
+            return 0, 0.0
+        
+        # Combine dataframes
+        combined_df = pd.concat([real_df, synthetic_df], ignore_index=True)
+        
+        # Save combined pairs for Julia
+        combined_df.to_parquet(combined_pairs_path, index=False)
+        
+        logger.info(f"  Real pairs: {len(real_df):,}")
+        logger.info(f"  Synthetic pairs: {len(synthetic_df):,}")
+        logger.info(f"  Combined pairs: {len(combined_df):,}")
+        logger.info(f"  Saved to: {combined_pairs_path}")
+        
+        # Update Julia script path to use combined pairs (will be handled in Julia script)
     
     # Write dirty entity list for Julia (only entities with new data since last training)
     try:
@@ -554,6 +603,7 @@ def main():
     parser.add_argument("--full-pairs", action="store_true", help="Force full rebuild of matched pairs (ignore incremental state)")
     parser.add_argument("--skip-training", action="store_true", help="Skip model training")
     parser.add_argument("--skip-scoring", action="store_true", help="Skip historical scoring")
+    parser.add_argument("--use-synthetic", action="store_true", help="Include synthetic actuals in training")
     args = parser.parse_args()
 
     output_base = args.output_base.resolve()
@@ -580,7 +630,25 @@ def main():
     
     # Step 2: Training
     if not args.skip_training:
-        n_models, train_time = step2_train_julia(logger)
+        # Build synthetic pairs if requested
+        if args.use_synthetic:
+            logger.info("Building synthetic pairs...")
+            import subprocess
+            result = subprocess.run([
+                sys.executable, 
+                str(PROJECT_ROOT / "scripts" / "build_synthetic_pairs.py"),
+                "--output-base", str(output_base)
+            ], capture_output=True, text=True)
+            
+            if result.returncode != 0:
+                logger.error(f"Synthetic pairs building failed:\n{result.stderr}")
+                logger.info("Continuing with real pairs only...")
+                n_models, train_time = step2_train_julia(logger, use_synthetic=False)
+            else:
+                logger.info(result.stdout)
+                n_models, train_time = step2_train_julia(logger, use_synthetic=True)
+        else:
+            n_models, train_time = step2_train_julia(logger, use_synthetic=False)
     else:
         logger.info("Skipping training")
         n_models, train_time = 0, 0.0
