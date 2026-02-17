@@ -436,7 +436,31 @@ python src/build_dimensions.py               # Dimensions
 - `scripts/hybrid_pipeline_v2.py` — `pq.read_metadata()` for prediction count
 - `requirements.txt` — `pyarrow>=14.0.0`
 
-**Wilma:** Please paste the error message and stack trace when the daily pipeline fails. Common fixes: pin PyArrow version (e.g. `pyarrow==21.0.0` if 22.x regressed), or switch to DuckDB for parquet metadata reads.
+**Full error from today's run (2026-02-17 06:31):**
+
+```
+File "/home/wilma/theme-park-crowd-report/.venv/lib/python3.12/site-packages/pyarrow/pandas_compat.py", line 633, in convert_column
+    result = pa.array(col, type=type_, from_pandas=True, safe=safe)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pyarrow/array.pxi", line 365, in pyarrow.lib.array
+  File "pyarrow/array.pxi", line 91, in pyarrow.lib._ndarray_to_array
+  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
+pyarrow.lib.ArrowTypeError: ("Expected bytes, got a 'Timestamp' object", 'Conversion failed for column park_date with type object')
+```
+
+**Sequence from the log:**
+1. `generate_synthetic_actuals` completes OK
+2. `hybrid_pipeline_v2.py` starts, builds 90,591,998 synthetic pairs successfully
+3. Crashes during parquet write of the merged pairs (real + synthetic)
+4. `[ERROR] Failed: Hybrid training V2 (Julia + geo decay + synthetic actuals)`
+
+**Likely cause:** `park_date` column becomes mixed-type `object` when synthetic pairs (Timestamps) are concatenated with real pairs (strings/bytes). PyArrow can't serialize mixed types.
+
+**Suggested fix:** After merging real + synthetic pairs in `hybrid_pipeline_v2.py`, normalize `park_date`:
+```python
+df['park_date'] = pd.to_datetime(df['park_date']).dt.strftime('%Y-%m-%d')
+```
+Or fix at the source in `generate_synthetic_actuals` to output string dates.
 
 ---
 
