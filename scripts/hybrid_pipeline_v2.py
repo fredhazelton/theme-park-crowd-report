@@ -468,6 +468,9 @@ def step2_train_julia(logger, use_synthetic: bool = False) -> tuple[int, float]:
         # Combine dataframes
         combined_df = pd.concat([real_df, synthetic_df], ignore_index=True)
         
+        # Normalize park_date to string (synthetic has Timestamps, real has strings; PyArrow fails on mixed types)
+        combined_df['park_date'] = pd.to_datetime(combined_df['park_date']).dt.strftime('%Y-%m-%d')
+        
         # Save combined pairs for Julia
         combined_df.to_parquet(combined_pairs_path, index=False)
         

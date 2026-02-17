@@ -425,42 +425,16 @@ python src/build_dimensions.py               # Dimensions
 
 ---
 
-### URGENT: PyArrow Bug — Blocking Daily Training
+### ~~URGENT: PyArrow Bug — Blocking Daily Training~~ ✅ FIXED (Bam-Bam, Feb 17)
 
 **Date:** Feb 17, 2026  
-**Priority:** HIGH — blocks daily retraining  
-**Context:** Wilma reported a PyArrow bug that's blocking the daily pipeline. Bam-Bam ready to fix once we have the error message/stack trace.
+**Priority:** HIGH  
+**Root cause:** `park_date` column became mixed-type (object) when synthetic pairs (Timestamps) were concatenated with real pairs (strings). PyArrow fails: `ArrowTypeError: Expected bytes, got a 'Timestamp' object`.
 
-**Where PyArrow is used:**
-- `scripts/convert_to_parquet.py` — `to_parquet()`, `pyarrow.parquet`
-- `scripts/hybrid_pipeline_v2.py` — `pq.read_metadata()` for prediction count
-- `requirements.txt` — `pyarrow>=14.0.0`
-
-**Full error from today's run (2026-02-17 06:31):**
-
-```
-File "/home/wilma/theme-park-crowd-report/.venv/lib/python3.12/site-packages/pyarrow/pandas_compat.py", line 633, in convert_column
-    result = pa.array(col, type=type_, from_pandas=True, safe=safe)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "pyarrow/array.pxi", line 365, in pyarrow.lib.array
-  File "pyarrow/array.pxi", line 91, in pyarrow.lib._ndarray_to_array
-  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
-pyarrow.lib.ArrowTypeError: ("Expected bytes, got a 'Timestamp' object", 'Conversion failed for column park_date with type object')
-```
-
-**Sequence from the log:**
-1. `generate_synthetic_actuals` completes OK
-2. `hybrid_pipeline_v2.py` starts, builds 90,591,998 synthetic pairs successfully
-3. Crashes during parquet write of the merged pairs (real + synthetic)
-4. `[ERROR] Failed: Hybrid training V2 (Julia + geo decay + synthetic actuals)`
-
-**Likely cause:** `park_date` column becomes mixed-type `object` when synthetic pairs (Timestamps) are concatenated with real pairs (strings/bytes). PyArrow can't serialize mixed types.
-
-**Suggested fix:** After merging real + synthetic pairs in `hybrid_pipeline_v2.py`, normalize `park_date`:
+**Fix applied:** In `hybrid_pipeline_v2.py`, after `pd.concat([real_df, synthetic_df])`, normalize `park_date`:
 ```python
-df['park_date'] = pd.to_datetime(df['park_date']).dt.strftime('%Y-%m-%d')
+combined_df['park_date'] = pd.to_datetime(combined_df['park_date']).dt.strftime('%Y-%m-%d')
 ```
-Or fix at the source in `generate_synthetic_actuals` to output string dates.
 
 ---
 
@@ -768,6 +742,8 @@ PREMIUM_ROLE_ID=<create this role>
 
 - **[Two-Stage Model Fallback — Entity-Specific Ratio Tier]** Implemented per WILMA-BAMBAM spec: (1) `train_live_inference_model.py` computes entity_ratio for 100-499 pair entities, saves to `models/_live_inference/entity_ratios.json`; (2) `live_inference.py` loads entity_ratios at init, checks entity_ratio tier first in predict() and predict_batch(), returns `method: 'entity_ratio'`. Wilma: re-run train script to generate entity_ratios.json.
 
+- **[PyArrow Bug — Blocking Daily Training]** Fixed in `hybrid_pipeline_v2.py`: mixed-type `park_date` (Timestamps from synthetic pairs + strings from real pairs) caused `ArrowTypeError` when writing combined pairs to parquet. Added `combined_df['park_date'] = pd.to_datetime(combined_df['park_date']).dt.strftime('%Y-%m-%d')` before `to_parquet()`.
+
 ---
 
 ## Log
@@ -794,6 +770,7 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-16 | Bam-Bam | **Dual Color Mode (lollipop):** Per Wilma's fix: lollipop chart now uses `distributions["ALL"]` for colors when comparing all parks (common baseline). Added "ALL" entry to `compute_park_wti_distributions.py`. KPI/gauge/trend already use per-park when single park selected. Task moved to Completed. |
 | 2026-02-17 | Bam-Bam | **Two-Stage Model Fallback (entity-specific ratio tier):** Implemented per Active Items. train_live_inference_model.py now computes and saves entity_ratios.json for entities with 100-499 matched pairs. live_inference.py loads entity_ratios, checks tier first in predict()/predict_batch(), returns method='entity_ratio'. Task moved to Completed. Wilma: re-run train script to generate entity_ratios.json. |
 | 2026-02-17 | Bam-Bam | **PyArrow bug:** Wilma's Telegram: PyArrow bug blocking daily training. Added URGENT task to Active Items. Need error message/stack trace from Wilma to fix. Common mitigations: pin PyArrow version (21.x if 22.x regressed), or use DuckDB for parquet metadata reads instead of pq.read_metadata(). |
+| 2026-02-17 | Bam-Bam | **PyArrow bug FIXED:** Root cause: mixed-type park_date (Timestamps from synthetic + strings from real) when merging pairs. PyArrow can't serialize. Added `combined_df['park_date'] = pd.to_datetime(combined_df['park_date']).dt.strftime('%Y-%m-%d')` before to_parquet in hybrid_pipeline_v2.py. Task moved to Completed. |
 
 ---
 
