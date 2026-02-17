@@ -543,48 +543,22 @@ Export script enriches JSON with ride-level data from forecast curves.
 
 ---
 
-### NEW: Two-Stage Model Fallback — Entity-Specific Ratio Tier
+### ~~NEW: Two-Stage Model Fallback — Entity-Specific Ratio Tier~~ ✅ DONE (Bam-Bam, Feb 17)
 
 **Date:** Feb 14, 2026  
-**Priority:** Medium — next pipeline improvement after current fixes stabilize  
-**Context:** The global XGBoost live inference model fails on low-popularity rides (railroads, people-movers) because their posted-to-actual ratios are extreme and the global model can't capture entity-specific behavior. Example: MK49 (Railroad Fantasyland) has a 0.596 ratio, median actual 6 min — but the global model predicts 18 min for posted 30.
+**Priority:** Medium  
+**Context:** The global XGBoost live inference model fails on low-popularity rides (railroads, people-movers) because their posted-to-actual ratios are extreme.
 
-**Current flow:** Full Julia model (≥500 pairs) → Global XGBoost (everything else)  
-**New flow:** Full Julia model (≥500 pairs) → **Entity-specific ratio (100-499 pairs)** → Global XGBoost (<100 pairs)
+**Implemented:**
+1. **`scripts/train_live_inference_model.py`** — After loading matched pairs, computes `entity_ratio = actual_sum/posted_sum` for entities with 100-499 pairs; saves to `models/_live_inference/entity_ratios.json`
+2. **`src/processors/live_inference.py`** — Loads `entity_ratios.json` at init; in `predict()` and `predict_batch()`, checks entity_ratio tier FIRST (before model/fallback); returns `method: 'entity_ratio'` for this tier
+3. **Discord bot** — No changes needed (uses `live_inference_model.predict()`)
 
-**What to implement:**
+**Flow:** Entity-ratio (100-499 pairs) → Live model (XGBoost) → Fallback ratio
 
-1. **At training time** (in the pipeline, probably `hybrid_pipeline_v2.py` or a new script):
-   - For entities with 100-499 matched pairs, compute and store `entity_ratio = AVG(actual_time / posted_time)`
-   - Save to a JSON or CSV file at `/mnt/data/pipeline/models/_live_inference/entity_ratios.json`
-   - Format: `{"MK49": 0.596, "MK48": 0.659, ...}` (entity_code → ratio)
-   - Currently 54 entities fall in this tier
+**Wilma:** Re-run `train_live_inference_model.py` to generate `entity_ratios.json`; then verify predictions for MK49, MK48, DL13, IA10.
 
-2. **In `src/processors/live_inference.py`** — modify the `predict()` method:
-   - Load entity_ratios.json at init alongside the XGBoost model
-   - Prediction logic:
-     ```
-     if entity has full XGBoost model features → use model (current behavior)
-     elif entity in entity_ratios → return posted_time × entity_ratio
-     else → use global model (current behavior)
-     ```
-   - Return `method: 'entity_ratio'` in the prediction dict for this tier
-
-3. **In the Discord bot** (`/home/wilma/tpcr-discord-bot/bot.py`):
-   - No changes needed — it already calls `live_inference_model.predict()` which will automatically use the right tier
-
-**Entity counts (current data):**
-- 165 entities → full model (≥500 pairs)
-- 54 entities → entity ratio (100-499 pairs) ← NEW TIER
-- 53 entities → global model (<100 pairs)
-
-**Validation:** After implementing, test with these known entities:
-- MK49 (Railroad Fantasyland): ratio 0.596, posted 30 → should predict ~18 (vs global's 18... actually similar here, but at posted 40 → should be ~24 vs global's 27)
-- MK48 (Railroad Frontierland): ratio 0.659
-- DL13 (Disneyland Monorail): ratio 1.194 (actual > posted!)
-- IA10: ratio 0.588
-
-**Wilma will verify** the predictions improve after implementation.
+---
 
 ### ~~PRIORITY: Stripe Premium Subscription Integration~~ ✅ DONE
 
@@ -753,6 +727,8 @@ PREMIUM_ROLE_ID=<create this role>
 
 - **[Stripe Premium Subscription Integration]** Implemented full flow: (1) `web/subscribe.html` — premium landing page with Stripe Checkout button; (2) `web/subscribe-success.html` — thank-you page; (3) `dashboard/api.py` — `POST /api/create-checkout-session` and `POST /api/webhooks/stripe`; (4) `dashboard/stripe_handler.py` — webhook logic for checkout.session.completed, customer.subscription.deleted/updated, invoice.payment_failed; Discord role add/remove via API; JSON store for subscription mapping; (5) `tpcr-discord-bot/bot.py` — `has_premium_role()`, `max_forecast_days()`, `premium_teaser_message()` for 90-day/1-year unlock; (6) `docs/STRIPE_PREMIUM_SETUP.md` — setup guide. Credentials in ~/.env on wilma-server. Test with Stripe test mode (card 4242...).
 
+- **[Two-Stage Model Fallback — Entity-Specific Ratio Tier]** Implemented per WILMA-BAMBAM spec: (1) `train_live_inference_model.py` computes entity_ratio for 100-499 pair entities, saves to `models/_live_inference/entity_ratios.json`; (2) `live_inference.py` loads entity_ratios at init, checks entity_ratio tier first in predict() and predict_batch(), returns `method: 'entity_ratio'`. Wilma: re-run train script to generate entity_ratios.json.
+
 ---
 
 ## Log
@@ -777,6 +753,7 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-05 | Bam-Bam | **Stripe Premium Subscription Integration:** Implemented full flow per spec. Created web/subscribe.html, subscribe-success.html; dashboard/api.py (create-checkout-session, webhooks/stripe); dashboard/stripe_handler.py (webhook logic, Discord role add/remove); tpcr-discord-bot/bot.py (has_premium_role, max_forecast_days, premium_teaser_message); docs/STRIPE_PREMIUM_SETUP.md. Add credentials to ~/.env on wilma-server. Test with Stripe test mode. Task moved to Completed. |
 | 2026-02-16 | Bam-Bam | **Per-park WTI distributions:** Added GET /api/park-wti-distributions; stream dashboard fetches at init, uses per-park percentiles for KPI + lollipop colors (p5→deep blue, p25→blue, median→lavender, p75→pink, p95→red). Fallback to absolute scale when distributions unavailable. Documented in PIPELINE_DATA_FLOW. Task moved to Completed. |
 | 2026-02-16 | Bam-Bam | **Dual Color Mode (lollipop):** Per Wilma's fix: lollipop chart now uses `distributions["ALL"]` for colors when comparing all parks (common baseline). Added "ALL" entry to `compute_park_wti_distributions.py`. KPI/gauge/trend already use per-park when single park selected. Task moved to Completed. |
+| 2026-02-17 | Bam-Bam | **Two-Stage Model Fallback (entity-specific ratio tier):** Implemented per Active Items. train_live_inference_model.py now computes and saves entity_ratios.json for entities with 100-499 matched pairs. live_inference.py loads entity_ratios, checks tier first in predict()/predict_batch(), returns method='entity_ratio'. Task moved to Completed. Wilma: re-run train script to generate entity_ratios.json. |
 
 ---
 

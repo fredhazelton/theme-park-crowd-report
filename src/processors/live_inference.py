@@ -110,11 +110,26 @@ class LiveInferenceModel:
         # Load fallback ratios for unknown entities
         self._load_fallback_ratios()
         
+        # Load entity-specific ratios for 100-499 pair tier
+        self._load_entity_ratios()
+        
         print(f"✅ Live inference model loaded:")
         print(f"   Model: {model_path}")
         print(f"   Features: {len(self.feature_names)}")
         print(f"   Entities: {len(self.encodings['entity_code'])}")
         print(f"   Parks: {len(self.encodings['park_code'])}")
+        if self.entity_ratios:
+            print(f"   Entity-ratio tier: {len(self.entity_ratios)} entities")
+    
+    def _load_entity_ratios(self):
+        """Load entity-specific ratios for 100-499 pair tier."""
+        ratios_path = self.output_base / "models" / "_live_inference" / "entity_ratios.json"
+        if ratios_path.exists():
+            with open(ratios_path, "r", encoding="utf-8") as f:
+                self.entity_ratios = json.load(f)
+        else:
+            self.entity_ratios = {}
+            print(f"⚠️  Entity ratios file not found: {ratios_path}")
     
     def _load_dimension_tables(self):
         """Load all dimension tables into memory for fast lookup."""
@@ -278,42 +293,37 @@ class LiveInferenceModel:
                 "entity_code": str,
                 "posted_time": int,
                 "adjustment": int,
-                "method": "live_model" | "fallback_ratio"
+                "method": "live_model" | "entity_ratio" | "fallback_ratio"
             }
         """
         
-        # Check if entity is known and can use the model
-        can_use_model = (
-            entity_code in self.encodings['entity_code'] and
-            observed_at.date() in self.date_group_ids and
-            observed_at.date() in self.seasons
-        )
-        
-        if can_use_model:
-            # Use the trained model
-            try:
-                features = self._extract_features(entity_code, posted_time, observed_at)
-                
-                # Create feature vector in correct order
-                feature_vector = [features[name] for name in self.feature_names]
-                
-                # Make prediction
-                dmatrix = xgb.DMatrix([feature_vector], feature_names=self.feature_names)
-                prediction = self.model.predict(dmatrix)[0]
-                
-                # Clamp to reasonable range
-                prediction = max(0, min(300, prediction))
-                
-                method = "live_model"
-                
-            except Exception:
-                # Fallback to ratio if model fails
+        # 1. Entity-specific ratio tier (100-499 pairs) — use simple ratio before model
+        if entity_code in self.entity_ratios:
+            ratio = self.entity_ratios[entity_code]
+            prediction = posted_time * ratio
+            method = "entity_ratio"
+        else:
+            # 2. Check if entity can use the trained model
+            can_use_model = (
+                entity_code in self.encodings['entity_code'] and
+                observed_at.date() in self.date_group_ids and
+                observed_at.date() in self.seasons
+            )
+            
+            if can_use_model:
+                try:
+                    features = self._extract_features(entity_code, posted_time, observed_at)
+                    feature_vector = [features[name] for name in self.feature_names]
+                    dmatrix = xgb.DMatrix([feature_vector], feature_names=self.feature_names)
+                    prediction = self.model.predict(dmatrix)[0]
+                    prediction = max(0, min(300, prediction))
+                    method = "live_model"
+                except Exception:
+                    prediction = self._get_fallback_prediction(entity_code, posted_time)
+                    method = "fallback_ratio"
+            else:
                 prediction = self._get_fallback_prediction(entity_code, posted_time)
                 method = "fallback_ratio"
-        else:
-            # Use fallback ratio for unknown entities or dates
-            prediction = self._get_fallback_prediction(entity_code, posted_time)
-            method = "fallback_ratio"
         
         predicted_actual = int(round(prediction))
         adjustment = predicted_actual - int(posted_time)
@@ -338,7 +348,8 @@ class LiveInferenceModel:
         """
         results = []
         
-        # Group observations by method (model vs fallback) for efficiency
+        # Group observations by method (entity_ratio vs model vs fallback)
+        entity_ratio_obs = []
         model_obs = []
         fallback_obs = []
         
@@ -346,13 +357,13 @@ class LiveInferenceModel:
             entity_code = obs['entity_code']
             observed_at = obs['observed_at']
             
-            can_use_model = (
+            if entity_code in self.entity_ratios:
+                entity_ratio_obs.append((i, obs))
+            elif (
                 entity_code in self.encodings['entity_code'] and
                 observed_at.date() in self.date_group_ids and
                 observed_at.date() in self.seasons
-            )
-            
-            if can_use_model:
+            ):
                 model_obs.append((i, obs))
             else:
                 fallback_obs.append((i, obs))
@@ -386,19 +397,24 @@ class LiveInferenceModel:
                     }))
                     
             except Exception:
-                # If batch fails, process individually with fallback
+                # If batch fails, move to fallback
                 for i, obs in model_obs:
-                    prediction = self._get_fallback_prediction(obs['entity_code'], obs['posted_time'])
-                    predicted_actual = int(round(prediction))
-                    adjustment = predicted_actual - int(obs['posted_time'])
-                    
-                    results.append((i, {
-                        "predicted_actual": predicted_actual,
-                        "entity_code": obs['entity_code'],
-                        "posted_time": int(obs['posted_time']),
-                        "adjustment": adjustment,
-                        "method": "fallback_ratio"
-                    }))
+                    fallback_obs.append((i, obs))
+                model_obs = []
+        
+        # Process entity_ratio tier (100-499 pairs)
+        for i, obs in entity_ratio_obs:
+            ratio = self.entity_ratios[obs['entity_code']]
+            prediction = obs['posted_time'] * ratio
+            predicted_actual = int(round(prediction))
+            adjustment = predicted_actual - int(obs['posted_time'])
+            results.append((i, {
+                "predicted_actual": predicted_actual,
+                "entity_code": obs['entity_code'],
+                "posted_time": int(obs['posted_time']),
+                "adjustment": adjustment,
+                "method": "entity_ratio"
+            }))
         
         # Process fallback predictions
         for i, obs in fallback_obs:

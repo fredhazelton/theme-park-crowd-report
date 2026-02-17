@@ -140,6 +140,31 @@ def train_live_inference_model(
     if len(df) < 100:
         raise ValueError(f"Not enough matched pairs ({len(df)}). Need at least 100.")
     
+    # Step 1b: Compute entity-specific ratios for 100-499 pair tier
+    # Entities with 100-499 pairs use simple ratio instead of global XGBoost (better for railroads, people-movers)
+    entity_counts = df.groupby("entity_code").agg(
+        count=("actual_time", "count"),
+        actual_sum=("actual_time", "sum"),
+        posted_sum=("posted_time", "sum"),
+    ).reset_index()
+    ratio_tier = entity_counts[
+        (entity_counts["count"] >= 100) & (entity_counts["count"] < 500)
+    ]
+    entity_ratios = {}
+    for _, row in ratio_tier.iterrows():
+        if row["posted_sum"] > 0:
+            entity_ratios[row["entity_code"]] = round(
+                float(row["actual_sum"] / row["posted_sum"]), 4
+            )
+    model_dir = output_base / "models" / "_live_inference"
+    model_dir.mkdir(parents=True, exist_ok=True)
+    entity_ratios_path = model_dir / "entity_ratios.json"
+    with open(entity_ratios_path, "w", encoding="utf-8") as f:
+        json.dump(entity_ratios, f, indent=2)
+    if logger:
+        logger.info(f"  Entity-ratio tier (100-499 pairs): {len(entity_ratios)} entities")
+        logger.info(f"  Saved to: {entity_ratios_path}")
+    
     # Step 2: Encode categoricals
     if logger:
         logger.info("Encoding categorical features...")
