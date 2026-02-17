@@ -425,6 +425,21 @@ python src/build_dimensions.py               # Dimensions
 
 ---
 
+### URGENT: PyArrow Bug — Blocking Daily Training
+
+**Date:** Feb 17, 2026  
+**Priority:** HIGH — blocks daily retraining  
+**Context:** Wilma reported a PyArrow bug that's blocking the daily pipeline. Bam-Bam ready to fix once we have the error message/stack trace.
+
+**Where PyArrow is used:**
+- `scripts/convert_to_parquet.py` — `to_parquet()`, `pyarrow.parquet`
+- `scripts/hybrid_pipeline_v2.py` — `pq.read_metadata()` for prediction count
+- `requirements.txt` — `pyarrow>=14.0.0`
+
+**Wilma:** Please paste the error message and stack trace when the daily pipeline fails. Common fixes: pin PyArrow version (e.g. `pyarrow==21.0.0` if 22.x regressed), or switch to DuckDB for parquet metadata reads.
+
+---
+
 ### ~~LAUNCH BLOCKER: Wire year-view.html to Real API Data~~ ✅ DONE (Wilma, Feb 15)
 
 Implemented Option 3 (static JSON export). Pipeline exports `year-view-data/{PARK}.json` daily.
@@ -754,6 +769,7 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-16 | Bam-Bam | **Per-park WTI distributions:** Added GET /api/park-wti-distributions; stream dashboard fetches at init, uses per-park percentiles for KPI + lollipop colors (p5→deep blue, p25→blue, median→lavender, p75→pink, p95→red). Fallback to absolute scale when distributions unavailable. Documented in PIPELINE_DATA_FLOW. Task moved to Completed. |
 | 2026-02-16 | Bam-Bam | **Dual Color Mode (lollipop):** Per Wilma's fix: lollipop chart now uses `distributions["ALL"]` for colors when comparing all parks (common baseline). Added "ALL" entry to `compute_park_wti_distributions.py`. KPI/gauge/trend already use per-park when single park selected. Task moved to Completed. |
 | 2026-02-17 | Bam-Bam | **Two-Stage Model Fallback (entity-specific ratio tier):** Implemented per Active Items. train_live_inference_model.py now computes and saves entity_ratios.json for entities with 100-499 matched pairs. live_inference.py loads entity_ratios, checks tier first in predict()/predict_batch(), returns method='entity_ratio'. Task moved to Completed. Wilma: re-run train script to generate entity_ratios.json. |
+| 2026-02-17 | Bam-Bam | **PyArrow bug:** Wilma's Telegram: PyArrow bug blocking daily training. Added URGENT task to Active Items. Need error message/stack trace from Wilma to fix. Common mitigations: pin PyArrow version (21.x if 22.x regressed), or use DuckDB for parquet metadata reads instead of pq.read_metadata(). |
 
 ---
 
