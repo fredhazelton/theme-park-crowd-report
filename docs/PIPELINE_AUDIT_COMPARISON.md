@@ -1,6 +1,6 @@
 # Pipeline Audit Comparison
 
-**Date:** 2026-02-18  
+**Date:** 2026-02-18 (updated after Wilma's 2026-02-18 doc refresh)  
 **Author:** Barney (independent audit)  
 **Purpose:** Compare audit of `run_daily_pipeline.sh` and codebase against Wilma's `PIPELINE_DATA_FLOW.md` to verify alignment.
 
@@ -12,14 +12,14 @@
 |---|------|-----------------|-------|
 | 0 | S3 Sync | `sync_s3_data.sh` | wait_times + fastpass_times → output_base/raw |
 | 1 | ETL | `run_etl.sh` → `get_tp_wait_time_data_from_s3.py` | Reads from raw only (sync-only) |
-| 1b | **CSV→Parquet** | `convert_to_parquet.py` | After ETL; needed by WTI, forecasts, posted aggregates |
-| 2 | Dimension fetches | `run_dimension_fetches.sh` | get_entity, get_park_hours, get_events, get_metatable, build_dimdategroupid, build_dimseason |
-| 2a | **Closures** | `get_closures_from_s3.py` + `build_operating_calendar.py` | S3 closures → operating_calendar.parquet |
+| 1b | CSV→Parquet | `convert_to_parquet.py` | After ETL; needed by WTI, forecasts, posted aggregates |
+| 2 | Dimension fetches | `run_dimension_fetches.sh` | 6 sub-scripts (entity, park hours, events, metatable, dimdategroupid, dimseason) |
+| 2a | Closures | `get_closures_from_s3.py` + `build_operating_calendar.py` | S3 closures → operating_calendar.parquet |
 | 2b | Impute park hours | `impute_park_hours.py` | Fills missing future hours from donor pool |
 | 3 | Posted aggregates | `build_posted_aggregates_fast.py` | Monthly parquet, ~7s |
 | 4 | Wait time DB report | `report_wait_time_db.py` | wait_time_db_report.md |
-| 4b | **Forecast accuracy evaluation** | `evaluate_forecast_accuracy.py` | **BEFORE** new forecasts; compares prior forecast vs fresh actuals |
-| 4c | **Synthetic actuals** | `generate_synthetic_actuals.py` | For dashboard curves; NOT used for training yet |
+| 4b | Forecast accuracy evaluation | `evaluate_forecast_accuracy.py` | **BEFORE** new forecasts; compares prior forecast vs fresh actuals |
+| 4c | Synthetic actuals | `generate_synthetic_actuals.py` | For dashboard curves; NOT used for training by default |
 | 5 | Training | `hybrid_pipeline_v2.py --skip-scoring` | Matched pairs + Julia XGBoost |
 | 6 | Forecast | `forecast_vectorized.py --days 730` | 2-year predictions |
 | 7 | WTI | `calculate_wti_simple.py` | Park-level wait time index |
@@ -30,81 +30,65 @@
 
 ---
 
-## 2. Comparison: Wilma's Doc vs Actual Code
+## 2. Comparison: Wilma's Doc (2026-02-18) vs Actual Code
 
-### ✅ Matches (accurate)
+### ✅ Full Alignment
 
-| Item | Status |
-|------|--------|
-| S3 sync, ETL, dimensions, impute park hours, aggregates, report, training, forecast, WTI order | ✅ Correct |
-| `sync_s3_data.sh` PATH fix for AWS CLI | ✅ Documented |
-| `build_posted_aggregates_fast.py` vs deprecated `build_posted_aggregates.py` | ✅ Documented |
-| `forecast_vectorized.py` vs deprecated `generate_forecast.py` | ✅ Documented |
-| `hybrid_pipeline_v2.py` vs V1 | ✅ Documented |
-| Incremental matched pairs, training (dirty only), encoding mappings | ✅ Documented |
-| Geo decay at training time (not in pairs) | ✅ Documented |
-| Skip-if-unchanged cascade (training → forecast → WTI) | ✅ Documented |
-| Dimension tables (dimdategroupid, dimseason, dimparkhours) | ✅ Documented |
-| Model aggregates, fallback priority (model → aggregate → ratio) | ✅ Documented |
-| Data volumes, API endpoints, scripts reference | ✅ Generally accurate |
+Wilma's latest doc (post-2026-02-18 audit) now documents:
 
-### ⚠️ Gaps (missing from Wilma's doc)
+| Item | Doc Section | Status |
+|------|-------------|--------|
+| CSV→Parquet conversion | Step 1b | ✅ |
+| Closures module (get_closures + build_operating_calendar) | Step 2a | ✅ |
+| Dimension fetches (all 6 sub-scripts) | Step 2 | ✅ |
+| Forecast accuracy evaluation | Step 4b | ✅ |
+| Synthetic actuals generation | Step 4c | ✅ |
+| WTI: synthetic + real actuals (3.5:1 weighting) | Step 7 | ✅ |
+| WTI fallback (COALESCE when no synthetic) | Step 7 | ✅ |
+| Post-pipeline: landing chart, year-view, validation, API restart | Step 8 | ✅ |
+| Forecast fallback ratio from `fallback_ratios.json` (~0.678) | Step 6, Dynamic Fallback | ✅ |
+| Forecast timing (~8 min) | Pipeline Timing | ✅ |
+| Skip-if-unchanged cascade | Dedicated section | ✅ |
+| Model type detection (lite vs full V2) | Step 6 | ✅ |
+| WTI adaptive bias correction | Step 7 | ✅ |
+| WTI deduplication (historical wins) | Step 7 | ✅ |
+| `daily_accuracy_report.py`, `entity_wti_diagnostics.py` | Utility scripts | ✅ |
 
-| Gap | Detail |
-|-----|--------|
-| **CSV→Parquet conversion** | Step 1b runs after ETL. Not mentioned in pipeline flow or daily cron table. |
-| **Closures module** | Doc mentions "Operating Calendar" but not `get_closures_from_s3.py` (runs before `build_operating_calendar.py`). |
-| **Forecast accuracy evaluation** | Runs at step 4b, before new forecasts. Compares prior forecast vs actuals; writes to `accuracy/`. Not documented. |
-| **Synthetic actuals in pipeline** | Runs at step 4c. Doc mentions synthetic actuals in Stage 4c text but not in the daily cron / pipeline flow table. |
-| **Landing chart + year-view export** | Run after WTI; not in pipeline flow. |
-| **Validation + dashboard restart** | Post-run steps; not in pipeline flow. |
-| **Dimension fetches breakdown** | Doc says "Dimensions" but doesn't list the 6 scripts: get_entity, get_park_hours, get_events, get_metatable, build_dimdategroupid, build_dimseason. |
+### ⚠️ Minor Discrepancies
 
-### ⚠️ Discrepancies (doc differs from code)
+| Item | Doc | Code / Other Docs | Notes |
+|------|-----|-------------------|-------|
+| **Cron flags** | `--skip-dropbox-check --skip-if-unchanged --use-synthetic` | PIPELINE_STATE.md: `--skip-dropbox-check --skip-if-unchanged` (no `--use-synthetic`) | Doc says production uses `--use-synthetic`; PIPELINE_STATE doesn't list it. Verify which is correct for wilma-server. |
+| **Operating Calendar timing table** | Lists "Operating Calendar \| build_operating_calendar.py \| ~9s" | Closures module = get_closures + build_operating_calendar | Naming is fine; get_closures is typically fast, build does the work. |
 
-| Item | Wilma's Doc | Actual Code |
-|------|-------------|-------------|
-| **WTI historical source** | "ACTUAL preferred, POSTED fallback" | **Synthetic actuals + real ACTUAL** (weighted: real=3.5, synth=1.0). Falls back to COALESCE(ACTUAL, POSTED) only if synthetic_actuals unavailable. |
-| **Forecast fallback ratio** | "posted_estimate × 0.82" | Uses `state/fallback_ratios.json` → `__global__` (typically **0.678**). `DEFAULT_FALLBACK_RATIO = 0.678` in code. |
-| **Forecast script timing** | "~8 min" | Doc also says "~40 min" in Scripts Reference table (line 533). Inconsistent. |
+### 📋 Items Correctly Flagged as TODOs / Questions
 
-### 📋 New scripts (from latest pull, not in doc)
+The doc correctly identifies these as open items:
 
-| Script | Purpose |
-|--------|---------|
-| `daily_accuracy_report.py` | Daily accuracy report (standalone) |
-| `entity_wti_diagnostics.py` | Entity-level WTI diagnostics (standalone) |
+| Item | Doc Location |
+|------|--------------|
+| `build_model_aggregates.py` not in daily pipeline | TODO #1, Question #2 |
+| `compute_park_wti_distributions.py` not in daily pipeline | TODO #4 |
+| WTI fallback path (POSTED when no synthetic) — bootstrap vs remove? | Question #1 |
+| Synthetic actuals weight (3.5×) — calibrated? | Question #6 |
+| Conversion model retraining schedule | TODO #3, Question #5 |
 
 ---
 
-## 3. Recommendations for PIPELINE_DATA_FLOW.md
+## 3. Verification Summary
 
-1. **Add missing steps to daily cron / pipeline flow:**
-   - CSV→Parquet (after ETL)
-   - Closures: get_closures_from_s3 + build_operating_calendar
-   - Forecast accuracy evaluation (before forecast)
-   - Synthetic actuals generation
-   - Landing chart, year-view export, validation, dashboard restart
-
-2. **Update WTI section:**
-   - Historical WTI: synthetic actuals + real actuals (weighted) when available; fallback to ACTUAL/POSTED from fact tables.
-
-3. **Fix forecast fallback ratio:**
-   - Change "0.82" to "from fallback_ratios.json (__global__ typically 0.678)".
-
-4. **Reconcile forecast timing:**
-   - Use single value (~8 min for 159M predictions) and remove "~40 min" from Scripts Reference.
-
-5. **Optional:** Add "Other scripts" subsection for `daily_accuracy_report.py` and `entity_wti_diagnostics.py` (diagnostic tools, not in daily pipeline).
+| Category | Count |
+|----------|-------|
+| Steps in doc matching `run_daily_pipeline.sh` | 17/17 |
+| Previously identified gaps | 0 (all addressed) |
+| Previously identified discrepancies | 0 (WTI, fallback ratio, timing all fixed) |
+| Minor cross-doc inconsistencies | 1 (cron `--use-synthetic` vs PIPELINE_STATE) |
+| Open TODOs / Questions | 8 (appropriately flagged) |
 
 ---
 
-## 4. Summary
+## 4. Conclusion
 
-Wilma's doc is **substantially accurate** for the core data flow (fact tables → matched pairs → training → forecast → WTI) and the critical "use this / don't use that" guidance. The main gaps are:
+**Wilma's 2026-02-18 doc is now highly aligned with the codebase.** The pipeline flow, step order, scripts, WTI logic (synthetic+actual), forecast fallback, and post-pipeline outputs are all accurately documented. The Questions for Fred and TODOs sections appropriately capture remaining decisions and improvements.
 
-- **Pipeline flow completeness:** Several steps (CSV→Parquet, closures, forecast accuracy, synthetic actuals, landing chart, year-view, validation) are not in the documented flow.
-- **WTI logic:** The doc describes the old ACTUAL/POSTED fallback; the code now uses synthetic+actual blend.
-- **Minor:** Fallback ratio (0.82 vs 0.678) and forecast timing inconsistency.
-
-No major logic errors were found. The pipeline does what the doc describes for the core path; the doc needs updates to reflect recent additions and WTI changes.
+**Recommended follow-up:** Confirm whether production cron uses `--use-synthetic` and update PIPELINE_STATE.md or PIPELINE_DATA_FLOW.md so they match.
