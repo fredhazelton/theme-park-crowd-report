@@ -34,7 +34,7 @@ Single reference for the current Theme Park pipeline setup (Linux, user **fred**
 
 ### 3.1 Daily pipeline (cron, 6:00 AM Eastern)
 
-- **What:** One cron job runs `scripts/run_daily_pipeline.sh --skip-dropbox-check --skip-if-unchanged`.
+- **What:** One cron job runs `scripts/run_daily_pipeline.sh --skip-dropbox-check --skip-if-unchanged --use-synthetic`.
 - **Order:** S3 sync → ETL → Dimension fetches → Closures → Impute park hours → Posted aggregates → Wait time DB report → Batch training → Forecast → WTI → **Validation** (post-run data quality checks).
 - **Runs as:** wilma (wilma's crontab).
 - **Log:** `output_base/logs/daily_pipeline_YYYY-MM-DD.log`
