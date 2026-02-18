@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TPCR Premium | Theme Park Crowd Report</title>
-    <meta name="description" content="Unlock 90-day and 1-year crowd forecasts, ride-by-ride predictions, and extended best-day finder.">
+    <title>Personal Trip Planner | Theme Park Crowd Report</title>
+    <meta name="description" content="Get calendars personalized for YOUR favorite rides. Select attractions you want to do and see the best days to visit based on your custom wait time index.">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
     <meta name="theme-color" content="#0a1628">
@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
-        .subscribe-hero { padding: 6rem 2rem 4rem; text-align: center; }
+        .subscribe-hero { padding: 6rem 2rem 4rem; text-align: center; min-height: auto; justify-content: flex-start; }
         .subscribe-hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 1rem; }
         .subscribe-hero p { color: var(--text-secondary); max-width: 560px; margin: 0 auto 2rem; }
         .premium-features { max-width: 500px; margin: 0 auto 2.5rem; text-align: left; }
@@ -39,18 +39,26 @@
             </div>
         </nav>
         <div class="hero-content">
-            <h1>TPCR Premium</h1>
-            <p>Unlock extended forecasts and ride-by-ride predictions. $10/month — cancel anytime.</p>
+            <h1>Personal Trip Planner</h1>
+            <p>Get calendars personalized for YOUR favorite rides. Everything else is free. $12/month — cancel anytime.</p>
             <ul class="premium-features">
-                <li>90-day crowd forecasts (free = 7 days)</li>
-                <li>1-year outlook for long-term planning</li>
-                <li>Ride-by-ride predictions for every attraction</li>
-                <li>Best-day finder extended range</li>
-                <li>Priority support in Discord</li>
+                <li>🎯 Custom WTI Calendars — Select YOUR rides, get personalized best days</li>
+                <li>📧 Email alerts — "Space Mountain drops to 15 min wait tomorrow!"</li>
+                <li>📅 Google Calendar export — Sync optimal visit days to your calendar</li>
+                <li>⚡ Priority support in Discord</li>
             </ul>
+            <div style="margin: 2rem auto; max-width: 500px; text-align: left; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                <h3 style="margin-bottom: 1rem; text-align: center;">How Custom WTI Works</h3>
+                <ol style="color: var(--text-secondary); line-height: 1.6;">
+                    <li><strong>Pick your rides:</strong> Select attractions you actually want to do</li>
+                    <li><strong>We calculate:</strong> Custom wait time index for just YOUR rides</li>
+                    <li><strong>See best days:</strong> Calendar shows when YOUR rides are shortest</li>
+                    <li><strong>Plan smarter:</strong> Skip busy days for stuff you don't care about</li>
+                </ol>
+            </div>
             <div class="subscribe-cta">
                 <button id="checkout-btn" class="btn btn-primary">
-                    Subscribe for $10/month
+                    Start Free Trial — $12/month
                 </button>
             </div>
             <p class="subscribe-note">
@@ -81,7 +89,7 @@
                 })
                 .catch(function(err) {
                     btn.disabled = false;
-                    btn.textContent = 'Subscribe for $10/month';
+                    btn.textContent = 'Start Free Trial — $12/month';
                     alert('Could not start checkout. Please try again or contact support.');
                     console.error(err);
                 });
