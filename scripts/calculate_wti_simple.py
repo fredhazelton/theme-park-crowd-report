@@ -95,51 +95,87 @@ def main():
     pc_bare = park_code_sql("entity_code")
 
     # =========================================================================
-    # HISTORICAL WTI (from fact tables)
+    # HISTORICAL WTI (from synthetic actuals + real actuals)
     # =========================================================================
+    # Policy: NEVER use raw POSTED times. All POSTED observations are converted
+    # to synthetic actuals via the conversion model. Real ACTUAL observations are
+    # used alongside synthetic actuals. This ensures apples-to-apples comparison
+    # with forecast predictions (which also predict actuals).
     if not args.forecast_only:
-        logger.info("Computing historical WTI from fact tables...")
-
-        fact_join_oc = f"""
-            FROM read_parquet('{parquet_str}/*.parquet') f
-            JOIN read_parquet('{oc_str}') oc
-                ON f.entity_code = oc.entity_code
-                AND CAST(f.park_date AS DATE) = CAST(oc.park_date AS DATE)
-            WHERE f.wait_time_minutes > 0
-              AND oc.is_operating = TRUE
-        """ if use_oc else f"""
-            FROM read_parquet('{parquet_str}/*.parquet')
-            WHERE wait_time_minutes > 0
-        """
-        fact_cols = f"f.entity_code, {pc_f} as park_code, CAST(f.park_date AS DATE) as park_date, f.wait_time_type, f.wait_time_minutes" if use_oc else f"{pc_bare} as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes"
-
-        historical_sql = f"""
-            WITH fact_data AS (
-                SELECT {fact_cols}
-                {fact_join_oc}
-            ),
-            daily_entity_avg AS (
-                SELECT 
-                    park_code, park_date, entity_code,
-                    COALESCE(
-                        AVG(CASE WHEN wait_time_type = 'ACTUAL' THEN wait_time_minutes END),
-                        AVG(CASE WHEN wait_time_type = 'POSTED' THEN wait_time_minutes END)
-                    ) as entity_avg,
-                    CASE WHEN COUNT(CASE WHEN wait_time_type = 'ACTUAL' THEN 1 END) > 0 THEN 'actual' ELSE 'posted' END as wait_type_used
-                FROM fact_data
-                GROUP BY park_code, park_date, entity_code
-            )
-            SELECT park_code, park_date, ROUND(AVG(entity_avg), 1) as wti, COUNT(DISTINCT entity_code) as n_entities, 'historical' as source
-            FROM daily_entity_avg
-            WHERE entity_avg IS NOT NULL
-            GROUP BY park_code, park_date
-            ORDER BY park_code, park_date
-        """
-        try:
-            historical_wti = con.execute(historical_sql).fetchdf()
-        except Exception as e:
-            logger.warning(f"Operating calendar query failed (fallback to no filter): {e}")
-            historical_wti = con.execute(f"""
+        synth_dir = output_base / "synthetic_actuals"
+        synth_str = str(synth_dir.resolve()).replace("\\", "/")
+        synth_available = synth_dir.exists() and any(synth_dir.glob("*.parquet"))
+        
+        if synth_available:
+            logger.info("Computing historical WTI from synthetic actuals + real actuals...")
+            
+            # Combine two sources:
+            # 1. Synthetic actuals (POSTED→converted) from synthetic_actuals/*.parquet
+            # 2. Real ACTUAL observations from fact tables
+            # Average all together per entity per day
+            
+            historical_sql = f"""
+                WITH 
+                -- Source 1: Synthetic actuals (converted from POSTED)
+                synth AS (
+                    SELECT 
+                        {park_code_sql("entity_code")} as park_code,
+                        CAST(park_date AS DATE) as park_date,
+                        entity_code,
+                        synthetic_actual as wait_minutes,
+                        'synthetic' as obs_type
+                    FROM read_parquet('{synth_str}/*.parquet')
+                    WHERE synthetic_actual > 0
+                ),
+                -- Source 2: Real ACTUAL observations
+                real_actuals AS (
+                    SELECT 
+                        {pc_bare} as park_code,
+                        CAST(park_date AS DATE) as park_date,
+                        entity_code,
+                        wait_time_minutes as wait_minutes,
+                        'actual' as obs_type
+                    FROM read_parquet('{parquet_str}/*.parquet')
+                    WHERE wait_time_type = 'ACTUAL'
+                      AND wait_time_minutes > 0
+                ),
+                -- Combine both sources
+                all_obs AS (
+                    SELECT * FROM synth
+                    UNION ALL
+                    SELECT * FROM real_actuals
+                ),
+                -- Average per entity per day
+                daily_entity_avg AS (
+                    SELECT park_code, park_date, entity_code,
+                        ROUND(AVG(wait_minutes), 1) as entity_avg,
+                        COUNT(*) as n_obs,
+                        COUNT(CASE WHEN obs_type = 'actual' THEN 1 END) as n_actual,
+                        COUNT(CASE WHEN obs_type = 'synthetic' THEN 1 END) as n_synthetic
+                    FROM all_obs
+                    GROUP BY park_code, park_date, entity_code
+                )
+                SELECT park_code, park_date, 
+                    ROUND(AVG(entity_avg), 1) as wti, 
+                    COUNT(DISTINCT entity_code) as n_entities, 
+                    'historical' as source
+                FROM daily_entity_avg
+                WHERE entity_avg IS NOT NULL
+                GROUP BY park_code, park_date
+                ORDER BY park_code, park_date
+            """
+            try:
+                historical_wti = con.execute(historical_sql).fetchdf()
+                logger.info(f"  Historical WTI (synth+actual): {len(historical_wti):,} park-dates")
+            except Exception as e:
+                logger.error(f"  Synthetic actuals WTI query failed: {e}")
+                logger.info("  Falling back to fact-table-only WTI...")
+                synth_available = False
+        
+        if not synth_available:
+            # Fallback: original method (COALESCE actual/posted) for dates without synthetic actuals
+            logger.info("Computing historical WTI from fact tables (no synthetic actuals available)...")
+            historical_sql = f"""
                 WITH fact_data AS (
                     SELECT {pc_bare} as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes
                     FROM read_parquet('{parquet_str}/*.parquet')
@@ -147,17 +183,17 @@ def main():
                 ),
                 daily_entity_avg AS (
                     SELECT park_code, park_date, entity_code,
-                        COALESCE(AVG(CASE WHEN wait_time_type = 'ACTUAL' THEN wait_time_minutes END), AVG(CASE WHEN wait_time_type = 'POSTED' THEN wait_time_minutes END)) as entity_avg,
-                        CASE WHEN COUNT(CASE WHEN wait_time_type = 'ACTUAL' THEN 1 END) > 0 THEN 'actual' ELSE 'posted' END as wait_type_used
+                        COALESCE(AVG(CASE WHEN wait_time_type = 'ACTUAL' THEN wait_time_minutes END), AVG(CASE WHEN wait_time_type = 'POSTED' THEN wait_time_minutes END)) as entity_avg
                     FROM fact_data
                     GROUP BY park_code, park_date, entity_code
                 )
                 SELECT park_code, park_date, ROUND(AVG(entity_avg), 1) as wti, COUNT(DISTINCT entity_code) as n_entities, 'historical' as source
                 FROM daily_entity_avg WHERE entity_avg IS NOT NULL
                 GROUP BY park_code, park_date ORDER BY park_code, park_date
-            """).fetchdf()
+            """
+            historical_wti = con.execute(historical_sql).fetchdf()
+            logger.info(f"  Historical WTI (fallback): {len(historical_wti):,} park-dates")
         
-        logger.info(f"  Historical WTI: {len(historical_wti):,} park-dates")
         results.append(historical_wti)
     
     # =========================================================================
