@@ -130,7 +130,22 @@ def load_overall_accuracy(archive_dir: Path, wti_actual: pd.DataFrame, up_to_dat
     return pd.concat(all_comparisons, ignore_index=True)
 
 
-def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str) -> str:
+def get_current_bias_correction(pipeline_dir: Path) -> float:
+    """Read the current bias correction value from the latest WTI log."""
+    import re
+    logs_dir = pipeline_dir / "logs"
+    # Check most recent calculate_wti_simple or daily_pipeline log
+    for pattern in ["calculate_wti_simple_*.log", "daily_pipeline_*.log"]:
+        files = sorted(logs_dir.glob(pattern), reverse=True)
+        for f in files:
+            text = f.read_text()
+            match = re.search(r"Bias correction applied: \+?([-\d.]+)", text)
+            if match:
+                return float(match.group(1))
+    return 0.0
+
+
+def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str, bias_correction: float = 0.0) -> str:
     """Format the accuracy report for Telegram."""
     
     lines = []
@@ -142,13 +157,15 @@ def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str
         model_type = yesterday.iloc[0]["model_type"]
         made_date = yesterday.iloc[0]["made_date"]
         lines.append(f"Model: {model_type} (forecast from {made_date})")
+        if bias_correction != 0:
+            lines.append(f"Bias correction: {bias_correction:+.1f} (applied to Adj column)")
     lines.append("")
     
-    # Header
-    lines.append(f"{'Park':<5} {'Pred':>5} {'Actual':>6} {'Err':>6} │ {'Overall':>7}")
-    lines.append("─" * 42)
+    # Header — Raw and Adjusted columns
+    lines.append(f"{'Park':<5} {'Pred':>5} {'Adj':>5} {'Actual':>6} {'Raw':>6} {'Adj':>5} │ {'Ovr':>5}")
+    lines.append("─" * 50)
     
-    # Get overall stats per park
+    # Get overall stats per park (using raw errors)
     overall_by_park = {}
     if overall is not None:
         for park, grp in overall.groupby("park_code"):
@@ -158,54 +175,60 @@ def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str
                 "n": len(grp),
             }
     
-    # Sort parks by yesterday's absolute error (worst first)
+    # Sort parks by yesterday's absolute error (worst first, raw)
     if yesterday is not None:
-        parks = yesterday.sort_values("abs_error", ascending=False)
+        parks = yesterday.sort_values("abs_error", ascending=False).copy()
     else:
         parks = pd.DataFrame()
     
     for _, row in parks.iterrows():
         park = row["park_code"]
         pred = row["wti_forecast"]
+        adj_pred = pred + bias_correction
         actual = row["wti_actual"]
-        err = row["error"]
+        raw_err = row["error"]
+        adj_err = adj_pred - actual
         
         overall_mae = overall_by_park.get(park, {}).get("mae", float("nan"))
         
-        err_str = f"{err:+.1f}"
+        raw_str = f"{raw_err:+.1f}"
+        adj_str = f"{adj_err:+.1f}"
         overall_str = f"±{overall_mae:.1f}" if not pd.isna(overall_mae) else "  —"
         
-        # Add emoji indicators
-        if abs(err) <= 2.5:
+        # Emoji based on adjusted error (what matters after correction)
+        if abs(adj_err) <= 2.5:
             indicator = "🟢"
-        elif abs(err) <= 5:
+        elif abs(adj_err) <= 5:
             indicator = "🟡"
-        elif abs(err) <= 10:
+        elif abs(adj_err) <= 10:
             indicator = "🟠"
         else:
             indicator = "🔴"
         
-        lines.append(f"{indicator} {park:<4} {pred:>5.1f} {actual:>6.1f} {err_str:>6} │ {overall_str:>7}")
+        lines.append(f"{indicator} {park:<4} {pred:>5.1f} {adj_pred:>5.1f} {actual:>6.1f} {raw_str:>6} {adj_str:>5} │ {overall_str:>5}")
     
-    lines.append("─" * 42)
+    lines.append("─" * 50)
     
-    # Summary row
+    # Summary rows
     if yesterday is not None and len(yesterday) > 0:
-        avg_mae = yesterday["abs_error"].mean()
-        avg_bias = yesterday["error"].mean()
-        lines.append(f"   {'AVG':<4} {'':>5} {'':>6} {'MAE':>4}={avg_mae:.1f} │", )
-        lines.append(f"   {'':>4} {'':>5} {'':>6} {'Bias':>4}={avg_bias:+.1f} │")
+        raw_mae = yesterday["abs_error"].mean()
+        raw_bias = yesterday["error"].mean()
+        adj_errors = (yesterday["wti_forecast"] + bias_correction) - yesterday["wti_actual"]
+        adj_mae = adj_errors.abs().mean()
+        adj_bias = adj_errors.mean()
+        lines.append(f"  Raw:  MAE={raw_mae:.1f}  Bias={raw_bias:+.1f}")
+        lines.append(f"  Adj:  MAE={adj_mae:.1f}  Bias={adj_bias:+.1f}")
     
     if overall is not None:
         overall_mae = overall["abs_error"].mean()
         overall_bias = overall["error"].mean()
         n_dates = overall["eval_date"].nunique()
         lines.append("")
-        lines.append(f"Overall ({n_dates} days): MAE={overall_mae:.1f}, Bias={overall_bias:+.1f}")
+        lines.append(f"Overall raw ({n_dates} days): MAE={overall_mae:.1f}, Bias={overall_bias:+.1f}")
     
     # Target reminder
     lines.append("")
-    lines.append("🎯 Target: ±2.5 points")
+    lines.append("🎯 Target: ±2.5 adj points")
     lines.append("🟢 ≤2.5  🟡 ≤5  🟠 ≤10  🔴 >10")
     
     return "\n".join(lines)
@@ -244,6 +267,9 @@ def main():
     wti_all = pd.read_parquet(wti_file)
     wti_actual = wti_all[wti_all["source"] == "historical"]
     
+    # Get current bias correction
+    bias_correction = get_current_bias_correction(pipeline_dir)
+    
     # Yesterday's comparison
     yesterday = load_yesterday_comparison(eval_date, archive_dir, wti_actual)
     if yesterday is None:
@@ -251,7 +277,7 @@ def main():
     else:
         # Overall running accuracy
         overall = load_overall_accuracy(archive_dir, wti_actual, eval_date)
-        report = format_report(yesterday, overall, eval_date)
+        report = format_report(yesterday, overall, eval_date, bias_correction)
     
     # Output
     print(report)
