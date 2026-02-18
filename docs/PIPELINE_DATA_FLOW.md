@@ -862,21 +862,28 @@ Each pipeline run records which steps actually executed, enabling cascade logic 
 ## Questions for Fred ❓
 
 1. ❓ **WTI fallback path:** When synthetic actuals aren't available, the WTI code falls back to raw POSTED times via COALESCE. The code comments say "NEVER use raw POSTED times." Is this fallback just for bootstrap and should be removed now that synthetic actuals are always generated?
+YES - i think this is stale now that we have synthetic actuals. It shoudl be impossible to not have synthetic actuals but have raw posted times - If we have raw posted times, mkae sythetic actuals.
 
 2. ❓ **Model aggregates timing:** `build_model_aggregates.py` (~72s) doesn't appear in the daily pipeline `run_daily_pipeline.sh`. It's referenced in the forecast step as a data source, but when does it get rebuilt? Is it rebuilt outside the daily pipeline, or is the current `model_aggregates.parquet` from a one-time build?
+YES - not sure we need this naymore
 
 3. ❓ **Historical predictions step:** The existing doc mentions Stage 4 (historical predictions via `score_historical.py`), but the daily pipeline runs with `--skip-scoring`. When is scoring needed? Is it only for backfill/full rebuilds?
+YES - once we build it once we're good - but there may be occasions when we need to rebuild. For example, if the historical predictions are for time slots outside park hours, they need to be rebuilt.
 
 4. ❓ **P95 cap on forecasts:** The forecast script caps predictions at each entity's historical p95 posted wait time. Is p95 the right threshold? This means the forecast can never predict a wait time higher than what 95% of historical POSTED times fall below — which might undercount extreme days.
+I think we can rem,ove this limitation. Our models tend to underpredict and the XGboost is impervious to outliers anyway.
 
 5. ❓ **Conversion model retraining:** The `posted_to_actual.py` conversion model and `train_conversion_model.py` exist, but the daily pipeline doesn't retrain the conversion model. How often should this be retrained? Is it stable enough to be a periodic manual step?
+I would schedule the conversion to recalibrate monthly
 
 6. ❓ **Synthetic actuals weight (3.5×):** In WTI calculation, real actuals get 3.5× weight vs synthetic actuals. Where did 3.5 come from? Is this calibrated or just a reasonable initial guess?
+Just a guess - but i like it. There is some evidence that "real" actuals can have a lot of measurement error too.
 
 7. ❓ **Bias correction lookback window (14 days):** The WTI bias correction uses the last 14 days of accuracy data. Is 14 days the right window? Shorter = more responsive but noisier. Longer = smoother but slower to adapt.
+I think thats fine - but lets remind ourselves to revisit this periodically.
 
 8. ❓ **Forecast horizon vs accuracy:** The accuracy evaluation tracks forecast horizon (1-day, 7-day, 30-day). Has anyone analyzed whether we should use different bias corrections for different horizons?
-
+Lets track it over time.
 ---
 
 <a name="todos"></a>
