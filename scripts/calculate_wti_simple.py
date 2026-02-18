@@ -109,32 +109,35 @@ def main():
         if synth_available:
             logger.info("Computing historical WTI from synthetic actuals + real actuals...")
             
-            # Combine two sources:
-            # 1. Synthetic actuals (POSTED→converted) from synthetic_actuals/*.parquet
-            # 2. Real ACTUAL observations from fact tables
-            # Average all together per entity per day
+            # Combine two sources with weighting:
+            # 1. Synthetic actuals (POSTED→converted) — weight 1.0
+            # 2. Real ACTUAL observations — weight 3.5 (ground truth)
+            # Weighted average per entity per day, matching training methodology
+            
+            REAL_ACTUAL_WEIGHT = 3.5
+            SYNTHETIC_WEIGHT = 1.0
             
             historical_sql = f"""
                 WITH 
-                -- Source 1: Synthetic actuals (converted from POSTED)
+                -- Source 1: Synthetic actuals (converted from POSTED) — weight {SYNTHETIC_WEIGHT}
                 synth AS (
                     SELECT 
                         {park_code_sql("entity_code")} as park_code,
                         CAST(park_date AS DATE) as park_date,
                         entity_code,
                         synthetic_actual as wait_minutes,
-                        'synthetic' as obs_type
+                        {SYNTHETIC_WEIGHT} as weight
                     FROM read_parquet('{synth_str}/*.parquet')
                     WHERE synthetic_actual > 0
                 ),
-                -- Source 2: Real ACTUAL observations
+                -- Source 2: Real ACTUAL observations — weight {REAL_ACTUAL_WEIGHT}
                 real_actuals AS (
                     SELECT 
                         {pc_bare} as park_code,
                         CAST(park_date AS DATE) as park_date,
                         entity_code,
                         wait_time_minutes as wait_minutes,
-                        'actual' as obs_type
+                        {REAL_ACTUAL_WEIGHT} as weight
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_type = 'ACTUAL'
                       AND wait_time_minutes > 0
@@ -145,13 +148,13 @@ def main():
                     UNION ALL
                     SELECT * FROM real_actuals
                 ),
-                -- Average per entity per day
+                -- Weighted average per entity per day
                 daily_entity_avg AS (
                     SELECT park_code, park_date, entity_code,
-                        ROUND(AVG(wait_minutes), 1) as entity_avg,
+                        ROUND(SUM(wait_minutes * weight) / SUM(weight), 1) as entity_avg,
                         COUNT(*) as n_obs,
-                        COUNT(CASE WHEN obs_type = 'actual' THEN 1 END) as n_actual,
-                        COUNT(CASE WHEN obs_type = 'synthetic' THEN 1 END) as n_synthetic
+                        SUM(CASE WHEN weight = {REAL_ACTUAL_WEIGHT} THEN 1 ELSE 0 END) as n_actual,
+                        SUM(CASE WHEN weight = {SYNTHETIC_WEIGHT} THEN 1 ELSE 0 END) as n_synthetic
                     FROM all_obs
                     GROUP BY park_code, park_date, entity_code
                 )
