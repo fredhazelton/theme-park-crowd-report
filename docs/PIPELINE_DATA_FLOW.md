@@ -115,21 +115,15 @@ The master orchestrator is **`scripts/run_daily_pipeline.sh`**. Here's the full 
 ```
  Step 0:  S3 Sync              → Get new raw data from TouringPlans
  Step 1:  ETL                  → Parse raw data → clean CSVs
- Step 1b: CSV → Parquet        → Convert CSVs to fast-read parquet files
- ##FRED Is it necessary to create CSVs when we're converting to parquet anyway? Why not get the ETL to produce the parquets?
-
+ Step 1b: CSV → Parquet        → Convert CSVs to fast-read parquet files  ⚡ FUTURE: refactor ETL to output parquet directly, skip CSVs
  Step 2:  Dimension Fetches    → Get/build entity table, park hours, seasons, calendar groups
  Step 2a: Closures Module      → Download closures from S3 + build operating calendar
  Step 2b: Impute Park Hours    → Fill missing future park hours from historical donors
- Step 3:  Posted Aggregates    → Compute historical average posted wait times per entity/time/season
- ##FRED IS this step still used for anything? Are there any entities that rely on the posted aggregates for modelling? If so, what do they use exactly? An overall average posted time as the model for forecasts? Is ti converted to actuals?
-
+ Step 3:  Posted Aggregates    → Compute historical average posted wait times per entity/time/season  ⚡ REVIEW: see note below
  Step 4:  Wait Time DB Report  → Generate a summary report of the database state
  Step 4b: Forecast Accuracy    → Compare yesterday's forecast vs what actually happened (BEFORE new forecasts overwrite old ones)
  Step 4c: Synthetic Actuals    → Run all historical POSTED through conversion model → estimated actuals
- Step 5:  Matched Pairs + Training  → Pair ACTUAL with POSTED, train per-entity XGBoost models
- ##FRED With synthetic actuals added now should we modify the training? We would use the traditional features only - mins_since_6am, mins_since_open, date_group_id, season, season_year. Including POSTED time as a feature now seems redundent, no? We already mined the POSTED-ACTUAL relationship by creatring the synthetic actuals.
-
+ Step 5:  Matched Pairs + Training  → Pair ACTUAL with POSTED, train per-entity XGBoost models  ⚡ RETHINK: see architectural note below
  Step 6:  Forecast Generation  → Generate 2-year predictions at 5-minute resolution
  Step 7:  WTI Calculation      → Compute Wait Time Index per park per day
  Step 8:  Post-Pipeline        → Landing chart, year-view export, deploy to hazeydata.ai, validation, API restart
@@ -272,13 +266,14 @@ Creates a single table: for every (entity_code, park_date) combination, is that 
    - 2–4 years ago: weight 0.8 → 0.4
    - 5+ years ago: weight 0.1
 4. **Pick weighted mode** — The most common opening/closing time combo, weighted by recency.
-##FRED We need to be careful here, we may have a donor from a recent date (previous year) that is not suitable for being a donor. For example, an early closing (4pm) at MK for a corporate event. We should not allow an odd opening or odd closing to be used as a donor. Examples would be any opening after 9:30 am and any closing before 5pm. A 5m closing at Animal Kingdom is probably ok but a 5pm closing at Magic Kingdom is suspicious. Should we force the donor pool to only include park hours with a minimum frequency? So that outliers are excluded from the donor pool. 
-5. **Fallback** — If no matching date_group_id donors exist, use the mode park hours from the last 12 months for that park.
+5. **Filter outlier donors** — Exclude abnormal park hours from the donor pool to prevent corporate events and early closures from contaminating imputation. Rules: reject any opening after 9:30 AM, reject closings before 5:00 PM for parks where that's abnormal (e.g., MK closing at 4 PM for a corporate event). Optionally require minimum frequency so that a rare (open, close) combo can't become a donor.
+6. **Fallback** — If no matching date_group_id donors exist, use the mode park hours from the last 12 months for that park.
 
 - **Input:** `dimparkhours.csv` + `dimdategroupid.csv`
 - **Output:** Updated `dimparkhours.csv` with imputed rows (marked with `donor_date`)
 - **Accuracy tracking:** `parkhours_donations.csv` logs which historical date donated hours to which future date, enabling accuracy measurement later.
-##FRED Lets report on this accuracy too - add that to the reporting.
+
+> 📋 **TODO:** Add park hours imputation accuracy to the daily reporting pipeline.
 ---
 
 <a name="step-3-posted-aggregates"></a>
@@ -286,8 +281,7 @@ Creates a single table: for every (entity_code, park_date) combination, is that 
 
 **Script:** `scripts/build_posted_aggregates_fast.py`  
 **Time:** ~7 seconds  
-**What it does:** Computes historical average POSTED wait times, grouped by entity × calendar group × hour of day. These averages are used by the forecast step as the "expected posted time" for future predictions.
-##FRED What is Calendar Group? You mean date_group_id?
+**What it does:** Computes historical average POSTED wait times, grouped by entity × date_group_id × hour of day. These averages are used by the forecast step as the "expected posted time" for future predictions.
 
 ### Grouping:
 
@@ -333,8 +327,9 @@ A separate script (`scripts/build_model_aggregates.py`) computes similar aggrega
 
 1. **Archive current forecast** — Save the next 14 days of the current forecast file to `accuracy/archive/forecast_YYYY-MM-DD.parquet` before step 6 overwrites it. Also archives WTI predictions.
 2. **Find evaluation dates** — Look for dates where we have both an archived forecast AND fresh actual observations in the fact tables.
-##FRED Or, fresh synthetic actuals too - they should count as "observations". So we may need to add conversion from POSTED to ACTUALs here as well, if they havent yet.
-3. **Compare forecast vs actuals:**
+3. **Compare forecast vs actuals (and synthetic actuals):**
+
+   > 📋 **TODO:** Currently only compares against raw ACTUAL observations. Should also include synthetic actuals (POSTED→converted) as ground truth, which would dramatically increase evaluation coverage. May need to run conversion before this step if synthetic actuals for the evaluation dates don't exist yet.
    - Bucket actual observations into 5-minute slots (to match forecast granularity)
    - Join on (entity_code, park_date, time_slot)
    - Compute: signed error, absolute error, percentage error, forecast horizon (how many days ahead was the prediction?)
@@ -858,54 +853,63 @@ Each pipeline run records which steps actually executed, enabling cascade logic 
 
 ---
 
-<a name="questions-for-fred"></a>
-## Questions for Fred ❓
+<a name="decisions-log"></a>
+## Decisions Log (2026-02-18)
 
-1. ❓ **WTI fallback path:** When synthetic actuals aren't available, the WTI code falls back to raw POSTED times via COALESCE. The code comments say "NEVER use raw POSTED times." Is this fallback just for bootstrap and should be removed now that synthetic actuals are always generated?
-YES - i think this is stale now that we have synthetic actuals. It shoudl be impossible to not have synthetic actuals but have raw posted times - If we have raw posted times, mkae sythetic actuals.
+Fred reviewed all open questions. Resolved decisions:
 
-2. ❓ **Model aggregates timing:** `build_model_aggregates.py` (~72s) doesn't appear in the daily pipeline `run_daily_pipeline.sh`. It's referenced in the forecast step as a data source, but when does it get rebuilt? Is it rebuilt outside the daily pipeline, or is the current `model_aggregates.parquet` from a one-time build?
-YES - not sure we need this naymore
+| # | Decision | Status |
+|---|----------|--------|
+| 1 | **Remove WTI fallback to raw POSTED** — Stale now that synthetic actuals exist. If we have raw POSTED, make synthetic actuals. Should be impossible to have POSTED without synthetic. | ✅ Remove fallback |
+| 2 | **Model aggregates** — May not be needed anymore. Review whether anything still depends on them. | ⚡ Review & potentially remove |
+| 3 | **Historical scoring** — Build once, skip daily. Rebuild only when needed (e.g., predictions outside park hours). | ✅ Keep as-is |
+| 4 | **P95 cap on forecasts** — Removed. Models underpredict anyway, XGBoost handles outliers natively. | ✅ **DONE** (code updated 2026-02-18) |
+| 5 | **Conversion model retraining** — Schedule monthly. | ✅ Cron added (1st of each month) |
+| 6 | **3.5× weight on real actuals** — Reasonable initial guess, keep it. Real actuals have measurement error too. | ✅ Keep as-is, revisit if needed |
+| 7 | **14-day bias correction window** — Fine for now. Revisit periodically. | ✅ Keep, revisit quarterly |
+| 8 | **Horizon-specific bias correction** — Track accuracy over time, don't act yet. | 📊 Monitor |
 
-3. ❓ **Historical predictions step:** The existing doc mentions Stage 4 (historical predictions via `score_historical.py`), but the daily pipeline runs with `--skip-scoring`. When is scoring needed? Is it only for backfill/full rebuilds?
-YES - once we build it once we're good - but there may be occasions when we need to rebuild. For example, if the historical predictions are for time slots outside park hours, they need to be rebuilt.
+### Fred's Architectural Notes (same date):
 
-4. ❓ **P95 cap on forecasts:** The forecast script caps predictions at each entity's historical p95 posted wait time. Is p95 the right threshold? This means the forecast can never predict a wait time higher than what 95% of historical POSTED times fall below — which might undercount extreme days.
-I think we can rem,ove this limitation. Our models tend to underpredict and the XGboost is impervious to outliers anyway.
+- **ETL → Parquet directly:** Why produce CSVs then convert? Future refactor: ETL should output parquet directly, eliminating Step 1b.
+- **Posted aggregates review:** Are these still needed? They feed the forecast step's "expected posted time" for entities without models. If we move to synthetic-actuals-based training, this step may change.
+- **Training rethink:** With synthetic actuals, should we drop POSTED as a training feature? The POSTED→ACTUAL relationship is already captured by synthetic actuals. Models could train on temporal features only (mins_since_6am, mins_since_open, date_group_id, season, season_year). This is a significant architectural change — needs careful evaluation.
+- **Accuracy eval ground truth:** Include synthetic actuals as "observations" in accuracy evaluation, not just raw ACTUAL. This dramatically increases evaluation coverage.
+- **Park hours donor filtering:** Exclude outlier hours from donor pool (e.g., MK closing at 4 PM for corporate events). Reject openings after 9:30 AM, closings before 5 PM where abnormal. Consider minimum frequency filter.
+- **Park hours accuracy reporting:** Add imputation accuracy to the daily reporting pipeline.
 
-5. ❓ **Conversion model retraining:** The `posted_to_actual.py` conversion model and `train_conversion_model.py` exist, but the daily pipeline doesn't retrain the conversion model. How often should this be retrained? Is it stable enough to be a periodic manual step?
-I would schedule the conversion to recalibrate monthly
-
-6. ❓ **Synthetic actuals weight (3.5×):** In WTI calculation, real actuals get 3.5× weight vs synthetic actuals. Where did 3.5 come from? Is this calibrated or just a reasonable initial guess?
-Just a guess - but i like it. There is some evidence that "real" actuals can have a lot of measurement error too.
-
-7. ❓ **Bias correction lookback window (14 days):** The WTI bias correction uses the last 14 days of accuracy data. Is 14 days the right window? Shorter = more responsive but noisier. Longer = smoother but slower to adapt.
-I think thats fine - but lets remind ourselves to revisit this periodically.
-
-8. ❓ **Forecast horizon vs accuracy:** The accuracy evaluation tracks forecast horizon (1-day, 7-day, 30-day). Has anyone analyzed whether we should use different bias corrections for different horizons?
-Lets track it over time.
 ---
 
 <a name="todos"></a>
 ## TODOs 📋
 
-1. 📋 **TODO: Model aggregates in daily pipeline** — `build_model_aggregates.py` should probably run as part of the daily pipeline (after aggregates, before forecasts), but it's not currently included in `run_daily_pipeline.sh`. If the aggregates are stale, the forecast fallback and posted_time estimates may be using old data.
+1. 📋 **TODO: Remove WTI POSTED fallback** — Delete the COALESCE fallback path in `calculate_wti_simple.py`. If POSTED data exists without synthetic actuals, generate synthetic actuals first.
 
-2. 📋 **TODO: Ride closure handling in data collection** — The live scraper (`get_wait_times_from_queue_times.py`) silently skips rides where `is_open: false`. This means closed rides disappear from output. Two types of closures need different handling:
+2. 📋 **TODO: Review model aggregates necessity** — Determine if `build_model_aggregates.py` is still needed or if it can be retired.
+
+3. 📋 **TODO: Ride closure handling in data collection** — The live scraper (`get_wait_times_from_queue_times.py`) silently skips rides where `is_open: false`. This means closed rides disappear from output. Two types of closures need different handling:
    - **Scheduled closures** (refurbishments) — known in advance, predictable
    - **Temporary closures** (breakdowns, weather) — unplanned, short duration
    - **Decision needed:** Should the Discord bot show closed rides with a "Closed" label? Should forecasts exclude scheduled closures?
 
-3. 📋 **TODO: Conversion model retraining schedule** — The global POSTED→ACTUAL conversion model isn't retrained in the daily pipeline. It should probably be retrained periodically (weekly? monthly?) as new matched pairs accumulate.
-
 4. 📋 **TODO: Park WTI distributions in daily pipeline** — `compute_park_wti_distributions.py` updates the color scaling thresholds, but it's not explicitly called in `run_daily_pipeline.sh`. It should run after WTI calculation so the web/Discord/stream always have fresh per-park scales.
 
-5. 📋 **TODO: Accuracy-driven model improvements** — The accuracy evaluation step accumulates detailed per-entity, per-horizon accuracy data. This could drive:
-   - Automatic flagging of entities whose models have degraded
-   - Horizon-specific bias corrections
-   - Model retraining triggers based on accuracy thresholds
+5. 📋 **TODO: Accuracy eval with synthetic actuals** — Update `evaluate_forecast_accuracy.py` to include synthetic actuals as ground truth alongside raw ACTUAL observations.
 
-6. 📋 **TODO: Daily accuracy report integration** — `daily_accuracy_report.py` exists and generates Telegram-friendly reports. Consider adding it to the daily pipeline or cron to automatically send accuracy updates.
+6. 📋 **TODO: Park hours donor filtering** — Add outlier filtering to `impute_park_hours.py`: reject abnormal openings (after 9:30 AM) and abnormal closings (before 5 PM where unusual for that park). Consider minimum frequency threshold.
+
+7. 📋 **TODO: Park hours accuracy reporting** — Add imputation accuracy metrics to the daily reporting pipeline.
+
+8. 📋 **TODO: ETL → Parquet refactor** — Refactor ETL to output parquet directly, eliminating the CSV intermediate step and Step 1b.
+
+9. 📋 **TODO: Training architecture rethink** — Evaluate dropping POSTED as a training feature now that synthetic actuals exist. Would use temporal/seasonal features only. Needs careful A/B comparison before implementing.
+
+10. 📋 **TODO: Daily accuracy report integration** — `daily_accuracy_report.py` exists and generates Telegram-friendly reports. Consider adding it to the daily pipeline or cron.
+
+11. 📋 **TODO: Accuracy-driven model improvements** — The accuracy evaluation step accumulates detailed per-entity, per-horizon accuracy data. This could drive:
+    - Automatic flagging of entities whose models have degraded
+    - Horizon-specific bias corrections
+    - Model retraining triggers based on accuracy thresholds
 
 ---
 

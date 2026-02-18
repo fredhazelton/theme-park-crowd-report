@@ -242,16 +242,10 @@ def forecast_entity(args) -> tuple:
             df['predicted_actual'] = results.apply(lambda x: int(round(x[0])))
             df['prediction_method'] = results.apply(lambda x: x[1])
         
-        # Cap predictions at entity's historical p95 posted wait
-        if p95_cap is not None and p95_cap > 0:
-            before_cap = df['predicted_actual'].max()
-            df['predicted_actual'] = df['predicted_actual'].clip(upper=int(round(p95_cap)))
-            if before_cap > p95_cap:
-                cap_method = f" (capped at p95={int(round(p95_cap))})"
-            else:
-                cap_method = ""
-        else:
-            cap_method = ""
+        # P95 cap REMOVED (2026-02-18, Fred's decision):
+        # Models tend to underpredict, and XGBoost is impervious to outliers.
+        # Capping at p95 was artificially limiting predictions on busy days.
+        cap_method = ""
         
         # Select output columns
         result = df[['entity_code', 'park_date', 'time_slot', 'predicted_actual', 'prediction_method']].copy()
@@ -410,20 +404,7 @@ def main():
     agg_lookup = agg_df['wait_median'].to_dict()
     logger.info(f"  Loaded {len(agg_lookup)} aggregate entries")
     
-    # Compute per-entity p95 posted wait cap from historical data
-    logger.info("Computing per-entity historical p95 caps...")
-    parquet_path = str((output_base / "fact_tables" / "parquet").resolve())
-    p95_df = con.execute(f"""
-        SELECT entity_code,
-               PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY wait_time_minutes) as p95_posted,
-               MAX(wait_time_minutes) as max_posted,
-               COUNT(*) as n_obs
-        FROM read_parquet('{parquet_path}/*.parquet')
-        WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
-        GROUP BY entity_code
-    """).fetchdf()
-    entity_p95_cap = dict(zip(p95_df['entity_code'], p95_df['p95_posted']))
-    logger.info(f"  Computed p95 caps for {len(entity_p95_cap)} entities")
+    # P95 cap removed (2026-02-18) — models underpredict, no need to cap
     
     # Get entity list (exclude fastpass_booth / Lightning Lane entities)
     logger.info("Getting entity list...")
@@ -507,7 +488,7 @@ def main():
             continue
         entity_ratio = fallback_ratios.get(entity, global_ratio)
         work_items.append(
-            (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, entity_p95_cap.get(entity))
+            (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None)
         )
     if skipped_extinct:
         logger.info(f"Skipped {skipped_extinct} extinct/closed entities (no operating dates)")

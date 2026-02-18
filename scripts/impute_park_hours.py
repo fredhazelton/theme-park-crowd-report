@@ -140,8 +140,9 @@ def impute_park_hours(output_base: Path, logger: logging.Logger) -> int:
             WHERE (opening_time IS NULL OR opening_time = '')
               AND date_group_id IS NOT NULL
         ),
-        -- Donor pool: rows with hours
-        donors AS (
+        -- Donor pool: rows with hours, filtered to exclude outliers
+        -- Rejects: openings after 9:30 AM, closings before 5 PM (corporate events, etc.)
+        donors_raw AS (
             SELECT 
                 park,
                 date_parsed as donor_date,
@@ -153,16 +154,33 @@ def impute_park_hours(output_base: Path, logger: logging.Logger) -> int:
                 emh_morning,
                 emh_evening,
                 year,
+                -- Extract hours for filtering (from ISO timestamps)
+                EXTRACT(HOUR FROM CAST(opening_time AS TIMESTAMP)) as open_hour,
+                EXTRACT(MINUTE FROM CAST(opening_time AS TIMESTAMP)) as open_minute,
+                EXTRACT(HOUR FROM CAST(closing_time AS TIMESTAMP)) as close_hour
+            FROM hours_with_group
+            WHERE opening_time IS NOT NULL 
+              AND opening_time != ''
+              AND date_group_id IS NOT NULL
+        ),
+        donors AS (
+            SELECT 
+                park, donor_date, date_group_id,
+                opening_time, opening_time_with_emh,
+                closing_time, closing_time_with_emh_or_party,
+                emh_morning, emh_evening, year,
                 -- Recency weight
                 CASE 
                     WHEN {current_year} - year <= 1 THEN 1.0
                     WHEN {current_year} - year <= 4 THEN 1.0 - ({current_year} - year - 1) * 0.2
                     ELSE 0.1
                 END as weight
-            FROM hours_with_group
-            WHERE opening_time IS NOT NULL 
-              AND opening_time != ''
-              AND date_group_id IS NOT NULL
+            FROM donors_raw
+            -- Filter out outlier park hours:
+            -- No opening after 9:30 AM (corporate/special events)
+            WHERE (open_hour < 9 OR (open_hour = 9 AND open_minute <= 30))
+            -- No closing before 5 PM (17:00) — abnormally early closures
+              AND close_hour >= 17
         ),
         -- For each (park, date_group_id), find weighted mode of opening_time
         weighted_modes AS (
