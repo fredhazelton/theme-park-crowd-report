@@ -116,14 +116,20 @@ The master orchestrator is **`scripts/run_daily_pipeline.sh`**. Here's the full 
  Step 0:  S3 Sync              → Get new raw data from TouringPlans
  Step 1:  ETL                  → Parse raw data → clean CSVs
  Step 1b: CSV → Parquet        → Convert CSVs to fast-read parquet files
+ ##FRED Is it necessary to create CSVs when we're converting to parquet anyway? Why not get the ETL to produce the parquets?
+
  Step 2:  Dimension Fetches    → Get/build entity table, park hours, seasons, calendar groups
  Step 2a: Closures Module      → Download closures from S3 + build operating calendar
  Step 2b: Impute Park Hours    → Fill missing future park hours from historical donors
  Step 3:  Posted Aggregates    → Compute historical average posted wait times per entity/time/season
+ ##FRED IS this step still used for anything? Are there any entities that rely on the posted aggregates for modelling? If so, what do they use exactly? An overall average posted time as the model for forecasts? Is ti converted to actuals?
+
  Step 4:  Wait Time DB Report  → Generate a summary report of the database state
  Step 4b: Forecast Accuracy    → Compare yesterday's forecast vs what actually happened (BEFORE new forecasts overwrite old ones)
  Step 4c: Synthetic Actuals    → Run all historical POSTED through conversion model → estimated actuals
  Step 5:  Matched Pairs + Training  → Pair ACTUAL with POSTED, train per-entity XGBoost models
+ ##FRED With synthetic actuals added now should we modify the training? We would use the traditional features only - mins_since_6am, mins_since_open, date_group_id, season, season_year. Including POSTED time as a feature now seems redundent, no? We already mined the POSTED-ACTUAL relationship by creatring the synthetic actuals.
+
  Step 6:  Forecast Generation  → Generate 2-year predictions at 5-minute resolution
  Step 7:  WTI Calculation      → Compute Wait Time Index per park per day
  Step 8:  Post-Pipeline        → Landing chart, year-view export, deploy to hazeydata.ai, validation, API restart
@@ -266,12 +272,13 @@ Creates a single table: for every (entity_code, park_date) combination, is that 
    - 2–4 years ago: weight 0.8 → 0.4
    - 5+ years ago: weight 0.1
 4. **Pick weighted mode** — The most common opening/closing time combo, weighted by recency.
+##FRED We need to be careful here, we may have a donor from a recent date (previous year) that is not suitable for being a donor. For example, an early closing (4pm) at MK for a corporate event. We should not allow an odd opening or odd closing to be used as a donor. Examples would be any opening after 9:30 am and any closing before 5pm. A 5m closing at Animal Kingdom is probably ok but a 5pm closing at Magic Kingdom is suspicious. Should we force the donor pool to only include park hours with a minimum frequency? So that outliers are excluded from the donor pool. 
 5. **Fallback** — If no matching date_group_id donors exist, use the mode park hours from the last 12 months for that park.
 
 - **Input:** `dimparkhours.csv` + `dimdategroupid.csv`
 - **Output:** Updated `dimparkhours.csv` with imputed rows (marked with `donor_date`)
 - **Accuracy tracking:** `parkhours_donations.csv` logs which historical date donated hours to which future date, enabling accuracy measurement later.
-
+##FRED Lets report on this accuracy too - add that to the reporting.
 ---
 
 <a name="step-3-posted-aggregates"></a>
@@ -280,6 +287,7 @@ Creates a single table: for every (entity_code, park_date) combination, is that 
 **Script:** `scripts/build_posted_aggregates_fast.py`  
 **Time:** ~7 seconds  
 **What it does:** Computes historical average POSTED wait times, grouped by entity × calendar group × hour of day. These averages are used by the forecast step as the "expected posted time" for future predictions.
+##FRED What is Calendar Group? You mean date_group_id?
 
 ### Grouping:
 
@@ -325,6 +333,7 @@ A separate script (`scripts/build_model_aggregates.py`) computes similar aggrega
 
 1. **Archive current forecast** — Save the next 14 days of the current forecast file to `accuracy/archive/forecast_YYYY-MM-DD.parquet` before step 6 overwrites it. Also archives WTI predictions.
 2. **Find evaluation dates** — Look for dates where we have both an archived forecast AND fresh actual observations in the fact tables.
+##FRED Or, fresh synthetic actuals too - they should count as "observations". So we may need to add conversion from POSTED to ACTUALs here as well, if they havent yet.
 3. **Compare forecast vs actuals:**
    - Bucket actual observations into 5-minute slots (to match forecast granularity)
    - Join on (entity_code, park_date, time_slot)
