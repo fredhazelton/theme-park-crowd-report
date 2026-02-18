@@ -423,6 +423,45 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+### 🏗️ ARCHITECTURE: Move to Actuals-Only Forecasting (POSTED → ACTUAL Separation of Concerns)
+
+**Date:** Feb 18, 2026  
+**Priority:** HIGH (Pipeline Architecture)  
+**Context:** Fred's architectural decision after pipeline audit. The pipeline should **separate two concerns cleanly:**
+
+1. **Measurement problem:** POSTED times are biased observations. The conversion model solves this ONCE → synthetic actuals.
+2. **Forecasting problem:** Predict future actual wait times from temporal/seasonal features. No POSTED input needed.
+
+**Current state:** Forecast models use POSTED as a feature → requires estimating future POSTED times (posted_aggregates) → two layers of error.
+
+**Target state:** Forecast models predict actual wait times directly from temporal features. POSTED times exist ONLY to feed the conversion model.
+
+#### Phase 1: Retrain Models Without POSTED Feature
+- [ ] **Modify `hybrid_pipeline_v2.py`** — Train XGBoost models on synthetic actuals + real actuals (not matched pairs). Target variable: actual wait time. Features: `mins_since_6am`, `mins_since_open`, `date_group_id`, `season`, `season_year` (NO `posted_time`).
+- [ ] **Training data:** Use synthetic actuals (90M+ rows) + real ACTUAL observations (2.5M rows, weighted 3.5×) as the training set. Each row = one time slot observation with known actual wait.
+- [ ] **Keep per-entity models** — still one XGBoost per entity, but features change from 7 to 5.
+- [ ] **A/B comparison** — Before replacing production models, compare accuracy of new (5-feature) vs old (7-feature with POSTED) on held-out dates. Document results.
+
+#### Phase 2: Simplify Forecast Generation  
+- [ ] **Modify `forecast_vectorized.py`** — Remove posted_time estimation entirely. Predict actual wait directly from temporal features.
+- [ ] **Remove posted_aggregates dependency** in forecasting (may still keep for diagnostics).
+- [ ] **Update model metadata** — new model_label (e.g., `XGBOOST_ACTUALS_V1`) so we can distinguish from old POSTED-based models.
+
+#### Phase 3: Update Accuracy Evaluation
+- [ ] **Modify `evaluate_forecast_accuracy.py`** — Use synthetic actuals (not just raw ACTUAL) as ground truth for comparison. This dramatically increases evaluation coverage.
+- [ ] **Ensure synthetic actuals for eval dates exist** — May need to run conversion before accuracy eval step.
+
+#### Phase 4: Cleanup
+- [ ] **Review posted_aggregates step** — Still needed? If not used by forecasting, consider retiring or keeping only for diagnostics.
+- [ ] **Review model_aggregates** — Same question. If forecast no longer needs "estimated posted time," this step may be unnecessary.
+- [ ] **Update PIPELINE_DATA_FLOW.md** with new architecture.
+
+**Key principle (Fred, Feb 18):** "POSTED times should only be used to model the relationship between POSTED-ACTUAL times so that we can always convert. Everything else deals in actuals."
+
+**⚠️ Important:** Do Phase 1's A/B comparison BEFORE replacing production models. We need evidence the new approach is at least as good.
+
+---
+
 ### Custom WTI Calendar Feature — Premium Subscribe Page
 
 **Date:** Feb 18, 2026  
