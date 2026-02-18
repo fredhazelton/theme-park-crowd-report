@@ -149,6 +149,27 @@ def forecast_entity(args) -> tuple:
         df = time_grid.copy()
         df['entity_code'] = entity_code
         
+        # Extract park code from entity (handles TDL, TDS, USH correctly)
+        park_code = entity_code_to_park_code(entity_code)
+        
+        # Filter time grid to this park's operating hours per day
+        def is_within_park_hours(row):
+            key = (park_code, row['park_date'])
+            hours_tuple = park_hours_lookup.get(key)
+            if hours_tuple is not None:
+                open_mins, close_mins = hours_tuple
+                current_mins = row['hour_of_day'] * 60 + (row['time_slot'].minute if hasattr(row['time_slot'], 'minute') else 0)
+                if open_mins is not None and close_mins is not None:
+                    # Allow 15 min before open (guests arrive early)
+                    return (open_mins - 15) <= current_mins <= close_mins
+            return True  # Keep all slots if no park hours available
+        
+        mask = df.apply(is_within_park_hours, axis=1)
+        df = df[mask].reset_index(drop=True)
+        
+        if len(df) == 0:
+            return (entity_code, None, "no_operating_slots")
+        
         # Get estimated posted_time from aggregates for each row
         def get_posted_estimate(row):
             key = (entity_code, row['date_group_id'], row['time_slot_15min'])
@@ -157,9 +178,6 @@ def forecast_entity(args) -> tuple:
         df['posted_time'] = df.apply(get_posted_estimate, axis=1)
         
         # Get mins_since_open from park hours
-        # Extract park code from entity (handles TDL, TDS, USH correctly)
-        park_code = entity_code_to_park_code(entity_code)
-        
         def get_mins_since_open(row):
             key = (park_code, row['park_date'])
             hours_tuple = park_hours_lookup.get(key)
