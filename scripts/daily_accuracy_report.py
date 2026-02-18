@@ -130,23 +130,54 @@ def load_overall_accuracy(archive_dir: Path, wti_actual: pd.DataFrame, up_to_dat
     return pd.concat(all_comparisons, ignore_index=True)
 
 
-def get_current_bias_correction(pipeline_dir: Path) -> float:
-    """Read the current bias correction value from the latest WTI log."""
+def get_bias_corrections(pipeline_dir: Path) -> dict:
+    """Read per-park bias corrections from accuracy data, or fallback to log."""
     import re
+    
+    # Try to compute per-park corrections from wti_accuracy data directly
+    wti_accuracy_path = pipeline_dir / "accuracy" / "wti_accuracy.parquet"
+    if wti_accuracy_path.exists():
+        try:
+            acc = pd.read_parquet(wti_accuracy_path)
+            # Use same 14-day window as the pipeline
+            cutoff = (datetime.now(ET) - timedelta(days=14)).strftime("%Y-%m-%d")
+            recent = acc[acc["park_date"].astype(str).str[:10] >= cutoff]
+            if len(recent) > 0:
+                park_biases = recent.groupby("park_code")["wti_error"].mean()
+                corrections = {park: round(-bias, 1) for park, bias in park_biases.items()}
+                # Also compute overall fallback
+                corrections["_fallback"] = round(-recent["wti_error"].mean(), 1)
+                return corrections
+        except Exception:
+            pass
+    
+    # Fallback: parse flat correction from log
     logs_dir = pipeline_dir / "logs"
-    # Check most recent calculate_wti_simple or daily_pipeline log
     for pattern in ["calculate_wti_simple_*.log", "daily_pipeline_*.log"]:
         files = sorted(logs_dir.glob(pattern), reverse=True)
         for f in files:
             text = f.read_text()
             match = re.search(r"Bias correction applied: \+?([-\d.]+)", text)
             if match:
-                return float(match.group(1))
-    return 0.0
+                flat = float(match.group(1))
+                return {"_flat": flat}
+    return {}
 
 
-def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str, bias_correction: float = 0.0) -> str:
+def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str, corrections: dict = None) -> str:
     """Format the accuracy report for Telegram."""
+    if corrections is None:
+        corrections = {}
+    
+    def get_correction(park: str) -> float:
+        """Get per-park correction, fallback to overall or flat."""
+        if park in corrections:
+            return corrections[park]
+        if "_fallback" in corrections:
+            return corrections["_fallback"]
+        if "_flat" in corrections:
+            return corrections["_flat"]
+        return 0.0
     
     lines = []
     lines.append(f"📊 WTI Accuracy Report — {eval_date}")
@@ -157,8 +188,11 @@ def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str
         model_type = yesterday.iloc[0]["model_type"]
         made_date = yesterday.iloc[0]["made_date"]
         lines.append(f"Model: {model_type} (forecast from {made_date})")
-        if bias_correction != 0:
-            lines.append(f"Bias correction: {bias_correction:+.1f} (applied to Adj column)")
+        if corrections:
+            if "_flat" in corrections:
+                lines.append(f"Bias: flat {corrections['_flat']:+.1f}")
+            else:
+                lines.append(f"Bias: per-park corrections ({len([k for k in corrections if not k.startswith('_')])} parks)")
     lines.append("")
     
     # Header — Raw and Adjusted columns
@@ -175,16 +209,22 @@ def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str
                 "n": len(grp),
             }
     
-    # Sort parks by yesterday's absolute error (worst first, raw)
+    # Sort parks by adjusted absolute error (worst first)
     if yesterday is not None:
-        parks = yesterday.sort_values("abs_error", ascending=False).copy()
+        parks = yesterday.copy()
+        parks["adj_err"] = parks.apply(
+            lambda r: abs((r["wti_forecast"] + get_correction(r["park_code"])) - r["wti_actual"]),
+            axis=1,
+        )
+        parks = parks.sort_values("adj_err", ascending=False)
     else:
         parks = pd.DataFrame()
     
     for _, row in parks.iterrows():
         park = row["park_code"]
         pred = row["wti_forecast"]
-        adj_pred = pred + bias_correction
+        corr = get_correction(park)
+        adj_pred = pred + corr
         actual = row["wti_actual"]
         raw_err = row["error"]
         adj_err = adj_pred - actual
@@ -213,7 +253,10 @@ def format_report(yesterday: pd.DataFrame, overall: pd.DataFrame, eval_date: str
     if yesterday is not None and len(yesterday) > 0:
         raw_mae = yesterday["abs_error"].mean()
         raw_bias = yesterday["error"].mean()
-        adj_errors = (yesterday["wti_forecast"] + bias_correction) - yesterday["wti_actual"]
+        adj_errors = yesterday.apply(
+            lambda r: (r["wti_forecast"] + get_correction(r["park_code"])) - r["wti_actual"],
+            axis=1,
+        )
         adj_mae = adj_errors.abs().mean()
         adj_bias = adj_errors.mean()
         lines.append(f"  Raw:  MAE={raw_mae:.1f}  Bias={raw_bias:+.1f}")
@@ -267,8 +310,8 @@ def main():
     wti_all = pd.read_parquet(wti_file)
     wti_actual = wti_all[wti_all["source"] == "historical"]
     
-    # Get current bias correction
-    bias_correction = get_current_bias_correction(pipeline_dir)
+    # Get bias corrections (per-park or flat fallback)
+    corrections = get_bias_corrections(pipeline_dir)
     
     # Yesterday's comparison
     yesterday = load_yesterday_comparison(eval_date, archive_dir, wti_actual)
@@ -277,7 +320,7 @@ def main():
     else:
         # Overall running accuracy
         overall = load_overall_accuracy(archive_dir, wti_actual, eval_date)
-        report = format_report(yesterday, overall, eval_date, bias_correction)
+        report = format_report(yesterday, overall, eval_date, corrections)
     
     # Output
     print(report)

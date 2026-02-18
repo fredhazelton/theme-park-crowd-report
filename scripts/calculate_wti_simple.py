@@ -223,14 +223,29 @@ def main():
     # ADAPTIVE BIAS CORRECTION (forecast WTI only)
     # =========================================================================
     # Compare recent archived forecast WTI vs actual historical WTI to compute
-    # a rolling correction factor. As models improve, correction shrinks to zero.
+    # per-park rolling correction factors. As models improve, corrections shrink to zero.
     if not args.historical_only and len(results) >= 1:
         wti_accuracy_path = output_base / "accuracy" / "wti_accuracy.parquet"
         if wti_accuracy_path.exists():
             try:
                 bias_con = duckdb.connect()
-                # Use last 14 days of WTI accuracy data for rolling correction
-                bias_row = bias_con.execute(f"""
+                
+                # Per-park bias correction using last 14 days of accuracy data
+                park_biases = bias_con.execute(f"""
+                    SELECT 
+                        park_code,
+                        AVG(wti_error) as avg_bias,
+                        COUNT(*) as n_obs,
+                        COUNT(DISTINCT park_date) as n_dates
+                    FROM read_parquet('{wti_accuracy_path}')
+                    WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
+                    GROUP BY park_code
+                    HAVING COUNT(DISTINCT park_date) >= 2
+                    ORDER BY park_code
+                """).fetchdf()
+                
+                # Also get overall stats for logging
+                overall_row = bias_con.execute(f"""
                     SELECT 
                         AVG(wti_error) as avg_bias,
                         COUNT(*) as n_obs,
@@ -240,32 +255,42 @@ def main():
                 """).fetchone()
                 bias_con.close()
                 
-                avg_bias = bias_row[0]  # negative = underpredicting
-                n_obs = bias_row[1]
-                n_dates = bias_row[2]
-                
-                if avg_bias is not None and n_dates >= 2:
-                    # Correction = negative of the bias (if we underpredict by 10, add 10)
-                    correction = -avg_bias
+                if len(park_biases) > 0:
+                    # Build per-park correction dict: correction = -bias
+                    park_corrections = {}
+                    for _, row in park_biases.iterrows():
+                        park_corrections[row['park_code']] = round(-row['avg_bias'], 1)
                     
-                    # Apply correction to forecast WTI dataframes only
+                    # Fallback for parks without enough data: use overall bias
+                    overall_bias = overall_row[0] if overall_row[0] is not None else 0.0
+                    fallback_correction = round(-overall_bias, 1)
+                    
+                    # Apply per-park corrections to forecast WTI dataframes only
                     before_avg = None
                     after_avg = None
                     for i, df in enumerate(results):
                         mask = df['source'] == 'forecast'
                         if mask.any():
                             before_avg = df.loc[mask, 'wti'].mean()
-                            results[i].loc[mask, 'wti'] = (df.loc[mask, 'wti'] + correction).round(1)
+                            # Apply per-park correction, fallback to overall for unknown parks
+                            corrections = df.loc[mask, 'park_code'].map(
+                                lambda pc: park_corrections.get(pc, fallback_correction)
+                            )
+                            results[i].loc[mask, 'wti'] = (df.loc[mask, 'wti'] + corrections).round(1)
                             # Floor at 5 — WTI shouldn't go below a reasonable minimum
                             results[i].loc[mask, 'wti'] = results[i].loc[mask, 'wti'].clip(lower=5.0)
                             after_avg = results[i].loc[mask, 'wti'].mean()
                     
-                    logger.info(f"  Bias correction applied: {correction:+.1f} WTI points")
-                    logger.info(f"    Based on {n_obs} park-date observations over {n_dates} days")
-                    logger.info(f"    Historical bias: {avg_bias:.1f} (negative = underpredicting)")
+                    logger.info(f"  Per-park bias corrections applied:")
+                    for park in sorted(park_corrections.keys()):
+                        bias_val = -park_corrections[park]  # original bias
+                        corr_val = park_corrections[park]
+                        logger.info(f"    {park}: bias={bias_val:+.1f}, correction={corr_val:+.1f}")
+                    logger.info(f"    Fallback (parks w/o data): {fallback_correction:+.1f}")
+                    logger.info(f"    Overall bias: {overall_bias:.1f} ({overall_row[1]} obs, {overall_row[2]} dates)")
                     logger.info(f"    Forecast WTI avg: {before_avg:.1f} → {after_avg:.1f}")
                 else:
-                    logger.info(f"  Bias correction: insufficient data ({n_dates} dates, need ≥2). Skipping.")
+                    logger.info(f"  Bias correction: insufficient per-park data. Skipping.")
             except Exception as e:
                 logger.warning(f"  Bias correction failed (non-fatal): {e}")
         else:
