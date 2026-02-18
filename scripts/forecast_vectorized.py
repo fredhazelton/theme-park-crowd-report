@@ -106,9 +106,9 @@ def generate_time_grid(start_date: date, end_date: date, date_features: dict, pa
                     park_closes.append(close_m)
         
         if park_opens:
-            day_open = max(0, min(park_opens) - 30)  # 30 min buffer before earliest open
+            day_open = max(0, min(park_opens))
         if park_closes:
-            day_close = min(24 * 60, max(park_closes) + 15)  # 15 min buffer after latest close
+            day_close = min(24 * 60, max(park_closes))
         
         for t in all_times:
             dt = datetime.combine(park_date, t)
@@ -160,8 +160,7 @@ def forecast_entity(args) -> tuple:
                 open_mins, close_mins = hours_tuple
                 current_mins = row['hour_of_day'] * 60 + (row['time_slot'].minute if hasattr(row['time_slot'], 'minute') else 0)
                 if open_mins is not None and close_mins is not None:
-                    # Allow 15 min before open (guests arrive early)
-                    return (open_mins - 15) <= current_mins <= close_mins
+                    return open_mins <= current_mins <= close_mins
             return True  # Keep all slots if no park hours available
         
         mask = df.apply(is_within_park_hours, axis=1)
