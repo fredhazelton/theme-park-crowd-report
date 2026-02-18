@@ -61,9 +61,20 @@ def setup_logging(log_dir: Path | None = None):
 
 
 def generate_time_grid(start_date: date, end_date: date, date_features: dict, park_hours: dict) -> pd.DataFrame:
-    """Generate all time slots for date range with V2 features."""
+    """Generate time slots for date range, constrained to park operating hours.
+    
+    Only generates slots between earliest open (incl. early entry) and latest
+    close (incl. evening extras/parties) for each park-date. Falls back to
+    6am-midnight if park hours are unavailable for a date.
+    
+    park_hours: dict mapping (park_code, date) -> (open_mins, close_mins)
+    """
     dates = pd.date_range(start_date, end_date, freq='D')
-    times = pd.date_range('00:00', '23:55', freq='5min').time
+    all_times = pd.date_range('00:00', '23:55', freq='5min').time
+    
+    # Default fallback: 6am to midnight (conservative)
+    DEFAULT_OPEN_MINS = 6 * 60    # 06:00
+    DEFAULT_CLOSE_MINS = 24 * 60  # midnight
     
     rows = []
     for d in dates:
@@ -78,10 +89,37 @@ def generate_time_grid(start_date: date, end_date: date, date_features: dict, pa
         season_year = feat.get('season_year', 'UNKNOWN')
         season_year_encoded = feat.get('season_year_encoded', 0)
         
-        for t in times:
+        # Determine operating window across ALL parks for this date
+        # (we use the widest window since entities from different parks 
+        #  will be filtered by their own park's hours in forecast_entity)
+        day_open = DEFAULT_OPEN_MINS
+        day_close = DEFAULT_CLOSE_MINS
+        
+        # Find earliest open and latest close across all parks for this date
+        park_opens = []
+        park_closes = []
+        for (park, pd_date), (open_m, close_m) in park_hours.items():
+            if pd_date == park_date:
+                if open_m is not None:
+                    park_opens.append(open_m)
+                if close_m is not None:
+                    park_closes.append(close_m)
+        
+        if park_opens:
+            day_open = max(0, min(park_opens) - 30)  # 30 min buffer before earliest open
+        if park_closes:
+            day_close = min(24 * 60, max(park_closes) + 15)  # 15 min buffer after latest close
+        
+        for t in all_times:
             dt = datetime.combine(park_date, t)
             hour = dt.hour
             minute = dt.minute
+            current_mins = hour * 60 + minute
+            
+            # Skip time slots outside operating window
+            if current_mins < day_open or current_mins > day_close:
+                continue
+            
             mins_since_6am = max(0, (hour - 6) * 60 + minute)
             
             # 15-min time slot for aggregate lookup
@@ -124,10 +162,12 @@ def forecast_entity(args) -> tuple:
         
         def get_mins_since_open(row):
             key = (park_code, row['park_date'])
-            opening_mins = park_hours_lookup.get(key)
-            if opening_mins is not None:
-                current_mins = row['hour_of_day'] * 60 + (row['time_slot'].minute if hasattr(row['time_slot'], 'minute') else 0)
-                return max(0, current_mins - opening_mins)
+            hours_tuple = park_hours_lookup.get(key)
+            if hours_tuple is not None:
+                opening_mins = hours_tuple[0] if isinstance(hours_tuple, tuple) else hours_tuple
+                if opening_mins is not None:
+                    current_mins = row['hour_of_day'] * 60 + (row['time_slot'].minute if hasattr(row['time_slot'], 'minute') else 0)
+                    return max(0, current_mins - opening_mins)
             return row['mins_since_6am']  # Fallback
         
         df['mins_since_open'] = df.apply(get_mins_since_open, axis=1)
@@ -313,22 +353,32 @@ def main():
         }
     logger.info(f"  Loaded features for {len(date_features)} dates")
     
-    # Load park hours
+    # Load park hours (earliest open with early entry, latest close with extras)
     logger.info("Loading park hours...")
     park_hours_df = con.execute(f"""
         SELECT 
             park,
             CAST(date AS DATE) as park_date,
-            EXTRACT(HOUR FROM CAST(opening_time AS TIMESTAMP)) * 60 + 
-            EXTRACT(MINUTE FROM CAST(opening_time AS TIMESTAMP)) as opening_mins
+            EXTRACT(HOUR FROM CAST(opening_time_with_emh AS TIMESTAMP)) * 60 + 
+            EXTRACT(MINUTE FROM CAST(opening_time_with_emh AS TIMESTAMP)) as opening_mins,
+            EXTRACT(HOUR FROM CAST(closing_time_with_emh_or_party AS TIMESTAMP)) * 60 + 
+            EXTRACT(MINUTE FROM CAST(closing_time_with_emh_or_party AS TIMESTAMP)) as closing_mins
         FROM read_csv_auto('{dim_dir}/dimparkhours.csv')
-        WHERE opening_time IS NOT NULL
+        WHERE opening_time_with_emh IS NOT NULL
     """).fetchdf()
     
     park_hours_lookup = {}
     for _, row in park_hours_df.iterrows():
         key = (row['park'], pd.Timestamp(row['park_date']).date())
-        park_hours_lookup[key] = int(row['opening_mins']) if pd.notna(row['opening_mins']) else None
+        open_mins = int(row['opening_mins']) if pd.notna(row['opening_mins']) else None
+        close_mins = int(row['closing_mins']) if pd.notna(row['closing_mins']) else None
+        # Handle midnight+ closing (closing_mins=0 means midnight, treat as 24*60)
+        if close_mins is not None and close_mins == 0:
+            close_mins = 24 * 60
+        # Handle next-day close (e.g., 1am = 60 mins → should be 25*60=1500)
+        if close_mins is not None and close_mins < 360 and open_mins is not None and open_mins > close_mins:
+            close_mins += 24 * 60
+        park_hours_lookup[key] = (open_mins, close_mins)
     logger.info(f"  Loaded {len(park_hours_lookup)} park-date hours")
     
     # Load model aggregates for posted_time estimates and fallback
