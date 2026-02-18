@@ -60,6 +60,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 import pandas as pd
+
+from utils.park_code import entity_code_to_park_code
 import numpy as np
 from zoneinfo import ZoneInfo
 
@@ -211,8 +213,8 @@ class LiveInferenceModel:
             "mins_since_6am": (observed_at.hour - 6) * 60 + observed_at.minute,
         }
         
-        # Park code from entity code (first 2 characters)
-        park_code = entity_code[:2].upper() if len(entity_code) >= 2 else "XX"
+        # Park code from entity code (handles TDL, TDS, USH correctly)
+        park_code = entity_code_to_park_code(entity_code) or "XX"
         
         # Entity encoding
         if entity_code in self.encodings['entity_code']:
@@ -267,7 +269,7 @@ class LiveInferenceModel:
         """Get fallback prediction using ratio method for unknown entities."""
         
         # Try park-specific ratio first
-        park_code = entity_code[:2].upper() if len(entity_code) >= 2 else "XX"
+        park_code = entity_code_to_park_code(entity_code) or "XX"
         park_key = f"WDW-{park_code[4:]}" if park_code.startswith("WDW") else f"DL-{park_code[3:]}" if park_code.startswith("DL") else park_code
         
         if park_key in self.fallback_ratios:

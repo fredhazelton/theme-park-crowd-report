@@ -56,6 +56,7 @@ if str(Path(__file__).parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from processors.posted_to_actual import build_matched_pairs, _encode_categoricals, CONVERSION_XGB_PARAMS
+from utils.park_code import entity_code_to_park_code
 from utils.paths import get_output_base
 
 
@@ -126,9 +127,9 @@ def train_live_inference_model(
             logger.info(f"  Entities: {df['entity_code'].nunique()}")
             logger.info(f"  Date range: {df['park_date'].min()} to {df['park_date'].max()}")
         
-        # Add park_code column if missing
+        # Add park_code column if missing (handles TDL, TDS, USH correctly)
         if 'park_code' not in df.columns:
-            df['park_code'] = df['entity_code'].str[:2].str.upper()
+            df['park_code'] = df['entity_code'].apply(entity_code_to_park_code)
             if logger:
                 logger.info("  Added park_code column from entity_code")
     else:

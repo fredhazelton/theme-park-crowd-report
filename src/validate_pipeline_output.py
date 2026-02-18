@@ -25,6 +25,7 @@ from pathlib import Path
 import pandas as pd
 
 from utils import get_output_base
+from utils.park_code import entity_code_to_park_code
 
 # Park codes to expect forecasts for (active parks)
 ACTIVE_PARK_CODES = {"MK", "EP", "HS", "AK", "DL", "CA", "IA", "UF", "EU", "UH", "TDL", "TDS"}
@@ -73,10 +74,8 @@ def check_forecast_coverage(output_base: Path, results: dict) -> bool:
         return False
 
     df["park_date"] = pd.to_datetime(df["park_date"]).dt.date.astype(str)
-    # Handle 3-char prefixes: TDL*, TDS* → TDL, TDS; everything else → 2-char
-    df["park_code"] = df["entity_code"].apply(
-        lambda x: x[:3].upper() if x[:3].upper() in ("TDL", "TDS") else x[:2].upper()
-    )
+    # Derive park_code from entity_code (handles TDL, TDS, USH correctly)
+    df["park_code"] = df["entity_code"].apply(entity_code_to_park_code)
     tomorrow_parks = set(df[df["park_date"] == tomorrow]["park_code"].unique())
 
     missing = ACTIVE_PARK_CODES - tomorrow_parks

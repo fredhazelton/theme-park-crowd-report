@@ -39,6 +39,7 @@ except ImportError:
     xgb = None
 
 from processors.posted_to_actual import load_conversion_model
+from utils.park_code import entity_code_to_park_code
 
 # =============================================================================
 # CONFIGURATION
@@ -128,7 +129,7 @@ def generate_all(
     
     # Group eligible entities by park prefix for chunked processing
     # (90M rows in one query OOMs on 62GB; chunking by park keeps each batch manageable)
-    entity_to_park = {e: e[:2].upper() for e in eligible_entities}
+    entity_to_park = {e: entity_code_to_park_code(e) for e in eligible_entities}
     parks = sorted(set(entity_to_park.values()))
     park_to_entities = {}
     for e, p in entity_to_park.items():

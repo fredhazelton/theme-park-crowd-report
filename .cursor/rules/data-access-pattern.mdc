@@ -44,12 +44,14 @@ AVG(wait_time_minutes) OVER (
 
 ## Memory: Chunk Large Operations
 
-Server has 62GB RAM. For > 30M rows, chunk by park prefix:
+Server has 62GB RAM. For > 30M rows, chunk by park prefix. Use `entity_code_to_park_code` so TDL/TDS/USH map correctly (not TD/US):
 
 ```python
-parks = sorted(set(e[:2].upper() for e in entities))
+from utils.park_code import entity_code_to_park_code
+
+parks = sorted(set(entity_code_to_park_code(e) for e in entities))
 for park in parks:
-    chunk_entities = [e for e in entities if e[:2].upper() == park]
+    chunk_entities = [e for e in entities if entity_code_to_park_code(e) == park]
     # Process chunk...
 ```
 

@@ -494,6 +494,19 @@ year-view.html fetches real data. All 12 parks live on hazeydata.ai.
 
 ---
 
+### ~~#4 Fix Park Code Mismatch (Entity Mapping)~~ ✅ FIXED (Bam-Bam, Feb 18)
+
+**Issue:** Several pipeline components used `entity_code[:2]` to derive park_code, producing wrong codes: TDL→TD, TDS→TD, USH→US. This broke WTI accuracy, model validation, and accuracy tracking.
+
+**Fix applied:** Created shared `src/utils/park_code.py` with `entity_code_to_park_code()` and `park_code_sql()`. Updated 8 locations:
+- `live_inference.py`, `train_live_inference_model.py`, `forecast_vectorized.py`, `synthetic_actuals.py`, `validate_pipeline_output.py` — use `entity_code_to_park_code()`
+- `hybrid_pipeline_v2.py` — parkhours join uses `park_code_sql()`
+- `data-access-pattern.mdc` — chunking example uses correct mapping
+
+**Wilma:** Re-run training and forecast to regenerate outputs with correct TDL/TDS/UH codes.
+
+---
+
 ### ~~Year-View: Best Weeks + Busiest Weeks~~ ✅ DONE (Wilma, Feb 15)
 
 Implemented best weeks (WTI + description) and busiest weeks (headliner ride peak waits).
@@ -771,6 +784,7 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-17 | Bam-Bam | **Two-Stage Model Fallback (entity-specific ratio tier):** Implemented per Active Items. train_live_inference_model.py now computes and saves entity_ratios.json for entities with 100-499 matched pairs. live_inference.py loads entity_ratios, checks tier first in predict()/predict_batch(), returns method='entity_ratio'. Task moved to Completed. Wilma: re-run train script to generate entity_ratios.json. |
 | 2026-02-17 | Bam-Bam | **PyArrow bug:** Wilma's Telegram: PyArrow bug blocking daily training. Added URGENT task to Active Items. Need error message/stack trace from Wilma to fix. Common mitigations: pin PyArrow version (21.x if 22.x regressed), or use DuckDB for parquet metadata reads instead of pq.read_metadata(). |
 | 2026-02-17 | Bam-Bam | **PyArrow bug FIXED:** Root cause: mixed-type park_date (Timestamps from synthetic + strings from real) when merging pairs. PyArrow can't serialize. Added `combined_df['park_date'] = pd.to_datetime(combined_df['park_date']).dt.strftime('%Y-%m-%d')` before to_parquet in hybrid_pipeline_v2.py. Task moved to Completed. |
+| 2026-02-18 | Bam-Bam | **#4 Park code mismatch FIXED:** Created `src/utils/park_code.py` with `entity_code_to_park_code()` and `park_code_sql()`. Fixed 8 locations that used `entity_code[:2]` (wrong for TDL/TDS/USH). Now TDL→TDL, TDS→TDS, USH→UH. Wilma: re-run training and forecast for correct outputs. |
 
 ---
 

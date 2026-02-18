@@ -27,6 +27,11 @@ import pandas as pd
 import duckdb
 from zoneinfo import ZoneInfo
 
+# Ensure src is on path for utils import
+if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+from utils.park_code import park_code_sql
+
 # Constants
 MATCH_WINDOW_MINUTES = 15
 DEFAULT_MIN_OBS = 500
@@ -262,8 +267,11 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None, full_reb
             FROM best_match bm
             LEFT JOIN dategroupid dg ON bm.park_date = dg.park_date
             LEFT JOIN season s ON bm.park_date = s.park_date
-            LEFT JOIN parkhours ph ON UPPER(SUBSTRING(bm.entity_code, 1, 2)) = UPPER(ph.park) 
-                                   AND bm.park_date = ph.park_date
+            LEFT JOIN parkhours ph ON (
+                ({park_code_sql("bm.entity_code")}) = UPPER(ph.park)
+                OR (bm.entity_code LIKE 'USH%' AND UPPER(ph.park) IN ('UH', 'USH'))
+            )
+            AND bm.park_date = ph.park_date
             WHERE bm.rn = 1
         )
         SELECT 

@@ -20,6 +20,11 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import numpy as np
+
+# Ensure src is on path for utils import
+if str(Path(__file__).parent.parent / "src") not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from utils.park_code import entity_code_to_park_code
 import pandas as pd
 
 try:
@@ -114,8 +119,8 @@ def forecast_entity(args) -> tuple:
         df['posted_time'] = df.apply(get_posted_estimate, axis=1)
         
         # Get mins_since_open from park hours
-        # Extract park code from entity (first 2 chars)
-        park_code = entity_code[:2].upper()
+        # Extract park code from entity (handles TDL, TDS, USH correctly)
+        park_code = entity_code_to_park_code(entity_code)
         
         def get_mins_since_open(row):
             key = (park_code, row['park_date'])
