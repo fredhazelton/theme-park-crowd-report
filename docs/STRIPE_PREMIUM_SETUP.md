@@ -1,6 +1,6 @@
 # Stripe Premium Subscription Setup
 
-TPCR Premium ($10/mo) — users subscribe on hazeydata.ai and get the Premium Discord role automatically.
+TPCR Premium ($12/mo) — users subscribe on hazeydata.ai and get the Premium Discord role automatically.
 
 ## Environment Variables (wilma-server ~/.env)
 
@@ -25,7 +25,7 @@ STRIPE_STORE_PATH=/home/wilma/hazeydata/stripe_subscriptions.json
 
 ## Stripe Dashboard Setup
 
-1. **Product + Price**: Create product "TPCR Premium", recurring $10/mo. Copy the Price ID.
+1. **Product + Price**: Create product "TPCR Premium", recurring $12/mo. Copy the Price ID.
 2. **Webhook**: Add endpoint `https://YOUR_API_URL/api/webhooks/stripe`
    - Events: `checkout.session.completed`, `customer.subscription.deleted`, `customer.subscription.updated`, `invoice.payment_failed`
    - Copy the Signing secret → `STRIPE_WEBHOOK_SECRET`
@@ -42,7 +42,7 @@ STRIPE_STORE_PATH=/home/wilma/hazeydata/stripe_subscriptions.json
 1. Set all env vars with test keys.
 2. Start the API: `python dashboard/api.py` (or your production server).
 3. Serve subscribe page: ensure `subscribe.html` is reachable at `https://hazeydata.ai/subscribe.html`.
-4. Click "Subscribe for $10/month" → Stripe Checkout opens.
+4. Click "Start Free Trial — $12/month" → Stripe Checkout opens.
 5. Enter Discord username in the custom field, use test card `4242 4242 4242 4242`.
 6. Complete checkout → redirect to success page.
 7. Webhook fires → check API logs for "Added Premium role".

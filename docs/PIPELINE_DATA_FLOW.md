@@ -877,6 +877,23 @@ The following changes should trigger a re-scoring of predictions:
 
 ---
 
+## TODOs
+
+### Ride Closure Handling (added 2026-02-17)
+The scraper currently skips rides where `is_open: false` (line 536 of `get_wait_times_from_queue_times.py`). This means closed rides silently disappear from output (e.g., Space Mountain MK01 missing from Discord bot).
+
+**Two types of closures to handle differently:**
+1. **Scheduled closures** (refurbishments, seasonal) — known in advance, predictable duration
+2. **Temporary/unannounced closures** — ride breakdowns, weather, unexpected downtime
+
+**Decisions needed:**
+- How to represent each type in the data (separate status? flag?)
+- Should the Discord bot show closed rides (with a "Closed" label) or continue hiding them?
+- Should forecasts account for scheduled closures (exclude from predictions)?
+- Source for scheduled closure data? (Disney calendar, ThemeParkInsider, etc.)
+
+---
+
 ## See Also
 
 - [HYBRID_PIPELINE.md](HYBRID_PIPELINE.md) - Julia training details

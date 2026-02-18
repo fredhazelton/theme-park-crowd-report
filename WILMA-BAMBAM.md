@@ -423,6 +423,33 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+### Custom WTI Calendar Feature — Premium Subscribe Page
+
+**Date:** Feb 18, 2026  
+**Priority:** HIGH (Revenue-Direct)  
+**Context:** Fred had a hot tub breakthrough — Custom WTI Calendars as the flagship premium feature. Users select their favorite rides → get personalized calendars showing best days for THEIR ride list.
+
+**Phase 1: User Interface (This Week)**
+- [ ] **Attraction Selector** — Checkbox UI by park, save user selections 
+- [ ] **User Accounts** — Simple login/signup (can leverage existing Stripe infrastructure)
+- [ ] **Custom WTI Calculator** — Weighted average of selected attractions
+- [ ] **Calendar Display** — Show personalized best/worst days
+
+**Phase 2: Premium Integration (Next Week)**  
+- [ ] **Stripe Integration** — Link Custom WTI access to subscription status
+- [ ] **Export Features** — Google Calendar sync, PDF download
+- [ ] **Email Alerts** — "Your rides hit WTI 15 tomorrow!"
+
+**Technical Notes:**
+- Existing subscribe.html has full Stripe setup (just needs content updates)
+- `/api/entities/{park}` already returns attraction lists
+- Custom WTI = weighted average where weights = user's selected attractions
+- Store user preferences in JSON/SQLite (start simple)
+
+**Fred is updating subscribe.html content tonight. Ready for your dashboard work tomorrow!**
+
+---
+
 ---
 
 ### ~~URGENT: PyArrow Bug — Blocking Daily Training~~ ✅ FIXED (Bam-Bam, Feb 17)
