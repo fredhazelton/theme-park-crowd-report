@@ -166,7 +166,7 @@ def init(db_path: Path, output_base: Path, logger) -> bool:
                 SELECT 
                     park_code,
                     park_date::DATE,
-                    NULL,
+                    COALESCE(CAST(time_slot AS VARCHAR), 'daily'),
                     wti,
                     COALESCE(source, 'forecast'),
                     CURRENT_TIMESTAMP
