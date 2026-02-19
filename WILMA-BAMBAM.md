@@ -448,7 +448,7 @@ python src/build_dimensions.py               # Dimensions
 - [ ] **Update model metadata** — new model_label (e.g., `XGBOOST_ACTUALS_V1`) so we can distinguish from old POSTED-based models.
 
 #### Phase 3: Update Accuracy Evaluation
-- [ ] **Modify `evaluate_forecast_accuracy.py`** — Use synthetic actuals (not just raw ACTUAL) as ground truth for comparison. This dramatically increases evaluation coverage.
+- [ ] **Modify `evaluate_forecast_accuracy.py`** — Real ACTUAL observations remain the gold standard. But ALSO include synthetic actuals (POSTED→converted) as secondary ground truth where no real ACTUAL exists. This dramatically increases evaluation coverage from ~2.5% of time slots to nearly 100%. Weight real actuals more heavily than synthetic in aggregate metrics (same 3.5:1 principle as WTI).
 - [ ] **Ensure synthetic actuals for eval dates exist** — May need to run conversion before accuracy eval step.
 
 #### Phase 4: Cleanup
