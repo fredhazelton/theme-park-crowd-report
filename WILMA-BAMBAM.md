@@ -423,7 +423,7 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
-### 🏗️ ARCHITECTURE: Move to Actuals-Only Forecasting (POSTED → ACTUAL Separation of Concerns)
+### 🏗️ ARCHITECTURE: "Actuals-First" — The New Forecasting Method
 
 **Date:** Feb 18, 2026  
 **Priority:** HIGH (Pipeline Architecture)  
@@ -457,6 +457,8 @@ python src/build_dimensions.py               # Dimensions
 - [ ] **Update PIPELINE_DATA_FLOW.md** with new architecture.
 
 **Key principle (Fred, Feb 18):** "POSTED times should only be used to model the relationship between POSTED-ACTUAL times so that we can always convert. Everything else deals in actuals."
+
+**The name:** Fred calls this the **"Actuals-First"** method — convert to actuals first, then do everything else. POSTED times are a measurement instrument, not a prediction feature.
 
 **⚠️ Important:** Do Phase 1's A/B comparison BEFORE replacing production models. We need evidence the new approach is at least as good.
 
