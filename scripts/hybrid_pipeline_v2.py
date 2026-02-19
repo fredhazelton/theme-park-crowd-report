@@ -717,6 +717,17 @@ def main():
             else:
                 logger.info(result.stdout)
                 n_models, train_time = step2_train_julia(logger, use_synthetic=True)
+            
+            # Also train actuals-first models (runs alongside V2 models)
+            logger.info("")
+            logger.info("=" * 60)
+            logger.info("ALSO TRAINING ACTUALS-FIRST MODELS (no posted_time)")
+            logger.info("=" * 60)
+            try:
+                n_actuals, actuals_time = step2_train_actuals(logger, output_base)
+                logger.info(f"Actuals-first: {n_actuals} models in {actuals_time:.1f}s")
+            except Exception as e:
+                logger.warning(f"Actuals-first training failed (non-fatal): {e}")
         else:
             n_models, train_time = step2_train_julia(logger, use_synthetic=False)
     else:

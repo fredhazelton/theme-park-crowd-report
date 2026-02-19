@@ -198,8 +198,8 @@ def build_actuals_training_data(logger, output_base: Path) -> int:
                 dg.date_group_id,
                 se.season,
                 se.season_year,
-                EXTRACT(HOUR FROM s.observed_at_ts) as hour_of_day,
-                (EXTRACT(HOUR FROM s.observed_at_ts) - 6) * 60 + EXTRACT(MINUTE FROM s.observed_at_ts) as mins_since_6am,
+                EXTRACT(HOUR FROM CAST(s.observed_at AS TIMESTAMP)) as hour_of_day,
+                (EXTRACT(HOUR FROM CAST(s.observed_at AS TIMESTAMP)) - 6) * 60 + EXTRACT(MINUTE FROM CAST(s.observed_at AS TIMESTAMP)) as mins_since_6am,
                 {mins_since_open_synth} as mins_since_open
             FROM read_parquet('{synth_pattern}') s
             INNER JOIN valid_entities ve ON s.entity_code = ve.entity_code

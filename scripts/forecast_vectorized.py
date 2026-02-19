@@ -308,14 +308,20 @@ def main():
     # Load operating calendar (graceful fallback: assume all operating if missing)
     oc_path = output_base / "operating_calendar" / "operating_calendar.parquet"
     operating_set = set()
+    operating_by_entity = {}  # Pre-indexed: entity_code -> set of dates
     if oc_path.exists():
         try:
             oc_df = pd.read_parquet(oc_path)
             oc_df = oc_df[oc_df["is_operating"] == True]
-            operating_set = set(
-                zip(oc_df["entity_code"].astype(str).str.upper(), pd.to_datetime(oc_df["park_date"]).dt.date)
-            )
-            logger.info(f"Operating calendar: {len(operating_set):,} operating entity-dates")
+            oc_df["entity_upper"] = oc_df["entity_code"].astype(str).str.upper()
+            oc_df["date_val"] = pd.to_datetime(oc_df["park_date"]).dt.date
+            operating_set = set(zip(oc_df["entity_upper"], oc_df["date_val"]))
+            # Build per-entity index for fast lookup
+            for ec, d in zip(oc_df["entity_upper"], oc_df["date_val"]):
+                if ec not in operating_by_entity:
+                    operating_by_entity[ec] = set()
+                operating_by_entity[ec].add(d)
+            logger.info(f"Operating calendar: {len(operating_set):,} operating entity-dates ({len(operating_by_entity)} entities)")
         except Exception as e:
             logger.warning(f"Could not load operating calendar: {e}; assuming all operating")
     else:
@@ -479,12 +485,12 @@ def main():
         except Exception as e:
             logger.warning(f"Could not load entity list from operating calendar: {e}")
 
-    # Filter time grid per entity by operating calendar
+    # Filter time grid per entity by operating calendar (uses pre-indexed dict)
     def get_entity_time_grid(entity_code: str):
-        if not operating_set:
+        if not operating_by_entity:
             return time_grid_full
         ec_upper = str(entity_code).upper()
-        entity_dates = {d for (ec, d) in operating_set if ec == ec_upper}
+        entity_dates = operating_by_entity.get(ec_upper)
         if not entity_dates:
             if ec_upper in all_calendar_entities:
                 return None  # entity is in calendar but has NO operating dates = extinct/fully closed
@@ -495,60 +501,107 @@ def main():
     logger.info("Generating forecasts...")
     forecast_dir.mkdir(parents=True, exist_ok=True)
 
-    # Build work items, skipping extinct/fully-closed entities
-    work_items = []
+    # Pre-filter entity list (skip extinct/closed) without building grids yet
+    entity_queue = []
     skipped_extinct = 0
     for entity in entities:
-        grid = get_entity_time_grid(entity)
-        if grid is None or (hasattr(grid, '__len__') and len(grid) == 0):
-            skipped_extinct += 1
-            continue
-        entity_ratio = fallback_ratios.get(entity, global_ratio)
-        work_items.append(
-            (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None)
-        )
+        ec_upper = str(entity).upper()
+        if operating_by_entity:
+            entity_dates = operating_by_entity.get(ec_upper)
+            if not entity_dates and ec_upper in all_calendar_entities:
+                skipped_extinct += 1
+                continue  # In calendar but no operating dates = extinct
+        entity_queue.append(entity)
     if skipped_extinct:
         logger.info(f"Skipped {skipped_extinct} extinct/closed entities (no operating dates)")
     
-    all_forecasts = []
+    total_entities = len(entity_queue)
+    logger.info(f"Processing {total_entities} entities in batches of 50...")
+    
+    # Process in batches to control memory — flush each batch to a temp parquet file
+    BATCH_SIZE = 50
+    temp_dir = forecast_dir / "_temp_batches"
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    batch_files = []
     successful = 0
     failed = 0
+    processed = 0
     
-    with ProcessPoolExecutor(max_workers=args.workers) as executor:
-        futures = {executor.submit(forecast_entity, item): item[0] for item in work_items}
+    for batch_start in range(0, total_entities, BATCH_SIZE):
+        batch_end = min(batch_start + BATCH_SIZE, total_entities)
+        batch_entities = entity_queue[batch_start:batch_end]
         
-        for i, future in enumerate(as_completed(futures), 1):
-            entity = futures[future]
-            entity_code, result_df, msg = future.result()
+        # Build work items for this batch only (grids built lazily here)
+        work_items = []
+        for entity in batch_entities:
+            grid = get_entity_time_grid(entity)
+            if grid is None or (hasattr(grid, '__len__') and len(grid) == 0):
+                continue
+            entity_ratio = fallback_ratios.get(entity, global_ratio)
+            work_items.append(
+                (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None)
+            )
+        
+        batch_results = []
+        with ProcessPoolExecutor(max_workers=args.workers) as executor:
+            futures = {executor.submit(forecast_entity, item): item[0] for item in work_items}
             
-            if result_df is not None:
-                all_forecasts.append(result_df)
-                successful += 1
-            else:
-                failed += 1
-                logger.warning(f"  {entity_code}: {msg}")
-            
-            if i % 50 == 0 or i == len(entities):
-                elapsed = time.time() - start_time
-                rate = i / elapsed if elapsed > 0 else 0
-                logger.info(f"  Progress: {i}/{len(entities)} ({rate:.1f} entities/sec)")
+            for future in as_completed(futures):
+                entity = futures[future]
+                entity_code, result_df, msg = future.result()
+                
+                if result_df is not None:
+                    batch_results.append(result_df)
+                    successful += 1
+                else:
+                    failed += 1
+                    logger.warning(f"  {entity_code}: {msg}")
+        
+        # Flush this batch to a temp parquet file
+        if batch_results:
+            batch_df = pd.concat(batch_results, ignore_index=True)
+            batch_file = temp_dir / f"batch_{batch_start:04d}.parquet"
+            batch_df.to_parquet(batch_file, index=False)
+            batch_files.append(batch_file)
+            del batch_df, batch_results
+        
+        # Free the grid references for this batch
+        for i in range(batch_start, batch_end):
+            entity_queue[i] = (entity_queue[i][0], None)  # Release grid memory
+        
+        processed += len(batch_entities)
+        elapsed = time.time() - start_time
+        rate = processed / elapsed if elapsed > 0 else 0
+        logger.info(f"  Progress: {processed}/{total_entities} ({rate:.1f} entities/sec, {elapsed/60:.1f} min)")
     
-    # Combine and save
-    logger.info("Combining forecasts...")
-    if all_forecasts:
-        combined = pd.concat(all_forecasts, ignore_index=True)
+    # Combine batch files into final output
+    logger.info(f"Combining {len(batch_files)} batch files...")
+    if batch_files:
+        chunks = [pd.read_parquet(f) for f in batch_files]
+        combined = pd.concat(chunks, ignore_index=True)
+        del chunks
 
         output_file = forecast_dir / "all_forecasts.parquet"
         combined.to_parquet(output_file, index=False)
         
         # Stats
         method_counts = combined['prediction_method'].value_counts()
+        total_predictions = len(combined)
         
-        logger.info(f"  Saved {len(combined):,} predictions to {output_file}")
+        logger.info(f"  Saved {total_predictions:,} predictions to {output_file}")
         logger.info(f"  File size: {output_file.stat().st_size / 1024 / 1024:.1f} MB")
         logger.info("  By method:")
         for method, count in method_counts.items():
             logger.info(f"    {method}: {count:,}")
+        
+        del combined
+        
+        # Clean up temp files
+        for f in batch_files:
+            f.unlink()
+        temp_dir.rmdir()
+    else:
+        total_predictions = 0
     
     elapsed = time.time() - start_time
     
@@ -558,7 +611,7 @@ def main():
     logger.info("=" * 60)
     logger.info(f"Successful: {successful}")
     logger.info(f"Failed: {failed}")
-    logger.info(f"Total predictions: {len(combined) if all_forecasts else 0:,}")
+    logger.info(f"Total predictions: {total_predictions:,}")
     logger.info(f"Time: {elapsed:.1f}s ({elapsed/60:.1f} min)")
     logger.info("=" * 60)
     
