@@ -423,6 +423,51 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+### 🔥 NEW: Live "Now" Card — Shareable Wait Times Display
+
+**Date:** Feb 19, 2026
+**Priority:** 🔴 HIGH — Fred is designing in Figma today
+**Spec:** `docs/LIVE_NOW_CARD_SPEC.md` (read this first!)
+
+**What:** A beautiful image card showing live wait times with historical context. Designed to be screenshot-worthy and shareable on Reddit/Twitter.
+
+**Discord command:** `/now mk` → returns rendered PNG card
+
+**Build Order:**
+1. **Data fetcher** (`renderers/now_card_renderer.py`):
+   - Fetch live waits from queue-times.com API for the requested park
+   - Look up historical medians from `posted_aggregates.parquet` (entity + date_group_id + hour → posted_median)
+   - Look up entity names from `dimentity.csv`
+   - Look up today's date_group_id from `dimdate.csv`
+   - Compute "% above/below average" context line
+   - Return structured data dict
+
+2. **HTML template** (`templates/now_card.html`):
+   - Fred will provide Figma design — match it exactly
+   - Self-contained HTML+CSS (no external deps)
+   - Gauge chart (reuse code from `docs/stream/stream-dashboard.html` lines 1492-1670)
+   - Headliner table with NOW vs AVG columns
+   - ↑/↓ arrows color-coded (red above avg, green below)
+   - Dark background, Benedictus palette, hazeydata.ai branding
+
+3. **Renderer** (HTML → PNG):
+   - Use Playwright to render template to PNG
+   - 800×600 or similar dimensions
+   - Cache result for 5 minutes
+
+4. **Discord integration** (`bot.py`):
+   - `/now [park]` command, default MK
+   - Send PNG as embed attachment
+   - Include text summary in embed description
+
+**Phase 1 (MVP):** Headliner table + context line (no gauge yet)
+**Phase 2:** Gauge chart
+**Phase 3:** Alert system for extreme waits
+
+**MK Headliner codes:** MK191 (TRON), MK141 (7 Dwarfs), MK01 (Space Mtn), MK03 (Big Thunder), MK23 (Haunted Mansion), MK05 (Peter Pan), MK13 (Jungle Cruise), MK16 (Pirates)
+
+---
+
 ### 🚨 ARCHITECTURE: "Actuals-First" — The New Forecasting Method
 
 **Date:** Feb 18, 2026  
