@@ -1,64 +1,95 @@
 # XGBoost Training Parameters
 
-We train per-entity XGBoost models in [src/processors/training.py](../src/processors/training.py) to predict ACTUAL (or PRIORITY) wait times. **Parameters match the Julia legacy** (attraction-io, XGBoost.jl in `run_trainer.jl`) so behavior and predictions align with the proven pipeline.
+> **Last updated:** 2026-02-19 — reflects current Julia training scripts (`train_v2.jl`, `train_actuals_v2.jl`)
+
+We train per-entity XGBoost models using **Julia/XGBoost.jl** to predict actual wait times. Two model types are trained:
+
+1. **V2 Models** (`model_julia_v2.json`) — 7 features including posted_time
+2. **Actuals-First Models** (`model_julia_actuals.json`) — 5 features, NO posted_time
+
+Both use identical hyperparameters; only the feature set differs.
 
 ---
 
-## Current Python Parameters (aligned with Julia)
+## Current Hyperparameters (Julia)
 
-Defined in `src/processors/training.py` as `DEFAULT_XGB_PARAMS` and `EARLY_STOPPING_ROUNDS`:
+Defined in `julia-ml/train_v2.jl` and `julia-ml/train_actuals_v2.jl`:
 
-| Parameter            | Value | Julia (run_trainer.jl) |
-|----------------------|-------|------------------------|
-| `objective`          | `"reg:absoluteerror"` | `objective = "reg:absoluteerror"` (MAE) |
-| `tree_method`        | `"hist"` | `tree_method = use_gpu ? "gpu_hist" : "hist"`; we use CPU `"hist"` |
-| `max_depth`          | `6` | `max_depth = 6` |
-| `learning_rate`      | `0.1` | `eta = 0.1` |
-| `n_estimators`      | `2000` | `num_round = 2000` — need 2000 trees for accurate prediction |
-| `subsample`          | `0.5` | `subsample = 0.5` |
-| `colsample_bytree`   | `1.0` | not set in Julia → XGBoost default 1.0 |
-| `min_child_weight`   | `10` | `min_child_weight = 10` |
-| `random_state`       | `42` | (Python-only for reproducibility) |
-| `verbosity`          | `0` | `verbosity = 0` |
-| **Early stopping**  | **None** | Julia uses `watchlist = ()` → no early stop; we run all 2000 rounds |
+| Parameter              | Value                   | Notes |
+|------------------------|-------------------------|-------|
+| `objective`            | `"reg:squarederror"`    | MSE-based (robust for wait time prediction) |
+| `num_round`            | `2000`                  | Max boosting rounds (early stopping usually stops earlier) |
+| `max_depth`            | `10`                    | Deeper trees for complex time-of-day patterns |
+| `eta` (learning_rate)  | `0.1`                   | Standard learning rate |
+| `subsample`            | `0.8`                   | Row subsampling per tree |
+| `colsample_bytree`     | `0.8`                   | Column subsampling per tree |
+| `min_child_weight`     | `1`                     | Minimum sum of instance weight in a child |
+| `seed`                 | `42`                    | Reproducibility |
+| `early_stopping_rounds`| `20`                    | Stop if no improvement on eval set for 20 rounds |
+| `verbosity`            | `0`                     | Silent |
 
-Julia snippet from `run_trainer.jl`:
+---
 
-```julia
-booster = xgboost(
-    dtrain;
-    num_round = 2000,
-    eta = 0.1,
-    max_depth = 6,
-    subsample = 0.5,
-    min_child_weight = 10,
-    objective = "reg:absoluteerror",
-    tree_method = use_gpu ? "gpu_hist" : "hist",
-    nthread = XGB_THREADS,
-    verbosity = 0,
-    watchlist = ()
-)
+## Training Features
+
+### V2 Model (7 features)
+```
+posted_time, mins_since_6am, mins_since_open, hour_of_day,
+date_group_id_encoded, season_encoded, season_year_encoded
 ```
 
----
+### Actuals-First Model (5 features)
+```
+mins_since_6am, mins_since_open,
+date_group_id_encoded, season_encoded, season_year_encoded
+```
 
-## Parameter name mapping (Python ↔ Julia / XGBoost native)
-
-| Python (training.py) | XGBoost native / Julia |
-|----------------------|-------------------------|
-| `learning_rate`      | `eta`                   |
-| `n_estimators`       | `num_round` (Julia) / `num_boost_round` (Python train call) |
-| `max_depth`          | `max_depth`             |
-| `subsample`          | `subsample`             |
-| `colsample_bytree`   | `colsample_bytree`     |
-| `min_child_weight`   | `min_child_weight`      |
-| `objective`          | `objective`             |
-| early stopping       | Julia: `watchlist = ()` = no early stop; Python: `early_stopping_rounds=None` |
+The key difference: actuals-first models have **no dependency on posted_time**, meaning they can predict actual wait times from temporal features alone.
 
 ---
 
-## Notes
+## Training Data Split
 
-- **2000 rounds**: Julia runs 2000 trees by default; we need that many for accurate enough predictions. Training time per entity will be longer than with 100 rounds + early stop.
-- **reg:absoluteerror**: Legacy uses MAE, not MSE; we use `reg:absoluteerror` to match.
-- **GPU**: Julia can use `gpu_hist` when `use_gpu` is true; our Python code uses `"hist"` (CPU). To use GPU in Python you would set `tree_method="gpu_hist"` and ensure an NVIDIA GPU + CUDA-enabled XGBoost build.
+- **80/20 temporal split** — first 80% of rows (sorted by date) for training, last 20% for validation
+- Early stopping uses the validation set (`watchlist = [(dtrain, "train"), (dval, "eval")]`)
+- Typical models stop between 50-200 rounds (well under the 2000 max)
+
+---
+
+## Geo Decay Weights
+
+Both model types use geographic/temporal decay weighting:
+- **Half-life:** 730 days (newer observations weighted higher)
+- **Real actuals:** 3.5× weight multiplier on top of geo decay
+- Weights computed at training time, not stored in model files
+
+---
+
+## Lite Models (Fallback)
+
+For entities with very few training samples (< threshold), a "lite" model is trained with fewer features:
+- **V2 Lite:** `posted_time, mins_since_6am, mins_since_open, hour_of_day` (4 features)
+- **Actuals Lite:** `mins_since_6am, mins_since_open` (2 features)
+
+These are stored in the same model files but flagged in metadata (`model_label` contains "LITE").
+
+---
+
+## Legacy Reference
+
+The original Julia pipeline (`run_trainer.jl` from attraction-io) used different parameters:
+
+| Parameter            | Legacy | Current | Change Reason |
+|----------------------|--------|---------|---------------|
+| `max_depth`          | 6      | 10      | Deeper trees for richer patterns |
+| `subsample`          | 0.5    | 0.8     | More data per tree, less variance |
+| `colsample_bytree`   | 1.0    | 0.8     | Added column sampling for regularization |
+| `min_child_weight`   | 10     | 1       | Allow finer splits |
+| `objective`          | `reg:absoluteerror` | `reg:squarederror` | MSE gives better gradient signal |
+| `early_stopping`     | None   | 20 rounds | Prevents overfitting, faster training |
+
+---
+
+## P95 Cap
+
+**REMOVED** (2026-02-18, Fred's decision). Models tend to underpredict on busy days, and XGBoost is impervious to outliers. Capping at p95 was artificially limiting predictions.
