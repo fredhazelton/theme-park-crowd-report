@@ -57,6 +57,7 @@ from botocore.config import Config
 from botocore.exceptions import ClientError, ResponseStreamingError
 
 from utils import get_output_base
+from utils.park_code import park_code_sql
 
 # =============================================================================
 # CONFIGURATION
@@ -186,6 +187,56 @@ def _fetch_and_combine(s3, bucket: str, keys: list[str], logger: logging.Logger)
 
 
 # =============================================================================
+# DUCKDB ENTITIES REFRESH (for bot + dashboard)
+# =============================================================================
+
+def _refresh_entities_duckdb(
+    dimentity_path: Path,
+    output_base: Path,
+    logger: logging.Logger,
+) -> None:
+    """Refresh entities table in tpcr_live.duckdb from dimentity.csv."""
+    try:
+        import duckdb
+    except ImportError:
+        logger.debug("duckdb not installed; skipping entities refresh")
+        return
+    db_path = output_base / "tpcr_live.duckdb"
+    if not db_path.exists():
+        logger.debug("tpcr_live.duckdb not found; run init_live_duckdb.py first")
+        return
+    try:
+        dim_str = str(dimentity_path.resolve()).replace("\\", "/")
+        cols_df = pd.read_csv(dimentity_path, nrows=0)
+        col_names = {c.lower() for c in cols_df.columns}
+        ec_col = "entity_code" if "entity_code" in col_names else "code"
+        en_col = "entity_name" if "entity_name" in col_names else "name"
+        pc_sql = park_code_sql(ec_col)
+        short_sql = "short_name" if "short_name" in col_names else "NULL"
+        prop_sql = "property_code" if "property_code" in col_names else "NULL"
+        park_sql = f"COALESCE(park_code, ({pc_sql}))" if "park_code" in col_names else pc_sql
+        con = duckdb.connect(str(db_path))
+        con.execute("DELETE FROM entities")
+        con.execute(f"""
+            INSERT INTO entities (entity_code, entity_name, short_name, park_code, property_code, updated_at)
+            SELECT {ec_col}, {en_col}, {short_sql}, {park_sql}, {prop_sql}, CURRENT_TIMESTAMP
+            FROM read_csv_auto('{dim_str}')
+        """)
+        n = con.execute("SELECT COUNT(*) FROM entities").fetchone()[0]
+        con.execute(
+            """
+            INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
+            VALUES ('entities', CURRENT_TIMESTAMP, ?, 'dimension_fetch')
+            """,
+            [n],
+        )
+        con.close()
+        logger.info(f"Refreshed {n:,} entities in tpcr_live.duckdb")
+    except Exception as e:
+        logger.warning(f"Entities DuckDB refresh failed: {e}")
+
+
+# =============================================================================
 # MAIN ENTRY POINT
 # =============================================================================
 
@@ -241,6 +292,8 @@ def main() -> None:
         combined.to_csv(tmp_path, index=False)
         os.replace(tmp_path, out_path)
         logger.info(f"Wrote {out_path}")
+        # Refresh entities in tpcr_live.duckdb for bot + dashboard
+        _refresh_entities_duckdb(out_path, base, logger)
     except Exception as e:
         try:
             if tmp_path.exists():

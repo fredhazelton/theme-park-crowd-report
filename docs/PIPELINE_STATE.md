@@ -79,6 +79,7 @@ All under **output_base** unless noted.
 | `output_base/models/` | Per-entity XGBoost (or mean) models |
 | `output_base/curves/forecast/` | Forecast curves (actual/posted predicted) |
 | `output_base/state/` | entity_index.sqlite, pipeline_state.json, run_manifest.json, pipeline_status.json, daily_pipeline.lock, encoding_mappings.json, **etl_last_run.json** (timestamp of last successful ETL; ETL only processes files modified since), processed_files.json, failed_files.json, dedupe.sqlite, etc. |
+| `output_base/tpcr_live.duckdb` | Shared DuckDB for bot + dashboard (live_waits, wti, forecasts, entities, data_freshness). Created by `init_live_duckdb.py`; dual-written by scraper, WTI, forecast, dimension scripts. |
 | `output_base/raw/` | Synced S3 data: `raw/export/wait_times/`, `raw/export/fastpass_times/` (ETL reads from here only; sync-only, no S3 streaming). |
 | `output_base/reports/` | wait_time_db_report.md, etc. |
 
@@ -117,6 +118,15 @@ bash scripts/install_docs_check_cron.sh --remove
 # View log
 tail -f output_base/logs/docs_check.log
 ```
+
+### Init DuckDB (bot + dashboard)
+
+```bash
+# Run once after pipeline has produced wti, forecasts, dimentity, staging
+python scripts/init_live_duckdb.py [--output-base PATH]
+```
+
+Creates `output_base/tpcr_live.duckdb` with schema and backfills from existing data. Scraper, WTI, forecast, and dimension scripts dual-write to it when it exists.
 
 ### Manual daily run
 

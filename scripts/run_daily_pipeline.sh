@@ -223,6 +223,16 @@ run_step_optional() {
 
 FAILED_ANY=false
 
+# -1. Init DuckDB for bot + dashboard (if not yet created)
+if [[ ! -f "$OUTPUT_BASE/tpcr_live.duckdb" ]]; then
+    log_info "=== Init DuckDB (tpcr_live.duckdb) ==="
+    if $PYTHON scripts/init_live_duckdb.py --output-base "$OUTPUT_BASE" 2>/dev/null; then
+        log_info "DuckDB initialized for bot + dashboard"
+    else
+        log_info "DuckDB init skipped or failed (non-fatal)"
+    fi
+fi
+
 # 0. S3 sync (before ETL) - syncs wait_times and fastpass_times to output_base/raw for reliable local reads
 if ! $SKIP_SYNC && ! $SKIP_ETL; then
     if run_step "S3 sync" "$SCRIPT_DIR/sync_s3_data.sh" --output-base "$OUTPUT_BASE"; then

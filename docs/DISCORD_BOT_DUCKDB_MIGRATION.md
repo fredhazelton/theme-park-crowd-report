@@ -391,11 +391,11 @@ db = duckdb.connect(DUCKDB_PATH, read_only=True)
 
 ## Migration Steps (Execution Order)
 
-1. **[ ] Create init script** — `scripts/init_live_duckdb.py` (schema + backfill)
-2. **[ ] Run init** — creates DuckDB with all existing data
-3. **[ ] Update scraper** — dual-write (CSV + DuckDB) for safety
+1. **[x] Create init script** — `scripts/init_live_duckdb.py` (schema + backfill)
+2. **[ ] Run init** — creates DuckDB with all existing data (run on wilma-server after pipeline)
+3. **[x] Update scraper** — dual-write (CSV + DuckDB) for safety
 4. **[ ] Verify** — check DuckDB has fresh data after a few scraper cycles
-5. **[ ] Update pipeline** — WTI, forecasts, entities write to DuckDB after parquet
+5. **[x] Update pipeline** — WTI, forecasts, entities write to DuckDB after parquet
 6. **[ ] Move bot code** — into main repo `tpcr-discord-bot/` directory
 7. **[ ] Rewrite bot queries** — use DuckDB instead of file scanning
 8. **[ ] Update systemd service** — point to new bot location

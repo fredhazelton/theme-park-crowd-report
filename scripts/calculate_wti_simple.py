@@ -349,6 +349,32 @@ def main():
         output_file = wti_dir / "wti.parquet"
         combined.to_parquet(output_file, index=False)
         
+        # Dual-write to DuckDB for bot + dashboard
+        db_path = output_base / "tpcr_live.duckdb"
+        if db_path.exists():
+            try:
+                live_con = duckdb.connect(str(db_path))
+                min_d = combined["park_date"].min()
+                max_d = combined["park_date"].max()
+                live_con.execute(
+                    "DELETE FROM wti WHERE park_date >= ? AND park_date <= ?",
+                    [min_d, max_d],
+                )
+                live_con.register("_wti_df", combined)
+                live_con.execute("""
+                    INSERT INTO wti (park_code, park_date, time_slot, wti, source, updated_at)
+                    SELECT park_code, park_date::DATE, NULL, wti, COALESCE(source, 'forecast'), CURRENT_TIMESTAMP
+                    FROM _wti_df
+                """)
+                live_con.execute("""
+                    INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
+                    VALUES ('wti', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM wti), 'pipeline')
+                """)
+                live_con.close()
+                logger.info(f"  Wrote {len(combined)} rows to tpcr_live.duckdb")
+            except Exception as e:
+                logger.warning(f"  DuckDB write failed: {e}")
+        
         logger.info("")
         logger.info("=" * 60)
         logger.info("WTI COMPLETE")

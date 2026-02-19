@@ -68,6 +68,11 @@ import pandas as pd
 import requests
 from zoneinfo import ZoneInfo
 
+try:
+    import duckdb
+except ImportError:
+    duckdb = None
+
 # ----- Ensure we can import from src/ when run from project root -----
 if str(Path(__file__).parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent))
@@ -106,6 +111,56 @@ REQUEST_RETRY_DELAY = 2
 
 # observed_at comes from queue-times last_updated; if older than this vs fetch time, we log a warning
 STALE_OBSERVED_AT_THRESHOLD_HOURS = 24
+
+# =============================================================================
+# DUCKDB DUAL-WRITE (live_waits for bot + dashboard)
+# =============================================================================
+
+def _write_to_live_duckdb(
+    df: pd.DataFrame,
+    park_tz: ZoneInfo,
+    output_base: Path,
+    logger: logging.Logger,
+) -> bool:
+    """
+    Append new wait time rows to tpcr_live.duckdb live_waits table.
+    Called after CSV write. Fails gracefully if DuckDB/init not available.
+    """
+    if duckdb is None or df.empty:
+        return False
+    db_path = output_base / "tpcr_live.duckdb"
+    if not db_path.exists():
+        logger.debug("Skipping DuckDB write: tpcr_live.duckdb not found (run init_live_duckdb.py)")
+        return False
+    try:
+        df = df.copy()
+        df["park_date"] = derive_park_date(df["observed_at"], park_tz)
+        df = df.dropna(subset=["park_date"])
+        if df.empty:
+            return False
+        df = df[df["wait_time_minutes"] > 0]
+        if df.empty:
+            return False
+        con = duckdb.connect(str(db_path))
+        con.register("_live_df", df)
+        con.execute("""
+            INSERT OR IGNORE INTO live_waits 
+                (entity_code, observed_at, wait_time_type, wait_time_minutes, park_date)
+            SELECT entity_code, observed_at::TIMESTAMPTZ, wait_time_type, 
+                   wait_time_minutes::INTEGER, park_date::DATE
+            FROM _live_df
+        """)
+        con.execute("""
+            INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
+            VALUES ('scraper', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM live_waits), 'queue-times')
+        """)
+        con.close()
+        logger.debug(f"Wrote {len(df)} rows to live_waits")
+        return True
+    except Exception as e:
+        logger.warning(f"DuckDB write failed: {e}")
+        return False
+
 
 # =============================================================================
 # QUEUE-TIMES.COM PARK ID TO PARK CODE MAPPING
@@ -724,6 +779,9 @@ def process_queue_times(
                 # Write to staging (morning ETL merges yesterday's staging into fact_tables)
                 rows_written = write_grouped_csvs(new_df, dirs["staging_queue_times"], park_tz, logger)
                 total_rows += rows_written
+                # Dual-write to DuckDB for bot + dashboard (if init_live_duckdb has been run)
+                if rows_written > 0:
+                    _write_to_live_duckdb(new_df, park_tz, output_base, logger)
             except Exception as e:
                 logger.exception(f"Error processing park {park.get('name', park.get('id', '?'))} (id={park.get('id')}): {e}")
         

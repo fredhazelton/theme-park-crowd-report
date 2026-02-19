@@ -584,6 +584,36 @@ def main():
         output_file = forecast_dir / "all_forecasts.parquet"
         combined.to_parquet(output_file, index=False)
         
+        # Dual-write to DuckDB for bot + dashboard
+        db_path = output_base / "tpcr_live.duckdb"
+        if db_path.exists():
+            try:
+                import duckdb
+                live_con = duckdb.connect(str(db_path))
+                min_d = combined["park_date"].min()
+                max_d = combined["park_date"].max()
+                min_d = min_d.date() if hasattr(min_d, "date") else min_d
+                max_d = max_d.date() if hasattr(max_d, "date") else max_d
+                live_con.execute(
+                    "DELETE FROM forecasts WHERE park_date >= ? AND park_date <= ?",
+                    [min_d, max_d],
+                )
+                live_con.register("_fc_df", combined)
+                live_con.execute("""
+                    INSERT INTO forecasts (entity_code, park_date, time_slot, predicted_actual, prediction_method, updated_at)
+                    SELECT entity_code, park_date::DATE, CAST(time_slot AS VARCHAR), predicted_actual,
+                           COALESCE(prediction_method, 'model'), CURRENT_TIMESTAMP
+                    FROM _fc_df
+                """)
+                live_con.execute("""
+                    INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
+                    VALUES ('forecasts', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM forecasts), 'pipeline')
+                """)
+                live_con.close()
+                logger.info(f"  Wrote {len(combined):,} predictions to tpcr_live.duckdb")
+            except Exception as e:
+                logger.warning(f"  DuckDB write failed: {e}")
+        
         # Stats
         method_counts = combined['prediction_method'].value_counts()
         total_predictions = len(combined)
