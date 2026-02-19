@@ -233,25 +233,65 @@ def evaluate_accuracy(
     
     parquet_glob = "', '".join(recent_parquets)
     date_list = "', '".join(eval_dates)
-    
-    # === SLOT-LEVEL ACCURACY ===
-    # Bucket actuals into 5-min slots and join with forecast
-    slot_df = con.execute(f"""
-        WITH actuals_bucketed AS (
+    synth_dir = os.path.join(output_base, "synthetic_actuals")
+    synth_glob = synth_dir.replace("\\", "/") + "/*.parquet"
+
+    # actuals_raw: raw ACTUAL from fact tables
+    # actuals_synth: synthetic actuals (POSTED→converted) — increases coverage
+    # actuals_bucketed: prefer raw when available, else synthetic
+    actuals_cte = f"""
+        WITH actuals_raw AS (
             SELECT
                 entity_code,
-                park_date,
-                -- Round to nearest 5-min slot (not floor)
-                -- Add 2.5 min then floor to 5-min boundary = round to nearest
-                TIME_BUCKET(INTERVAL '5 minutes', 
+                park_date::VARCHAR as park_date,
+                TIME_BUCKET(INTERVAL '5 minutes',
                     (observed_at_ts::TIMESTAMP + INTERVAL '2 minutes 30 seconds'))::TIME as time_slot,
                 AVG(wait_time_minutes) as actual_wait,
                 COUNT(*) as n_obs
             FROM read_parquet(['{parquet_glob}'])
             WHERE wait_time_type = 'ACTUAL'
-            AND park_date IN ('{date_list}')
+            AND park_date::VARCHAR IN ('{date_list}')
+            GROUP BY entity_code, park_date, time_slot
+        )"""
+    synth_parquets = [f for f in (os.listdir(synth_dir) or []) if f.endswith(".parquet")] if os.path.exists(synth_dir) else []
+    if synth_parquets:
+        # Include synthetic actuals for slots without raw — dramatically increases coverage
+        actuals_cte += f""",
+        actuals_synth AS (
+            SELECT
+                entity_code,
+                park_date::VARCHAR as park_date,
+                TIME_BUCKET(INTERVAL '5 minutes',
+                    (CAST(observed_at AS TIMESTAMP) + INTERVAL '2 minutes 30 seconds'))::TIME as time_slot,
+                AVG(synthetic_actual) as actual_wait,
+                COUNT(*) as n_obs
+            FROM read_parquet('{synth_glob}')
+            WHERE park_date::VARCHAR IN ('{date_list}')
+            AND synthetic_actual > 0
             GROUP BY entity_code, park_date, time_slot
         ),
+        actuals_bucketed AS (
+            SELECT
+                COALESCE(r.entity_code, s.entity_code) as entity_code,
+                COALESCE(r.park_date, s.park_date) as park_date,
+                COALESCE(r.time_slot, s.time_slot) as time_slot,
+                COALESCE(r.actual_wait, s.actual_wait) as actual_wait,
+                COALESCE(r.n_obs, 0) + COALESCE(s.n_obs, 0) as n_obs
+            FROM actuals_raw r
+            FULL OUTER JOIN actuals_synth s
+                ON r.entity_code = s.entity_code
+                AND r.park_date = s.park_date
+                AND r.time_slot = s.time_slot
+        )"""
+    else:
+        actuals_cte += """,
+        actuals_bucketed AS (
+            SELECT entity_code, park_date, time_slot, actual_wait, n_obs FROM actuals_raw
+        )"""
+
+    # === SLOT-LEVEL ACCURACY ===
+    slot_df = con.execute(f"""
+        {actuals_cte},
         forecasts AS (
             SELECT
                 entity_code,

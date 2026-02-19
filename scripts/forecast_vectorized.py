@@ -189,15 +189,37 @@ def forecast_entity(args) -> tuple:
         
         df['mins_since_open'] = df.apply(get_mins_since_open, axis=1)
         
-        # Check for V2 model
-        model_path = models_dir / entity_code / "model_julia_v2.json"
-        
-        if model_path.exists():
-            # Load model and detect type from metadata
+        # Check for actuals-only model first (ACTUALS-FIRST), then V2
+        actuals_model_path = models_dir / entity_code / "model_julia_actuals.json"
+        v2_model_path = models_dir / entity_code / "model_julia_v2.json"
+
+        if actuals_model_path.exists():
+            # Actuals-only model: 5 features, NO posted_time
             model = xgb.XGBRegressor()
-            model.load_model(str(model_path))
-            
-            # Check metadata to determine feature set (lite vs full)
+            model.load_model(str(actuals_model_path))
+            import json as _json
+            metadata_path = models_dir / entity_code / "metadata_julia_actuals.json"
+            is_actuals_lite = False
+            if metadata_path.exists():
+                try:
+                    with open(metadata_path) as _mf:
+                        meta = _json.load(_mf)
+                    is_actuals_lite = meta.get("model_label") == "XGBOOST_ACTUALS_LITE" or meta.get("version") == "actuals_lite"
+                except Exception:
+                    pass
+            if is_actuals_lite:
+                feature_cols = ['mins_since_6am', 'mins_since_open']
+            else:
+                feature_cols = ['mins_since_6am', 'mins_since_open', 'date_group_id_encoded', 'season_encoded', 'season_year_encoded']
+            X = df[feature_cols].values.astype(np.float32)
+            predictions = model.predict(X)
+            predictions = np.clip(predictions, 0, 300)
+            df['predicted_actual'] = np.round(predictions).astype(int)
+            df['prediction_method'] = 'model_actuals'
+        elif v2_model_path.exists():
+            # V2 model: uses posted_time
+            model = xgb.XGBRegressor()
+            model.load_model(str(v2_model_path))
             import json as _json
             metadata_path = models_dir / entity_code / "metadata_julia_v2.json"
             is_lite = False
@@ -208,24 +230,19 @@ def forecast_entity(args) -> tuple:
                     is_lite = meta.get("model_label") == "XGBOOST_LITE_MODEL" or meta.get("version") == "lite"
                 except Exception:
                     pass
-            
             if is_lite:
-                # Lite model: 4 features only
                 feature_cols = ['posted_time', 'mins_since_6am', 'mins_since_open', 'hour_of_day']
                 method_label = 'model_lite'
             else:
-                # Full V2 model: 7 features
                 feature_cols = [
-                    'posted_time', 'mins_since_6am', 'mins_since_open', 
-                    'hour_of_day', 'date_group_id_encoded', 
+                    'posted_time', 'mins_since_6am', 'mins_since_open',
+                    'hour_of_day', 'date_group_id_encoded',
                     'season_encoded', 'season_year_encoded'
                 ]
                 method_label = 'model_v2'
-            
             X = df[feature_cols].values.astype(np.float32)
             predictions = model.predict(X)
             predictions = np.clip(predictions, 0, 300)
-            
             df['predicted_actual'] = np.round(predictions).astype(int)
             df['prediction_method'] = method_label
         else:

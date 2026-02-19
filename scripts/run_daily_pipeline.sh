@@ -36,6 +36,7 @@ SKIP_DROPBOX_CHECK=false
 SKIP_SYNC=false
 SKIP_IF_UNCHANGED=false
 USE_SYNTHETIC=false
+USE_ACTUALS_ONLY=false
 PARK=""
 
 while [[ $# -gt 0 ]]; do
@@ -100,6 +101,10 @@ while [[ $# -gt 0 ]]; do
             USE_SYNTHETIC=true
             shift
             ;;
+        --actuals-only)
+            USE_ACTUALS_ONLY=true
+            shift
+            ;;
         --park)
             PARK="$2"
             shift 2
@@ -125,6 +130,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-sync             Skip S3 sync (use existing local raw data)"
             echo "  --skip-if-unchanged    Skip training/forecast/WTI if data hasn't changed (fast incremental mode)"
             echo "  --use-synthetic        Include synthetic actuals in training (balances real vs synthetic data)"
+            echo "  --actuals-only        ACTUALS-FIRST: train on actuals only, 5 features, no posted_time (OOM-safe)"
             echo "  --park PARK            Run training, forecast, and WTI for one park only (e.g. MK, EP, AK, BB)"
             exit 0
             ;;
@@ -367,9 +373,12 @@ elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check training 2>/d
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
     $PYTHON scripts/pipeline_state.py record training false "no dirty entities" 2>/dev/null || true
 else
-    # Build training command with synthetic flag if requested
+    # Build training command
     TRAINING_CMD="$PYTHON scripts/hybrid_pipeline_v2.py --output-base $OUTPUT_BASE --skip-scoring"
-    if $USE_SYNTHETIC; then
+    if $USE_ACTUALS_ONLY; then
+        TRAINING_CMD="$TRAINING_CMD --actuals-only"
+        TRAINING_DESC="Actuals-only training (5 features, no posted_time, OOM-safe)"
+    elif $USE_SYNTHETIC; then
         TRAINING_CMD="$TRAINING_CMD --use-synthetic"
         TRAINING_DESC="Hybrid training V2 (Julia + geo decay + synthetic actuals)"
     else

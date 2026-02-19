@@ -894,7 +894,7 @@ Fred reviewed all open questions. Resolved decisions:
 
 4. 📋 **TODO: Park WTI distributions in daily pipeline** — `compute_park_wti_distributions.py` updates the color scaling thresholds, but it's not explicitly called in `run_daily_pipeline.sh`. It should run after WTI calculation so the web/Discord/stream always have fresh per-park scales.
 
-5. 📋 **TODO: Accuracy eval with synthetic actuals** — Update `evaluate_forecast_accuracy.py` to include synthetic actuals as ground truth alongside raw ACTUAL observations.
+5. ~~**TODO: Accuracy eval with synthetic actuals**~~ ✅ **DONE** — `evaluate_forecast_accuracy.py` now includes synthetic actuals as ground truth (FULL OUTER JOIN with raw ACTUAL). Dramatically increases evaluation coverage.
 
 6. 📋 **TODO: Park hours donor filtering** — Add outlier filtering to `impute_park_hours.py`: reject abnormal openings (after 9:30 AM) and abnormal closings (before 5 PM where unusual for that park). Consider minimum frequency threshold.
 
@@ -902,7 +902,7 @@ Fred reviewed all open questions. Resolved decisions:
 
 8. 📋 **TODO: ETL → Parquet refactor** — Refactor ETL to output parquet directly, eliminating the CSV intermediate step and Step 1b.
 
-9. 📋 **TODO: Training architecture rethink** — Evaluate dropping POSTED as a training feature now that synthetic actuals exist. Would use temporal/seasonal features only. Needs careful A/B comparison before implementing.
+9. ~~**TODO: Training architecture rethink**~~ ✅ **IMPLEMENTED** — ACTUALS-FIRST methodology: `--actuals-only` in `hybrid_pipeline_v2.py` trains on actuals only (5 features, no posted_time). `forecast_vectorized.py` prefers `model_julia_actuals.json` when present. A/B comparison recommended before full rollout.
 
 10. 📋 **TODO: Daily accuracy report integration** — `daily_accuracy_report.py` exists and generates Telegram-friendly reports. Consider adding it to the daily pipeline or cron.
 
@@ -920,7 +920,8 @@ Fred reviewed all open questions. Resolved decisions:
 | Pipeline output base | `/home/wilma/hazeydata/pipeline/` (aliased as `{output_base}`) |
 | Fact tables (fast) | `{output_base}/fact_tables/parquet/*.parquet` |
 | Matched pairs | `{output_base}/matched_pairs/all_pairs_v2.parquet` |
-| Models | `{output_base}/models/{entity}/model_julia_v2.json` |
+| Actuals training data | `{output_base}/matched_pairs/actuals_training_v2.parquet` (ACTUALS-FIRST) |
+| Models | `{output_base}/models/{entity}/model_julia_v2.json` or `model_julia_actuals.json` |
 | Forecasts | `{output_base}/curves/forecast_parquet/all_forecasts.parquet` |
 | WTI | `{output_base}/wti/wti.parquet` |
 | Operating calendar | `{output_base}/operating_calendar/operating_calendar.parquet` |

@@ -436,19 +436,19 @@ python src/build_dimensions.py               # Dimensions
 
 **Target state:** Forecast models predict actual wait times directly from temporal features. POSTED times exist ONLY to feed the conversion model.
 
-#### Phase 1: Retrain Models Without POSTED Feature
-- [ ] **Modify `hybrid_pipeline_v2.py`** — Train XGBoost models on synthetic actuals + real actuals (not matched pairs). Target variable: actual wait time. Features: `mins_since_6am`, `mins_since_open`, `date_group_id`, `season`, `season_year` (NO `posted_time`).
-- [ ] **Training data:** Use synthetic actuals (90M+ rows) + real ACTUAL observations (2.5M rows, weighted 3.5×) as the training set. Each row = one time slot observation with known actual wait.
-- [ ] **Keep per-entity models** — still one XGBoost per entity, but features change from 7 to 5.
+#### Phase 1: Retrain Models Without POSTED Feature ✅ DONE (Bam-Bam, Feb 18)
+- [x] **Modify `hybrid_pipeline_v2.py`** — Added `--actuals-only` flag. New script `build_actuals_training_data.py` builds `actuals_training_v2.parquet` from synthetic + real actuals. Julia `train_actuals_v2.jl` trains with 5 features (no posted_time).
+- [x] **Training data:** Synthetic actuals + real ACTUAL (weighted 3.5×). Output: `matched_pairs/actuals_training_v2.parquet`.
+- [x] **Keep per-entity models** — One XGBoost per entity, saves to `model_julia_actuals.json`.
 - [ ] **A/B comparison** — Before replacing production models, compare accuracy of new (5-feature) vs old (7-feature with POSTED) on held-out dates. Document results.
 
-#### Phase 2: Simplify Forecast Generation  
-- [ ] **Modify `forecast_vectorized.py`** — Remove posted_time estimation entirely. Predict actual wait directly from temporal features.
-- [ ] **Remove posted_aggregates dependency** in forecasting (may still keep for diagnostics).
-- [ ] **Update model metadata** — new model_label (e.g., `XGBOOST_ACTUALS_V1`) so we can distinguish from old POSTED-based models.
+#### Phase 2: Simplify Forecast Generation ✅ DONE (Bam-Bam, Feb 18)
+- [x] **Modify `forecast_vectorized.py`** — Prefers `model_julia_actuals.json` when present; uses 5 features only, no posted_time. Falls back to V2 model when actuals model missing.
+- [ ] **Remove posted_aggregates dependency** — Still used for fallback (entities without models). May keep for diagnostics.
+- [x] **Update model metadata** — `XGBOOST_ACTUALS_V1` / `XGBOOST_ACTUALS_LITE` in `metadata_julia_actuals.json`.
 
-#### Phase 3: Update Accuracy Evaluation
-- [ ] **Modify `evaluate_forecast_accuracy.py`** — Real ACTUAL observations remain the gold standard. But ALSO include synthetic actuals (POSTED→converted) as secondary ground truth where no real ACTUAL exists. This dramatically increases evaluation coverage from ~2.5% of time slots to nearly 100%. Weight real actuals more heavily than synthetic in aggregate metrics (same 3.5:1 principle as WTI).
+#### Phase 3: Update Accuracy Evaluation ✅ DONE (Bam-Bam, Feb 18)
+- [x] **Modify `evaluate_forecast_accuracy.py`** — Uses synthetic actuals (FULL OUTER JOIN with raw ACTUAL) as ground truth. Dramatically increases evaluation coverage.
 - [ ] **Ensure synthetic actuals for eval dates exist** — May need to run conversion before accuracy eval step.
 
 #### Phase 4: Cleanup
@@ -853,6 +853,8 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-17 | Bam-Bam | **PyArrow bug:** Wilma's Telegram: PyArrow bug blocking daily training. Added URGENT task to Active Items. Need error message/stack trace from Wilma to fix. Common mitigations: pin PyArrow version (21.x if 22.x regressed), or use DuckDB for parquet metadata reads instead of pq.read_metadata(). |
 | 2026-02-17 | Bam-Bam | **PyArrow bug FIXED:** Root cause: mixed-type park_date (Timestamps from synthetic + strings from real) when merging pairs. PyArrow can't serialize. Added `combined_df['park_date'] = pd.to_datetime(combined_df['park_date']).dt.strftime('%Y-%m-%d')` before to_parquet in hybrid_pipeline_v2.py. Task moved to Completed. |
 | 2026-02-18 | Bam-Bam | **#4 Park code mismatch FIXED:** Created `src/utils/park_code.py` with `entity_code_to_park_code()` and `park_code_sql()`. Fixed 8 locations that used `entity_code[:2]` (wrong for TDL/TDS/USH). Now TDL→TDL, TDS→TDS, USH→UH. Wilma: re-run training and forecast for correct outputs. |
+| 2026-02-18 | Bam-Bam | **ACTUALS-FIRST implementation:** Phase 1–3 done. (1) `build_actuals_training_data.py` builds synthetic+real actuals; `train_actuals_v2.jl` trains 5-feature models; `hybrid_pipeline_v2.py --actuals-only`. (2) `forecast_vectorized.py` prefers `model_julia_actuals.json`. (3) `evaluate_forecast_accuracy.py` includes synthetic actuals as ground truth. Run: `python scripts/hybrid_pipeline_v2.py --actuals-only --skip-pairs --skip-scoring` (after synthetic actuals exist). A/B comparison recommended before full rollout. |
+| 2026-02-18 | Bam-Bam | **OOM fix for Actuals-FIRST:** Chunk by park per data-access-pattern. (1) `build_actuals_training_data.py` processes one park at a time, writes per-park parquets to `actuals_training_v2/MK.parquet` etc. (2) Julia `train_actuals_v2.jl` reads one park file at a time. (3) `run_daily_pipeline.sh --actuals-only` added. Run: `./scripts/run_daily_pipeline.sh --actuals-only` or `python scripts/hybrid_pipeline_v2.py --actuals-only`. |
 
 ---
 

@@ -17,6 +17,7 @@ Uses the fastest tool for each step:
 import argparse
 import json
 import logging
+import os
 import subprocess
 import sys
 import time
@@ -420,6 +421,60 @@ def step1_create_matched_pairs(logger, output_base: Path | None = None, full_reb
     return len(all_df)
 
 
+def step2_train_actuals(logger, output_base: Path | None = None) -> tuple[int, float]:
+    """Run Julia actuals-only training (ACTUALS-FIRST methodology)."""
+    base = output_base or OUTPUT_BASE
+    logger.info("=" * 60)
+    logger.info("STEP 2: TRAINING ACTUALS-ONLY (Julia/XGBoost.jl, no posted_time)")
+    logger.info("=" * 60)
+
+    train_script = PROJECT_ROOT / "julia-ml" / "train_actuals_v2.jl"
+    if not train_script.exists():
+        logger.error(f"Actuals training script not found: {train_script}")
+        return 0, 0.0
+
+    # Build actuals training data first
+    logger.info("Building actuals training data...")
+    result = subprocess.run(
+        [sys.executable, str(PROJECT_ROOT / "scripts" / "build_actuals_training_data.py"),
+         "--output-base", str(base)],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        logger.error(f"Build actuals training data failed:\n{result.stderr}")
+        return 0, 0.0
+    logger.info(result.stdout)
+
+    start = time.time()
+    env = dict(os.environ)
+    env["OUTPUT_BASE"] = str(base)
+
+    result = subprocess.run(
+        [str(JULIA_BIN), f"--project={PROJECT_ROOT / 'julia-ml'}", "--threads=4", str(train_script)],
+        cwd=str(PROJECT_ROOT / "julia-ml"),
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    elapsed = time.time() - start
+
+    if result.returncode != 0:
+        logger.error(f"Julia actuals training failed:\n{result.stderr}")
+        return 0, elapsed
+
+    logger.info(result.stdout)
+    successful = 0
+    for line in result.stdout.split("\n"):
+        if "Successful:" in line:
+            try:
+                successful = int(line.split(":")[1].strip())
+            except Exception:
+                pass
+    logger.info(f"  ⏱️  Actuals training: {elapsed:.1f}s ({successful} models)")
+    return successful, elapsed
+
+
 def step2_train_julia(logger, use_synthetic: bool = False) -> tuple[int, float]:
     """Run Julia XGBoost training with geo decay weights."""
     logger.info("=" * 60)
@@ -615,6 +670,8 @@ def main():
     parser.add_argument("--skip-training", action="store_true", help="Skip model training")
     parser.add_argument("--skip-scoring", action="store_true", help="Skip historical scoring")
     parser.add_argument("--use-synthetic", action="store_true", help="Include synthetic actuals in training")
+    parser.add_argument("--actuals-only", action="store_true",
+                       help="ACTUALS-FIRST: train on actuals only (no posted_time). Uses synthetic+real actuals.")
     args = parser.parse_args()
 
     output_base = args.output_base.resolve()
@@ -641,8 +698,10 @@ def main():
     
     # Step 2: Training
     if not args.skip_training:
-        # Build synthetic pairs if requested
-        if args.use_synthetic:
+        if args.actuals_only:
+            # ACTUALS-FIRST: train on actuals only (no posted_time)
+            n_models, train_time = step2_train_actuals(logger, output_base)
+        elif args.use_synthetic:
             logger.info("Building synthetic pairs...")
             import subprocess
             result = subprocess.run([
