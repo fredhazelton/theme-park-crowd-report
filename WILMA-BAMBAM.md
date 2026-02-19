@@ -423,6 +423,32 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+### 🔥 ARCHITECTURE: Shared DuckDB Data Layer + Bot Migration
+
+**Date:** Feb 19, 2026  
+**Priority:** 🔴 HIGH — The queue-times scraper has been dead since Feb 5 (cleanup commit deleted the bash wrapper). Fixed now, but this migration prevents it from happening again and speeds up everything.  
+**Full Spec:** `docs/DISCORD_BOT_DUCKDB_MIGRATION.md` ← **READ THIS FIRST**
+
+**TL;DR:**
+1. Create persistent DuckDB (`/mnt/data/pipeline/tpcr_live.duckdb`) as single data layer
+2. Scraper INSERTs live waits into DuckDB (+ keeps CSV for backward compat)
+3. Daily pipeline writes WTI, forecasts, entities to same DuckDB
+4. Discord bot + dashboard API read from DuckDB (millisecond queries, not CSV scanning)
+5. Move bot code from `~/tpcr-discord-bot/` into main repo `tpcr-discord-bot/`
+6. Add data freshness tracking so we never silently serve stale data again
+
+**Build order:**
+1. `scripts/init_live_duckdb.py` — create schema + backfill from existing data
+2. Update scraper to dual-write (CSV + DuckDB)
+3. Update pipeline to write WTI/forecasts/entities to DuckDB
+4. Move bot code into main repo + rewrite queries
+5. Update dashboard API to use same DuckDB
+6. Add `/health` command with freshness monitoring
+
+**Key principle:** DuckDB supports concurrent readers (bot + API both use `read_only=True`). One writer at a time (scraper every 5 min, pipeline once/day at 6am — no conflict).
+
+---
+
 ### 🔥 NEW: Live "Now" Card — Shareable Wait Times Display
 
 **Date:** Feb 19, 2026
