@@ -272,6 +272,27 @@ def _parse_time_to_minutes(s) -> Optional[int]:
     return None
 
 
+def _parse_time_to_minutes_local(s, park_tz: ZoneInfo) -> Optional[int]:
+    """
+    Parse time from dimparkhours: supports HH:MM or full timestamp (EST).
+    Full timestamps are converted to park local time before extracting.
+    """
+    simple = _parse_time_to_minutes(s)
+    if simple is not None:
+        return simple
+    try:
+        ts = pd.to_datetime(s)
+        if pd.isna(ts):
+            return None
+        est = ZoneInfo("America/New_York")
+        if ts.tzinfo is None:
+            ts = ts.tz_localize(est)
+        local = ts.astimezone(park_tz)
+        return int(local.hour * 60 + local.minute)
+    except Exception:
+        return None
+
+
 def _get_park_date_local(now: datetime, tz: ZoneInfo) -> str:
     """Park operational date in park TZ using 6am rule: if hour < 6, use previous calendar date."""
     local = now.astimezone(tz)
@@ -334,18 +355,19 @@ def get_in_window_park_ids(
             continue
 
         # Aggregate if multiple rows: earliest open, latest close; earliest EMH if present
+        # Use _parse_time_to_minutes_local for EST timestamps (fixes Tokyo TDL/TDS)
         open_min = None
         close_min = None
         emh_min = None
         for _, r in rows.iterrows():
-            o = _parse_time_to_minutes(r.get(open_col))
-            c = _parse_time_to_minutes(r.get(close_col))
+            o = _parse_time_to_minutes_local(r.get(open_col), tz)
+            c = _parse_time_to_minutes_local(r.get(close_col), tz)
             if o is not None:
                 open_min = o if open_min is None else min(open_min, o)
             if c is not None:
                 close_min = c if close_min is None else max(close_min, c)
             if emh_col and r.get(emh_col) is not None:
-                e = _parse_time_to_minutes(r.get(emh_col))
+                e = _parse_time_to_minutes_local(r.get(emh_col), tz)
                 if e is not None:
                     emh_min = e if emh_min is None else min(emh_min, e)
 

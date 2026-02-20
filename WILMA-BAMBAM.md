@@ -449,56 +449,16 @@ python src/build_dimensions.py               # Dimensions
 
 ---
 
-### 🔥 BUG: Tokyo Parks (TDL/TDS) Forecasts Empty — Timezone Bug in forecast_vectorized.py
+### ✅ FIXED: Tokyo Parks (TDL/TDS) Forecasts Empty — Timezone Bug
 
-**Date:** Feb 20, 2026  
-**Priority:** 🔴 HIGH — Tokyo parks have trained models but produce almost zero forecasts  
-**Root cause:** Park hours in `dimparkhours.csv` are stored as EST timestamps. `forecast_vectorized.py` line ~393 does `EXTRACT(HOUR FROM CAST(opening_time_with_emh AS TIMESTAMP))` which gives the EST hour (e.g., 19 for 7pm EST) instead of the local hour (9am JST).
+**Date:** Feb 20, 2026 → Fixed Feb 20, 2026  
+**Status:** Completed by Bam-Bam
 
-**The math that breaks:**
-- TDL opens 9am JST = `2026-02-19 19:00:00-05:00` (EST)
-- `EXTRACT(HOUR)` → 19, so `open_mins = 1140`
-- TDL closes 6:30pm JST = `2026-02-20 04:30:00-05:00` (EST)  
-- `EXTRACT(HOUR)` → 4, so `close_mins = 270`
-- Midnight adjustment: `270 + 1440 = 1710`
-- Park hours window: 1140–1710 mins — mostly outside the 0–1440 time grid
-- Result: almost all time slots filtered as "outside park hours" → no forecasts
+**Fix applied:** Option 1 — park→timezone mapping, convert to local before extracting.
+- `scripts/forecast_vectorized.py`: Added `PARK_TIMEZONE` map; fetch raw timestamps, convert to park local (ZoneInfo) in Python, then extract hour*60+minute. Normalize park key to uppercase for lookup.
+- `src/get_wait_times_from_queue_times.py`: Added `_parse_time_to_minutes_local()` to handle full EST timestamps; converts to park TZ before extracting. Scraper hours filter now correct for Tokyo.
 
-**US parks work fine** because EST hours happen to be correct for EST-stored timestamps.
-
-**Fix options (pick one):**
-
-1. **Convert to local time before extracting** (cleanest):
-   - Add a park→timezone mapping: `{'TDL': 'Asia/Tokyo', 'TDS': 'Asia/Tokyo', 'MK': 'America/New_York', ...}`
-   - In the SQL: `EXTRACT(HOUR FROM opening_time_with_emh AT TIME ZONE park_tz)`
-   - Or do it in Python after the query
-
-2. **Extract from the time component only** (simpler):
-   - The park hours represent local park times. Parse as local time regardless of the timezone offset in the CSV.
-   - After reading the timestamp, convert to the park's timezone, then extract hour/minute.
-
-3. **Store park hours as naive local times** (upstream fix):
-   - Change `dimparkhours.csv` to store times without timezone offset
-   - Bigger change, affects more code
-
-**I recommend option 1** — add a timezone map and convert before extracting. Minimal blast radius.
-
-**Files to modify:**
-- `scripts/forecast_vectorized.py` — lines ~393-416 (park hours loading section)
-
-**Verification after fix:**
-```python
-# Should see ~365 dates for TDL/TDS in forecast output
-import duckdb
-duckdb.sql("""
-    SELECT entity_code LIKE 'TDL%' as is_tdl, COUNT(DISTINCT park_date) 
-    FROM read_parquet('/mnt/data/pipeline/curves/forecast_parquet/all_forecasts.parquet')
-    WHERE entity_code LIKE 'TDL%' OR entity_code LIKE 'TDS%'
-    GROUP BY is_tdl
-""")
-```
-
-**Also check:** Does the same timezone issue affect `get_wait_times_from_queue_times.py`'s park hours filter? That scraper also uses dimparkhours to decide when to fetch — if it's broken for Tokyo, we might be missing scrape windows too.
+**Verification:** Re-run forecast on wilma-server; TDL/TDS should have ~365 dates in output.
 
 ---
 
@@ -992,6 +952,7 @@ PREMIUM_ROLE_ID=<create this role>
 | 2026-02-18 | Bam-Bam | **ACTUALS-FIRST implementation:** Phase 1–3 done. (1) `build_actuals_training_data.py` builds synthetic+real actuals; `train_actuals_v2.jl` trains 5-feature models; `hybrid_pipeline_v2.py --actuals-only`. (2) `forecast_vectorized.py` prefers `model_julia_actuals.json`. (3) `evaluate_forecast_accuracy.py` includes synthetic actuals as ground truth. Run: `python scripts/hybrid_pipeline_v2.py --actuals-only --skip-pairs --skip-scoring` (after synthetic actuals exist). A/B comparison recommended before full rollout. |
 | 2026-02-18 | Bam-Bam | **OOM fix for Actuals-FIRST:** Chunk by park per data-access-pattern. (1) `build_actuals_training_data.py` processes one park at a time, writes per-park parquets to `actuals_training_v2/MK.parquet` etc. (2) Julia `train_actuals_v2.jl` reads one park file at a time. (3) `run_daily_pipeline.sh --actuals-only` added. Run: `./scripts/run_daily_pipeline.sh --actuals-only` or `python scripts/hybrid_pipeline_v2.py --actuals-only`. |
 | 2026-02-19 | Bam-Bam | **DuckDB migration (Phase 1–3):** Implemented shared DuckDB for bot + dashboard. (1) `scripts/init_live_duckdb.py` — schema + backfill from staging, wti, forecasts, dimentity, with dimentity column detection. (2) Scraper dual-write: `write_to_live_duckdb` after CSV write. (3) Pipeline dual-write: `calculate_wti_simple.py`, `forecast_vectorized.py`, `get_entity_table_from_s3.py` write to tpcr_live.duckdb. (4) `run_daily_pipeline.sh` runs init if DB missing. Added duckdb to requirements. PIPELINE_STATE and DISCORD_BOT_DUCKDB_MIGRATION updated. Next: move bot, update dashboard API, add /health. |
+| 2026-02-20 | Bam-Bam | **Tokyo timezone bug FIXED:** Park hours in dimparkhours are EST; forecast was extracting EST hour (19 for 7pm) instead of local (9am JST) → TDL/TDS had no forecasts. Fixed: (1) `forecast_vectorized.py` — PARK_TIMEZONE map, convert timestamps to park local before extracting mins. (2) `get_wait_times_from_queue_times.py` — `_parse_time_to_minutes_local()` for full timestamps. Wilma: re-run forecast to verify TDL/TDS. |
 
 ---
 

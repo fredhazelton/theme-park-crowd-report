@@ -18,6 +18,7 @@ import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import numpy as np
 
@@ -36,6 +37,24 @@ except ImportError:
 DEFAULT_WORKERS = 8
 SLOTS_PER_DAY = 288  # 5-minute intervals
 DEFAULT_FALLBACK_RATIO = 0.678  # Fallback if ratios file missing; overridden by state/fallback_ratios.json
+
+# Park code -> IANA timezone (for converting dimparkhours EST timestamps to local time)
+PARK_TIMEZONE: dict[str, str] = {
+    "TDL": "Asia/Tokyo",
+    "TDS": "Asia/Tokyo",
+    "MK": "America/New_York",
+    "EP": "America/New_York",
+    "HS": "America/New_York",
+    "AK": "America/New_York",
+    "BB": "America/New_York",
+    "TL": "America/New_York",
+    "DL": "America/Los_Angeles",
+    "CA": "America/Los_Angeles",
+    "IA": "America/New_York",
+    "UF": "America/New_York",
+    "EU": "America/New_York",
+    "UH": "America/Los_Angeles",
+}
 
 # Paths
 OUTPUT_BASE = Path("/home/wilma/hazeydata/pipeline")
@@ -388,30 +407,54 @@ def main():
     logger.info(f"  Loaded features for {len(date_features)} dates")
     
     # Load park hours (earliest open with early entry, latest close with extras)
+    # Timestamps in dimparkhours are stored as EST; convert to each park's local timezone
+    # before extracting hour/minute (fixes Tokyo TDL/TDS which had wrong hour extraction)
     logger.info("Loading park hours...")
     park_hours_df = con.execute(f"""
         SELECT 
             park,
             CAST(date AS DATE) as park_date,
-            EXTRACT(HOUR FROM CAST(opening_time_with_emh AS TIMESTAMP)) * 60 + 
-            EXTRACT(MINUTE FROM CAST(opening_time_with_emh AS TIMESTAMP)) as opening_mins,
-            EXTRACT(HOUR FROM CAST(closing_time_with_emh_or_party AS TIMESTAMP)) * 60 + 
-            EXTRACT(MINUTE FROM CAST(closing_time_with_emh_or_party AS TIMESTAMP)) as closing_mins
+            opening_time_with_emh,
+            closing_time_with_emh_or_party
         FROM read_csv_auto('{dim_dir}/dimparkhours.csv')
         WHERE opening_time_with_emh IS NOT NULL
     """).fetchdf()
     
     park_hours_lookup = {}
     for _, row in park_hours_df.iterrows():
-        key = (row['park'], pd.Timestamp(row['park_date']).date())
-        open_mins = int(row['opening_mins']) if pd.notna(row['opening_mins']) else None
-        close_mins = int(row['closing_mins']) if pd.notna(row['closing_mins']) else None
+        park_norm = str(row["park"]).strip().upper() if pd.notna(row["park"]) else ""
+        park_date = pd.Timestamp(row["park_date"]).date()
+        park_tz = PARK_TIMEZONE.get(park_norm, "America/New_York")
+        zone = ZoneInfo(park_tz)
+        open_mins = None
+        close_mins = None
+        # dimparkhours timestamps are EST; convert to park local before extracting
+        est = ZoneInfo("America/New_York")
+        try:
+            open_ts = pd.to_datetime(row["opening_time_with_emh"])
+            if open_ts.tzinfo is None:
+                open_ts = open_ts.tz_localize(est)
+            open_local = open_ts.astimezone(zone)
+            open_mins = int(open_local.hour * 60 + open_local.minute)
+        except Exception:
+            pass
+        try:
+            close_ts = pd.to_datetime(row["closing_time_with_emh_or_party"])
+            if close_ts.tzinfo is None:
+                close_ts = close_ts.tz_localize(est)
+            close_local = close_ts.astimezone(zone)
+            close_mins = int(close_local.hour * 60 + close_local.minute)
+        except Exception:
+            pass
+        if open_mins is None and close_mins is None:
+            continue
         # Handle midnight+ closing (closing_mins=0 means midnight, treat as 24*60)
         if close_mins is not None and close_mins == 0:
             close_mins = 24 * 60
         # Handle next-day close (e.g., 1am = 60 mins → should be 25*60=1500)
         if close_mins is not None and close_mins < 360 and open_mins is not None and open_mins > close_mins:
             close_mins += 24 * 60
+        key = (park_norm, park_date)
         park_hours_lookup[key] = (open_mins, close_mins)
     logger.info(f"  Loaded {len(park_hours_lookup)} park-date hours")
     
