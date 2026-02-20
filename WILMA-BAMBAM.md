@@ -449,6 +449,59 @@ python src/build_dimensions.py               # Dimensions
 
 ---
 
+### 🔥 BUG: Tokyo Parks (TDL/TDS) Forecasts Empty — Timezone Bug in forecast_vectorized.py
+
+**Date:** Feb 20, 2026  
+**Priority:** 🔴 HIGH — Tokyo parks have trained models but produce almost zero forecasts  
+**Root cause:** Park hours in `dimparkhours.csv` are stored as EST timestamps. `forecast_vectorized.py` line ~393 does `EXTRACT(HOUR FROM CAST(opening_time_with_emh AS TIMESTAMP))` which gives the EST hour (e.g., 19 for 7pm EST) instead of the local hour (9am JST).
+
+**The math that breaks:**
+- TDL opens 9am JST = `2026-02-19 19:00:00-05:00` (EST)
+- `EXTRACT(HOUR)` → 19, so `open_mins = 1140`
+- TDL closes 6:30pm JST = `2026-02-20 04:30:00-05:00` (EST)  
+- `EXTRACT(HOUR)` → 4, so `close_mins = 270`
+- Midnight adjustment: `270 + 1440 = 1710`
+- Park hours window: 1140–1710 mins — mostly outside the 0–1440 time grid
+- Result: almost all time slots filtered as "outside park hours" → no forecasts
+
+**US parks work fine** because EST hours happen to be correct for EST-stored timestamps.
+
+**Fix options (pick one):**
+
+1. **Convert to local time before extracting** (cleanest):
+   - Add a park→timezone mapping: `{'TDL': 'Asia/Tokyo', 'TDS': 'Asia/Tokyo', 'MK': 'America/New_York', ...}`
+   - In the SQL: `EXTRACT(HOUR FROM opening_time_with_emh AT TIME ZONE park_tz)`
+   - Or do it in Python after the query
+
+2. **Extract from the time component only** (simpler):
+   - The park hours represent local park times. Parse as local time regardless of the timezone offset in the CSV.
+   - After reading the timestamp, convert to the park's timezone, then extract hour/minute.
+
+3. **Store park hours as naive local times** (upstream fix):
+   - Change `dimparkhours.csv` to store times without timezone offset
+   - Bigger change, affects more code
+
+**I recommend option 1** — add a timezone map and convert before extracting. Minimal blast radius.
+
+**Files to modify:**
+- `scripts/forecast_vectorized.py` — lines ~393-416 (park hours loading section)
+
+**Verification after fix:**
+```python
+# Should see ~365 dates for TDL/TDS in forecast output
+import duckdb
+duckdb.sql("""
+    SELECT entity_code LIKE 'TDL%' as is_tdl, COUNT(DISTINCT park_date) 
+    FROM read_parquet('/mnt/data/pipeline/curves/forecast_parquet/all_forecasts.parquet')
+    WHERE entity_code LIKE 'TDL%' OR entity_code LIKE 'TDS%'
+    GROUP BY is_tdl
+""")
+```
+
+**Also check:** Does the same timezone issue affect `get_wait_times_from_queue_times.py`'s park hours filter? That scraper also uses dimparkhours to decide when to fetch — if it's broken for Tokyo, we might be missing scrape windows too.
+
+---
+
 ### 🔥 NEW: Live "Now" Card — Shareable Wait Times Display
 
 **Date:** Feb 19, 2026
