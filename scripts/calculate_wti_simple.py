@@ -363,7 +363,7 @@ def main():
                 live_con.register("_wti_df", combined)
                 live_con.execute("""
                     INSERT INTO wti (park_code, park_date, time_slot, wti, source, updated_at)
-                    SELECT park_code, park_date::DATE, NULL, wti, COALESCE(source, 'forecast'), CURRENT_TIMESTAMP
+                    SELECT park_code, park_date::DATE, 'daily', wti, COALESCE(source, 'forecast'), CURRENT_TIMESTAMP
                     FROM _wti_df
                 """)
                 live_con.execute("""
