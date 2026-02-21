@@ -36,6 +36,7 @@ if str(Path(__file__).parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from utils.paths import get_output_base
+from utils.forecast_horizon import get_forecast_end_date
 
 
 def setup_logging(log_dir: Path) -> logging.Logger:
@@ -54,6 +55,79 @@ def setup_logging(log_dir: Path) -> logging.Logger:
     logger = logging.getLogger(__name__)
     logger.info(f"Logging initialized. Log file: {log_file}")
     return logger
+
+
+def scaffold_future_park_hours(output_base: Path, logger: logging.Logger) -> int:
+    """
+    Ensure dimparkhours.csv has rows for ALL parks × ALL dates through the
+    forecast horizon.  Only inserts rows that don't already exist.  New rows
+    have park_id, park, date filled in; all time columns empty; is_official=False.
+
+    Returns the number of scaffold rows added.
+    """
+    from datetime import date as date_type, timedelta as td
+
+    dim_dir = output_base / "dimension_tables"
+    parkhours_file = dim_dir / "dimparkhours.csv"
+
+    if not parkhours_file.exists():
+        logger.warning("dimparkhours.csv not found — skipping scaffold")
+        return 0
+
+    logger.info("--- SCAFFOLD FUTURE PARK HOURS ---")
+
+    df = pd.read_csv(parkhours_file, dtype=str)
+    original_len = len(df)
+
+    # Build park_id → park code mapping from existing data
+    park_map = (
+        df[["park_id", "park"]]
+        .drop_duplicates()
+        .dropna(subset=["park_id", "park"])
+    )
+    park_map = dict(zip(park_map["park_id"], park_map["park"]))
+    logger.info(f"  Parks in data: {len(park_map)} — {sorted(park_map.values())}")
+
+    # Existing (park_id, date) pairs for fast membership test
+    existing_keys = set(zip(df["park_id"], df["date"]))
+
+    # Date range: tomorrow → forecast end
+    tomorrow = date_type.today() + td(days=1)
+    end_date = get_forecast_end_date()
+    all_dates = pd.date_range(tomorrow, end_date, freq="D")
+    logger.info(f"  Scaffold window: {tomorrow} → {end_date} ({len(all_dates)} days)")
+
+    # Determine next park_day_id (auto-increment integer)
+    max_id = df["park_day_id"].dropna().astype(int).max()
+    next_id = int(max_id) + 1
+
+    # Build scaffold rows
+    new_rows: list[dict] = []
+    columns = list(df.columns)
+    for d in all_dates:
+        date_str = d.strftime("%Y-%m-%d")
+        for park_id_str, park_code in park_map.items():
+            if (park_id_str, date_str) not in existing_keys:
+                row = {col: "" for col in columns}
+                row["park_day_id"] = str(next_id)
+                row["park_id"] = park_id_str
+                row["park"] = park_code
+                row["date"] = date_str
+                row["is_official"] = "False"
+                new_rows.append(row)
+                next_id += 1
+
+    if not new_rows:
+        logger.info("  No scaffold rows needed — all park-dates already present")
+        return 0
+
+    scaffold_df = pd.DataFrame(new_rows, columns=columns)
+    df = pd.concat([df, scaffold_df], ignore_index=True)
+
+    # Write back
+    df.to_csv(parkhours_file, index=False)
+    logger.info(f"  Added {len(new_rows):,} scaffold rows (was {original_len:,}, now {len(df):,})")
+    return len(new_rows)
 
 
 def impute_park_hours(output_base: Path, logger: logging.Logger) -> int:
@@ -405,6 +479,9 @@ def main() -> None:
     logger = setup_logging(log_dir)
 
     try:
+        scaffold_count = scaffold_future_park_hours(base, logger)
+        if scaffold_count > 0:
+            logger.info(f"Scaffolded {scaffold_count:,} future park-date rows")
         count = impute_park_hours(base, logger)
         logger.info("Success!")
         sys.exit(0)

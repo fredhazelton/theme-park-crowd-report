@@ -25,6 +25,7 @@ import numpy as np
 # Ensure src is on path for utils import
 if str(Path(__file__).parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from utils.forecast_horizon import get_forecast_end_date
 from utils.park_code import entity_code_to_park_code
 import pandas as pd
 
@@ -297,7 +298,7 @@ def main():
     parser = argparse.ArgumentParser(description="Vectorized forecast generation (V2)")
     parser.add_argument("--output-base", type=Path, default=OUTPUT_BASE, help="Pipeline output base")
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS, help="Parallel workers")
-    parser.add_argument("--days", type=int, default=730, help="Days to forecast")
+    parser.add_argument("--days", type=int, default=None, help="Days to forecast (default: use global FORECAST_DAYS)")
     parser.add_argument("--max-entities", type=int, help="Limit entities (testing)")
     args = parser.parse_args()
 
@@ -315,10 +316,15 @@ def main():
 
     # Date range
     start_date = date.today() + timedelta(days=1)
-    end_date = start_date + timedelta(days=args.days)
-
-    logger.info(f"Output base: {output_base}")
-    logger.info(f"Date range: {start_date} to {end_date} ({args.days} days)")
+    if args.days is not None:
+        end_date = start_date + timedelta(days=args.days)
+        logger.info(f"Output base: {output_base}")
+        logger.info(f"Date range: {start_date} to {end_date} ({args.days} days, CLI override)")
+    else:
+        end_date = get_forecast_end_date()
+        forecast_days = (end_date - start_date).days
+        logger.info(f"Output base: {output_base}")
+        logger.info(f"Date range: {start_date} to {end_date} ({forecast_days} days, global horizon)")
     logger.info(f"Workers: {args.workers}")
 
     import duckdb

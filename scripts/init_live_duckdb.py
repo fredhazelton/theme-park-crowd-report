@@ -110,6 +110,7 @@ def init(db_path: Path, output_base: Path, logger) -> bool:
             property_code   VARCHAR,
             category        VARCHAR,
             has_wait_times  BOOLEAN DEFAULT TRUE,
+            has_posted      BOOLEAN DEFAULT FALSE,
             wait_time_type  VARCHAR DEFAULT 'standby',
             is_extinct      BOOLEAN DEFAULT FALSE,
             updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -192,16 +193,18 @@ def init(db_path: Path, output_base: Path, logger) -> bool:
             pc_sql = park_code_sql(ec_col)
             short_sql = "short_name" if "short_name" in col_names else "NULL"
             prop_sql = "property_code" if "property_code" in col_names else "NULL"
+            has_posted_sql = "COALESCE(has_posted, FALSE)" if "has_posted" in col_names else "FALSE"
             park_sql = f"COALESCE(park_code, ({pc_sql}))" if "park_code" in col_names else pc_sql
             con.execute(f"""
                 INSERT OR REPLACE INTO entities 
-                    (entity_code, entity_name, short_name, park_code, property_code, updated_at)
+                    (entity_code, entity_name, short_name, park_code, property_code, has_posted, updated_at)
                 SELECT 
                     {ec_col},
                     {en_col},
                     {short_sql},
                     {park_sql},
                     {prop_sql},
+                    {has_posted_sql},
                     CURRENT_TIMESTAMP
                 FROM read_csv_auto('{dim_str}')
             """)

@@ -386,15 +386,15 @@ def evaluate_accuracy(
         try:
             wti_df = con.execute(f"""
                 WITH forecast_wti AS (
-                    SELECT park_code, park_date::VARCHAR as park_date, wti as forecast_wti,
+                    SELECT park_code, park_date::DATE::VARCHAR as park_date, wti as forecast_wti,
                            wti_made_date
                     FROM read_parquet('{wti_archive}')
-                    WHERE park_date::VARCHAR IN ('{date_list}')
+                    WHERE park_date::DATE::VARCHAR IN ('{date_list}')
                 ),
                 actual_wti AS (
-                    SELECT park_code, park_date::VARCHAR as park_date, wti as actual_wti
+                    SELECT park_code, park_date::DATE::VARCHAR as park_date, wti as actual_wti
                     FROM read_parquet('{wti_path}')
-                    WHERE source = 'historical' AND park_date::VARCHAR IN ('{date_list}')
+                    WHERE source = 'historical' AND park_date::DATE::VARCHAR IN ('{date_list}')
                 )
                 SELECT
                     f.park_code,

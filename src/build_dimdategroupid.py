@@ -52,13 +52,13 @@ import pandas as pd
 from zoneinfo import ZoneInfo
 
 from utils import get_output_base
+from utils.forecast_horizon import get_forecast_end_date
 
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
 
 START_DATE = date(2005, 1, 1)
-YEARS_AHEAD = 2
 EASTERN = ZoneInfo("America/New_York")
 DIMDATEGROUPID_NAME = "dimdategroupid.csv"
 
@@ -185,7 +185,7 @@ def build_dimdate(today: date, logger: logging.Logger) -> pd.DataFrame:
     Add year, month, day, day_of_week, quarter, week_of_year, day_of_year,
     month_name, month_mmm, day_of_week_name, day_of_week_ddd, offsets, flags, etc.
     """
-    end = today + timedelta(days=365 * YEARS_AHEAD)
+    end = get_forecast_end_date()
     dr = pd.date_range(START_DATE, end, freq="D")
     df = pd.DataFrame({"park_date": pd.to_datetime(dr)})
     df["year"] = df["park_date"].dt.year

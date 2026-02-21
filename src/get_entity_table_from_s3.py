@@ -214,12 +214,18 @@ def _refresh_entities_duckdb(
         pc_sql = park_code_sql(ec_col)
         short_sql = "short_name" if "short_name" in col_names else "NULL"
         prop_sql = "property_code" if "property_code" in col_names else "NULL"
+        has_posted_sql = "COALESCE(has_posted, FALSE)" if "has_posted" in col_names else "FALSE"
         park_sql = f"COALESCE(park_code, ({pc_sql}))" if "park_code" in col_names else pc_sql
         con = duckdb.connect(str(db_path))
+        # Add has_posted column if missing (upgrade path)
+        try:
+            con.execute("ALTER TABLE entities ADD COLUMN has_posted BOOLEAN DEFAULT FALSE")
+        except Exception:
+            pass  # column already exists
         con.execute("DELETE FROM entities")
         con.execute(f"""
-            INSERT INTO entities (entity_code, entity_name, short_name, park_code, property_code, updated_at)
-            SELECT {ec_col}, {en_col}, {short_sql}, {park_sql}, {prop_sql}, CURRENT_TIMESTAMP
+            INSERT INTO entities (entity_code, entity_name, short_name, park_code, property_code, has_posted, updated_at)
+            SELECT {ec_col}, {en_col}, {short_sql}, {park_sql}, {prop_sql}, {has_posted_sql}, CURRENT_TIMESTAMP
             FROM read_csv_auto('{dim_str}')
         """)
         n = con.execute("SELECT COUNT(*) FROM entities").fetchone()[0]

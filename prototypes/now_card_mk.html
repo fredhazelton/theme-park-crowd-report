@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1080px;
+    height: 1350px;
+    background: #0d1117;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #e6edf3;
+    overflow: hidden;
+  }
+
+  .card {
+    width: 1080px;
+    height: 1350px;
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .park-icon {
+    font-size: 42px;
+    line-height: 1;
+  }
+  .park-name {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .live-badge {
+    margin-left: auto;
+    background: #da3633;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  .datetime {
+    font-size: 22px;
+    color: #7d8590;
+    margin-bottom: 36px;
+    padding-left: 58px;
+  }
+
+  /* ── Gauge ── */
+  .gauge-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  .gauge-container {
+    position: relative;
+    width: 480px;
+    height: 280px;
+  }
+  canvas#gauge {
+    width: 480px;
+    height: 280px;
+  }
+
+  /* ── Context Banner ── */
+  .context-banner {
+    background: linear-gradient(135deg, rgba(218,54,51,0.15), rgba(218,54,51,0.05));
+    border: 1px solid rgba(218,54,51,0.3);
+    border-radius: 16px;
+    padding: 20px 28px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .context-icon { font-size: 28px; }
+  .context-text {
+    font-size: 22px;
+    font-weight: 600;
+    color: #f0883e;
+  }
+  .context-sub {
+    font-size: 17px;
+    color: #7d8590;
+    margin-top: 4px;
+  }
+
+  /* ── Table ── */
+  .table-header {
+    display: flex;
+    padding: 0 8px 12px 8px;
+    border-bottom: 1px solid #21262d;
+    margin-bottom: 4px;
+  }
+  .th-ride {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    color: #7d8590;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .th-now, .th-avg {
+    width: 110px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #7d8590;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .th-diff {
+    width: 120px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #7d8590;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .ride-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 8px;
+    border-radius: 12px;
+    transition: background 0.2s;
+  }
+  .ride-row:nth-child(odd) {
+    background: rgba(255,255,255,0.02);
+  }
+  .ride-name {
+    flex: 1;
+    font-size: 22px;
+    font-weight: 500;
+  }
+  .ride-now {
+    width: 110px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+  }
+  .ride-avg {
+    width: 110px;
+    text-align: center;
+    font-size: 22px;
+    color: #7d8590;
+  }
+  .ride-diff {
+    width: 120px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 4px 12px;
+  }
+  .diff-up {
+    color: #f85149;
+    background: rgba(248,81,73,0.1);
+  }
+  .diff-down {
+    color: #3fb950;
+    background: rgba(63,185,80,0.1);
+  }
+  .diff-flat {
+    color: #7d8590;
+  }
+
+  /* ── Closed row ── */
+  .ride-closed .ride-name { color: #484f58; }
+  .ride-closed .ride-now {
+    font-size: 16px;
+    color: #484f58;
+    font-weight: 500;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 24px;
+    border-top: 1px solid #21262d;
+  }
+  .brand {
+    font-size: 22px;
+    font-weight: 700;
+    color: #7d8590;
+  }
+  .brand span { color: #58a6ff; }
+  .powered {
+    font-size: 16px;
+    color: #484f58;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <!-- Header -->
+  <div class="header">
+    <div class="park-icon">🏰</div>
+    <div class="park-name">Magic Kingdom</div>
+    <div class="live-badge">● LIVE</div>
+  </div>
+  <div class="datetime">Thursday, February 19 · 8:42 AM ET</div>
+
+  <!-- Gauge -->
+  <div class="gauge-section">
+    <div class="gauge-container">
+      <canvas id="gauge" width="960" height="560"></canvas>
+    </div>
+  </div>
+
+  <!-- Context Banner -->
+  <div class="context-banner">
+    <div class="context-icon">📈</div>
+    <div>
+      <div class="context-text">Park is running 18% below typical for a Thursday morning</div>
+      <div class="context-sub">Based on historical averages for this date type · Presidents' Day week</div>
+    </div>
+  </div>
+
+  <!-- Ride Table -->
+  <div class="table-header">
+    <div class="th-ride">Attraction</div>
+    <div class="th-now">Now</div>
+    <div class="th-avg">Typical</div>
+    <div class="th-diff">vs Avg</div>
+  </div>
+
+  <div class="ride-row">
+    <div class="ride-name">🎢 TRON Lightcycle / Run</div>
+    <div class="ride-now" style="color:#f0883e">75</div>
+    <div class="ride-avg">85</div>
+    <div class="ride-diff diff-down">↓ 12%</div>
+  </div>
+  <div class="ride-row">
+    <div class="ride-name">⛏️ Seven Dwarfs Mine Train</div>
+    <div class="ride-now" style="color:#f0883e">45</div>
+    <div class="ride-avg">75</div>
+    <div class="ride-diff diff-down">↓ 40%</div>
+  </div>
+  <div class="ride-row">
+    <div class="ride-name">🐻 Winnie the Pooh</div>
+    <div class="ride-now" style="color:#f0883e">40</div>
+    <div class="ride-avg">30</div>
+    <div class="ride-diff diff-up">↑ 33%</div>
+  </div>
+  <div class="ride-row">
+    <div class="ride-name">🚀 Space Mountain</div>
+    <div class="ride-now" style="color:#e6edf3">35</div>
+    <div class="ride-avg">35</div>
+    <div class="ride-diff diff-flat">—</div>
+  </div>
+  <div class="ride-row">
+    <div class="ride-name">🌿 Jungle Cruise</div>
+    <div class="ride-now" style="color:#e6edf3">35</div>
+    <div class="ride-avg">35</div>
+    <div class="ride-diff diff-flat">—</div>
+  </div>
+  <div class="ride-row">
+    <div class="ride-name">🧚 Peter Pan's Flight</div>
+    <div class="ride-now" style="color:#3fb950">25</div>
+    <div class="ride-avg">45</div>
+    <div class="ride-diff diff-down">↓ 44%</div>
+  </div>
+  <div class="ride-row">
+    <div class="ride-name">👻 Haunted Mansion</div>
+    <div class="ride-now" style="color:#3fb950">13</div>
+    <div class="ride-avg">15</div>
+    <div class="ride-diff diff-down">↓ 13%</div>
+  </div>
+  <div class="ride-row">
+    <div class="ride-name">🏴‍☠️ Pirates of the Caribbean</div>
+    <div class="ride-now" style="color:#3fb950">5</div>
+    <div class="ride-avg">10</div>
+    <div class="ride-diff diff-down">↓ 50%</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="brand">hazeydata<span>.ai</span></div>
+    <div class="powered">Powered by AI · Updated every 5 min</div>
+  </div>
+</div>
+
+<script>
+// ── Gauge Drawing (adapted from stream dashboard) ──
+const canvas = document.getElementById('gauge');
+const ctx = canvas.getContext('2d');
+const dpr = 2;
+canvas.width = 480 * dpr;
+canvas.height = 280 * dpr;
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+const w = 480, h = 280;
+const centerX = w / 2, centerY = h * 0.72;
+const radius = 180;
+const arcWidth = radius * 0.20;
+const startAngle = Math.PI, endAngle = 2 * Math.PI;
+
+// Benedictus palette
+const colors = [
+  [10,47,143],[48,95,209],[90,150,234],[152,196,242],[193,221,252],
+  [255,224,233],[255,177,201],[255,129,172],[235,66,123],[166,0,56]
+];
+
+// Draw arc
+const segments = 80;
+for (let i = 0; i < segments; i++) {
+  const t = i / segments;
+  const a1 = startAngle + t * Math.PI;
+  const a2 = startAngle + (i + 1) / segments * Math.PI;
+  const ci = Math.min(t * colors.length, colors.length - 1);
+  const cL = colors[Math.floor(ci)], cH = colors[Math.min(Math.ceil(ci), colors.length-1)];
+  const f = ci - Math.floor(ci);
+  const r = Math.round(cL[0]+(cH[0]-cL[0])*f);
+  const g = Math.round(cL[1]+(cH[1]-cL[1])*f);
+  const b = Math.round(cL[2]+(cH[2]-cL[2])*f);
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, a1, a2+0.02);
+  ctx.arc(centerX, centerY, radius-arcWidth, a2+0.02, a1, true);
+  ctx.closePath();
+  ctx.fillStyle = `rgba(${r},${g},${b},0.85)`;
+  ctx.fill();
+}
+
+// Tick marks
+ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+ctx.lineWidth = 1.5;
+for (let i = 0; i <= 5; i++) {
+  const angle = startAngle + (i/5) * Math.PI;
+  ctx.beginPath();
+  ctx.moveTo(centerX + Math.cos(angle)*(radius-arcWidth-4), centerY + Math.sin(angle)*(radius-arcWidth-4));
+  ctx.lineTo(centerX + Math.cos(angle)*(radius+4), centerY + Math.sin(angle)*(radius+4));
+  ctx.stroke();
+}
+
+// Current value needle — position at ~30% (below average morning)
+const pct = 0.30;
+const needleAngle = startAngle + pct * Math.PI;
+const ci = Math.min(pct * colors.length, colors.length-1);
+const cL = colors[Math.floor(ci)], cH = colors[Math.min(Math.ceil(ci), colors.length-1)];
+const f = ci - Math.floor(ci);
+const nr = Math.round(cL[0]+(cH[0]-cL[0])*f);
+const ng = Math.round(cL[1]+(cH[1]-cL[1])*f);
+const nb = Math.round(cL[2]+(cH[2]-cL[2])*f);
+
+ctx.save();
+ctx.translate(centerX, centerY);
+const tipX = Math.cos(needleAngle - Math.PI) * (radius + 10);
+const tipY = Math.sin(needleAngle - Math.PI) * (radius + 10);
+const baseSize = 10;
+const perpAngle = needleAngle - Math.PI + Math.PI/2;
+ctx.beginPath();
+ctx.moveTo(tipX, tipY);
+ctx.lineTo(Math.cos(perpAngle)*baseSize, Math.sin(perpAngle)*baseSize);
+ctx.lineTo(-Math.cos(perpAngle)*baseSize, -Math.sin(perpAngle)*baseSize);
+ctx.closePath();
+ctx.fillStyle = `rgb(${nr},${ng},${nb})`;
+ctx.fill();
+// Center dot
+ctx.beginPath();
+ctx.arc(0, 0, 14, 0, Math.PI*2);
+ctx.fillStyle = '#0d1117';
+ctx.fill();
+ctx.beginPath();
+ctx.arc(0, 0, 10, 0, Math.PI*2);
+ctx.fillStyle = `rgb(${nr},${ng},${nb})`;
+ctx.fill();
+ctx.restore();
+
+// Labels
+ctx.fillStyle = '#7d8590';
+ctx.font = '500 16px Inter, sans-serif';
+ctx.textAlign = 'center';
+ctx.fillText('Quieter', centerX - radius - 15, centerY + 30);
+ctx.fillText('Busier', centerX + radius + 15, centerY + 30);
+
+// Big label
+ctx.fillStyle = '#e6edf3';
+ctx.font = '700 30px Inter, sans-serif';
+ctx.textAlign = 'center';
+ctx.fillText('Below Average', centerX, centerY + 50);
+
+ctx.fillStyle = '#7d8590';
+ctx.font = '500 16px Inter, sans-serif';
+ctx.fillText('avg wait: 34 min · typical: 42 min', centerX, centerY + 76);
+</script>
+</body>
+</html>

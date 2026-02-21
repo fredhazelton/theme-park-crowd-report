@@ -59,6 +59,27 @@ def main():
 
     con = duckdb.connect()
 
+    # Load has_posted filter from dimentity
+    dimentity_path = output_base / "dimension_tables" / "dimentity.csv"
+    dimentity_str = str(dimentity_path.resolve()).replace("\\", "/")
+    if dimentity_path.exists():
+        # Build a set of entity codes with has_posted=True for SQL filtering
+        has_posted_count = con.execute(
+            f"SELECT COUNT(*) FROM read_csv_auto('{dimentity_str}') WHERE has_posted = TRUE"
+        ).fetchone()[0]
+        logger.info(f"Entity filter: has_posted=TRUE → {has_posted_count} entities (from dimentity)")
+        # Create temp table for efficient joins
+        con.execute(f"""
+            CREATE TEMP TABLE posted_entities AS
+            SELECT code as entity_code
+            FROM read_csv_auto('{dimentity_str}')
+            WHERE has_posted = TRUE
+        """)
+        use_posted_filter = True
+    else:
+        logger.warning("dimentity.csv not found — WTI will include ALL entities (no has_posted filter)")
+        use_posted_filter = False
+
     # SQL expression to derive park_code from entity_code
     # Handles multi-char prefixes: USH→UH, TDL→TD, TDS→TD
     # Everything else uses first 2 alpha chars
@@ -117,6 +138,9 @@ def main():
             REAL_ACTUAL_WEIGHT = 3.5
             SYNTHETIC_WEIGHT = 1.0
             
+            # has_posted filter: only include entities that actually post wait times
+            posted_join = "JOIN posted_entities pe ON all_obs.entity_code = pe.entity_code" if use_posted_filter else ""
+            
             historical_sql = f"""
                 WITH 
                 -- Source 1: Synthetic actuals (converted from POSTED) — weight {SYNTHETIC_WEIGHT}
@@ -148,6 +172,11 @@ def main():
                     UNION ALL
                     SELECT * FROM real_actuals
                 ),
+                -- Filter to has_posted entities only
+                filtered_obs AS (
+                    SELECT all_obs.* FROM all_obs
+                    {posted_join}
+                ),
                 -- Weighted average per entity per day
                 daily_entity_avg AS (
                     SELECT park_code, park_date, entity_code,
@@ -155,7 +184,7 @@ def main():
                         COUNT(*) as n_obs,
                         SUM(CASE WHEN weight = {REAL_ACTUAL_WEIGHT} THEN 1 ELSE 0 END) as n_actual,
                         SUM(CASE WHEN weight = {SYNTHETIC_WEIGHT} THEN 1 ELSE 0 END) as n_synthetic
-                    FROM all_obs
+                    FROM filtered_obs
                     GROUP BY park_code, park_date, entity_code
                 )
                 SELECT park_code, park_date, 
@@ -178,16 +207,21 @@ def main():
         if not synth_available:
             # Fallback: original method (COALESCE actual/posted) for dates without synthetic actuals
             logger.info("Computing historical WTI from fact tables (no synthetic actuals available)...")
+            posted_join_fb = "JOIN posted_entities pe ON fact_data.entity_code = pe.entity_code" if use_posted_filter else ""
             historical_sql = f"""
                 WITH fact_data AS (
                     SELECT {pc_bare} as park_code, CAST(park_date AS DATE) as park_date, entity_code, wait_time_type, wait_time_minutes
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_minutes > 0
                 ),
+                filtered_facts AS (
+                    SELECT fact_data.* FROM fact_data
+                    {posted_join_fb}
+                ),
                 daily_entity_avg AS (
                     SELECT park_code, park_date, entity_code,
                         COALESCE(AVG(CASE WHEN wait_time_type = 'ACTUAL' THEN wait_time_minutes END), AVG(CASE WHEN wait_time_type = 'POSTED' THEN wait_time_minutes END)) as entity_avg
-                    FROM fact_data
+                    FROM filtered_facts
                     GROUP BY park_code, park_date, entity_code
                 )
                 SELECT park_code, park_date, ROUND(AVG(entity_avg), 1) as wti, COUNT(DISTINCT entity_code) as n_entities, 'historical' as source
@@ -209,6 +243,9 @@ def main():
         if forecast_file.exists():
             logger.info("Computing forecast WTI from predictions...")
 
+            posted_join_fc = "JOIN posted_entities pe ON f.entity_code = pe.entity_code" if use_posted_filter else ""
+            posted_join_fc_bare = "JOIN posted_entities pe ON entity_code = pe.entity_code" if use_posted_filter else ""
+
             if use_oc:
                 forecast_sql = f"""
                     SELECT 
@@ -221,6 +258,7 @@ def main():
                     JOIN read_parquet('{oc_str}') oc
                         ON f.entity_code = oc.entity_code
                         AND CAST(f.park_date AS DATE) = CAST(oc.park_date AS DATE)
+                    {posted_join_fc}
                     WHERE f.predicted_actual > 0
                       AND oc.is_operating = TRUE
                     GROUP BY {pc_f}, f.park_date
@@ -235,6 +273,7 @@ def main():
                         COUNT(DISTINCT entity_code) as n_entities,
                         'forecast' as source
                     FROM read_parquet('{forecast_str}')
+                    {posted_join_fc_bare}
                     WHERE predicted_actual > 0
                     GROUP BY {pc_bare}, park_date
                     ORDER BY park_code, park_date
@@ -247,6 +286,7 @@ def main():
                     SELECT {pc_bare} as park_code, park_date,
                         ROUND(AVG(predicted_actual), 1) as wti, COUNT(DISTINCT entity_code) as n_entities, 'forecast' as source
                     FROM read_parquet('{forecast_str}')
+                    {posted_join_fc_bare}
                     WHERE predicted_actual > 0
                     GROUP BY {pc_bare}, park_date ORDER BY park_code, park_date
                 """).fetchdf()
@@ -265,33 +305,79 @@ def main():
     # per-park rolling correction factors. As models improve, corrections shrink to zero.
     if not args.historical_only and len(results) >= 1:
         wti_accuracy_path = output_base / "accuracy" / "wti_accuracy.parquet"
+        entity_accuracy_path = output_base / "accuracy" / "entity_daily_accuracy.parquet"
         if wti_accuracy_path.exists():
             try:
                 bias_con = duckdb.connect()
                 
-                # Per-park bias correction using last 14 days of accuracy data
-                park_biases = bias_con.execute(f"""
-                    SELECT 
-                        park_code,
-                        AVG(wti_error) as avg_bias,
-                        COUNT(*) as n_obs,
-                        COUNT(DISTINCT park_date) as n_dates
-                    FROM read_parquet('{wti_accuracy_path}')
-                    WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
-                    GROUP BY park_code
-                    HAVING COUNT(DISTINCT park_date) >= 2
-                    ORDER BY park_code
-                """).fetchdf()
+                # Per-park bias correction using last 14 days of accuracy data.
+                # FILTER: Only use actuals-first (model_actuals) predictions to avoid
+                # contaminating corrections with V2 model errors during transition period.
+                # Falls back to wti_accuracy (all methods) if insufficient actuals-first data.
                 
-                # Also get overall stats for logging
-                overall_row = bias_con.execute(f"""
-                    SELECT 
-                        AVG(wti_error) as avg_bias,
-                        COUNT(*) as n_obs,
-                        COUNT(DISTINCT park_date) as n_dates
-                    FROM read_parquet('{wti_accuracy_path}')
-                    WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
-                """).fetchone()
+                use_actuals_filter = False
+                if entity_accuracy_path.exists():
+                    # Check if we have enough actuals-first entity accuracy data
+                    actuals_check = bias_con.execute(f"""
+                        SELECT COUNT(DISTINCT park_date) as n_dates
+                        FROM read_parquet('{entity_accuracy_path}')
+                        WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
+                        AND prediction_method = 'model_actuals'
+                    """).fetchone()
+                    if actuals_check[0] >= 2:
+                        use_actuals_filter = True
+                        logger.info("  Bias correction: using actuals-first predictions only (filtering out V2)")
+                
+                if use_actuals_filter:
+                    # Compute per-park bias from entity-level accuracy, actuals-first only.
+                    # Aggregate entity bias up to park level (weighted by slot count).
+                    park_biases = bias_con.execute(f"""
+                        SELECT 
+                            LEFT(entity_code, 2) as park_code,
+                            SUM(bias * n_slots) / SUM(n_slots) as avg_bias,
+                            SUM(n_slots) as n_obs,
+                            COUNT(DISTINCT park_date) as n_dates
+                        FROM read_parquet('{entity_accuracy_path}')
+                        WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
+                        AND prediction_method = 'model_actuals'
+                        GROUP BY LEFT(entity_code, 2)
+                        HAVING COUNT(DISTINCT park_date) >= 2
+                        ORDER BY park_code
+                    """).fetchdf()
+                    
+                    overall_row = bias_con.execute(f"""
+                        SELECT 
+                            SUM(bias * n_slots) / SUM(n_slots) as avg_bias,
+                            SUM(n_slots) as n_obs,
+                            COUNT(DISTINCT park_date) as n_dates
+                        FROM read_parquet('{entity_accuracy_path}')
+                        WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
+                        AND prediction_method = 'model_actuals'
+                    """).fetchone()
+                else:
+                    # Fallback: use wti_accuracy (all methods) — pre-actuals-first transition
+                    logger.info("  Bias correction: insufficient actuals-first data, using all methods")
+                    park_biases = bias_con.execute(f"""
+                        SELECT 
+                            park_code,
+                            AVG(wti_error) as avg_bias,
+                            COUNT(*) as n_obs,
+                            COUNT(DISTINCT park_date) as n_dates
+                        FROM read_parquet('{wti_accuracy_path}')
+                        WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
+                        GROUP BY park_code
+                        HAVING COUNT(DISTINCT park_date) >= 2
+                        ORDER BY park_code
+                    """).fetchdf()
+                    
+                    overall_row = bias_con.execute(f"""
+                        SELECT 
+                            AVG(wti_error) as avg_bias,
+                            COUNT(*) as n_obs,
+                            COUNT(DISTINCT park_date) as n_dates
+                        FROM read_parquet('{wti_accuracy_path}')
+                        WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
+                    """).fetchone()
                 bias_con.close()
                 
                 if len(park_biases) > 0:
