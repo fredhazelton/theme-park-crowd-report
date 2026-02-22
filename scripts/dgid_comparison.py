@@ -153,18 +153,19 @@ def top_entity_drivers(con, target_date, same_dates, park_code, n=10):
             FROM read_csv_auto('{DIMENTITY_PATH}')
             WHERE code LIKE '{park_code}%'
         )
-        SELECT COALESCE(h.entity_code, t.entity_code) as entity_code,
+        -- Only show entities that have data TODAY (in current WTI)
+        SELECT t.entity_code,
                n.name,
                n.has_posted,
                h.hist_avg,
                t.today_avg,
-               round(COALESCE(t.today_avg, 0) - COALESCE(h.hist_avg, 0), 1) as diff,
+               round(t.today_avg - COALESCE(h.hist_avg, t.today_avg), 1) as diff,
                h.n_dates as hist_dates
-        FROM hist_entity h
-        FULL OUTER JOIN today_entity t ON h.entity_code = t.entity_code
-        LEFT JOIN names n ON COALESCE(h.entity_code, t.entity_code) = n.code
+        FROM today_entity t
+        LEFT JOIN hist_entity h ON t.entity_code = h.entity_code
+        LEFT JOIN names n ON t.entity_code = n.code
         WHERE n.has_posted = TRUE
-        ORDER BY abs(COALESCE(t.today_avg, 0) - COALESCE(h.hist_avg, 0)) DESC
+        ORDER BY abs(t.today_avg - COALESCE(h.hist_avg, t.today_avg)) DESC
         LIMIT {n}
     """).fetchdf()
     return df
