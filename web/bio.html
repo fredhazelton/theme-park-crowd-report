@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Theme Park Crowd Report</title>
+    <meta name="description" content="Built by a former TouringPlans statistician. Meet the person behind the Wait Time Index.">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+    <meta name="theme-color" content="#0a1628">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .page-hero { padding: 6rem 2rem 4rem; text-align: center; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; }
+        .page-hero h1 { font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 1.5rem; }
+        .bio-content { max-width: 600px; margin: 0 auto; text-align: left; }
+        .bio-content p { color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 1.05rem; line-height: 1.7; }
+        .bio-content strong { color: var(--text-primary); }
+        .bio-highlight { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; margin: 2rem 0; }
+        .bio-highlight h3 { margin-bottom: 0.75rem; font-size: 1.1rem; }
+        .bio-highlight ul { list-style: none; padding: 0; }
+        .bio-highlight li { color: var(--text-secondary); padding: 0.4rem 0; padding-left: 1.5rem; position: relative; }
+        .bio-highlight li::before { content: "→"; position: absolute; left: 0; color: var(--hot-pink); }
+        .bio-cta { text-align: center; margin-top: 2.5rem; }
+    </style>
+</head>
+<body>
+    <section class="hero page-hero">
+        <div class="hero-bg"></div>
+        <nav class="nav">
+            <div class="nav-logo">
+                <a href="/"><img src="assets/icon.jpg" alt="TPCR" class="nav-icon"></a>
+                <span class="nav-title">Crowd Report</span>
+            </div>
+            <div class="nav-links">
+                <a href="/blog/">Blog</a>
+                <a href="https://discord.gg/Bz89uXrD" class="btn btn-sm" target="_blank">Join Discord</a>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <h1>About the Project</h1>
+            <div class="bio-content">
+                <p><strong>Theme Park Crowd Report</strong> is built by <strong>Fred Hazelton</strong>, a data scientist and former statistician at <a href="https://touringplans.com" target="_blank" style="color: var(--mid-blue);">TouringPlans.com</a> — where he spent years building the crowd prediction and wait time models that millions of Disney visitors rely on.</p>
+                
+                <p>Now he's building something new: the <strong>Wait Time Index (WTI)</strong> — a single number that tells you how crowded a park is, no asterisks required. Think of it like a temperature for a theme park.</p>
+                
+                <p>WTI is built on machine learning, not hand-picked attraction lists or subjective 1-10 scales. It uses real wait time data from every reporting attraction to give you an objective, consistent measure of crowd levels — across <strong>12 parks</strong> and <strong>15+ years</strong> of historical data.</p>
+
+                <div class="bio-highlight">
+                    <h3>What makes this different?</h3>
+                    <ul>
+                        <li>ML-powered predictions trained on millions of wait time observations</li>
+                        <li>One consistent metric across all parks — no arbitrary scales</li>
+                        <li>Built by someone who literally wrote crowd prediction models for a living</li>
+                        <li>Independent — not tied to any park or travel company</li>
+                        <li>A different lens on the same problem</li>
+                    </ul>
+                </div>
+
+                <p>This project is currently in <strong>alpha</strong> — everything is free, and we're actively improving the models every day. Join the Discord to get early access and help shape what this becomes.</p>
+
+                <div class="bio-cta">
+                    <a href="https://discord.gg/Bz89uXrD" target="_blank" class="btn btn-primary">
+                        Join Free — See All 12 Parks
+                    </a>
+                    <p style="margin-top: 1rem;"><a href="/" style="color: var(--text-muted);">← Back to home</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

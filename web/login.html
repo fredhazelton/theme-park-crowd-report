@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Theme Park Crowd Report</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+    <meta name="theme-color" content="#0a1628">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .page-hero { padding: 6rem 2rem 4rem; text-align: center; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; }
+        .page-hero h1 { font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 1rem; }
+        .page-hero p { color: var(--text-secondary); max-width: 480px; margin: 0 auto 1.5rem; }
+        .login-box { max-width: 400px; margin: 2rem auto 0; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; }
+        .login-box p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 1.5rem; text-align: left; }
+        .login-box .btn { width: 100%; justify-content: center; }
+        .login-note { font-size: 0.85rem; color: var(--text-muted); margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+    <section class="hero page-hero">
+        <div class="hero-bg"></div>
+        <nav class="nav">
+            <div class="nav-logo">
+                <a href="/"><img src="assets/icon.jpg" alt="TPCR" class="nav-icon"></a>
+                <span class="nav-title">Crowd Report</span>
+            </div>
+            <div class="nav-links">
+                <a href="/blog/">Blog</a>
+                <a href="https://discord.gg/Bz89uXrD" class="btn btn-sm" target="_blank">Join Discord</a>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <h1>Log In</h1>
+            <p>Theme Park Crowd Report currently lives on Discord. All features — including crowd forecasts, best-day finder, and live wait times — are available there.</p>
+            <div class="login-box">
+                <p>We're working on a web dashboard with full login support. For now, everything is accessible through our Discord server — and it's all free during alpha.</p>
+                <a href="https://discord.gg/Bz89uXrD" target="_blank" class="btn btn-primary" style="display: flex;">
+                    Open Discord
+                </a>
+            </div>
+            <p class="login-note">Web dashboard with login coming soon. <a href="/" style="color: var(--text-muted);">← Back to home</a></p>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Theme Park Crowd Report</title>
+    <meta name="description" content="Join Theme Park Crowd Report for free. Get crowd forecasts, best-day finder, and live wait times for 12 theme parks.">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+    <meta name="theme-color" content="#0a1628">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .page-hero { padding: 6rem 2rem 4rem; text-align: center; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; }
+        .page-hero h1 { font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 1rem; }
+        .page-hero p { color: var(--text-secondary); max-width: 520px; margin: 0 auto 1.5rem; }
+        .signup-features { max-width: 480px; margin: 1.5rem auto; text-align: left; }
+        .signup-features li { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.95rem; }
+        .signup-cta { margin-top: 2rem; }
+        .free-badge { display: inline-block; background: linear-gradient(135deg, var(--deep-blue), var(--mid-blue)); color: #fff; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <section class="hero page-hero">
+        <div class="hero-bg"></div>
+        <nav class="nav">
+            <div class="nav-logo">
+                <a href="/"><img src="assets/icon.jpg" alt="TPCR" class="nav-icon"></a>
+                <span class="nav-title">Crowd Report</span>
+            </div>
+            <div class="nav-links">
+                <a href="/blog/">Blog</a>
+                <a href="https://discord.gg/Bz89uXrD" class="btn btn-sm" target="_blank">Join Discord</a>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <span class="free-badge">100% Free During Alpha</span>
+            <h1>Join Theme Park Crowd Report</h1>
+            <p>Get ML-powered crowd forecasts for 12 theme parks. No account needed — just join the Discord and you're in.</p>
+            <ul class="signup-features">
+                <li>🎢 Crowd forecasts for 12 parks across the US and Japan</li>
+                <li>📊 Wait Time Index (WTI) — one number, no asterisks</li>
+                <li>🔮 Best-day finder — see the lowest-crowd days ahead</li>
+                <li>⚡ Live wait times with historical context</li>
+                <li>🆓 Everything free — no credit card, no paywall</li>
+            </ul>
+            <div class="signup-cta">
+                <a href="https://discord.gg/Bz89uXrD" target="_blank" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.1rem; padding: 0.85rem 2rem;">
+                    Join Free — See All 12 Parks
+                </a>
+                <p style="margin-top: 0.75rem; color: var(--text-muted); font-size: 0.85rem;">No account needed. Just click and you're in.</p>
+            </div>
+            <p style="margin-top: 2rem;"><a href="/" style="color: var(--text-muted);">← Back to home</a></p>
+        </div>
+    </section>
+</body>
+</html>
