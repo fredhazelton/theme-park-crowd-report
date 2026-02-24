@@ -235,14 +235,129 @@ def main():
         results.append(historical_wti)
     
     # =========================================================================
-    # FORECAST WTI (from predictions)
+    # FORECAST WTI (from predictions — NGBoost preferred, XGBoost fallback)
     # =========================================================================
     if not args.historical_only:
+        # Check for NGBoost forecasts first (heteroscedastic: has predicted_std)
+        ngboost_file = output_base / "curves" / "forecast_parquet" / "ngboost_forecasts.parquet"
+        use_ngboost = ngboost_file.exists()
+        
+        if use_ngboost:
+            ngboost_str = str(ngboost_file.resolve()).replace("\\", "/")
+            logger.info("Computing forecast WTI from NGBoost predictions (distribution-aware)...")
+
+            # Check if the file has predicted_std column
+            try:
+                ngb_cols = con.execute(
+                    f"SELECT column_name FROM (DESCRIBE SELECT * FROM read_parquet('{ngboost_str}'))"
+                ).fetchdf()["column_name"].tolist()
+                if "predicted_std" not in ngb_cols:
+                    logger.warning("  NGBoost file missing predicted_std column — falling back to XGBoost")
+                    use_ngboost = False
+            except Exception as e:
+                logger.warning(f"  Could not read NGBoost file: {e} — falling back to XGBoost")
+                use_ngboost = False
+
+        if use_ngboost:
+            # Distribution-aware WTI: weight entities by inverse variance
+            # Confident predictions (low σ) contribute more to the park average.
+            # This naturally produces wider WTI range since high-variance entities
+            # don't drag everything toward the mean.
+            posted_join_fc = "JOIN posted_entities pe ON f.entity_code = pe.entity_code" if use_posted_filter else ""
+
+            if use_oc:
+                ngboost_sql = f"""
+                    WITH entity_daily AS (
+                        SELECT
+                            {pc_f} as park_code,
+                            f.park_date,
+                            f.entity_code,
+                            AVG(f.predicted_wait) as entity_mean,
+                            AVG(f.predicted_std) as entity_std
+                        FROM read_parquet('{ngboost_str}') f
+                        JOIN read_parquet('{oc_str}') oc
+                            ON f.entity_code = oc.entity_code
+                            AND CAST(f.park_date AS DATE) = CAST(oc.park_date AS DATE)
+                        {posted_join_fc}
+                        WHERE f.predicted_wait > 0
+                          AND oc.is_operating = TRUE
+                        GROUP BY {pc_f}, f.park_date, f.entity_code
+                    ),
+                    weighted AS (
+                        SELECT
+                            park_code,
+                            park_date,
+                            entity_code,
+                            entity_mean,
+                            entity_std,
+                            -- Inverse-variance weight: 1/σ² (floored to avoid div-by-zero)
+                            1.0 / GREATEST(entity_std * entity_std, 1.0) as inv_var_weight
+                        FROM entity_daily
+                    )
+                    SELECT
+                        park_code,
+                        park_date,
+                        -- Inverse-variance weighted mean
+                        ROUND(SUM(entity_mean * inv_var_weight) / SUM(inv_var_weight), 1) as wti,
+                        COUNT(DISTINCT entity_code) as n_entities,
+                        'forecast_ngboost' as source
+                    FROM weighted
+                    GROUP BY park_code, park_date
+                    ORDER BY park_code, park_date
+                """
+            else:
+                posted_join_fc_bare = "JOIN posted_entities pe ON f.entity_code = pe.entity_code" if use_posted_filter else ""
+                ngboost_sql = f"""
+                    WITH entity_daily AS (
+                        SELECT
+                            {park_code_sql("f.entity_code")} as park_code,
+                            f.park_date,
+                            f.entity_code,
+                            AVG(f.predicted_wait) as entity_mean,
+                            AVG(f.predicted_std) as entity_std
+                        FROM read_parquet('{ngboost_str}') f
+                        {posted_join_fc_bare}
+                        WHERE f.predicted_wait > 0
+                        GROUP BY {park_code_sql("f.entity_code")}, f.park_date, f.entity_code
+                    ),
+                    weighted AS (
+                        SELECT
+                            park_code,
+                            park_date,
+                            entity_code,
+                            entity_mean,
+                            entity_std,
+                            1.0 / GREATEST(entity_std * entity_std, 1.0) as inv_var_weight
+                        FROM entity_daily
+                    )
+                    SELECT
+                        park_code,
+                        park_date,
+                        ROUND(SUM(entity_mean * inv_var_weight) / SUM(inv_var_weight), 1) as wti,
+                        COUNT(DISTINCT entity_code) as n_entities,
+                        'forecast_ngboost' as source
+                    FROM weighted
+                    GROUP BY park_code, park_date
+                    ORDER BY park_code, park_date
+                """
+            try:
+                forecast_wti = con.execute(ngboost_sql).fetchdf()
+                # Normalize source to 'forecast' for downstream compatibility
+                forecast_wti["source"] = "forecast"
+                logger.info(f"  NGBoost forecast WTI: {len(forecast_wti):,} park-dates")
+                logger.info(f"    WTI range: {forecast_wti['wti'].min():.1f} - {forecast_wti['wti'].max():.1f}")
+                logger.info(f"    (quantile mapping SKIPPED — NGBoost provides natural distribution)")
+                results.append(forecast_wti)
+            except Exception as e:
+                logger.warning(f"  NGBoost WTI failed: {e} — falling back to XGBoost")
+                use_ngboost = False
+
+        # XGBoost fallback (or primary if no NGBoost)
         forecast_file = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
         forecast_str = str(forecast_file.resolve()).replace("\\", "/")
 
-        if forecast_file.exists():
-            logger.info("Computing forecast WTI from predictions...")
+        if not use_ngboost and forecast_file.exists():
+            logger.info("Computing forecast WTI from XGBoost predictions...")
 
             posted_join_fc = "JOIN posted_entities pe ON f.entity_code = pe.entity_code" if use_posted_filter else ""
             posted_join_fc_bare = "JOIN posted_entities pe ON entity_code = pe.entity_code" if use_posted_filter else ""
@@ -294,7 +409,7 @@ def main():
             
             logger.info(f"  Forecast WTI: {len(forecast_wti):,} park-dates")
             results.append(forecast_wti)
-        else:
+        elif not use_ngboost:
             logger.warning(f"  Forecast file not found: {forecast_file}")
     
     con.close()
@@ -408,8 +523,14 @@ def main():
     # Quantile mapping preserves the model's relative ordering (it knows which
     # days are busier) while stretching the scale to match historical variance.
     # This is a stopgap until NGBoost (heteroscedastic) models are deployed.
+    # SKIP when NGBoost is active — it produces natural variance.
     
-    if len(results) >= 2:  # need both historical and forecast
+    # Check if NGBoost forecasts were used (variable defined in forecast block above)
+    _ngboost_file = output_base / "curves" / "forecast_parquet" / "ngboost_forecasts.parquet"
+    ngboost_active = not args.historical_only and _ngboost_file.exists()
+    if ngboost_active:
+        logger.info("  Quantile mapping: SKIPPED (NGBoost provides natural distribution)")
+    elif len(results) >= 2:  # need both historical and forecast
         try:
             historical_dfs = [df for df in results if (df['source'] == 'historical').any()]
             forecast_dfs_idx = [i for i, df in enumerate(results) if (df['source'] == 'forecast').any()]
