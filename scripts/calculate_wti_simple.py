@@ -19,6 +19,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 import duckdb
+import numpy as np
 import pandas as pd
 
 OUTPUT_BASE = Path("/home/wilma/hazeydata/pipeline")
@@ -311,13 +312,11 @@ def main():
                 bias_con = duckdb.connect()
                 
                 # Per-park bias correction using last 14 days of accuracy data.
-                # FILTER: Only use actuals-first (model_actuals) predictions to avoid
-                # contaminating corrections with V2 model errors during transition period.
-                # Falls back to wti_accuracy (all methods) if insufficient actuals-first data.
+                # STRICT: Only use actuals-first (model_actuals) predictions.
+                # No fallback to old methods — skip correction if insufficient data.
                 
-                use_actuals_filter = False
+                has_actuals_data = False
                 if entity_accuracy_path.exists():
-                    # Check if we have enough actuals-first entity accuracy data
                     actuals_check = bias_con.execute(f"""
                         SELECT COUNT(DISTINCT park_date) as n_dates
                         FROM read_parquet('{entity_accuracy_path}')
@@ -325,10 +324,12 @@ def main():
                         AND prediction_method = 'model_actuals'
                     """).fetchone()
                     if actuals_check[0] >= 2:
-                        use_actuals_filter = True
-                        logger.info("  Bias correction: using actuals-first predictions only (filtering out V2)")
+                        has_actuals_data = True
+                        logger.info(f"  Bias correction: using actuals-first predictions only ({actuals_check[0]} dates)")
+                    else:
+                        logger.info(f"  Bias correction: only {actuals_check[0]} actuals-first date(s) — need ≥2, skipping correction")
                 
-                if use_actuals_filter:
+                if has_actuals_data:
                     # Compute per-park bias from entity-level accuracy, actuals-first only.
                     # Aggregate entity bias up to park level (weighted by slot count).
                     park_biases = bias_con.execute(f"""
@@ -355,29 +356,7 @@ def main():
                         AND prediction_method = 'model_actuals'
                     """).fetchone()
                 else:
-                    # Fallback: use wti_accuracy (all methods) — pre-actuals-first transition
-                    logger.info("  Bias correction: insufficient actuals-first data, using all methods")
-                    park_biases = bias_con.execute(f"""
-                        SELECT 
-                            park_code,
-                            AVG(wti_error) as avg_bias,
-                            COUNT(*) as n_obs,
-                            COUNT(DISTINCT park_date) as n_dates
-                        FROM read_parquet('{wti_accuracy_path}')
-                        WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
-                        GROUP BY park_code
-                        HAVING COUNT(DISTINCT park_date) >= 2
-                        ORDER BY park_code
-                    """).fetchdf()
-                    
-                    overall_row = bias_con.execute(f"""
-                        SELECT 
-                            AVG(wti_error) as avg_bias,
-                            COUNT(*) as n_obs,
-                            COUNT(DISTINCT park_date) as n_dates
-                        FROM read_parquet('{wti_accuracy_path}')
-                        WHERE park_date::DATE >= CURRENT_DATE - INTERVAL '14 days'
-                    """).fetchone()
+                    park_biases = pd.DataFrame()
                 bias_con.close()
                 
                 if len(park_biases) > 0:
@@ -421,6 +400,60 @@ def main():
         else:
             logger.info("  Bias correction: no wti_accuracy.parquet yet. Will activate once accuracy data accumulates.")
 
+    # =========================================================================
+    # QUANTILE MAPPING — match forecast distribution to historical
+    # =========================================================================
+    # The XGBoost models compress predictions toward the mean, producing a
+    # narrow forecast WTI range (~5-17) vs historical reality (~2-56).
+    # Quantile mapping preserves the model's relative ordering (it knows which
+    # days are busier) while stretching the scale to match historical variance.
+    # This is a stopgap until NGBoost (heteroscedastic) models are deployed.
+    
+    if len(results) >= 2:  # need both historical and forecast
+        try:
+            historical_dfs = [df for df in results if (df['source'] == 'historical').any()]
+            forecast_dfs_idx = [i for i, df in enumerate(results) if (df['source'] == 'forecast').any()]
+            
+            if historical_dfs and forecast_dfs_idx:
+                # Build historical reference distribution per park
+                hist_combined = pd.concat(historical_dfs, ignore_index=True)
+                hist_combined = hist_combined[hist_combined['source'] == 'historical']
+                
+                parks_mapped = 0
+                for idx in forecast_dfs_idx:
+                    df = results[idx]
+                    forecast_mask = df['source'] == 'forecast'
+                    if not forecast_mask.any():
+                        continue
+                    
+                    for park_code in df.loc[forecast_mask, 'park_code'].unique():
+                        park_hist = hist_combined[hist_combined['park_code'] == park_code]['wti'].values
+                        if len(park_hist) < 30:
+                            continue  # not enough historical data
+                        
+                        park_forecast_mask = forecast_mask & (df['park_code'] == park_code)
+                        forecast_vals = df.loc[park_forecast_mask, 'wti'].values
+                        
+                        if len(forecast_vals) == 0:
+                            continue
+                        
+                        # Compute percentile rank of each forecast value within forecast distribution
+                        from scipy import stats
+                        forecast_percentiles = stats.rankdata(forecast_vals, method='average') / len(forecast_vals)
+                        
+                        # Map each percentile to the historical distribution
+                        mapped_vals = np.percentile(park_hist, forecast_percentiles * 100)
+                        
+                        results[idx].loc[park_forecast_mask, 'wti'] = np.round(mapped_vals, 1)
+                        parks_mapped += 1
+                
+                logger.info(f"  Quantile mapping: applied to {parks_mapped} park forecast series")
+                logger.info(f"    Forecast WTI now matches historical distribution shape per park")
+            else:
+                logger.info("  Quantile mapping: skipped (missing historical or forecast data)")
+        except Exception as e:
+            logger.warning(f"  Quantile mapping failed (non-fatal): {e}")
+    
     # =========================================================================
     # COMBINE AND SAVE
     # =========================================================================
