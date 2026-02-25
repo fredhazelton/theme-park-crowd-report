@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | Theme Park Crowd Report</title>
+    <meta name="description" content="Data-driven insights on theme park crowds, wait times, and trip planning from an independent data scientist.">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/icon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/icon-180.png">
+    <meta name="theme-color" content="#0a1628">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hazeydata.ai/blog/">
+    <meta property="og:title" content="Blog | Theme Park Crowd Report">
+    <meta property="og:description" content="Data-driven insights on theme park crowds, wait times, and trip planning.">
+    <meta property="og:image" content="https://hazeydata.ai/assets/banner.jpg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@disneystatswhiz">
+    <meta name="twitter:title" content="Blog | Theme Park Crowd Report">
+    <meta name="twitter:description" content="Data-driven insights on theme park crowds, wait times, and trip planning.">
+    <meta name="twitter:image" content="https://hazeydata.ai/assets/banner.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css?v=20260227">
+    <style>
+        .blog-hero {
+            padding: 6rem 2rem 3rem;
+            text-align: center;
+            min-height: auto;
+        }
+        .blog-hero h1 {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+        .blog-hero p {
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+        }
+        .blog-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+        .blog-post {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .blog-post-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .blog-post-meta .tag {
+            background: rgba(60, 120, 210, 0.15);
+            color: var(--mid-blue);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .blog-post h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            line-height: 1.3;
+        }
+        .blog-post h2 a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .blog-post h2 a:hover {
+            background: linear-gradient(135deg, var(--text-primary), var(--light-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .blog-post h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 2rem 0 0.75rem;
+            color: var(--text-primary);
+        }
+        .blog-post p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        .blog-post strong {
+            color: var(--text-primary);
+        }
+        .blog-post em {
+            color: var(--lavender);
+        }
+        .blog-post a {
+            color: var(--mid-blue);
+            text-decoration: none;
+        }
+        .blog-post a:hover {
+            text-decoration: underline;
+        }
+        .blog-post ul, .blog-post ol {
+            color: var(--text-secondary);
+            margin: 0.75rem 0 1rem 1.5rem;
+            line-height: 1.8;
+        }
+        .blog-post li {
+            margin-bottom: 0.3rem;
+        }
+        .blog-post code {
+            background: rgba(60, 120, 210, 0.15);
+            color: var(--mid-blue);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .blog-post blockquote {
+            border-left: 3px solid var(--hot-pink);
+            padding-left: 1.25rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .blog-post hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+        .blog-post .author-sig {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        .blog-cta-box {
+            background: linear-gradient(135deg, rgba(10, 47, 143, 0.2), rgba(235, 66, 123, 0.1));
+            border: 1px solid rgba(60, 120, 210, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .blog-cta-box p {
+            margin-bottom: 0.75rem;
+        }
+        .blog-footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+        }
+        .blog-footer .footer-content {
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .blog-footer .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .blog-footer .footer-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+        }
+        .blog-footer .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        .blog-footer .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .blog-footer .footer-links a:hover {
+            color: var(--text-secondary);
+        }
+        .blog-footer .footer-copy {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            width: 100%;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        @media (max-width: 768px) {
+            .blog-post {
+                padding: 1.5rem;
+            }
+            .blog-post h2 {
+                font-size: 1.3rem;
+            }
+            .blog-footer .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero blog-hero">
+        <div class="hero-bg"></div>
+        <nav class="nav">
+            <div class="nav-logo">
+                <a href="/"><img src="../assets/icon.jpg" alt="TPCR" class="nav-icon"></a>
+                <span class="nav-title">Crowd Report</span>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="https://discord.gg/Bz89uXrD" class="btn btn-sm" target="_blank">Join Discord</a>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <h1>Blog</h1>
+            <p>Data-driven insights on theme park crowds, wait times, and trip planning.</p>
+        </div>
+    </section>
+
+    <div class="blog-container">
+        <!-- Launch Blog Post -->
+        <article class="blog-post" id="measuring-crowds-wrong">
+            <div class="blog-post-meta">
+                <span>February 27, 2026</span>
+                <span class="tag">Launch</span>
+                <span class="tag">WTI</span>
+            </div>
+            <h2><a href="#measuring-crowds-wrong">Why I Think We've Been Measuring Theme Park Crowds Wrong</a></h2>
+
+            <p>I've been analyzing theme park wait times professionally for over a decade. Started at TouringPlans, built crowd prediction models, dove deep into the mathematical patterns that determine whether your Space Mountain wait will be 20 minutes or 2 hours.</p>
+
+            <p>But the more I worked with crowd data, the more convinced I became that we're approaching the whole problem incorrectly.</p>
+
+            <p>Every crowd calendar, every planning app, every forecasting system uses the same fundamental approach: rate park crowds as "Low," "Moderate," or "High." Universal scale. One-size-fits-all. Magic Kingdom gets the same rating system as Epic Universe.</p>
+
+            <p>Here's why that's wrong: <strong>"Busy" doesn't mean the same thing at different parks.</strong></p>
+
+            <h3>The Weather Analogy</h3>
+
+            <p>The breakthrough came when I started thinking about theme park crowds like weather.</p>
+
+            <p>A 40-degree day means something completely different in Miami versus Minnesota. In Miami, you're reaching for a jacket. In Minnesota, you're firing up the grill for a barbecue. Same number, totally different experience, because each location has its own baseline normal.</p>
+
+            <p>Theme park crowds work exactly the same way.</p>
+
+            <p>A "High" crowd day at Epic Universe feels completely different from a "High" day at Magic Kingdom, even when raw wait times look similar. Epic Universe was designed for higher capacity. Its layout handles crowds differently. Guest flow patterns are distinct. Operational characteristics vary significantly.</p>
+
+            <p>Each park has its own version of "normal."</p>
+
+            <h3>The Wait Time Index</h3>
+
+            <p>When I left TouringPlans to work independently, this insight became the foundation of my first project: a metric I call the <strong>Wait Time Index (WTI)</strong>.</p>
+
+            <p>Think of WTI as a crowd "temperature" that's calibrated specifically for each park:</p>
+            <ul>
+                <li>WTI 40 at Epic Universe = Pretty typical Tuesday</li>
+                <li>WTI 40 at Magic Kingdom = Pack patience and snacks</li>
+                <li>WTI 40 at Animal Kingdom = Strategy meeting time</li>
+            </ul>
+
+            <p>Instead of generic crowd levels that mean different things at different places, you get numbers that are actually meaningful for that specific park's operations.</p>
+
+            <p>Today I'm launching <strong><a href="https://hazeydata.ai">hazeydata.ai</a></strong> — ML-powered predictions for 12 parks across Disney, Universal, and more. WDW, Disneyland Resort, Universal Orlando (including Epic Universe), and even Tokyo Disney Resort. All calibrated individually. All updated daily.</p>
+
+            <h3>Why This Changes Trip Planning</h3>
+
+            <p>Traditional crowd calendars leave you guessing. What does "Moderate" actually mean for your specific park on your specific day? How much patience should you pack? Should you buy Genie+ or not?</p>
+
+            <p>With park-calibrated WTI, those decisions become data-driven:</p>
+            <ul>
+                <li>WTI 25? Great day for walk-ons and leisurely exploration</li>
+                <li>WTI 55? Plan your priorities and use skip-the-line options strategically</li>
+                <li>WTI 80? Maybe stay at the hotel pool instead</li>
+            </ul>
+
+            <h3>The Discord Bot Experience</h3>
+
+            <p>I built a Discord bot around this concept that makes WTI actionable for trip planning:</p>
+
+            <p><code>/today</code> — Current WTI across all tracked parks with context about what those numbers mean</p>
+
+            <p><code>/crowd</code> — 7-day forecast showing how crowds will evolve through the week</p>
+
+            <p><code>/best-day</code> — Find the optimal visit window in the next 7, 90, or 365 days</p>
+
+            <p>Instead of vague predictions, you get specific numbers with park-appropriate context. "Magic Kingdom hits WTI 35 on March 4th — excellent day for first-time visitors" tells you something actionable.</p>
+
+            <h3>What the Data Reveals</h3>
+
+            <p>When you calibrate crowd measurements properly and map them over time, fascinating patterns emerge:</p>
+
+            <p><strong>September 8-22 really is Disney paradise.</strong> Not just "less crowded," but fundamentally different. When you see Magic Kingdom consistently hitting WTI 25-30, that represents a qualitatively different park experience. Space Mountain averaging 25 minutes instead of 75+. Seven Dwarfs Mine Train becomes doable without Genie+.</p>
+
+            <p><strong>Park personality differences become obvious.</strong> Epic Universe maintains more consistent crowd levels throughout the year — fewer extreme high days, but also fewer completely dead days. Magic Kingdom has more volatile swings. Universal Studios shows different seasonality patterns than Disney parks.</p>
+
+            <p><strong>Hidden optimization opportunities appear.</strong> Traditional crowd calendars might rate two days as "Moderate," missing that one day hits WTI 35 while the other reaches WTI 55. For trip planning, that's the difference between a great day and a challenging one.</p>
+
+            <h3>The Year View</h3>
+
+            <p>When you map a full year of calibrated WTI data as a color-coded heatmap — which you can explore right now on hazeydata.ai — the patterns become impossible to ignore:</p>
+
+            <p>Blue paradise in September. Deep red zones around Christmas and Easter. Those hidden gems in early February that most crowd calendars undervalue because they don't account for how Magic Kingdom specifically operates during those weeks.</p>
+
+            <p>It's oddly mesmerizing once you start exploring the patterns. The year-view heatmap lets you see 365 days of crowd data at a glance, and it immediately answers questions like "Why does everyone say avoid summer and holidays?" — because when you see 12 months of data at once, those red-hot periods literally jump off the screen.</p>
+
+            <h3>The Alpha Launch</h3>
+
+            <p>Everything is free during this alpha testing phase. No subscriptions, no paywalls — just good data and a growing community of people who appreciate nuanced crowd analysis. The predictions are improving daily as the models learn and the data grows.</p>
+
+            <h3>A Different Approach</h3>
+
+            <p>This isn't about competing with existing crowd calendars or claiming revolutionary accuracy. It's about bringing more nuance to how we think about theme park crowds.</p>
+
+            <p>After years of building models that treated all parks the same, I wanted to try something that acknowledges the fundamental differences in how these places actually operate.</p>
+
+            <p>The weather analogy keeps proving useful. We don't rate temperature the same way everywhere — we understand that 40° means different things in different places. Theme park crowds deserve the same contextual intelligence.</p>
+
+            <div class="blog-cta-box">
+                <p><strong>Explore the data:</strong> <a href="https://hazeydata.ai">hazeydata.ai</a> — dig into the year-view heatmaps, compare parks, and find those blue paradise weeks.</p>
+                <p><strong>Join the community:</strong> <a href="https://discord.gg/Bz89uXrD" target="_blank">Discord</a> — ask the bot questions, discuss strategies, and hang out with other planning enthusiasts.</p>
+                <a href="https://discord.gg/Bz89uXrD" class="btn btn-primary" target="_blank" style="margin-top: 0.5rem;">Join Free — See All 12 Parks</a>
+            </div>
+
+            <p>Sometimes the best insights come from asking better questions. What if "busy" isn't binary? What if context matters more than we thought?</p>
+
+            <p>The data suggests it does.</p>
+
+            <p class="author-sig">Fred Hazelton is an independent theme park data analyst and former TouringPlans statistician. He builds tools that help people make smarter trip planning decisions using calibrated crowd metrics and comprehensive data visualization.</p>
+        </article>
+    </div>
+
+    <footer class="blog-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="../assets/icon.jpg" alt="" class="footer-icon">
+                <span>Theme Park Crowd Report</span>
+            </div>
+            <div class="footer-links">
+                <a href="/">Home</a>
+                <a href="/bio.html">About</a>
+                <a href="https://discord.gg/Bz89uXrD" target="_blank">Discord</a>
+                <a href="https://twitter.com/disneystatswhiz" target="_blank">Twitter</a>
+                <a href="mailto:fred@hazeydata.ai">Contact</a>
+            </div>
+            <p class="footer-copy">© 2026 hazeydata.ai</p>
+        </div>
+    </footer>
+</body>
+</html>
