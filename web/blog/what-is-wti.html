@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is the Wait Time Index (WTI)? | Theme Park Crowd Report</title>
+    <meta name="description" content="Learn how the Wait Time Index distills an entire park's crowd level into a single number — and why it's more useful than raw wait times.">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/icon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/icon-180.png">
+    <meta name="theme-color" content="#0a1628">
+    <link rel="canonical" href="https://hazeydata.ai/blog/what-is-wti.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://hazeydata.ai/blog/what-is-wti.html">
+    <meta property="og:title" content="What is the Wait Time Index (WTI)?">
+    <meta property="og:description" content="Learn how the Wait Time Index distills an entire park's crowd level into a single number — and why it's more useful than raw wait times.">
+    <meta property="og:image" content="https://hazeydata.ai/assets/banner.jpg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@disneystatswhiz">
+    <meta name="twitter:title" content="What is the Wait Time Index (WTI)?">
+    <meta name="twitter:description" content="Learn how the Wait Time Index distills an entire park's crowd level into a single number — and why it's more useful than raw wait times.">
+    <meta name="twitter:image" content="https://hazeydata.ai/assets/banner.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css?v=20260227">
+    <style>
+        .blog-hero {
+            padding: 6rem 2rem 3rem;
+            text-align: center;
+            min-height: auto;
+        }
+        .blog-hero h1 {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+        .blog-hero p {
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+        }
+        .blog-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+        .blog-post {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .blog-post-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .blog-post-meta .tag {
+            background: rgba(60, 120, 210, 0.15);
+            color: var(--mid-blue);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .blog-post h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            line-height: 1.3;
+        }
+        .blog-post h2 a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .blog-post h2 a:hover {
+            background: linear-gradient(135deg, var(--text-primary), var(--light-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .blog-post h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 2rem 0 0.75rem;
+            color: var(--text-primary);
+        }
+        .blog-post p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        .blog-post strong {
+            color: var(--text-primary);
+        }
+        .blog-post em {
+            color: var(--lavender);
+        }
+        .blog-post a {
+            color: var(--mid-blue);
+            text-decoration: none;
+        }
+        .blog-post a:hover {
+            text-decoration: underline;
+        }
+        .blog-post ul, .blog-post ol {
+            color: var(--text-secondary);
+            margin: 0.75rem 0 1rem 1.5rem;
+            line-height: 1.8;
+        }
+        .blog-post li {
+            margin-bottom: 0.3rem;
+        }
+        .blog-post code {
+            background: rgba(60, 120, 210, 0.15);
+            color: var(--mid-blue);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .blog-post blockquote {
+            border-left: 3px solid var(--hot-pink);
+            padding-left: 1.25rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .blog-post hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+        .blog-post .author-sig {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        .blog-cta-box {
+            background: linear-gradient(135deg, rgba(10, 47, 143, 0.2), rgba(235, 66, 123, 0.1));
+            border: 1px solid rgba(60, 120, 210, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .blog-cta-box p {
+            margin-bottom: 0.75rem;
+        }
+        .blog-back {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .blog-back:hover {
+            color: var(--text-secondary);
+        }
+        .blog-footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+        }
+        .blog-footer .footer-content {
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .blog-footer .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .blog-footer .footer-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+        }
+        .blog-footer .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        .blog-footer .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .blog-footer .footer-links a:hover {
+            color: var(--text-secondary);
+        }
+        .blog-footer .footer-copy {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            width: 100%;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        @media (max-width: 768px) {
+            .blog-post {
+                padding: 1.5rem;
+            }
+            .blog-post h2 {
+                font-size: 1.3rem;
+            }
+            .blog-footer .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero blog-hero">
+        <div class="hero-bg"></div>
+        <nav class="nav">
+            <div class="nav-logo">
+                <a href="/"><img src="../assets/icon.jpg" alt="TPCR" class="nav-icon"></a>
+                <span class="nav-title">Crowd Report</span>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="https://discord.gg/Bz89uXrD" class="btn btn-sm" target="_blank">Join Discord</a>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <h1>Blog</h1>
+            <p>Data-driven insights on theme park crowds, wait times, and trip planning.</p>
+        </div>
+    </section>
+
+    <div class="blog-container">
+        <a href="/blog/" class="blog-back">← Back to all posts</a>
+
+        <article class="blog-post">
+            <div class="blog-post-meta">
+                <span>February 27, 2026</span>
+                <span class="tag">Explainer</span>
+                <span class="tag">WTI</span>
+            </div>
+            <h2>What is the Wait Time Index (WTI)?</h2>
+
+            <p>If you've been exploring <a href="https://hazeydata.ai">hazeydata.ai</a> or chatting with our Discord bot, you've probably seen a number called <strong>WTI</strong> next to every park. But what does it actually mean, and why should you care?</p>
+
+            <p>This post breaks it all down.</p>
+
+            <h3>One Number, One Park, One Day</h3>
+
+            <p>The <strong>Wait Time Index</strong> is a single number that summarizes how busy a theme park is on a given day. Instead of scanning through dozens of individual ride wait times and trying to form a mental picture, WTI does the math for you and gives you one easy-to-read score.</p>
+
+            <p>Think of it like a stock market index. The S&amp;P 500 doesn't tell you what every individual stock is doing — it tells you how the market is doing <em>overall</em>. WTI does the same thing for theme park crowds.</p>
+
+            <h3>How It Works</h3>
+
+            <p>WTI aggregates individual ride wait times across every tracked attraction in a park and distills them into a single park-level index. The process looks like this:</p>
+
+            <ol>
+                <li><strong>Collect wait times</strong> — Our models predict (or observe) wait times for every major attraction in the park throughout the day.</li>
+                <li><strong>Weight and aggregate</strong> — Not all rides are created equal. Headliners like Space Mountain or Hagrid's carry more weight than kiddie spinners. The aggregation accounts for this.</li>
+                <li><strong>Calibrate per park</strong> — Here's the crucial part. Each park's WTI is calibrated against <em>that park's own history</em>, not some universal scale. More on why this matters below.</li>
+            </ol>
+
+            <p>The result is a number that captures the overall crowd pressure for that specific park on that specific day.</p>
+
+            <h3>How to Interpret It</h3>
+
+            <p>The core rule is simple: <strong>higher WTI = busier park</strong>. But the real power comes from comparing a day's WTI to the historical distribution for that park.</p>
+
+            <p>Here's a rough guide:</p>
+            <ul>
+                <li><strong>WTI below 30</strong> — Light crowds. Expect short waits, walk-on opportunities, and a relaxed pace. These are the days people dream about.</li>
+                <li><strong>WTI 30–50</strong> — Moderate. A solid park day. You'll wait for headliners, but the lines are manageable with a little planning.</li>
+                <li><strong>WTI 50–70</strong> — Busy. This is when skip-the-line products (Genie+, Express Pass) start paying for themselves. Prioritize your must-dos.</li>
+                <li><strong>WTI above 70</strong> — Heavy crowds. Peak holiday territory. Every line is long, every restaurant is full, and patience is required. Consider whether today is the best day, or whether tomorrow looks better.</li>
+            </ul>
+
+            <p>Because WTI is calibrated per park, these ranges actually mean something consistent. WTI 40 at Magic Kingdom reflects that park's version of "moderate" — not some abstract average across all parks everywhere.</p>
+
+            <h3>Why Not Just Look at Raw Wait Times?</h3>
+
+            <p>Fair question. If you can see that Space Mountain is 60 minutes and Big Thunder is 45, why do you need an index?</p>
+
+            <p>A few reasons:</p>
+
+            <p><strong>Context is everything.</strong> Is a 60-minute wait for Space Mountain good or bad? If you don't know that the historical median is 45 minutes, you can't tell. WTI bakes in that context automatically.</p>
+
+            <p><strong>Individual rides fluctuate wildly.</strong> A single ride might spike to 90 minutes because of a temporary breakdown and reopening — that doesn't mean the park suddenly got busier. WTI smooths out this noise by looking at the whole park together.</p>
+
+            <p><strong>Comparing across parks is impossible with raw times.</strong> A 40-minute average wait at Epic Universe means something completely different than a 40-minute average at Animal Kingdom. They have different ride capacities, different guest volumes, different layouts. WTI accounts for each park's unique characteristics.</p>
+
+            <p><strong>Planning decisions need a summary.</strong> When you're deciding which park to visit tomorrow, you don't want to compare 120 individual ride predictions across 4 parks. You want to see four numbers and pick the lowest one. That's WTI.</p>
+
+            <h3>The Weather Analogy</h3>
+
+            <p>We like to compare WTI to a weather forecast. A temperature of 40°F means something completely different in Miami versus Minneapolis. In Miami, people are reaching for their coats. In Minneapolis, they're enjoying a warm spell.</p>
+
+            <p>Same idea with WTI. The number only makes sense in the context of the park it describes. That's why we calibrate each park individually rather than using a one-size-fits-all crowd rating.</p>
+
+            <h3>Try It Yourself</h3>
+
+            <p>The easiest way to experience WTI is through our Discord bot:</p>
+            <ul>
+                <li><code>/today</code> — See current WTI across all 12 tracked parks</li>
+                <li><code>/crowd</code> — Get a 7-day WTI forecast for any park</li>
+                <li><code>/best-day</code> — Find the lowest-WTI day in a given timeframe</li>
+            </ul>
+
+            <p>Or explore the year-view heatmaps on <a href="https://hazeydata.ai">hazeydata.ai</a> — they visualize 365 days of WTI data in one glance, making it easy to spot the best (and worst) times to visit.</p>
+
+            <div class="blog-cta-box">
+                <p><strong>Ready to plan with data?</strong> Join the Discord to get WTI forecasts for all 12 parks, every day — completely free during alpha.</p>
+                <a href="https://discord.gg/Bz89uXrD" class="btn btn-primary" target="_blank" style="margin-top: 0.5rem;">Join the Discord</a>
+            </div>
+
+            <p class="author-sig">Written by Fred Hazelton — independent theme park data analyst, former TouringPlans statistician, and the person behind <a href="https://hazeydata.ai">hazeydata.ai</a>.</p>
+        </article>
+    </div>
+
+    <footer class="blog-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="../assets/icon.jpg" alt="" class="footer-icon">
+                <span>Theme Park Crowd Report</span>
+            </div>
+            <div class="footer-links">
+                <a href="/">Home</a>
+                <a href="/bio.html">About</a>
+                <a href="https://discord.gg/Bz89uXrD" target="_blank">Discord</a>
+                <a href="https://twitter.com/disneystatswhiz" target="_blank">Twitter</a>
+                <a href="mailto:fred@hazeydata.ai">Contact</a>
+            </div>
+            <p class="footer-copy">© 2026 hazeydata.ai</p>
+        </div>
+    </footer>
+</body>
+</html>
