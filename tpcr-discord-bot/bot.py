@@ -559,11 +559,19 @@ def get_current_waits(park_code: str, target_date: date_type):
 
 
 def get_wti_range(park_code: str, target_date: date_type) -> dict:
-    """Get low/avg/high WTI for a park on a date (from time-slot level forecasts).
+    """Get low/avg/high WTI for a park on a date.
+    
+    For forecast dates: uses the pre-computed WTI table (which has quantile mapping
+    applied for proper distribution). Derives low/high from time-slot entity forecasts
+    scaled to match the mapped WTI average.
+    
+    For historical dates: uses time-slot level forecasts directly.
     DuckDB primary, parquet fallback."""
     try:
         entity_filter = _entity_filter_sql(park_code)
+        wti_code = WTI_CODE_MAP.get(park_code, park_code)
 
+        # Get entity-level time-slot data for low/high range
         if _USE_DUCKDB:
             con = get_db()
             result = con.execute(f"""
@@ -575,6 +583,12 @@ def get_wti_range(park_code: str, target_date: date_type) -> dict:
                 GROUP BY time_slot
                 ORDER BY time_slot
             """, [target_date]).fetchdf()
+            
+            # Get the quantile-mapped WTI value for this date
+            wti_row = con.execute("""
+                SELECT wti FROM wti
+                WHERE park_code = ? AND park_date = ?
+            """, [wti_code, target_date]).fetchone()
             con.close()
         else:
             query = f"""
@@ -587,13 +601,34 @@ def get_wti_range(park_code: str, target_date: date_type) -> dict:
                 ORDER BY time_slot
             """
             result = duckdb.sql(query).fetchdf()
+            wti_row = duckdb.sql(f"""
+                SELECT wti FROM read_parquet('{WTI_PATH}')
+                WHERE park_code = '{wti_code}' AND park_date = '{target_date}'
+            """).fetchone()
 
         if len(result) == 0:
             return None
+        
+        raw_low = float(result["slot_avg"].min())
+        raw_avg = float(result["slot_avg"].mean())
+        raw_high = float(result["slot_avg"].max())
+        
+        # If we have a mapped WTI value, scale the range to match it
+        # This preserves the shape (low/avg/high ratio) but uses the
+        # quantile-mapped average for proper distribution
+        if wti_row and raw_avg > 0:
+            mapped_avg = float(wti_row[0])
+            scale = mapped_avg / raw_avg
+            return {
+                "wti_low": round(raw_low * scale, 1),
+                "wti_avg": round(mapped_avg, 1),
+                "wti_high": round(raw_high * scale, 1),
+            }
+        
         return {
-            "wti_low": float(result["slot_avg"].min()),
-            "wti_avg": float(result["slot_avg"].mean()),
-            "wti_high": float(result["slot_avg"].max()),
+            "wti_low": raw_low,
+            "wti_avg": raw_avg,
+            "wti_high": raw_high,
         }
     except Exception as e:
         print(f"⚠️ Error getting WTI range: {e}")
