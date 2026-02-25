@@ -65,7 +65,7 @@ if str(Path(__file__).parent.parent) not in sys.path:
 
 # PARK_CODE_MAP and get_park_code logic (inline to avoid circular import)
 _PARK_CODE_MAP = {
-    "MK": "mk", "EP": "ep", "HS": "hs", "AK": "ak", "BB": "bb", "TL": "tl",
+    "MK": "mk", "EP": "ep", "HS": "hs", "AK": "ak", "TL": "tl",
     "DL": "dl", "CA": "ca",
     "TDL": "tdl", "TDS": "tds",
     "IA": "ia", "UF": "uf", "EU": "eu", "USH": "uh",

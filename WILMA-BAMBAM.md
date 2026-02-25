@@ -654,7 +654,7 @@ year-view.html fetches real data. All 12 parks live on hazeydata.ai.
 
 **Fix applied:** Removed `TD` and `US` rows from the Feb 13 archive (can't meaningfully split `TD` into TDL/TDS retroactively). Future archives are correct.
 
-**BB = Blizzard Beach** (water park), not Busch Gardens. It's in both forecast and historical WTI — no mismatch, just a minor park. Appears in both sides so join works fine.
+**BB = Blizzard Beach** (water park) — DROPPED from pipeline (Feb 24). Seasonal water park, never needed in output.
 
 ---
 

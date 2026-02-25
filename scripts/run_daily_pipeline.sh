@@ -131,7 +131,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-if-unchanged    Skip training/forecast/WTI if data hasn't changed (fast incremental mode)"
             echo "  --use-synthetic        Include synthetic actuals in training (balances real vs synthetic data)"
             echo "  --actuals-only        ACTUALS-FIRST: train on actuals only, 5 features, no posted_time (OOM-safe)"
-            echo "  --park PARK            Run training, forecast, and WTI for one park only (e.g. MK, EP, AK, BB)"
+            echo "  --park PARK            Run training, forecast, and WTI for one park only (e.g. MK, EP, AK)"
             exit 0
             ;;
         *)

@@ -34,7 +34,6 @@ SYNTHETIC_FIRST_FORECAST_DATE = "2026-02-18"
 
 PARK_NAMES = {
     "AK": "Animal Kingdom",
-    "BB": "Busch Gardens",
     "CA": "DCA",
     "DL": "Disneyland",
     "EP": "EPCOT",

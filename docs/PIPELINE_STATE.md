@@ -143,7 +143,7 @@ nohup ./scripts/run_daily_pipeline.sh >> "output_base/logs/daily_pipeline_$(date
 
 **Dropbox:** If `output_base` is under Dropbox, the pipeline force-quits Dropbox before starting (to avoid file locks / partial reads). It runs `dropbox stop` (or `pkill -TERM` if no CLI), waits up to 15s for exit, then proceeds. Dropbox stays stopped until you start it again (or next login if it auto-starts). Use `--skip-dropbox-check` to skip stopping Dropbox (e.g. if output is not on Dropbox).
 
-**Single-park test:** To run the pipeline for one park only (training, forecast, WTI), use `--park PARK` so the run finishes in a reasonable time during development. Example: `./scripts/run_daily_pipeline.sh --park MK`. Exclude water parks (TL, BB) when choosing; see **docs/SINGLE_PARK_TEST.md** for the entity-count query.
+**Single-park test:** To run the pipeline for one park only (training, forecast, WTI), use `--park PARK` so the run finishes in a reasonable time during development. Example: `./scripts/run_daily_pipeline.sh --park MK`. Exclude water parks (TL) when choosing; see **docs/SINGLE_PARK_TEST.md** for the entity-count query.
 
 ### Queue-times (systemd)
 

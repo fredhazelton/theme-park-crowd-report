@@ -780,7 +780,7 @@ Each pipeline run records which steps actually executed, enabling cascade logic 
 ### Date Range:
 - Historical data: **2009-03-02** to present
 - Forecasts: Tomorrow to +2 years (731 days)
-- Parks: 13 (MK, EP, HS, AK, DL, CA, UF, IA, EU, UH, TDL, TDS, BB)
+- Parks: 12 (MK, EP, HS, AK, DL, CA, UF, IA, EU, UH, TDL, TDS)
 
 ---
 

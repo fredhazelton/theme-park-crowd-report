@@ -47,7 +47,6 @@ PARK_TIMEZONE: dict[str, str] = {
     "EP": "America/New_York",
     "HS": "America/New_York",
     "AK": "America/New_York",
-    "BB": "America/New_York",
     "TL": "America/New_York",
     "DL": "America/Los_Angeles",
     "CA": "America/Los_Angeles",
