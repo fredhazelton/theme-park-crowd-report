@@ -361,13 +361,28 @@ def main():
                 
                 if len(park_biases) > 0:
                     # Build per-park correction dict: correction = -bias
+                    # Conservative approach:
+                    #   - Cap corrections at ±10 WTI points (prevent wild swings)
+                    #   - Dampen by confidence factor based on n_dates (ramp 2→7 days)
+                    #   - Parks with <5 dates get proportionally smaller corrections
+                    MAX_CORRECTION = 10.0  # Cap: never adjust more than ±10 WTI points
+                    FULL_CONFIDENCE_DATES = 7  # Need 7 dates for full correction strength
+                    
                     park_corrections = {}
                     for _, row in park_biases.iterrows():
-                        park_corrections[row['park_code']] = round(-row['avg_bias'], 1)
+                        raw_correction = -row['avg_bias']
+                        n_dates = row['n_dates']
+                        # Confidence ramp: 2 dates = 28%, 3 = 43%, 5 = 71%, 7+ = 100%
+                        confidence = min(1.0, n_dates / FULL_CONFIDENCE_DATES)
+                        # Cap then dampen
+                        capped = max(-MAX_CORRECTION, min(MAX_CORRECTION, raw_correction))
+                        dampened = round(capped * confidence, 1)
+                        park_corrections[row['park_code']] = dampened
                     
-                    # Fallback for parks without enough data: use overall bias
+                    # Fallback: no correction for parks without enough data
+                    # (was using overall bias, but that often made things worse)
                     overall_bias = overall_row[0] if overall_row[0] is not None else 0.0
-                    fallback_correction = round(-overall_bias, 1)
+                    fallback_correction = 0.0
                     
                     # Apply per-park corrections to forecast WTI dataframes only
                     before_avg = None
@@ -385,12 +400,15 @@ def main():
                             results[i].loc[mask, 'wti'] = results[i].loc[mask, 'wti'].clip(lower=5.0)
                             after_avg = results[i].loc[mask, 'wti'].mean()
                     
-                    logger.info(f"  Per-park bias corrections applied:")
+                    logger.info(f"  Per-park bias corrections (capped ±{MAX_CORRECTION}, dampened by confidence):")
                     for park in sorted(park_corrections.keys()):
-                        bias_val = -park_corrections[park]  # original bias
+                        park_row = park_biases[park_biases['park_code'] == park].iloc[0]
+                        raw_bias = park_row['avg_bias']
+                        n_dates = park_row['n_dates']
+                        confidence = min(1.0, n_dates / FULL_CONFIDENCE_DATES)
                         corr_val = park_corrections[park]
-                        logger.info(f"    {park}: bias={bias_val:+.1f}, correction={corr_val:+.1f}")
-                    logger.info(f"    Fallback (parks w/o data): {fallback_correction:+.1f}")
+                        logger.info(f"    {park}: bias={raw_bias:+.1f}, correction={corr_val:+.1f} ({n_dates}d, {confidence:.0%} conf)")
+                    logger.info(f"    Fallback (parks w/o data): {fallback_correction:+.1f} (no correction)")
                     logger.info(f"    Overall bias: {overall_bias:.1f} ({overall_row[1]} obs, {overall_row[2]} dates)")
                     logger.info(f"    Forecast WTI avg: {before_avg:.1f} → {after_avg:.1f}")
                 else:
