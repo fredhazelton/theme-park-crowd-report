@@ -159,10 +159,23 @@ def generate_time_grid(start_date: date, end_date: date, date_features: dict, pa
     return pd.DataFrame(rows)
 
 
+def _sanitize_scope_name(scope: str) -> str:
+    """Convert scope_and_scale value to a safe directory name."""
+    return scope.lower().replace(" ", "_")
+
+
 def forecast_entity(args) -> tuple:
-    """Generate forecast for single entity using V2 model."""
+    """Generate forecast for single entity using V2 model.
+    
+    Args tuple: (entity_code, time_grid, models_dir, fallback_ratio,
+                  agg_lookup, park_hours_lookup, p95_cap,
+                  entity_scope_value)
+    
+    entity_scope_value: scope_and_scale value for this entity (or None)
+    """
     (entity_code, time_grid, models_dir, fallback_ratio,
-     agg_lookup, park_hours_lookup, p95_cap) = args
+     agg_lookup, park_hours_lookup, p95_cap,
+     entity_scope_value) = args
 
     try:
         df = time_grid.copy()
@@ -208,12 +221,57 @@ def forecast_entity(args) -> tuple:
         
         df['mins_since_open'] = df.apply(get_mins_since_open, axis=1)
         
-        # Check for actuals-only model first (ACTUALS-FIRST), then V2
+        # Model selection priority:
+        # - If entity_scope_value is set (EU entities forced to scope_scale): use group model FIRST
+        # - Otherwise: per-entity actuals model → per-entity V2 → scope_scale → aggregate
         actuals_model_path = models_dir / entity_code / "model_julia_actuals.json"
         v2_model_path = models_dir / entity_code / "model_julia_v2.json"
 
-        if actuals_model_path.exists():
-            # Actuals-only model: 5 features, NO posted_time
+        if entity_scope_value is not None:
+            # Scope-and-scale group model fallback (primarily for EU entities)
+            # Load model from disk (can't pickle XGBoost across processes)
+            import json as _json
+            safe_scope = _sanitize_scope_name(entity_scope_value)
+            scope_dir = models_dir / f"_scope_scale_{safe_scope}"
+            scope_model_path = scope_dir / "model_scope_scale_actuals.json"
+            scope_mapping_path = scope_dir / "entity_code_mapping.json"
+            
+            if scope_model_path.exists() and scope_mapping_path.exists():
+                scope_model = xgb.XGBRegressor()
+                scope_model.load_model(str(scope_model_path))
+                with open(scope_mapping_path) as _mf:
+                    scope_mapping = _json.load(_mf)
+                
+                # Encode entity_code: use existing mapping or assign unseen code
+                if entity_code in scope_mapping:
+                    ec_encoded = float(scope_mapping[entity_code])
+                else:
+                    ec_encoded = float(max(scope_mapping.values()) + 1) if scope_mapping else 0.0
+                
+                # Actuals features + entity_code_encoded
+                df['entity_code_encoded'] = ec_encoded
+                feature_cols = [
+                    'mins_since_6am', 'mins_since_open',
+                    'date_group_id_encoded', 'season_encoded',
+                    'season_year_encoded', 'entity_code_encoded'
+                ]
+                X = df[feature_cols].values.astype(np.float32)
+                predictions = scope_model.predict(X)
+                predictions = np.clip(predictions, 0, 300)
+                df['predicted_actual'] = np.round(predictions).astype(int)
+                df['prediction_method'] = 'model_scope_scale'
+            else:
+                # Scope model files missing — fall through to aggregate
+                def get_fallback(row):
+                    key = (entity_code, row['date_group_id'], row['time_slot_15min'])
+                    if key in agg_lookup:
+                        return agg_lookup[key] * fallback_ratio, 'aggregate'
+                    return row['posted_time'] * fallback_ratio, 'fallback_ratio'
+                results = df.apply(get_fallback, axis=1)
+                df['predicted_actual'] = results.apply(lambda x: int(round(x[0])))
+                df['prediction_method'] = results.apply(lambda x: x[1])
+        elif actuals_model_path.exists():
+            # Per-entity actuals-only model: 5 features, NO posted_time
             model = xgb.XGBRegressor()
             model.load_model(str(actuals_model_path))
             import json as _json
@@ -236,7 +294,7 @@ def forecast_entity(args) -> tuple:
             df['predicted_actual'] = np.round(predictions).astype(int)
             df['prediction_method'] = 'model_actuals'
         elif v2_model_path.exists():
-            # V2 model: uses posted_time
+            # Per-entity V2 model: uses posted_time
             model = xgb.XGBRegressor()
             model.load_model(str(v2_model_path))
             import json as _json
@@ -265,7 +323,7 @@ def forecast_entity(args) -> tuple:
             df['predicted_actual'] = np.round(predictions).astype(int)
             df['prediction_method'] = method_label
         else:
-            # No model - use aggregate posted median × ratio to estimate actual
+            # No model at all - use aggregate posted median × ratio to estimate actual
             def get_fallback(row):
                 key = (entity_code, row['date_group_id'], row['time_slot_15min'])
                 if key in agg_lookup:
@@ -491,6 +549,22 @@ def main():
     """).fetchdf()['entity_code'].tolist()
     logger.info(f"  Excluded FastPass/Lightning Lane booth entities (fastpass_booth=TRUE)")
     
+    # Add EU entities with scope_and_scale that aren't already in the entity list
+    # These have no POSTED data yet but can use scope_scale group models
+    eu_scope_entities = con.execute(f"""
+        SELECT code as entity_code
+        FROM read_csv_auto('{dim_entity_path}')
+        WHERE code LIKE 'EU%'
+          AND fastpass_booth = FALSE
+          AND scope_and_scale IS NOT NULL
+    """).fetchdf()['entity_code'].tolist()
+    
+    existing_set = set(entity_list)
+    eu_added = [e for e in eu_scope_entities if e not in existing_set]
+    if eu_added:
+        entity_list.extend(eu_added)
+        logger.info(f"  Added {len(eu_added)} EU entities via scope_scale (no POSTED data yet): {eu_added}")
+    
     con.close()
     
     # Count models
@@ -514,6 +588,29 @@ def main():
         global_ratio = DEFAULT_FALLBACK_RATIO
         logger.warning(f"No fallback_ratios.json found, using default {global_ratio}")
     
+    # Discover scope-and-scale group models (fallback for entities without per-entity models)
+    # Models are loaded lazily in worker processes to avoid pickling issues
+    logger.info("Checking for scope-and-scale group models...")
+    scope_scale_models = set()  # set of available scope_value strings
+    entity_scope_map = {}       # entity_code -> scope_and_scale
+    try:
+        dim_df = pd.read_csv(str((output_base / "dimension_tables" / "dimentity.csv").resolve()))
+        entity_scope_map = {code: ss for code, ss in zip(dim_df["code"], dim_df["scope_and_scale"]) if pd.notna(ss)}
+        # Check which scope values have trained models on disk
+        for scope_dir in models_dir.glob("_scope_scale_*"):
+            if (scope_dir / "model_scope_scale_actuals.json").exists() and (scope_dir / "entity_code_mapping.json").exists():
+                metadata_path = scope_dir / "metadata.json"
+                if metadata_path.exists():
+                    with open(metadata_path) as f:
+                        meta = json.load(f)
+                    scope_scale_models.add(meta["scope_and_scale"])
+        if scope_scale_models:
+            logger.info(f"  Found {len(scope_scale_models)} scope-scale group models: {sorted(scope_scale_models)}")
+        else:
+            logger.info("  No scope-scale group models found")
+    except Exception as e:
+        logger.warning(f"  Could not check scope-scale models: {e}")
+
     entities = sorted(entity_list)
     if args.max_entities:
         entities = entities[:args.max_entities]
@@ -586,8 +683,18 @@ def main():
             if grid is None or (hasattr(grid, '__len__') and len(grid) == 0):
                 continue
             entity_ratio = fallback_ratios.get(entity, global_ratio)
+            # For EU entities: ALWAYS use scope_scale group model (until 1 year of data)
+            # EU opened May 2025 — per-entity models have limited, novelty-affected data.
+            # Group models trained on millions of established observations are more reliable.
+            # TODO: Remove this override after May 2026 (1-year mark)
+            scope_val = None
+            if entity.startswith("EU"):
+                sv = entity_scope_map.get(entity)
+                if sv and sv in scope_scale_models:
+                    scope_val = sv
             work_items.append(
-                (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None)
+                (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None,
+                 scope_val)
             )
         
         batch_results = []
@@ -677,7 +784,10 @@ def main():
         # Clean up temp files
         for f in batch_files:
             f.unlink()
-        temp_dir.rmdir()
+        try:
+            temp_dir.rmdir()
+        except OSError:
+            pass  # May have leftover files from prior interrupted run
     else:
         total_predictions = 0
     

@@ -407,6 +407,18 @@ else
     fi
 fi
 
+# 5b. Scope-and-scale group model training (for EU/new entities without per-entity models)
+# Fast (~15s) — trains pooled models by scope_and_scale category from dimentity.csv
+# Non-fatal: forecast works without these (falls back to aggregate)
+if ! $SKIP_TRAINING; then
+    log_info "=== Scope-and-scale group model training ==="
+    if run_step "Scope-scale group models" $PYTHON scripts/train_scope_scale_models.py --output-base "$OUTPUT_BASE"; then
+        log_info "Done: Scope-scale group models"
+    else
+        log_info "WARNING: Scope-scale group model training failed (non-fatal, continuing)"
+    fi
+fi
+
 # 6. Forecast
 # Skip logic: only skip if training was skipped this run (no new models = forecasts still valid)
 if $SKIP_FORECAST; then

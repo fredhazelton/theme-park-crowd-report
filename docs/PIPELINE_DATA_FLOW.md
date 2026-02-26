@@ -519,6 +519,45 @@ When `--use-synthetic` flag is passed:
 
 ---
 
+### Step 5c: Scope-and-Scale Group Models (Python XGBoost)
+
+**Script:** `scripts/train_scope_scale_models.py`  
+**Time:** ~15 seconds  
+**What it does:** Trains pooled XGBoost models by `scope_and_scale` category (from `dimentity.csv`). These group models serve as fallbacks for EU (Epic Universe) entities that lack per-entity models.
+
+#### Why:
+EU entities opened May 2025 and have limited training data. Entities without enough observations (e.g., EU03, EU08, EU12) can't get per-entity models but can benefit from group-level patterns learned from hundreds of similar entities across all parks.
+
+#### How:
+1. Reads matched pairs + dimentity.csv scope_and_scale mapping
+2. For each of 5 scope categories (Super Headliner, Headliner, Major Attraction, Minor Attraction, Diversion):
+   - Pools ALL observations from ALL entities with that scope_and_scale
+   - Adds `entity_code_encoded` as a categorical feature (integer encoding)
+   - Trains **actuals model** (6 features: mins_since_6am, mins_since_open, date_group_id_encoded, season_encoded, season_year_encoded, entity_code_encoded)
+   - Trains **V2 model** (8 features: + posted_time, hour_of_day)
+   - Uses geo_decay weights (same as per-entity training)
+3. Saves models to `models/_scope_scale_{category}/`
+
+#### Training Data Volumes (Feb 2026):
+| Category | Entities | Observations | Actuals MAE |
+|----------|----------|--------------|-------------|
+| Super Headliner | 36 | 464K | 17.0 min |
+| Headliner | 42 | 582K | 11.8 min |
+| Major Attraction | 63 | 558K | 11.5 min |
+| Minor Attraction | 107 | 779K | 8.4 min |
+| Diversion | 17 | 15K | 9.7 min |
+
+#### Output Files (per scope category):
+- `models/_scope_scale_{category}/model_scope_scale_actuals.json` — actuals model
+- `models/_scope_scale_{category}/model_scope_scale_v2.json` — V2 model
+- `models/_scope_scale_{category}/entity_code_mapping.json` — entity→integer encoding
+- `models/_scope_scale_{category}/metadata.json` — training metadata
+
+#### Note:
+For EU entities not in the training data (unseen entity_code), XGBoost uses group-level patterns without entity-specific adjustment — exactly what we want for cold start.
+
+---
+
 <a name="step-6-forecast-generation"></a>
 ## Step 6: Forecast Generation
 
@@ -545,14 +584,17 @@ When `--use-synthetic` flag is passed:
 
 | Priority | Method | When Used |
 |----------|--------|-----------|
-| 1 | **V2 Model** | Entity has `model_julia_v2.json` (~142 entities) |
-| 2 | **Aggregate** | No model, but aggregate data exists for (entity, date_group_id, time_slot) |
-| 3 | **Fallback Ratio** | No model, no aggregate. Uses `posted_estimate × entity_ratio` |
+| 1 | **Actuals Model** | Entity has `model_julia_actuals.json` (actuals-first, no posted_time) |
+| 2 | **V2 Model** | Entity has `model_julia_v2.json` (with posted_time) |
+| 3 | **Scope-Scale Group Model** | EU entity with no per-entity model, has `scope_and_scale` value with trained group model |
+| 4 | **Aggregate** | No model, but aggregate data exists for (entity, date_group_id, time_slot) |
+| 5 | **Fallback Ratio** | No model, no aggregate. Uses `posted_estimate × entity_ratio` |
 
 ### Entity Filtering:
 - Excludes Lightning Lane booths (`fastpass_booth = FALSE`)
 - Excludes extinct/fully-closed entities (zero operating dates in calendar)
 - Entities not in the operating calendar at all are assumed operating (graceful fallback)
+- **EU entities with `scope_and_scale` are added even without POSTED data** (use scope-scale group models)
 
 ### Model Type Detection:
 Checks model metadata for `model_label`. Lite models (4 features: posted_time, mins_since_6am, mins_since_open, hour_of_day) get different feature selection than full V2 models (7 features).

@@ -43,6 +43,7 @@ Last updated: 2026-02-14
 | `src/build_operating_calendar.py` | Operating calendar (incremental) | run_daily_pipeline.sh step 2a |
 | `src/processors/entity_index.py` | Entity dirty tracking (SQLite) | ETL + training |
 | `scripts/pipeline_state.py` | Skip-if-unchanged decisions | run_daily_pipeline.sh |
+| `scripts/train_scope_scale_models.py` | Scope-and-scale group models (EU fallback) | run_daily_pipeline.sh step 5b |
 | `scripts/forecast_vectorized.py` | Generate forecasts | run_daily_pipeline.sh step 6 |
 | `scripts/calculate_wti_simple.py` | WTI calculation | run_daily_pipeline.sh step 7 |
 
