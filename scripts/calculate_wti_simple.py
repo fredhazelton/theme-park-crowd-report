@@ -459,8 +459,19 @@ def main():
                         from scipy import stats
                         forecast_percentiles = stats.rankdata(forecast_vals, method='average') / len(forecast_vals)
                         
-                        # Map each percentile to the historical distribution
-                        mapped_vals = np.percentile(park_hist, forecast_percentiles * 100)
+                        # Clamp percentiles to [1st, 99th] to avoid extreme tail values
+                        # The historical min/max are often one-off anomalies (e.g. Christmas 2009)
+                        # that shouldn't be assigned to the single highest/lowest forecast day
+                        PERCENTILE_FLOOR = 1.0   # P1
+                        PERCENTILE_CAP = 99.0     # P99
+                        clamped_percentiles = np.clip(
+                            forecast_percentiles * 100,
+                            PERCENTILE_FLOOR,
+                            PERCENTILE_CAP
+                        )
+                        
+                        # Map clamped percentiles to the historical distribution
+                        mapped_vals = np.percentile(park_hist, clamped_percentiles)
                         
                         results[idx].loc[park_forecast_mask, 'wti'] = np.round(mapped_vals, 1)
                         parks_mapped += 1
