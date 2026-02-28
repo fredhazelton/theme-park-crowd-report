@@ -300,11 +300,13 @@ def main():
     con.close()
     
     # =========================================================================
-    # ADAPTIVE BIAS CORRECTION (forecast WTI only)
+    # ADAPTIVE BIAS CORRECTION (DISABLED 2026-02-28)
     # =========================================================================
-    # Compare recent archived forecast WTI vs actual historical WTI to compute
-    # per-park rolling correction factors. As models improve, corrections shrink to zero.
-    if not args.historical_only and len(results) >= 1:
+    # Disabled: season_year feature in XGBoost already captures short-term trends,
+    # making external bias correction redundant (double-correction).
+    # Raw MAE consistently outperformed adjusted MAE over 14-day evaluation window.
+    # Keeping code intact for potential future use.
+    if False and not args.historical_only and len(results) >= 1:
         wti_accuracy_path = output_base / "accuracy" / "wti_accuracy.parquet"
         entity_accuracy_path = output_base / "accuracy" / "entity_daily_accuracy.parquet"
         if wti_accuracy_path.exists():
