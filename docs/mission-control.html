@@ -5,345 +5,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🦴 Mission Control | hazeydata.ai</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #ffffff;
-            line-height: 1.6;
-            min-height: 100vh;
+            color: #fff; line-height: 1.6; min-height: 100vh;
         }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            color: #00d4ff;
-            margin-bottom: 10px;
-        }
-        
-        .header .subtitle {
-            opacity: 0.8;
-            font-size: 1.1em;
-        }
-        
-        .header .timestamp {
-            opacity: 0.6;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; margin-bottom: 4px; }
+        .header .sub { color: #8892b0; font-size: 0.9rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
         .card {
-            background: rgba(255,255,255,0.08);
-            border-radius: 15px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: transform 0.3s ease;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 20px;
         }
-        
-        .card:hover {
-            transform: translateY(-5px);
+        .card h2 { font-size: 1.1rem; margin-bottom: 12px; color: #ccd6f6; }
+        .card-full { grid-column: 1 / -1; }
+        .item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .item:last-child { border-bottom: none; }
+        .badge {
+            font-size: 0.7rem; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+            white-space: nowrap; text-transform: uppercase;
         }
-        
-        .card h2 {
-            color: #00d4ff;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #00d4ff;
-            padding-bottom: 5px;
-        }
-        
-        .status-indicator {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-left: 8px;
-        }
-        
-        .status-good { background: #27ae60; }
-        .status-warning { background: #f39c12; }
-        .status-critical { background: #e74c3c; }
-        .status-blocked { background: #9b59b6; }
-        
-        .metric-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 10px 0;
-        }
-        
-        .metric {
-            padding: 8px 12px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            border-left: 3px solid #00d4ff;
-        }
-        
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        
-        .quick-link {
-            display: block;
-            padding: 10px 15px;
-            background: rgba(0, 212, 255, 0.1);
-            color: #00d4ff;
-            text-decoration: none;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-        }
-        
-        .quick-link:hover {
-            background: rgba(0, 212, 255, 0.2);
-            transform: scale(1.02);
-        }
-        
-        .priority-item {
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .priority-critical { border-left: 4px solid #e74c3c; }
-        .priority-high { border-left: 4px solid #f39c12; }
-        .priority-medium { border-left: 4px solid #00d4ff; }
-        
-        .crew-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        
-        .crew-member {
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .crew-avatar {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        
-        .auto-refresh {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 212, 255, 0.9);
-            color: #000;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-        
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 10px;
-            }
-            .header h1 {
-                font-size: 2em;
-            }
-        }
+        .badge-done { background: #1a3a2a; color: #4ade80; }
+        .badge-high { background: #3a1a1a; color: #f87171; }
+        .badge-medium { background: #3a2a1a; color: #fbbf24; }
+        .badge-active { background: #1a2a3a; color: #60a5fa; }
+        .item-text { flex: 1; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; color: #8892b0; font-weight: 500; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .val { font-weight: 600; color: #ccd6f6; }
+        .good { color: #4ade80; }
+        .warn { color: #fbbf24; }
+        .bad { color: #f87171; }
+        .meter { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); margin-top: 4px; }
+        .meter-fill { height: 100%; border-radius: 3px; }
+        .refresh { text-align: center; margin-top: 20px; color: #8892b0; font-size: 0.8rem; }
+        a { color: #60a5fa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="auto-refresh">🔄 Auto-refresh: 60s</div>
-    
     <div class="container">
         <div class="header">
             <h1>🦴 Mission Control</h1>
-            <div class="subtitle">Fred's External Brain — Everything in One Place</div>
-            <div class="timestamp">Last updated: Friday, February 6th, 2026 at 4:01 AM EST</div>
-            <div class="timestamp">🌙 Built during overnight autonomous session while Fred slept</div>
+            <div class="sub" id="lastUpdated">Loading...</div>
         </div>
-
-        <div class="grid">
-            <!-- Today's Priorities -->
-            <div class="card">
-                <h2>🎯 Today's Priorities</h2>
-                <div class="priority-item priority-critical">
-                    <span>⚠️ Pipeline ETL Stalled</span>
-                    <span class="status-indicator status-critical">CRITICAL</span>
-                </div>
-                <div class="priority-item priority-high">
-                    <span>🔑 Configure Brave API</span>
-                    <span class="status-indicator status-blocked">BLOCKED</span>
-                </div>
-                <div class="priority-item priority-high">
-                    <span>💾 Main Disk 91% Full</span>
-                    <span class="status-indicator status-warning">WARNING</span>
-                </div>
-                <div class="priority-item priority-medium">
-                    <span>📅 John Visits Tomorrow</span>
-                    <span class="status-indicator status-good">READY</span>
-                </div>
-            </div>
-
-            <!-- System Status -->
-            <div class="card">
-                <h2>🚀 System Status</h2>
-                <div class="metric-grid">
-                    <div class="metric">
-                        <strong>Uptime:</strong> 17+ hours <span class="status-indicator status-good">GOOD</span>
-                    </div>
-                    <div class="metric">
-                        <strong>Load:</strong> 0.81 <span class="status-indicator status-good">NORMAL</span>
-                    </div>
-                    <div class="metric">
-                        <strong>Memory:</strong> 5.0GB / 62GB <span class="status-indicator status-good">PLENTY</span>
-                    </div>
-                    <div class="metric">
-                        <strong>Main Disk:</strong> 91% <span class="status-indicator status-critical">CRITICAL</span>
-                    </div>
-                </div>
-                <div style="margin-top: 15px; padding: 10px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
-                    <strong>⚠️ Use /mnt/data (1.7TB free) for new work!</strong>
-                </div>
-            </div>
-
-            <!-- Pipeline Status -->
-            <div class="card">
-                <h2>📈 Pipeline Status</h2>
-                <div class="priority-item priority-critical">
-                    <span>ETL</span>
-                    <span class="status-indicator status-critical">STALLED</span>
-                </div>
-                <div class="priority-item">
-                    <span>Dimensions</span>
-                    <span class="status-indicator" style="background: #95a5a6;">PENDING</span>
-                </div>
-                <div class="priority-item">
-                    <span>Aggregates</span>
-                    <span class="status-indicator" style="background: #95a5a6;">PENDING</span>
-                </div>
-                <div class="priority-item">
-                    <span>Training</span>
-                    <span class="status-indicator" style="background: #95a5a6;">PENDING</span>
-                </div>
-                <div style="margin-top: 15px; padding: 10px; background: rgba(231, 76, 60, 0.1); border-radius: 8px;">
-                    <strong>🚨 Action Required:</strong> ETL appears stalled. Check logs and restart.
-                </div>
-            </div>
-
-            <!-- Quick Links -->
-            <div class="card">
-                <h2>🔗 Quick Links</h2>
-                <div class="quick-links">
-                    <a href="https://github.com/hazeydata/theme-park-crowd-report" class="quick-link">🐙 GitHub Repo</a>
-                    <a href="https://hazeydata.ai" class="quick-link">🌐 hazeydata.ai</a>
-                    <a href="https://dash.cloudflare.com" class="quick-link">☁️ Cloudflare</a>
-                    <a href="http://wilma-server:8888/chat-overlay.html" class="quick-link">💬 Chat Overlay</a>
-                    <a href="http://wilma-server:8051/api/stats/wdw" class="quick-link">🔧 Pipeline API</a>
-                    <a href="https://hazeydata.github.io/theme-park-crowd-report/stream/main-dashboard.html" class="quick-link">🎥 Stream Dashboard</a>
-                </div>
-            </div>
-
-            <!-- Active Projects -->
-            <div class="card">
-                <h2>🚀 Active Projects</h2>
-                <div class="priority-item">
-                    <span>🎬 Streaming Infrastructure</span>
-                    <span class="status-indicator status-good">PRODUCTION</span>
-                </div>
-                <div class="priority-item">
-                    <span>📊 Theme Park Pipeline</span>
-                    <span class="status-indicator status-warning">NEEDS ATTENTION</span>
-                </div>
-                <div class="priority-item">
-                    <span>🌐 hazeydata.ai Website</span>
-                    <span class="status-indicator status-good">LIVE</span>
-                </div>
-                <div class="priority-item">
-                    <span>🤖 AI Research Automation</span>
-                    <span class="status-indicator status-blocked">BLOCKED</span>
-                </div>
-            </div>
-
-            <!-- The Flintstones Crew -->
-            <div class="card">
-                <h2>🧠 The Flintstones Crew</h2>
-                <div class="crew-grid">
-                    <div class="crew-member">
-                        <div class="crew-avatar">👨‍💼</div>
-                        <strong>Fred</strong><br>
-                        Product Owner<br>
-                        <span class="status-indicator" style="background: #34495e;">SLEEPING</span>
-                    </div>
-                    <div class="crew-member">
-                        <div class="crew-avatar">🦴</div>
-                        <strong>Wilma</strong><br>
-                        24/7 Assistant<br>
-                        <span class="status-indicator status-good">ONLINE</span>
-                    </div>
-                    <div class="crew-member">
-                        <div class="crew-avatar">🔵</div>
-                        <strong>Barney</strong><br>
-                        Strategic Advisor<br>
-                        <span class="status-indicator" style="background: #34495e;">STANDBY</span>
-                    </div>
-                    <div class="crew-member">
-                        <div class="crew-avatar">💪</div>
-                        <strong>Bam-Bam</strong><br>
-                        Senior Developer<br>
-                        <span class="status-indicator" style="background: #34495e;">STANDBY</span>
-                    </div>
-                </div>
-            </div>
+        <div class="grid" id="grid">
+            <div class="card"><h2>Loading...</h2></div>
         </div>
+        <div class="refresh" id="refresh"></div>
     </div>
-
     <script>
-        // Auto-refresh every 60 seconds
-        setTimeout(function() {
-            location.reload();
-        }, 60000);
-        
-        // Add click tracking for links
-        document.querySelectorAll('.quick-link').forEach(link => {
-            link.addEventListener('click', function() {
-                console.log('Quick link clicked:', this.textContent);
-            });
+    const JSON_URL = 'mission-control-content.json';
+
+    async function load() {
+        try {
+            const r = await fetch(JSON_URL + '?t=' + Date.now());
+            const d = await r.json();
+            render(d);
+        } catch(e) {
+            document.getElementById('grid').innerHTML = '<div class="card"><h2>❌ Failed to load data</h2><p>'+e.message+'</p></div>';
+        }
+    }
+
+    function badgeClass(sc) {
+        if (sc === 'done') return 'badge-done';
+        if (sc === 'high') return 'badge-high';
+        if (sc === 'medium') return 'badge-medium';
+        return 'badge-active';
+    }
+
+    function render(d) {
+        const ts = d.last_updated ? new Date(d.last_updated).toLocaleString() : 'Unknown';
+        document.getElementById('lastUpdated').textContent = 'Last updated: ' + ts;
+
+        let html = '';
+
+        // Today's Focus
+        html += '<div class="card"><h2>🎯 Today\'s Priorities</h2>';
+        (d.todays_focus || []).forEach(item => {
+            html += `<div class="item"><span class="badge ${badgeClass(item.status_class)}">${item.status_text}</span><span class="item-text">${item.task}</span></div>`;
         });
+        html += '</div>';
+
+        // /Ask Analytics
+        if (d.ask_analytics) {
+            const a = d.ask_analytics;
+            html += '<div class="card"><h2>🤖 /ask Analytics</h2><table>';
+            html += `<tr><td>Questions</td><td class="val">${a.total_questions}</td></tr>`;
+            html += `<tr><td>Unique Users</td><td class="val">${a.unique_users}</td></tr>`;
+            html += `<tr><td>👍 / 👎</td><td class="val good">${a.thumbs_up} / ${a.thumbs_down}</td></tr>`;
+            html += `<tr><td>Avg Response</td><td class="val">${(a.avg_response_ms/1000).toFixed(1)}s</td></tr>`;
+            html += `<tr><td>Model</td><td class="val">${a.model}</td></tr>`;
+            html += '</table></div>';
+        }
+
+        // Accuracy
+        if (d.accuracy) {
+            const a = d.accuracy;
+            html += '<div class="card"><h2>📊 Forecast Accuracy</h2><table>';
+            html += '<tr><th>Metric</th><th>Cumulative</th><th>Yesterday</th></tr>';
+            html += `<tr><td>Entity MAE</td><td class="val">${a.entity_mae}</td><td class="val">${a.yesterday_entity_mae || '—'}</td></tr>`;
+            html += `<tr><td>WTI MAE</td><td class="val">${a.wti_mae}</td><td class="val good">${a.yesterday_wti_mae || '—'}</td></tr>`;
+            html += `<tr><td>Entity Bias</td><td class="val">${a.entity_bias}</td><td>—</td></tr>`;
+            html += `<tr><td>WTI Bias</td><td class="val">${a.wti_bias}</td><td>—</td></tr>`;
+            html += `<tr><td>Days Eval</td><td class="val">${a.days_evaluated}</td><td>—</td></tr>`;
+            html += '</table></div>';
+        }
+
+        // Pipeline
+        if (d.pipeline_status) {
+            html += '<div class="card"><h2>🔧 Pipeline Status</h2>';
+            Object.entries(d.pipeline_status).forEach(([key, p]) => {
+                const bc = p.status === 'done' ? 'badge-done' : p.status === 'running' ? 'badge-active' : 'badge-medium';
+                const label = p.status === 'done' ? '✅' : p.status === 'running' ? '🔄' : '⏳';
+                html += `<div class="item"><span class="badge ${bc}">${label} ${p.status}</span><span class="item-text"><strong>${p.label}</strong> — ${p.detail}</span></div>`;
+            });
+            html += '</div>';
+        }
+
+        // Infrastructure
+        if (d.infrastructure) {
+            const inf = d.infrastructure;
+            html += '<div class="card"><h2>🖥️ Infrastructure</h2>';
+
+            // Services
+            (inf.services || []).forEach(s => {
+                const bc = s.status === 'active' ? 'badge-done' : 'badge-high';
+                html += `<div class="item"><span class="badge ${bc}">${s.status}</span><span class="item-text"><strong>${s.name}</strong> — ${s.detail}</span></div>`;
+            });
+
+            // Disk
+            html += '<div style="margin-top:12px"><strong>Disk</strong></div>';
+            const mainPct = inf.disk_main_pct || 0;
+            const dataPct = inf.disk_data_pct || 0;
+            const mainColor = mainPct > 85 ? '#f87171' : mainPct > 70 ? '#fbbf24' : '#4ade80';
+            const dataColor = dataPct > 85 ? '#f87171' : '#4ade80';
+            html += `<div style="margin-top:6px;font-size:0.85rem">Main (/) — ${mainPct}%<div class="meter"><div class="meter-fill" style="width:${mainPct}%;background:${mainColor}"></div></div></div>`;
+            html += `<div style="margin-top:6px;font-size:0.85rem">Data (/mnt/data) — ${dataPct}%<div class="meter"><div class="meter-fill" style="width:${dataPct}%;background:${dataColor}"></div></div></div>`;
+
+            // DB
+            html += '<div style="margin-top:12px"><strong>Database</strong></div><table>';
+            html += `<tr><td>Entities</td><td class="val">${(inf.db_entities||0).toLocaleString()}</td></tr>`;
+            html += `<tr><td>Forecasts</td><td class="val">${(inf.db_forecasts||0).toLocaleString()}</td></tr>`;
+            html += `<tr><td>Live Waits</td><td class="val">${(inf.db_live_waits||0).toLocaleString()}</td></tr>`;
+            html += `<tr><td>WTI</td><td class="val">${(inf.db_wti||0).toLocaleString()}</td></tr>`;
+            html += '</table></div>';
+        }
+
+        // Key Dates
+        if (d.key_dates && d.key_dates.length) {
+            html += '<div class="card"><h2>📅 Key Dates</h2>';
+            d.key_dates.forEach(k => {
+                html += `<div class="item"><span style="font-size:1.2rem">${k.emoji}</span><span class="item-text"><strong>${k.event}</strong> — ${k.date} ${k.urgency ? '<span class="badge badge-high">'+k.urgency+'</span>' : ''}</span></div>`;
+            });
+            html += '</div>';
+        }
+
+        document.getElementById('grid').innerHTML = html;
+        document.getElementById('refresh').innerHTML = 'Auto-refreshes every 60s • <a href="https://hazeydata.ai">hazeydata.ai</a> • <a href="https://discord.gg/Bz89uXrD">Discord</a>';
+    }
+
+    load();
+    setInterval(load, 60000);
     </script>
 </body>
 </html>
