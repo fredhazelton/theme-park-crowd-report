@@ -27,7 +27,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20260227">
+    <link rel="stylesheet" href="styles.css?v=20260302">
 </head>
 <body>
     <!-- Hero -->
@@ -55,7 +55,7 @@
                 </a>
                 <a href="#features" class="btn btn-outline">Learn More</a>
             </div>
-            <p class="hero-note">🎉 Everything free during alpha • 12 parks and counting</p>
+            <p class="hero-note">🎉 100% free during alpha • 12 parks • AI-powered Q&A • Updated daily</p>
         </div>
     </section>
 
@@ -94,7 +94,7 @@
     <section class="bot-preview">
         <h2>See It In Action</h2>
         <p class="section-sub">Real Discord commands. Real predictions. Instant answers.</p>
-        <div class="preview-grid">
+        <div class="preview-grid preview-grid-5">
             <div class="preview-card">
                 <div class="preview-label">/today</div>
                 <img src="assets/screenshot-today.png" alt="All parks overview showing WTI crowd levels" loading="lazy">
@@ -103,12 +103,22 @@
             <div class="preview-card">
                 <div class="preview-label">/now</div>
                 <img src="assets/screenshot-now.png" alt="Live wait times for Magic Kingdom" loading="lazy">
-                <p>Live estimated actual wait times — not what Disney posts.</p>
+                <p>Live wait times grouped by tier — updated every 5 minutes.</p>
             </div>
             <div class="preview-card">
                 <div class="preview-label">/crowd</div>
                 <img src="assets/screenshot-crowd.png" alt="Crowd forecast for a specific park" loading="lazy">
                 <p>Detailed forecast for any park, any date.</p>
+            </div>
+            <div class="preview-card">
+                <div class="preview-label">/best-day</div>
+                <img src="assets/screenshot-bestday.png" alt="Calendar heat map showing best days to visit" loading="lazy">
+                <p>Find the least crowded day — with calendar heat maps up to a year out.</p>
+            </div>
+            <div class="preview-card preview-card-highlight">
+                <div class="preview-label">/ask</div>
+                <img src="assets/screenshot-ask.png" alt="AI answering a question about park crowds" loading="lazy">
+                <p>Ask anything about crowds and wait times — powered by AI and real data.</p>
             </div>
         </div>
     </section>
@@ -128,14 +138,24 @@
                 <p>See predicted wait times for individual attractions. Know which headliners to hit first and which rides will be walk-ons.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">⭐</div>
+                <div class="feature-icon">📅</div>
                 <h3>Best Day Finder</h3>
-                <p>Pick a park and a timeframe — we'll tell you the lowest-crowd day to visit. Up to 30 days out (premium: 1 year).</p>
+                <p>Pick a park and a timeframe — we'll show you the lowest-crowd days with color-coded calendar heat maps, up to a year out.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🤖</div>
-                <h3>Discord Bot</h3>
-                <p>Slash commands that work instantly. <code>/today</code> for all parks, <code>/crowd</code> for details, <code>/best-day</code> to plan ahead.</p>
+                <h3>Ask Anything</h3>
+                <p>AI-powered Q&A backed by real data. Ask <em>"Is July 4th a good day for EPCOT?"</em> and get an instant, data-driven answer.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏱️</div>
+                <h3>Live Wait Times</h3>
+                <p>See what's happening right now — estimated actual waits grouped by tier, updated every 5 minutes from real queue data.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>All In Discord</h3>
+                <p>Seven slash commands, zero setup. <code>/today</code> <code>/now</code> <code>/crowd</code> <code>/best-day</code> <code>/ask</code> — everything lives where you already hang out.</p>
             </div>
         </div>
     </section>

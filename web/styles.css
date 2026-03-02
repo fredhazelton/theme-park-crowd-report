@@ -258,6 +258,15 @@ body {
     text-align: center;
 }
 
+.preview-grid-5 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.preview-card-highlight {
+    border-color: var(--mid-blue);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(60, 120, 210, 0.08) 100%);
+}
+
 .preview-card {
     background: var(--bg-card);
     border-radius: 12px;
