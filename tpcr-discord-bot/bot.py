@@ -18,6 +18,8 @@ import re
 import io
 from pathlib import Path
 from forecast_image import generate_forecast_image
+from calendar_image import generate_calendar_image
+from ask_agent import ask_agent
 
 # Add theme-park-crowd-report/src to sys.path for live inference model
 theme_park_src = os.path.expanduser("~/theme-park-crowd-report/src")
@@ -174,19 +176,19 @@ def wti_emoji(wti: float) -> str:
 
 def wti_label(wti: float) -> str:
     if wti <= 12:
-        return "Shortest waits — best day to visit"
+        return "Well below avg WTI — best day to visit"
     elif wti <= 18:
-        return "Short waits — great day to visit"
+        return "Below avg WTI — great day to visit"
     elif wti <= 25:
         return "Typical day — moderate waits, plan headliners"
     elif wti <= 34:
         return "Above average — rope drop and Lightning Lane recommended"
     elif wti <= 42:
-        return "Long waits — arrive early, plan strategically"
+        return "Well above average — arrive early, plan strategically"
     elif wti <= 50:
-        return "Very long waits — consider another day"
+        return "Very high WTI — consider another day"
     else:
-        return "Extreme waits — plan carefully or reschedule"
+        return "Extreme WTI — plan carefully or reschedule"
 
 def get_embed_color(wti: float) -> int:
     """Get embed color based on WTI score — median-anchored Benedictus"""
@@ -682,6 +684,28 @@ async def on_ready():
     )
 
 
+@client.event
+async def on_message(message: discord.Message):
+    # Ignore our own messages
+    if message.author == client.user:
+        return
+
+    # Catch messages that look like failed slash commands (e.g. "/MK", "/ mk", "/help")
+    text = message.content.strip()
+    if text.startswith("/") and len(text) > 1 and not text.startswith("//"):
+        help_text = (
+            "👋 Looks like you're trying a command! Here are the ones I know:\n\n"
+            "🏰 `/now` — Live wait times for a park right now\n"
+            "📊 `/crowd` — Crowd forecast (WTI) for a specific date\n"
+            "📅 `/today` — Today's crowd levels across all parks\n"
+            "🗓️ `/best-day` — Find the least crowded days to visit\n"
+            "🤖 `/ask` — Ask anything about crowds & wait times\n"
+            "ℹ️ `/about` — What is WTI and how does this work?\n\n"
+            "💡 **Tip:** Type `/` and wait for the menu to pop up, then pick a command!"
+        )
+        await message.reply(help_text, delete_after=30)
+
+
 # Autocomplete choices for park parameter
 PARK_CHOICES = [
     # Walt Disney World
@@ -825,8 +849,8 @@ async def crowd_command(interaction: discord.Interaction, park: str, date: str =
 TIMEFRAME_CHOICES = [
     app_commands.Choice(name="Next 7 days", value=7),
     app_commands.Choice(name="Next 30 days", value=30),
-    app_commands.Choice(name="Next 90 days", value=90),
-    app_commands.Choice(name="Next 1 year", value=365),
+    app_commands.Choice(name="Next 90 days — heat map", value=90),
+    app_commands.Choice(name="Next 1 year — heat map", value=365),
 ]
 
 @tree.command(name="best-day", description="Find the best day to visit a park (lowest wait times)")
@@ -910,29 +934,110 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
         )
         return
 
-    # Sort by date for the image (chronological)
+    # Sort by date (chronological)
     days_data.sort(key=lambda x: x["date"])
 
-    # Generate the forecast image
-    img_buf = generate_forecast_image(park_full, days_data)
-    file = discord.File(fp=img_buf, filename="forecast.png")
-
-    # Find best and worst days
+    # Find best day
     best = min(days_data, key=lambda x: x["wti_avg"])
-    worst = max(days_data, key=lambda x: x["wti_avg"])
 
-    embed = discord.Embed(
-        title=f"📅 {park_full} — Next {timeframe} Days",
-        url=f"https://hazeydata.ai/year-view?park={park_code}",
-        description=f"Daily wait times: **low** · avg · **high** WTI",
-        color=get_embed_color(best["wti_avg"]),
-    )
-    embed.set_image(url="attachment://forecast.png")
+    # Build text description
+    THIN_LINE = "─" * 35
 
-    tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg']).lower()}"
-    embed.set_footer(text=f"{tip}  •  Theme Park Crowd Report")
+    from collections import defaultdict
 
-    await interaction.followup.send(embed=embed, file=file)
+    if timeframe <= 7:
+        # Flat list for 7-day view
+        day_lines = []
+        for d in days_data:
+            day_name = d["date"].strftime("%a")
+            date_str = d["date"].strftime("%b %d")
+            wti = d["wti_avg"]
+            label = wti_label(wti)
+            marker = "  ◄ **Best**" if d["date"] == best["date"] else ""
+            day_lines.append(f"**{day_name}** {date_str} — WTI **{wti:.0f}** (*{label}*){marker}")
+        description = THIN_LINE + "\n\n" + "\n".join(day_lines)
+
+    elif timeframe <= 30:
+        # Weekly grouping with daily detail for 30-day view
+        weeks = defaultdict(list)
+        for d in days_data:
+            week_start = d["date"] - timedelta(days=d["date"].weekday())
+            weeks[week_start].append(d)
+
+        desc_parts = []
+        for week_start in sorted(weeks.keys()):
+            week_days = weeks[week_start]
+            week_label = f"Week of {week_start.strftime('%b %d')}"
+            day_lines = []
+            for d in week_days:
+                day_name = d["date"].strftime("%a")
+                date_str = d["date"].strftime("%b %d")
+                wti = d["wti_avg"]
+                label = wti_label(wti)
+                marker = "  ◄ **Best**" if d["date"] == best["date"] else ""
+                day_lines.append(f"  **{day_name}** {date_str} — WTI **{wti:.0f}** (*{label}*){marker}")
+            desc_parts.append(THIN_LINE + "\n" + week_label + "\n\n" + "\n".join(day_lines))
+        description = "\n\n".join(desc_parts)
+
+    else:
+        # 90+ day views: calendar image instead of text
+        try:
+            import asyncio
+            loop = asyncio.get_event_loop()
+            cal_buf = await loop.run_in_executor(None, generate_calendar_image, park_full, days_data)
+            file = discord.File(cal_buf, filename="calendar.png")
+
+            tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg']).lower()}"
+            embed = discord.Embed(
+                title=f"📅 {park_full} — Next {timeframe} Days",
+                url=f"https://hazeydata.ai/year-view?park={park_code}",
+                color=get_embed_color(best["wti_avg"]),
+            )
+            embed.set_image(url="attachment://calendar.png")
+            embed.set_footer(text=f"{tip}  •  Theme Park Crowd Report")
+
+            await interaction.followup.send(embed=embed, file=file)
+            return
+        except Exception as e:
+            print(f"⚠️ Calendar image generation failed, falling back to text: {e}")
+            # Fall through to text fallback below
+
+        # Text fallback if image generation fails
+        description = f"📊 Calendar view unavailable — showing summary\n\n"
+        weeks = defaultdict(list)
+        for d in days_data:
+            week_start = d["date"] - timedelta(days=d["date"].weekday())
+            weeks[week_start].append(d)
+        desc_parts = []
+        for week_start in sorted(weeks.keys()):
+            week_days = weeks[week_start]
+            week_end = max(d["date"] for d in week_days)
+            avg_wti = sum(d["wti_avg"] for d in week_days) / len(week_days)
+            label = wti_label(avg_wti)
+            week_best = min(week_days, key=lambda x: x["wti_avg"])
+            best_name = week_best["date"].strftime("%a %b %d")
+            best_wti_val = week_best["wti_avg"]
+            is_overall_best = week_best["date"] == best["date"]
+            marker = "  ⭐" if is_overall_best else ""
+            week_range = f"{week_start.strftime('%b %d')}–{week_end.strftime('%b %d')}"
+            desc_parts.append(
+                f"**{week_range}** — Avg WTI **{avg_wti:.0f}** (*{label}*)\n"
+                f"  ▸ Best: **{best_name}** (WTI {best_wti_val:.0f}){marker}"
+            )
+        description += "\n\n".join(desc_parts)
+
+    if timeframe < 90:
+        embed = discord.Embed(
+            title=f"📅 {park_full} — Next {timeframe} Days",
+            url=f"https://hazeydata.ai/year-view?park={park_code}",
+            description=description,
+            color=get_embed_color(best["wti_avg"]),
+        )
+
+        tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg']).lower()}"
+        embed.set_footer(text=f"{tip}  •  Theme Park Crowd Report")
+
+        await interaction.followup.send(embed=embed)
 
 
 @tree.command(name="today", description="Quick overview of all parks today")
@@ -970,43 +1075,49 @@ async def today_command(interaction: discord.Interaction):
     ]
 
 
-    embed = discord.Embed(
-        title=f"\U0001f3f0 All Parks \u2014 {date_display}",
-        url="https://hazeydata.ai",
-        color=0x0A2F8F,
-    )
-
-    best_picks = []  # (resort_name, park_name, wti) per resort group
+    THIN_LINE = "\u2500" * 35
+    desc_parts = []
+    best_picks = []
 
     for group_name, parks in park_groups:
-        lines = []
         group_best_park = None
         group_best_wti = 999
+
+        section = THIN_LINE + "\n" + group_name + "\n"
+        park_lines = []
         for park_code, park_name in parks:
             wti = get_wti_score(park_code, target_date)
             if wti is not None:
-                emoji = wti_emoji(wti)
                 label = wti_label(wti)
-                lines.append(f"{emoji} **{park_name}** \u2014 WTI {wti:.0f}\n\u2570 *{label}*")
+                park_lines.append(f"  \u25b8 **{park_name}** \u2014 WTI **{wti:.0f}** (*{label}*)")
                 if wti < group_best_wti:
                     group_best_wti = wti
                     group_best_park = park_name
             else:
-                lines.append(f"\u2b1c **{park_name}** \u2014 No data")
+                park_lines.append(f"  \u25b8 **{park_name}** \u2014 No data")
 
-        if lines:
-            embed.add_field(name=group_name, value="\n".join(lines), inline=False)
+        section += "\n".join(park_lines)
+        desc_parts.append(section)
 
         if group_best_park and len(parks) > 1:
             best_picks.append((group_name, group_best_park, group_best_wti))
 
     if best_picks:
-        picks_text = "\n".join(
-            f"\u2b50 **{park}** (WTI {wti:.0f})" for _, park, wti in best_picks
-        )
-        embed.add_field(name="Best picks by resort", value=picks_text, inline=False)
+        picks_section = THIN_LINE + "\n\u2b50 **Best Picks**\n"
+        pick_lines = []
+        for _, park, wti in best_picks:
+            pick_lines.append(f"  \u25b8 **{park}** (WTI {wti:.0f})")
+        picks_section += "\n".join(pick_lines)
+        desc_parts.append(picks_section)
 
-    embed.set_footer(text="\U0001f4a1 /now [park] for live wait times \u2022 /crowd [park] for forecasts  \u2022  hazeydata.ai")
+    embed = discord.Embed(
+        title=f"\U0001f3f0 All Parks \u2014 {date_display}",
+        url="https://hazeydata.ai",
+        description="\n\n".join(desc_parts),
+        color=0x0A2F8F,
+    )
+
+    embed.set_footer(text="\U0001f4a1 /now [park] for live waits \u2022 /crowd [park] for forecasts \u2022 hazeydata.ai")
 
     await interaction.followup.send(embed=embed)
 
@@ -1059,7 +1170,6 @@ async def now_command(interaction: discord.Interaction, park: str):
     embed = discord.Embed(
         title=f"\u23f1\ufe0f {park_full}{wti_str}",
         url=f"https://hazeydata.ai/year-view?park={park_code}",
-        description="Live estimated wait times",
         color=0x0A2F8F,
     )
 
@@ -1068,11 +1178,11 @@ async def now_command(interaction: discord.Interaction, park: str):
         entity_code = row['entity_code']
         posted_wait = int(row['current_wait'])
 
-        # Get ride name
+        # Get ride name — skip unmapped entities entirely
         if entity_code in entity_names:
             ride_name = entity_names[entity_code][1]  # short_name
         else:
-            ride_name = entity_code
+            continue
 
         # Convert posted -> estimated actual
         estimated = posted_wait
@@ -1090,29 +1200,43 @@ async def now_command(interaction: discord.Interaction, park: str):
     # Sort by wait time descending
     ride_lines.sort(key=lambda x: -x[1])
 
-    # Build the display
+    # Build the display with tier headers
+    TIER_HEADERS = {
+        "\U0001f534": "\U0001f534 **Extreme Waits**",
+        "\U0001f7e0": "\U0001f7e0 **Long Waits**",
+        "\U0001f7e1": "\U0001f7e1 **Moderate Waits**",
+        "\U0001f7e2": "\U0001f7e2 **Short Waits**",
+    }
     lines_text = []
+    prev_dot = None
     for name, wait, dot in ride_lines:
         if wait > 0:
-            lines_text.append(f"{dot} **{name}** \u2014 {wait} min")
+            if dot != prev_dot:
+                if prev_dot is not None:
+                    lines_text.append("")  # blank line before new tier
+                lines_text.append(TIER_HEADERS.get(dot, ""))
+            lines_text.append(f"  \u25b8 **{name}** \u2014 {wait} min")
+            prev_dot = dot
 
-    # Discord field value limit is 1024 chars - split if needed
+    # Use embed description (4096 char limit) instead of fields to avoid mid-tier splits
     if lines_text:
-        chunk = []
-        chunk_len = 0
-        field_num = 1
-        for line in lines_text:
-            if chunk_len + len(line) + 1 > 1000:
-                label = "Rides" if field_num == 1 else "\u200b"
-                embed.add_field(name=label, value="\n".join(chunk), inline=False)
-                chunk = []
-                chunk_len = 0
-                field_num += 1
-            chunk.append(line)
-            chunk_len += len(line) + 1
-        if chunk:
-            label = "Rides" if field_num == 1 else "\u200b"
-            embed.add_field(name=label, value="\n".join(chunk), inline=False)
+        full_text = "\n".join(lines_text)
+        if len(full_text) <= 4000:
+            embed.description = "Live estimated wait times\n\n" + full_text
+        else:
+            # Fallback: split into fields if somehow over 4096
+            embed.description = "Live estimated wait times"
+            chunk = []
+            chunk_len = 0
+            for line in lines_text:
+                if chunk_len + len(line) + 1 > 1000:
+                    embed.add_field(name="\u200b", value="\n".join(chunk), inline=False)
+                    chunk = []
+                    chunk_len = 0
+                chunk.append(line)
+                chunk_len += len(line) + 1
+            if chunk:
+                embed.add_field(name="\u200b", value="\n".join(chunk), inline=False)
 
     embed.set_footer(text="\u23f1\ufe0f Updated every 5 min  \u2022  /crowd for forecasts  \u2022  hazeydata.ai")
 
@@ -1220,6 +1344,8 @@ async def about_command(interaction: discord.Interaction):
             "`/today` — All parks at a glance\n"
             "`/crowd [park] [date]` — Detailed park forecast\n"
             "`/best-day [park] [days]` — Find the lowest-crowd day\n"
+            "`/now [park]` — Live wait times right now\n"
+            "`/ask [question]` — Ask anything about crowds & waits\n"
             "`/ping` — Check if I'm alive"
         ),
         inline=False
@@ -1241,6 +1367,114 @@ async def about_command(interaction: discord.Interaction):
     )
     embed.set_footer(text="Theme Park Crowd Report  •  Alpha")
     await interaction.response.send_message(embed=embed)
+
+
+# ── /ask — AI-powered natural language Q&A ──────────────────────────
+import json as _json
+
+FEEDBACK_LOG = Path("/home/wilma/theme-park-crowd-report/tpcr-discord-bot/ask_feedback.jsonl")
+
+
+class AskFeedbackView(discord.ui.View):
+    """Thumbs up/down buttons for /ask responses."""
+
+    def __init__(self, question: str, user_id: str, username: str):
+        super().__init__(timeout=300)  # 5 min to respond
+        self.question = question
+        self.user_id = user_id
+        self.username = username
+
+        # Add buttons dynamically (unique per instance)
+        label_btn = discord.ui.Button(label="Was this helpful?", style=discord.ButtonStyle.secondary, disabled=True)
+        up_btn = discord.ui.Button(emoji="👍", style=discord.ButtonStyle.secondary)
+        down_btn = discord.ui.Button(emoji="👎", style=discord.ButtonStyle.secondary)
+
+        async def on_up(interaction: discord.Interaction):
+            self._log_feedback("up", interaction.user.id, str(interaction.user))
+            up_btn.style = discord.ButtonStyle.success
+            up_btn.disabled = True
+            down_btn.disabled = True
+            await interaction.response.edit_message(view=self)
+
+        async def on_down(interaction: discord.Interaction):
+            self._log_feedback("down", interaction.user.id, str(interaction.user))
+            down_btn.style = discord.ButtonStyle.danger
+            down_btn.disabled = True
+            up_btn.disabled = True
+            await interaction.response.edit_message(view=self)
+
+        up_btn.callback = on_up
+        down_btn.callback = on_down
+        self.add_item(label_btn)
+        self.add_item(up_btn)
+        self.add_item(down_btn)
+
+    def _log_feedback(self, rating: str, reviewer_id: str, reviewer_name: str):
+        entry = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "question": self.question,
+            "user_id": self.user_id,
+            "username": self.username,
+            "reviewer_id": str(reviewer_id),
+            "reviewer_name": reviewer_name,
+            "rating": rating,
+        }
+        with open(FEEDBACK_LOG, "a") as f:
+            f.write(_json.dumps(entry) + "\n")
+
+    async def on_timeout(self):
+        # Disable buttons after timeout
+        for item in self.children:
+            item.disabled = True
+
+
+ANTHROPIC_API_KEY = None
+_auth_profiles = os.path.expanduser("~/.clawdbot/agents/anthropic/agent/auth-profiles.json")
+try:
+    import json as _json
+    _data = _json.loads(open(_auth_profiles).read())
+    _profiles = _data.get("profiles", _data)  # handle nested or flat
+    ANTHROPIC_API_KEY = _profiles.get("anthropic:default", {}).get("key")
+except Exception as e:
+    print(f"⚠️ Could not load Anthropic API key: {e}")
+
+BOT_COMMANDS_CHANNEL = 1471935481469210736  # #bot-commands
+
+
+@tree.command(name="ask", description="Ask anything about theme park crowds, wait times, and visit planning")
+@app_commands.describe(question="Your question (e.g., 'What's the best day to visit Magic Kingdom this month?')")
+async def ask_command(interaction: discord.Interaction, question: str):
+    print(f"📥 /ask called: question='{question}' by {interaction.user}")
+
+    if not ANTHROPIC_API_KEY:
+        await interaction.response.send_message(
+            "❌ AI agent is not configured. Contact the admin.", ephemeral=True
+        )
+        return
+
+    # Defer — this will take a few seconds
+    await interaction.response.defer()
+
+    try:
+        answer = await ask_agent(question, str(interaction.user.id), ANTHROPIC_API_KEY, username=str(interaction.user))
+
+        # Build embed
+        embed = discord.Embed(
+            description=answer,
+            color=0x3C78D2,
+        )
+        embed.set_author(name=f"Q: {question[:100]}", icon_url=interaction.user.display_avatar.url)
+        embed.set_footer(text="AI-powered • Data may not be 100% accurate • hazeydata.ai")
+
+        view = AskFeedbackView(question, str(interaction.user.id), str(interaction.user))
+        await interaction.followup.send(embed=embed, view=view)
+
+    except Exception as e:
+        print(f"❌ /ask error: {e}")
+        await interaction.followup.send(
+            f"❌ Sorry, I hit an error processing that question. Try rephrasing!\n`{str(e)[:100]}`",
+            ephemeral=True
+        )
 
 
 if __name__ == "__main__":
