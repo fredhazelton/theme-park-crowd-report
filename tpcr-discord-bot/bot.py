@@ -1363,9 +1363,10 @@ async def about_command(interaction: discord.Interaction):
     embed.add_field(
         name="📡 Data Sources",
         value=(
-            "Historical wait times from [TouringPlans.com](https://touringplans.com) • "
-            "Live wait times from [Queue-Times.com](https://queue-times.com) • "
-            "Park hours & events from official sources"
+            "Our models and techniques are our own — trained on many great data sources. "
+            "Big thanks to [TouringPlans](https://touringplans.com), "
+            "[Queue-Times](https://queue-times.com), and "
+            "[Thrill-Data](https://www.thrill-data.com)!"
         ),
         inline=False
     )
@@ -1374,7 +1375,7 @@ async def about_command(interaction: discord.Interaction):
         value="[hazeydata.ai](https://hazeydata.ai)",
         inline=False
     )
-    embed.set_footer(text="Theme Park Crowd Report  •  Alpha")
+    embed.set_footer(text="Theme Park Crowd Report  •  Beta")
     await interaction.response.send_message(embed=embed)
 
 
