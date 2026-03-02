@@ -1,143 +1,92 @@
 {
-  "todays_focus": [
-    {
-      "status_class": "medium",
-      "status_text": "\ud83d\udcb0 Running",
-      "task": "Autonomy Pilot Day 2 \u2014 $500/mo budget active"
+    "todays_focus": [
+        {
+            "status_class": "high",
+            "status_text": "🚀 Tomorrow",
+            "task": "LAUNCH DAY — March 3, 2026"
+        },
+        {
+            "status_class": "done",
+            "status_text": "✅ Live",
+            "task": "/ask AI Q&A — Claude Sonnet + DuckDB, feedback buttons"
+        },
+        {
+            "status_class": "done",
+            "status_text": "✅ Live",
+            "task": "7 slash commands ready: /today /now /crowd /best-day /ask /about /ping"
+        },
+        {
+            "status_class": "done",
+            "status_text": "✅ Updated",
+            "task": "Landing page — new screenshots, /ask + /best-day showcased"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "📝 Todo",
+            "task": "Draft launch announcement for Discord #announcements"
+        }
+    ],
+    "key_dates": [
+        {
+            "emoji": "🚀",
+            "event": "Alpha Launch",
+            "date": "Mar 3",
+            "days_out": 1,
+            "urgency": "tomorrow"
+        },
+        {
+            "emoji": "📊",
+            "event": "Pipeline running daily",
+            "date": "6 AM EST",
+            "days_out": 0,
+            "urgency": ""
+        },
+        {
+            "emoji": "🤖",
+            "event": "/ask paywall (when audience grows)",
+            "date": "TBD",
+            "days_out": 0,
+            "urgency": ""
+        }
+    ],
+    "pipeline_status": {
+        "etl": {"status": "done", "label": "S3 ETL", "detail": "6:00 AM daily"},
+        "forecasts": {"status": "done", "label": "Forecasts", "detail": "24.3M rows"},
+        "wti": {"status": "done", "label": "WTI", "detail": "55K park-dates"},
+        "live_waits": {"status": "done", "label": "Live Waits", "detail": "450K obs, 5-min updates"},
+        "discord_bot": {"status": "done", "label": "Discord Bot", "detail": "7 commands active"},
+        "daily_report": {"status": "done", "label": "Daily Report", "detail": "7 AM to #crowd-reports"}
     },
-    {
-      "status_class": "medium",
-      "status_text": "\ud83d\udd0d Check",
-      "task": "Pipeline ETL \u2014 No recent activity in logs"
+    "accuracy": {
+        "entity_mae": "11.6 min",
+        "entity_bias": "+1.8 min",
+        "wti_mae": "7.2",
+        "wti_bias": "-2.7",
+        "days_evaluated": 19,
+        "yesterday_wti_mae": "6.7",
+        "yesterday_entity_mae": "11.4 min"
     },
-    {
-      "status_class": "medium",
-      "status_text": "\ud83d\udcdd Todo",
-      "task": "Dashboard refinements \u2014 Date slicer, entity filtering"
+    "ask_analytics": {
+        "total_questions": 15,
+        "unique_users": 1,
+        "thumbs_up": 2,
+        "thumbs_down": 0,
+        "avg_response_ms": 9868,
+        "model": "Claude Sonnet 4"
     },
-    {
-      "status_class": "medium",
-      "status_text": "\ud83d\udcdd Todo",
-      "task": "Configure Brave API key \u2014 Research scans blocked"
-    }
-  ],
-  "key_dates": [
-    {
-      "emoji": "\ud83d\udc64",
-      "event": "John visits",
-      "date": "Feb 7",
-      "days_out": 363,
-      "urgency": ""
+    "infrastructure": {
+        "services": [
+            {"name": "tpcr-discord-bot", "status": "active", "detail": "7 commands"},
+            {"name": "queue-times-fetcher", "status": "active", "detail": "11+ days uptime"},
+            {"name": "chat-server", "status": "active", "detail": "Stream overlay"},
+            {"name": "twitch-chat", "status": "active", "detail": "Stream overlay"}
+        ],
+        "disk_main_pct": 90,
+        "disk_data_pct": 4,
+        "db_entities": 1710,
+        "db_forecasts": 24257000,
+        "db_live_waits": 449670,
+        "db_wti": 55011
     },
-    {
-      "emoji": "\u26a0\ufe0f",
-      "event": "GPT-4o retires",
-      "date": "Feb 13",
-      "days_out": 4,
-      "urgency": ""
-    },
-    {
-      "emoji": "\ud83d\udcc5",
-      "event": "Valentine's Day \u2764",
-      "date": "Feb 14",
-      "days_out": 5,
-      "urgency": ""
-    }
-  ],
-  "active_projects": [
-    {
-      "status_class": "medium",
-      "status_text": "LIVE!",
-      "title": "Twitch/YouTube Streaming",
-      "description": "Two successful streams! Infrastructure validated."
-    },
-    {
-      "status_class": "medium",
-      "status_text": "CHECK",
-      "title": "Theme Park Crowd Report",
-      "description": "Pipeline ETL needs investigation"
-    },
-    {
-      "status_class": "low",
-      "status_text": "LIVE",
-      "title": "hazeydata.ai Website",
-      "description": "Live! Needs blog content"
-    }
-  ],
-  "theme_park_intel": [],
-  "dino_tasks": [
-    {
-      "id": "task-001",
-      "title": "Historical pipeline ETL load",
-      "description": "First-time load of all historical wait time data",
-      "status": "in_progress",
-      "status_class": "critical",
-      "status_text": "IN PROGRESS",
-      "priority": "high",
-      "priority_icon": "\u26a1",
-      "owner": "Wilma",
-      "notes": "Forecast generation running 21+ hours. Pipeline healthy.",
-      "updated": "2026-02-04T04:00:00"
-    },
-    {
-      "id": "task-005",
-      "title": "Replace \"Twitter\" icons and text with \"X\" icons and text",
-      "description": "We need to be on-brand for X",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
-      "priority": "low",
-      "priority_icon": "\ud83d\udcdd",
-      "owner": "Fred",
-      "notes": "",
-      "updated": "2026-02-02T13:14:00"
-    },
-    {
-      "id": "task-007",
-      "title": "Investigate nonsensical entity values in pipeline data",
-      "description": "Dashboard showing invalid attraction names like 'HS 6369', waypoints appearing as attractions. Need to check pipeline filtering logic and add exclusions for non-attraction entities.",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
-      "priority": "medium",
-      "priority_icon": "\ud83d\udccb",
-      "owner": "Bam-Bam",
-      "notes": "Noticed during first live stream 2026-02-03",
-      "updated": "2026-02-03T16:36:45"
-    },
-    {
-      "id": "task-008",
-      "title": "Dashboard date range slicer redesign",
-      "description": "Row 1: Yesterday | Today | Tomorrow. Row 2: Last 7 Days | 30 Days | 90 Days | Last Year",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
-      "priority": "medium",
-      "priority_icon": "\ud83d\udccb",
-      "owner": "Bam-Bam",
-      "notes": "Fred's feedback from first stream",
-      "updated": "2026-02-04T04:00:00"
-    },
-    {
-      "id": "task-009",
-      "title": "Configure Brave Search API key",
-      "description": "Wilma's web search is broken - needs Brave API key configured",
-      "status": "todo",
-      "status_class": "medium",
-      "status_text": "TODO",
-      "priority": "medium",
-      "priority_icon": "\ud83d\udccb",
-      "owner": "Fred",
-      "notes": "Run: clawdbot configure --section web",
-      "updated": "2026-02-04T04:00:00"
-    }
-  ],
-  "dino_summary": {
-    "total": 5,
-    "todo": 4,
-    "in_progress": 1,
-    "blocked": 0,
-    "done": 0
-  },
-  "last_updated": "2026-02-09T15:35:01.108984-05:00"
+    "last_updated": "2026-03-02T10:00:00-05:00"
 }
