@@ -1361,6 +1361,15 @@ async def about_command(interaction: discord.Interaction):
         inline=False
     )
     embed.add_field(
+        name="📡 Data Sources",
+        value=(
+            "Historical wait times from [TouringPlans.com](https://touringplans.com) • "
+            "Live wait times from [Queue-Times.com](https://queue-times.com) • "
+            "Park hours & events from official sources"
+        ),
+        inline=False
+    )
+    embed.add_field(
         name="🔗 Links",
         value="[hazeydata.ai](https://hazeydata.ai)",
         inline=False
