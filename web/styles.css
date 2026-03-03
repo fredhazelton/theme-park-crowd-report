@@ -484,6 +484,14 @@ body {
     color: var(--text-primary);
 }
 
+.data-sources a {
+    color: #7cb9ff;
+}
+
+.data-sources a:hover {
+    color: #a8d4ff;
+}
+
 /* CTA */
 .cta {
     padding: 6rem 2rem;
