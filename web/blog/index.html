@@ -244,105 +244,56 @@
                 <span class="tag">Launch</span>
                 <span class="tag">WTI</span>
             </div>
-            <h2><a href="#measuring-crowds-wrong">Why I Think We've Been Measuring Theme Park Crowds Wrong</a></h2>
+            <h2><a href="#measuring-crowds-wrong">A New Metric to Track Theme Park Crowds</a></h2>
 
-            <p>I've been analyzing theme park wait times professionally for over a decade. Started at TouringPlans, built crowd prediction models, dove deep into the mathematical patterns that determine whether your Space Mountain wait will be 20 minutes or 2 hours.</p>
+            <p>I've been analyzing theme park wait times professionally for over two decades. I started at TouringPlans, built crowd prediction models, dove deep into the mathematical patterns that determine whether your Space Mountain wait will be 20 minutes or 2 hours.</p>
 
-            <p>But the more I worked with crowd data, the more convinced I became that we're approaching the whole problem incorrectly.</p>
+            <p>Now I'm wondering if there's a better way to represent the wait times that we observe in the parks.</p>
 
-            <p>Every crowd calendar, every planning app, every forecasting system uses the same fundamental approach: rate park crowds as "Low," "Moderate," or "High." Universal scale. One-size-fits-all. Magic Kingdom gets the same rating system as Epic Universe.</p>
+            <h3>The Problem with Crowd Calendars</h3>
 
-            <p>Here's why that's wrong: <strong>"Busy" doesn't mean the same thing at different parks.</strong></p>
+            <p>The crowd calendar that we built at TouringPlans — and many others have copied — uses a 1-to-10 scale, for obvious reasons. It's easy to understand. It closely mimics other rating systems we're all familiar with.</p>
 
-            <h3>The Weather Analogy</h3>
-
-            <p>The breakthrough came when I started thinking about theme park crowds like weather.</p>
-
-            <p>A 40-degree day means something completely different in Miami versus Minnesota. In Miami, you're reaching for a jacket. In Minnesota, you're firing up the grill for a barbecue. Same number, totally different experience, because each location has its own baseline normal.</p>
-
-            <p>Theme park crowds work exactly the same way.</p>
-
-            <p>A "High" crowd day at Epic Universe feels completely different from a "High" day at Magic Kingdom, even when raw wait times look similar. Epic Universe was designed for higher capacity. Its layout handles crowds differently. Guest flow patterns are distinct. Operational characteristics vary significantly.</p>
-
-            <p>Each park has its own version of "normal."</p>
-
-            <h3>The Wait Time Index</h3>
-
-            <p>When I left TouringPlans to work independently, this insight became the foundation of my first project: a metric I call the <strong>Wait Time Index (WTI)</strong>.</p>
-
-            <p>Think of WTI as a crowd "temperature" that's calibrated specifically for each park:</p>
+            <p>But it comes with some real challenges:</p>
             <ul>
-                <li>WTI 40 at Epic Universe = Pretty typical Tuesday</li>
-                <li>WTI 40 at Magic Kingdom = Pack patience and snacks</li>
-                <li>WTI 40 at Animal Kingdom = Strategy meeting time</li>
+                <li>You need to decide which attractions go into the bucket that drives the calendar</li>
+                <li>You need to adjust the thresholds of what each 1-to-10 value means over time</li>
+                <li>You have to make sure the values are distributed in a way that makes the calendar usable</li>
             </ul>
 
-            <p>Instead of generic crowd levels that mean different things at different places, you get numbers that are actually meaningful for that specific park's operations.</p>
+            <p>These are all valid concerns, and worthwhile to maintain for a crowd calendar. But now that I'm on my own, I'm wondering if it's time to try a different approach.</p>
 
-            <p>Today I'm launching <strong><a href="https://hazeydata.ai">hazeydata.ai</a></strong> — ML-powered predictions for 12 parks across Disney, Universal, and more. WDW, Disneyland Resort, Universal Orlando (including Epic Universe), and even Tokyo Disney Resort. All calibrated individually. All updated daily.</p>
+            <h3>Introducing the Wait Time Index</h3>
 
-            <h3>Why This Changes Trip Planning</h3>
+            <p>The <strong>Wait Time Index (WTI)</strong> represents the average wait time across all operating attractions throughout the day. One number. No context needed. No thresholds. No bucket of attractions. No changing what the numbers mean over time (that's a big one).</p>
 
-            <p>Traditional crowd calendars leave you guessing. What does "Moderate" actually mean for your specific park on your specific day? How much patience should you pack? Should you buy Genie+ or not?</p>
+            <p>It's an interesting idea, and one that's come together quite well over the last few weeks as I've tinkered with it.</p>
 
-            <p>With park-calibrated WTI, those decisions become data-driven:</p>
-            <ul>
-                <li>WTI 25? Great day for walk-ons and leisurely exploration</li>
-                <li>WTI 55? Plan your priorities and use skip-the-line options strategically</li>
-                <li>WTI 80? Maybe stay at the hotel pool instead</li>
-            </ul>
+            <p>What I've noticed is that the parks become like cities on a weather forecast. 40° in Minnesota means something different than 40° in Miami. Same thing with the Wait Time Index — the range of values you'll see at Magic Kingdom is much different than, say, Disney's Hollywood Studios.</p>
 
-            <h3>The Discord Bot Experience</h3>
+            <p>That's because Magic Kingdom does a better job distributing its guests amongst its many more attractions than the Studios does.</p>
 
-            <p>I built a Discord bot around this concept that makes WTI actionable for trip planning:</p>
+            <h3>How Do I Bring This to You?</h3>
 
-            <p><code>/today</code> — Current WTI across all tracked parks with context about what those numbers mean</p>
+            <p>So now the question is: how do I make this useful for the Disney trip planner?</p>
 
-            <p><code>/crowd</code> — 7-day forecast showing how crowds will evolve through the week</p>
+            <p>For now, we're using Discord. If you <a href="https://discord.gg/Bz89uXrD" target="_blank">join the Discord</a> (100% free), you can get information about the crowds that have happened, the crowds happening today, and the crowds that will happen in the future. All of the predictions use actual wait times and the Wait Time Index.</p>
 
-            <p><code>/best-day</code> — Find the optimal visit window in the next 7, 90, or 365 days</p>
+            <p>A few commands to get you started:</p>
 
-            <p>Instead of vague predictions, you get specific numbers with park-appropriate context. "Magic Kingdom hits WTI 35 on March 4th — excellent day for first-time visitors" tells you something actionable.</p>
+            <p><code>/today</code> — Current WTI across all 12 tracked parks</p>
 
-            <h3>What the Data Reveals</h3>
+            <p><code>/crowd</code> — Detailed forecast for any park, any date</p>
 
-            <p>When you calibrate crowd measurements properly and map them over time, fascinating patterns emerge:</p>
+            <p><code>/best-day</code> — Find the lowest wait times in the next 7, 90, or 365 days</p>
 
-            <p><strong>September 8-22 really is Disney paradise.</strong> Not just "less crowded," but fundamentally different. When you see Magic Kingdom consistently hitting WTI 25-30, that represents a qualitatively different park experience. Space Mountain averaging 25 minutes instead of 75+. Seven Dwarfs Mine Train becomes doable without Genie+.</p>
-
-            <p><strong>Park personality differences become obvious.</strong> Epic Universe maintains more consistent crowd levels throughout the year — fewer extreme high days, but also fewer completely dead days. Magic Kingdom has more volatile swings. Universal Studios shows different seasonality patterns than Disney parks.</p>
-
-            <p><strong>Hidden optimization opportunities appear.</strong> Traditional crowd calendars might rate two days as "Moderate," missing that one day hits WTI 35 while the other reaches WTI 55. For trip planning, that's the difference between a great day and a challenging one.</p>
-
-            <h3>The Year View</h3>
-
-            <p>When you map a full year of calibrated WTI data as a color-coded heatmap — which you can explore right now on hazeydata.ai — the patterns become impossible to ignore:</p>
-
-            <p>Blue paradise in September. Deep red zones around Christmas and Easter. Those hidden gems in early February that most crowd calendars undervalue because they don't account for how Magic Kingdom specifically operates during those weeks.</p>
-
-            <p>It's oddly mesmerizing once you start exploring the patterns. The year-view heatmap lets you see 365 days of crowd data at a glance, and it immediately answers questions like "Why does everyone say avoid summer and holidays?" — because when you see 12 months of data at once, those red-hot periods literally jump off the screen.</p>
-
-            <h3>The Beta Launch</h3>
-
-            <p>Everything is free during this open beta. No subscriptions, no paywalls — just good data and a growing community of people who appreciate nuanced crowd analysis. The predictions are improving daily as the models learn and the data grows.</p>
-
-            <h3>A Different Approach</h3>
-
-            <p>This isn't about competing with existing crowd calendars or claiming revolutionary accuracy. It's about bringing more nuance to how we think about theme park crowds.</p>
-
-            <p>After years of building models that treated all parks the same, I wanted to try something that acknowledges the fundamental differences in how these places actually operate.</p>
-
-            <p>The weather analogy keeps proving useful. We don't rate temperature the same way everywhere — we understand that 40° means different things in different places. Theme park crowds deserve the same contextual intelligence.</p>
+            <p><code>/ask</code> — Ask anything about crowds and wait times, powered by AI and real data</p>
 
             <div class="blog-cta-box">
-                <p><strong>Explore the data:</strong> <a href="https://hazeydata.ai">hazeydata.ai</a> — dig into the year-view heatmaps, compare parks, and find those blue paradise weeks.</p>
+                <p><strong>Explore the data:</strong> <a href="https://hazeydata.ai">hazeydata.ai</a> — dig into the year-view heatmaps, compare parks, and find the best days to visit.</p>
                 <p><strong>Join the community:</strong> <a href="https://discord.gg/Bz89uXrD" target="_blank">Discord</a> — ask the bot questions, discuss strategies, and hang out with other planning enthusiasts.</p>
                 <a href="https://discord.gg/Bz89uXrD" class="btn btn-primary" target="_blank" style="margin-top: 0.5rem;">Join Free — See All 12 Parks</a>
             </div>
-
-            <p>Sometimes the best insights come from asking better questions. What if "busy" isn't binary? What if context matters more than we thought?</p>
-
-            <p>The data suggests it does.</p>
 
             <p class="author-sig">Fred Hazelton is an independent theme park data analyst and former TouringPlans statistician. He builds tools that help people make smarter trip planning decisions using calibrated crowd metrics and comprehensive data visualization.</p>
         </article>
