@@ -804,6 +804,14 @@ async def crowd_command(interaction: discord.Interaction, park: str, date: str =
             display_name = entity_names[entity_code][1]
         else:
             display_name = entity_code
+        
+        # Skip non-ride entities (waypoints, lightning lane, meet & greets, shows, etc.)
+        skip_keywords = ['Waypoint', 'Get Lightning Lane', 'Lightning Lane Return',
+                        'FASTPASS Booth', 'Temporary', 'Glassblowing', 'Showbot',
+                        'Cavalcade', 'Fireworks', 'Parade', 'Spectacular',
+                        'Dance Party', 'Street Party', 'Processional']
+        if any(kw.lower() in display_name.lower() for kw in skip_keywords):
+            continue
         if avg_wait > 25:
             headliners.append((display_name, int(avg_wait)))
         elif avg_wait > 0:
@@ -913,19 +921,96 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
         return
 
     # Build per-day WTI ranges (low/avg/high from time slots)
+    # For large timeframes, use a single batch query to avoid 365 separate DB connections
+    # (which causes DuckDB lock contention and blocks the Discord heartbeat)
     days_data = []
-    for _, row in df.iterrows():
-        d = row['park_date']
-        if isinstance(d, pd.Timestamp):
-            d = d.date()
-        wti_range = get_wti_range(park_code, d)
-        if wti_range:
-            days_data.append({
-                "date": d,
-                "wti_low": wti_range["wti_low"],
-                "wti_avg": wti_range["wti_avg"],
-                "wti_high": wti_range["wti_high"],
-            })
+    if timeframe >= 90:
+        # Batch query: get all time-slot data + WTI values in two queries
+        try:
+            entity_filter = _entity_filter_sql(park_code)
+            wti_code = WTI_CODE_MAP.get(park_code, park_code)
+            con = get_db()
+            
+            # Get per-date time-slot stats (min/mean/max of slot averages)
+            slot_stats = con.execute(f"""
+                WITH slot_avgs AS (
+                    SELECT park_date, 
+                           CAST(time_slot AS VARCHAR) as ts,
+                           AVG(predicted_actual) as slot_avg
+                    FROM forecasts
+                    WHERE {entity_filter}
+                      AND park_date BETWEEN ? AND ?
+                      AND CAST(time_slot AS VARCHAR) BETWEEN '08:00' AND '22:00'
+                    GROUP BY park_date, time_slot
+                )
+                SELECT park_date, 
+                       MIN(slot_avg) as raw_low,
+                       AVG(slot_avg) as raw_avg, 
+                       MAX(slot_avg) as raw_high
+                FROM slot_avgs
+                GROUP BY park_date
+                ORDER BY park_date
+            """, [start, end]).fetchdf()
+            
+            # Get WTI mapped values
+            wti_vals = con.execute("""
+                SELECT park_date, wti FROM wti
+                WHERE park_code = ? AND park_date BETWEEN ? AND ?
+            """, [wti_code, start, end]).fetchdf()
+            con.close()
+            
+            # Build lookup for WTI mapped values
+            wti_map = {}
+            for _, wrow in wti_vals.iterrows():
+                wd = wrow['park_date']
+                if isinstance(wd, pd.Timestamp):
+                    wd = wd.date()
+                wti_map[wd] = float(wrow['wti'])
+            
+            # Build days_data from batch results
+            for _, srow in slot_stats.iterrows():
+                d = srow['park_date']
+                if isinstance(d, pd.Timestamp):
+                    d = d.date()
+                raw_low = float(srow['raw_low'])
+                raw_avg = float(srow['raw_avg'])
+                raw_high = float(srow['raw_high'])
+                
+                if d in wti_map and raw_avg > 0:
+                    mapped_avg = wti_map[d]
+                    scale = mapped_avg / raw_avg
+                    days_data.append({
+                        "date": d,
+                        "wti_low": round(raw_low * scale, 1),
+                        "wti_avg": round(mapped_avg, 1),
+                        "wti_high": round(raw_high * scale, 1),
+                    })
+                elif raw_avg > 0:
+                    days_data.append({
+                        "date": d,
+                        "wti_low": raw_low,
+                        "wti_avg": raw_avg,
+                        "wti_high": raw_high,
+                    })
+            print(f"📊 Batch query: {len(days_data)} days loaded for {park_full} ({timeframe}-day view)")
+        except Exception as e:
+            print(f"⚠️ Batch WTI query failed, falling back to per-day: {e}")
+            days_data = []  # Fall through to per-day below
+    
+    # Per-day fallback (for small timeframes or if batch failed)
+    if not days_data:
+        for _, row in df.iterrows():
+            d = row['park_date']
+            if isinstance(d, pd.Timestamp):
+                d = d.date()
+            wti_range = get_wti_range(park_code, d)
+            if wti_range:
+                days_data.append({
+                    "date": d,
+                    "wti_low": wti_range["wti_low"],
+                    "wti_avg": wti_range["wti_avg"],
+                    "wti_high": wti_range["wti_high"],
+                })
 
     if not days_data:
         await interaction.followup.send(
@@ -981,11 +1066,18 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
 
     else:
         # 90+ day views: calendar image instead of text
+        # Try pre-generated image first, fall back to live rendering
         try:
-            import asyncio
-            loop = asyncio.get_event_loop()
-            cal_buf = await loop.run_in_executor(None, generate_calendar_image, park_full, days_data)
-            file = discord.File(cal_buf, filename="calendar.png")
+            pre_gen_path = f"/mnt/data/pipeline/calendar_images/{park_code}_{timeframe}.png"
+            if os.path.exists(pre_gen_path):
+                file = discord.File(pre_gen_path, filename="calendar.png")
+                print(f"📸 Serving pre-generated image: {pre_gen_path}")
+            else:
+                import asyncio
+                loop = asyncio.get_event_loop()
+                cal_buf = await loop.run_in_executor(None, generate_calendar_image, park_full, days_data)
+                file = discord.File(cal_buf, filename="calendar.png")
+                print(f"📸 Generated image live for {park_code}_{timeframe} (no pre-gen found)")
 
             tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg']).lower()}"
             embed = discord.Embed(
@@ -999,7 +1091,7 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
             await interaction.followup.send(embed=embed, file=file)
             return
         except Exception as e:
-            print(f"⚠️ Calendar image generation failed, falling back to text: {e}")
+            print(f"⚠️ Calendar image failed, falling back to text: {e}")
             # Fall through to text fallback below
 
         # Text fallback if image generation fails
@@ -1448,7 +1540,7 @@ try:
 except Exception as e:
     print(f"⚠️ Could not load Anthropic API key: {e}")
 
-BOT_COMMANDS_CHANNEL = 1471935481469210736  # #bot-commands
+BOT_COMMANDS_CHANNEL = 1478240248361128079  # #bot-commands (recreated Mar 2)
 
 
 @tree.command(name="ask", description="Ask anything about theme park crowds, wait times, and visit planning")
