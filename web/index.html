@@ -278,5 +278,23 @@
             <p class="footer-copy">© 2026 hazeydata.ai</p>
         </div>
     </footer>
+
+    <!-- Lightbox -->
+    <div id="lightbox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; cursor:zoom-out; align-items:center; justify-content:center;">
+        <img id="lightbox-img" style="max-width:90vw; max-height:90vh; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,0.5);">
+    </div>
+    <script>
+        document.querySelectorAll('.preview-card img').forEach(img => {
+            img.style.cursor = 'zoom-in';
+            img.addEventListener('click', () => {
+                const lb = document.getElementById('lightbox');
+                document.getElementById('lightbox-img').src = img.src;
+                lb.style.display = 'flex';
+            });
+        });
+        document.getElementById('lightbox').addEventListener('click', () => {
+            document.getElementById('lightbox').style.display = 'none';
+        });
+    </script>
 </body>
 </html>
