@@ -259,7 +259,15 @@ body {
 }
 
 .preview-grid-5 {
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.preview-grid-5 .preview-card {
+    width: calc(33.333% - 1.5rem);
+    min-width: 260px;
 }
 
 .preview-card-highlight {
