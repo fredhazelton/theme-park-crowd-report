@@ -237,7 +237,7 @@ def load_entity_names():
         if _USE_DUCKDB:
             con = get_db()
             df = con.execute("""
-                SELECT entity_code, entity_name, short_name, is_extinct
+                SELECT entity_code, entity_name, short_name, is_extinct, has_posted
                 FROM entities
             """).fetchdf()
             con.close()
@@ -247,7 +247,8 @@ def load_entity_names():
                 name = row['entity_name'] if pd.notna(row['entity_name']) else code
                 short = row['short_name'] if pd.notna(row['short_name']) else name
                 extinct = bool(row['is_extinct']) if pd.notna(row['is_extinct']) else False
-                mapping[code] = (name, short, extinct)
+                has_posted = bool(row['has_posted']) if pd.notna(row['has_posted']) else False
+                mapping[code] = (name, short, extinct, has_posted)
             print(f"📋 Loaded {len(mapping)} entity names from DuckDB")
             return mapping
 
@@ -796,22 +797,15 @@ async def crowd_command(interaction: discord.Interaction, park: str, date: str =
         entity_code = row['entity_code']
         avg_wait = row['avg_wait']
         
-        # Skip extinct entities
-        if entity_code in entity_names and entity_names[entity_code][2]:  # is_extinct
-            continue
-        
+        # Skip extinct entities or entities without posted wait times
         if entity_code in entity_names:
+            is_extinct = entity_names[entity_code][2]
+            has_posted = entity_names[entity_code][3] if len(entity_names[entity_code]) > 3 else True
+            if is_extinct or not has_posted:
+                continue
             display_name = entity_names[entity_code][1]
         else:
             display_name = entity_code
-        
-        # Skip non-ride entities (waypoints, lightning lane, meet & greets, shows, etc.)
-        skip_keywords = ['Waypoint', 'Get Lightning Lane', 'Lightning Lane Return',
-                        'FASTPASS Booth', 'Temporary', 'Glassblowing', 'Showbot',
-                        'Cavalcade', 'Fireworks', 'Parade', 'Spectacular',
-                        'Dance Party', 'Street Party', 'Processional']
-        if any(kw.lower() in display_name.lower() for kw in skip_keywords):
-            continue
         if avg_wait > 25:
             headliners.append((display_name, int(avg_wait)))
         elif avg_wait > 0:
