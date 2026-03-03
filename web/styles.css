@@ -252,10 +252,16 @@ body {
 }
 
 .preview-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1.5rem;
     text-align: center;
+}
+
+.preview-grid .preview-card {
+    width: calc(33.333% - 1.5rem);
+    min-width: 260px;
 }
 
 .preview-grid-5 {
@@ -335,13 +341,16 @@ body {
 }
 
 .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1.5rem;
     margin-top: 3rem;
 }
 
 .feature-card {
+    width: calc(25% - 1.5rem);
+    min-width: 220px;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 12px;
