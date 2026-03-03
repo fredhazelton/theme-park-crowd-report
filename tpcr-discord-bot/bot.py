@@ -1264,8 +1264,12 @@ async def now_command(interaction: discord.Interaction, park: str):
         entity_code = row['entity_code']
         posted_wait = int(row['current_wait'])
 
-        # Get ride name — skip unmapped entities entirely
+        # Get ride name — skip unmapped or non-ride entities
         if entity_code in entity_names:
+            is_extinct = entity_names[entity_code][2]
+            has_posted = entity_names[entity_code][3] if len(entity_names[entity_code]) > 3 else True
+            if is_extinct or not has_posted:
+                continue
             ride_name = entity_names[entity_code][1]  # short_name
         else:
             continue
