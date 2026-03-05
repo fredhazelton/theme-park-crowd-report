@@ -1039,6 +1039,185 @@
         }
 
         /* ═══════════════════════════════════════════════════
+           PROJECTS TAB
+           ═══════════════════════════════════════════════════ */
+        .projects-header {
+            margin-bottom: 24px;
+        }
+        .projects-header h2 {
+            font-family: var(--font-text);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .projects-header .projects-subtitle {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 16px;
+        }
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .project-card:hover {
+            border-color: var(--border-accent);
+        }
+        .project-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .project-card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .project-status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: capitalize;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+        .project-status-badge.active {
+            background: rgba(74,222,128,0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(74,222,128,0.2);
+        }
+        .project-status-badge.planning {
+            background: rgba(250,204,21,0.15);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(250,204,21,0.2);
+        }
+        .project-status-badge.paused {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .project-status-badge.complete {
+            background: rgba(34,211,238,0.15);
+            color: #22d3ee;
+            border: 1px solid rgba(34,211,238,0.2);
+        }
+        .project-card-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .project-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .project-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .project-progress-bar .fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        .project-progress-bar .fill.active { background: var(--accent-green); }
+        .project-progress-bar .fill.planning { background: var(--accent-yellow); }
+        .project-progress-bar .fill.paused { background: rgba(255,255,255,0.3); }
+        .project-progress-bar .fill.complete { background: #22d3ee; }
+        .project-progress-pct {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 38px;
+            text-align: right;
+        }
+        .project-progress-fraction {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            min-width: 40px;
+            text-align: right;
+        }
+        .project-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .project-owner {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .project-priority-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: lowercase;
+        }
+        .project-priority-badge.high {
+            background: rgba(248,113,113,0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(248,113,113,0.2);
+        }
+        .project-priority-badge.medium {
+            background: rgba(250,204,21,0.15);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(250,204,21,0.2);
+        }
+        .project-priority-badge.low {
+            background: rgba(74,222,128,0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(74,222,128,0.2);
+        }
+        .project-updated {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════
            CALENDAR TAB
            ═══════════════════════════════════════════════════ */
         .always-running-section {
@@ -1309,6 +1488,9 @@
     <div class="tab" data-tab="tasks" onclick="switchTab('tasks')">
         <span class="tab-icon">✅</span><span class="tab-label">Tasks</span>
     </div>
+    <div class="tab" data-tab="projects" onclick="switchTab('projects')">
+        <span class="tab-icon">📂</span><span class="tab-label">Projects</span>
+    </div>
     <div class="tab disabled" data-tab="ideas">
         <span class="tab-icon">💡</span><span class="tab-label">Ideas</span>
     </div>
@@ -1513,6 +1695,19 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
+     PROJECTS TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-projects" class="tab-content">
+    <div class="projects-header">
+        <h2>📂 Projects</h2>
+        <div class="projects-subtitle" id="projectsSubtitle">Loading...</div>
+    </div>
+    <div class="projects-grid" id="projectsGrid">
+        <div class="loading">Loading projects data...</div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
      CALENDAR TAB
      ═══════════════════════════════════════════════════════════ -->
 <div id="tab-calendar" class="tab-content">
@@ -1676,8 +1871,9 @@ async function loadAllData() {
         console.error('Load error:', e);
     }
 
-    // Load tasks and calendar data separately (non-blocking)
+    // Load tasks, projects, and calendar data separately (non-blocking)
     loadTasksData();
+    loadProjectsData();
     loadCalendarData();
 }
 
@@ -2408,6 +2604,81 @@ function showToast(msg) {
 document.getElementById('addTaskModal').addEventListener('click', function(e) {
     if (e.target === this) closeAddTaskModal();
 });
+
+// ═══════════════════════════════════════════════════════════════
+// PROJECTS TAB
+// ═══════════════════════════════════════════════════════════════
+State.projectsData = null;
+
+async function loadProjectsData() {
+    try {
+        State.projectsData = await fetchJSON(`${BASE}analytics-data/projects.json`);
+        renderProjects();
+    } catch (e) {
+        console.error('Projects load error:', e);
+    }
+}
+
+function renderProjects() {
+    const data = State.projectsData;
+    if (!data) return;
+
+    const s = data.summary;
+    document.getElementById('projectsSubtitle').textContent =
+        `${s.total} total · ${s.active} active · ${s.planning} planning`;
+
+    const ownerEmoji = { Fred: '🪨', Wilma: '🦴', 'Bam-Bam': '🏏' };
+
+    const grid = document.getElementById('projectsGrid');
+    grid.innerHTML = data.projects.map(p => {
+        const emoji = ownerEmoji[p.owner] || '👤';
+        const updatedAgo = getTimeAgo(p.updated + 'T12:00:00');
+
+        return `
+            <div class="project-card" onclick="navigateToProjectTasks('${escHtml(p.id)}', '${escHtml(p.name)}')">
+                <div class="project-card-header">
+                    <div class="project-card-name">${escHtml(p.name)}</div>
+                    <span class="project-status-badge ${p.status}">${p.status}</span>
+                </div>
+                <div class="project-card-desc">${escHtml(p.description)}</div>
+                <div class="project-progress">
+                    <div class="project-progress-bar">
+                        <div class="fill ${p.status}" style="width: ${p.pct_complete}%"></div>
+                    </div>
+                    <span class="project-progress-pct">${p.pct_complete}%</span>
+                    <span class="project-progress-fraction">${p.tasks_done}/${p.tasks_total}</span>
+                </div>
+                <div class="project-card-footer">
+                    <span class="project-owner">${emoji} ${escHtml(p.owner)}</span>
+                    <span class="project-priority-badge ${p.priority}">${p.priority}</span>
+                </div>
+                <div class="project-updated">Updated ${updatedAgo || p.updated}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function navigateToProjectTasks(projectId, projectName) {
+    // Map project IDs to project filter values
+    const idToFilter = {
+        'pipeline': 'Pipeline',
+        'discord-bot': 'Discord Bot',
+        'mission-control': 'Pipeline',  // MC tasks are under Pipeline project
+        'website': 'Website',
+        'streaming': 'Content',
+        'business': 'Business',
+    };
+    const filterVal = idToFilter[projectId];
+    if (filterVal) {
+        const sel = document.getElementById('projectFilter');
+        if (sel) {
+            sel.value = filterVal;
+            State.tasksFilter.project = filterVal;
+        }
+    }
+    switchTab('tasks');
+    if (filterVal) renderTasks();
+}
 
 // ═══════════════════════════════════════════════════════════════
 // CALENDAR TAB
