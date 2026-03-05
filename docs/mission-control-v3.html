@@ -1444,6 +1444,293 @@
             font-size: 13px;
         }
         .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+
+        /* ═══════════════════════════════════════════════════
+           MEMORY TAB
+           ═══════════════════════════════════════════════════ */
+        #tab-memory { padding: 0; }
+        .memory-layout {
+            display: flex;
+            height: calc(100vh - 65px);
+        }
+        .memory-left {
+            width: 30%;
+            max-width: 380px;
+            min-width: 260px;
+            border-right: 1px solid var(--border-card);
+            display: flex;
+            flex-direction: column;
+            background: rgba(0,0,0,0.15);
+        }
+        .memory-right {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Search */
+        .memory-search {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-card);
+        }
+        .memory-search input {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: var(--font-text);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .memory-search input::placeholder { color: var(--text-muted); }
+        .memory-search input:focus { border-color: var(--accent); }
+
+        /* Long-term card */
+        .memory-lt-card {
+            margin: 12px 16px;
+            padding: 14px;
+            background: rgba(74,222,128,0.06);
+            border: 1px solid rgba(74,222,128,0.15);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .memory-lt-card:hover {
+            background: rgba(74,222,128,0.1);
+            border-color: rgba(74,222,128,0.3);
+        }
+        .memory-lt-card.selected {
+            border-left: 3px solid var(--accent-green);
+            background: rgba(74,222,128,0.12);
+        }
+        .memory-lt-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .memory-lt-info { flex: 1; min-width: 0; }
+        .memory-lt-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--accent-green);
+        }
+        .memory-lt-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-top: 3px;
+        }
+
+        /* Daily section */
+        .memory-daily-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px 8px;
+        }
+        .memory-daily-title {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .memory-daily-badge {
+            background: rgba(74,144,164,0.2);
+            color: var(--accent-light);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Entry list */
+        .memory-entries {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 8px 16px;
+        }
+        .memory-entry {
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+            margin-bottom: 2px;
+        }
+        .memory-entry:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .memory-entry.selected {
+            background: rgba(74,144,164,0.1);
+            border-left-color: var(--accent);
+        }
+        .memory-entry-date {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        .memory-entry.selected .memory-entry-date {
+            color: var(--accent-light);
+        }
+        .memory-entry-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-top: 2px;
+        }
+
+        /* Right panel header */
+        .memory-content-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border-card);
+            flex-shrink: 0;
+        }
+        .memory-content-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .memory-content-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-top: 4px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Markdown content */
+        .memory-content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .memory-md {
+            line-height: 1.7;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .memory-md h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 24px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-card);
+        }
+        .memory-md h1:first-child { margin-top: 0; }
+        .memory-md h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 20px 0 10px;
+        }
+        .memory-md h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent-light);
+            margin: 16px 0 8px;
+        }
+        .memory-md h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 14px 0 6px;
+        }
+        .memory-md p {
+            margin: 8px 0;
+        }
+        .memory-md ul, .memory-md ol {
+            margin: 8px 0;
+            padding-left: 24px;
+        }
+        .memory-md li {
+            margin: 4px 0;
+        }
+        .memory-md strong { color: var(--text-primary); }
+        .memory-md em { font-style: italic; color: var(--text-secondary); }
+        .memory-md code {
+            background: rgba(255,255,255,0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--accent-light);
+        }
+        .memory-md pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+        .memory-md pre code {
+            background: none;
+            padding: 0;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .memory-md a {
+            color: var(--accent-light);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(107,181,201,0.3);
+            transition: border-color 0.2s;
+        }
+        .memory-md a:hover { border-bottom-color: var(--accent-light); }
+        .memory-md hr {
+            border: none;
+            border-top: 1px solid var(--border-card);
+            margin: 16px 0;
+        }
+        .memory-md blockquote {
+            border-left: 3px solid var(--accent);
+            padding-left: 16px;
+            margin: 12px 0;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .memory-md mark, .memory-md .highlight {
+            background: rgba(250,204,21,0.25);
+            color: var(--text-primary);
+            padding: 1px 3px;
+            border-radius: 2px;
+        }
+
+        .memory-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            font-size: 14px;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .memory-empty .icon { font-size: 40px; }
+
+        @media (max-width: 768px) {
+            .memory-layout { flex-direction: column; height: auto; }
+            .memory-left {
+                width: 100%;
+                max-width: none;
+                max-height: 300px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-card);
+            }
+            .memory-right { min-height: 60vh; }
+        }
     </style>
 </head>
 <body>
@@ -1490,6 +1777,9 @@
     </div>
     <div class="tab" data-tab="projects" onclick="switchTab('projects')">
         <span class="tab-icon">📂</span><span class="tab-label">Projects</span>
+    </div>
+    <div class="tab" data-tab="memory" onclick="switchTab('memory')">
+        <span class="tab-icon">🧠</span><span class="tab-label">Memory</span>
     </div>
     <div class="tab disabled" data-tab="ideas">
         <span class="tab-icon">💡</span><span class="tab-label">Ideas</span>
@@ -1787,6 +2077,46 @@
     </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     MEMORY TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-memory" class="tab-content">
+    <div class="memory-layout">
+        <!-- Left Panel -->
+        <div class="memory-left">
+            <div class="memory-search">
+                <input type="text" id="memorySearchInput" placeholder="Search memory..." oninput="onMemorySearch(this.value)">
+            </div>
+            <div class="memory-lt-card" id="memoryLtCard" onclick="selectLongTermMemory()">
+                <div class="memory-lt-icon">🧬</div>
+                <div class="memory-lt-info">
+                    <div class="memory-lt-title">Long-Term Memory</div>
+                    <div class="memory-lt-meta" id="memoryLtMeta">Loading...</div>
+                </div>
+            </div>
+            <div class="memory-daily-header">
+                <span class="memory-daily-title">Daily Journal</span>
+                <span class="memory-daily-badge" id="memoryDailyBadge">0</span>
+            </div>
+            <div class="memory-entries" id="memoryEntries">
+                <div class="memory-empty"><span class="icon">📝</span>Loading journal...</div>
+            </div>
+        </div>
+        <!-- Right Panel -->
+        <div class="memory-right">
+            <div class="memory-content-header" id="memoryContentHeader">
+                <div class="memory-content-title" id="memoryContentTitle">Select an entry</div>
+                <div class="memory-content-meta" id="memoryContentMeta"></div>
+            </div>
+            <div class="memory-content-body">
+                <div class="memory-md" id="memoryContentBody">
+                    <div class="memory-empty"><span class="icon">🧠</span>Choose a memory entry from the left panel</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Toast notification -->
 <div class="toast" id="toast"></div>
 
@@ -1871,10 +2201,11 @@ async function loadAllData() {
         console.error('Load error:', e);
     }
 
-    // Load tasks, projects, and calendar data separately (non-blocking)
+    // Load tasks, projects, calendar, and memory data separately (non-blocking)
     loadTasksData();
     loadProjectsData();
     loadCalendarData();
+    loadMemoryData();
 }
 
 function updateTimestamp() {
@@ -2767,6 +3098,286 @@ async function init() {
     setInterval(async () => {
         await loadAllData();
     }, 60000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MEMORY TAB
+// ═══════════════════════════════════════════════════════════════
+let memoryData = null;
+let memorySelected = null; // {type:'longterm'} or {type:'daily', index:N}
+let memorySearchTerm = '';
+let memorySearchTimer = null;
+
+async function loadMemoryData() {
+    try {
+        memoryData = await fetchJSON(`${BASE}analytics-data/memory.json`);
+        renderMemorySidebar();
+        // Auto-select most recent daily or long-term on first load
+        if (!memorySelected) {
+            if (memoryData.daily && memoryData.daily.length > 0) {
+                selectDailyEntry(0);
+            } else if (memoryData.long_term) {
+                selectLongTermMemory();
+            }
+        }
+    } catch (e) {
+        console.error('Memory load error:', e);
+    }
+}
+
+function renderMemorySidebar() {
+    if (!memoryData) return;
+
+    // Long-term card meta
+    const ltMeta = document.getElementById('memoryLtMeta');
+    if (memoryData.long_term) {
+        ltMeta.textContent = `${memoryData.long_term.words.toLocaleString()} words · Updated ${memoryData.long_term.updated}`;
+    } else {
+        ltMeta.textContent = 'Not found';
+    }
+
+    // Daily badge
+    const filtered = getFilteredDaily();
+    document.getElementById('memoryDailyBadge').textContent = filtered.length;
+
+    // Daily entries list
+    const container = document.getElementById('memoryEntries');
+    if (filtered.length === 0) {
+        container.innerHTML = '<div class="memory-empty"><span class="icon">📭</span>' +
+            (memorySearchTerm ? 'No matching entries' : 'No journal entries') + '</div>';
+        return;
+    }
+
+    let html = '';
+    filtered.forEach((entry, idx) => {
+        const origIdx = entry._origIndex;
+        const dt = new Date(entry.date + 'T12:00:00');
+        const dayStr = dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        const isSelected = memorySelected && memorySelected.type === 'daily' && memorySelected.index === origIdx;
+        html += `<div class="memory-entry${isSelected ? ' selected' : ''}" onclick="selectDailyEntry(${origIdx})">
+            <div class="memory-entry-date">${dayStr}</div>
+            <div class="memory-entry-meta">${entry.size_kb} KB · ${entry.words.toLocaleString()} words</div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function getFilteredDaily() {
+    if (!memoryData || !memoryData.daily) return [];
+    const term = memorySearchTerm.toLowerCase();
+    return memoryData.daily
+        .map((e, i) => ({...e, _origIndex: i}))
+        .filter(e => {
+            if (!term) return true;
+            return e.date.toLowerCase().includes(term) ||
+                   e.day_name.toLowerCase().includes(term) ||
+                   (e.content && e.content.toLowerCase().includes(term));
+        });
+}
+
+function selectLongTermMemory() {
+    if (!memoryData || !memoryData.long_term) return;
+    memorySelected = { type: 'longterm' };
+
+    // Update selection styling
+    document.getElementById('memoryLtCard').classList.add('selected');
+    document.querySelectorAll('.memory-entry').forEach(e => e.classList.remove('selected'));
+
+    const lt = memoryData.long_term;
+    document.getElementById('memoryContentTitle').textContent = '🧬 Long-Term Memory';
+    document.getElementById('memoryContentMeta').innerHTML =
+        `<span>${lt.words.toLocaleString()} words</span>` +
+        `<span>${lt.lines} lines</span>` +
+        `<span>${lt.size_kb} KB</span>` +
+        `<span>Updated ${lt.updated}</span>`;
+    document.getElementById('memoryContentBody').innerHTML = renderMarkdown(lt.content);
+}
+
+function selectDailyEntry(index) {
+    if (!memoryData || !memoryData.daily[index]) return;
+    memorySelected = { type: 'daily', index: index };
+
+    // Update selection styling
+    document.getElementById('memoryLtCard').classList.remove('selected');
+    document.querySelectorAll('.memory-entry').forEach((e, i) => {
+        // Match by origIndex stored in onclick
+        const onclick = e.getAttribute('onclick');
+        const match = onclick && onclick.match(/selectDailyEntry\((\d+)\)/);
+        if (match && parseInt(match[1]) === index) {
+            e.classList.add('selected');
+        } else {
+            e.classList.remove('selected');
+        }
+    });
+
+    const entry = memoryData.daily[index];
+    const dt = new Date(entry.date + 'T12:00:00');
+    const fullDate = dt.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    document.getElementById('memoryContentTitle').textContent = fullDate;
+    document.getElementById('memoryContentMeta').innerHTML =
+        `<span>${entry.words.toLocaleString()} words</span>` +
+        `<span>${entry.size_kb} KB</span>` +
+        `<span>Modified ${timeAgo(entry.updated)}</span>`;
+
+    let rendered = renderMarkdown(entry.content);
+    // Highlight search term in content
+    if (memorySearchTerm) {
+        const escapedTerm = memorySearchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(`(${escapedTerm})`, 'gi');
+        rendered = rendered.replace(/>([^<]+)</g, (match, text) => {
+            return '>' + text.replace(re, '<mark>$1</mark>') + '<';
+        });
+    }
+    document.getElementById('memoryContentBody').innerHTML = rendered;
+}
+
+function onMemorySearch(val) {
+    clearTimeout(memorySearchTimer);
+    memorySearchTimer = setTimeout(() => {
+        memorySearchTerm = val.trim();
+        renderMemorySidebar();
+        // Also filter/check long-term card visibility
+        if (memorySearchTerm && memoryData && memoryData.long_term) {
+            const ltMatch = memoryData.long_term.content.toLowerCase().includes(memorySearchTerm.toLowerCase());
+            document.getElementById('memoryLtCard').style.display = ltMatch ? '' : 'none';
+        } else {
+            document.getElementById('memoryLtCard').style.display = '';
+        }
+    }, 300);
+}
+
+function renderMarkdown(text) {
+    if (!text) return '<div class="memory-empty"><span class="icon">📄</span>No content</div>';
+
+    // Escape HTML first
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    // Code blocks (``` ... ```) — must come before other inline transforms
+    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+        return `<pre><code>${code.trim()}</code></pre>`;
+    });
+
+    // Split into lines for block-level processing
+    const lines = html.split('\n');
+    let result = [];
+    let inList = false;
+    let listType = null; // 'ul' or 'ol'
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        // Skip if inside pre block (already handled)
+        if (line.includes('<pre>') || line.includes('</pre>')) {
+            if (inList) { result.push(`</${listType}>`); inList = false; }
+            result.push(line);
+            continue;
+        }
+
+        // Headers
+        if (line.match(/^#{4}\s+(.+)/)) {
+            if (inList) { result.push(`</${listType}>`); inList = false; }
+            result.push(line.replace(/^#{4}\s+(.+)/, '<h4>$1</h4>'));
+            continue;
+        }
+        if (line.match(/^#{3}\s+(.+)/)) {
+            if (inList) { result.push(`</${listType}>`); inList = false; }
+            result.push(line.replace(/^#{3}\s+(.+)/, '<h3>$1</h3>'));
+            continue;
+        }
+        if (line.match(/^#{2}\s+(.+)/)) {
+            if (inList) { result.push(`</${listType}>`); inList = false; }
+            result.push(line.replace(/^#{2}\s+(.+)/, '<h2>$1</h2>'));
+            continue;
+        }
+        if (line.match(/^#{1}\s+(.+)/)) {
+            if (inList) { result.push(`</${listType}>`); inList = false; }
+            result.push(line.replace(/^#{1}\s+(.+)/, '<h1>$1</h1>'));
+            continue;
+        }
+
+        // Horizontal rule
+        if (line.match(/^(\s*[-*_]){3,}\s*$/)) {
+            if (inList) { result.push(`</${listType}>`); inList = false; }
+            result.push('<hr>');
+            continue;
+        }
+
+        // Blockquote
+        if (line.match(/^&gt;\s*(.*)/)) {
+            if (inList) { result.push(`</${listType}>`); inList = false; }
+            result.push(line.replace(/^&gt;\s*(.*)/, '<blockquote>$1</blockquote>'));
+            continue;
+        }
+
+        // Unordered list
+        if (line.match(/^\s*[-*+]\s+(.+)/)) {
+            if (!inList || listType !== 'ul') {
+                if (inList) result.push(`</${listType}>`);
+                result.push('<ul>');
+                inList = true;
+                listType = 'ul';
+            }
+            result.push(line.replace(/^\s*[-*+]\s+(.+)/, '<li>$1</li>'));
+            continue;
+        }
+
+        // Ordered list
+        if (line.match(/^\s*\d+\.\s+(.+)/)) {
+            if (!inList || listType !== 'ol') {
+                if (inList) result.push(`</${listType}>`);
+                result.push('<ol>');
+                inList = true;
+                listType = 'ol';
+            }
+            result.push(line.replace(/^\s*\d+\.\s+(.+)/, '<li>$1</li>'));
+            continue;
+        }
+
+        // Close list if we hit a non-list line
+        if (inList) {
+            result.push(`</${listType}>`);
+            inList = false;
+        }
+
+        // Empty line = paragraph break
+        if (line.trim() === '') {
+            result.push('');
+            continue;
+        }
+
+        // Regular paragraph
+        result.push(`<p>${line}</p>`);
+    }
+    if (inList) result.push(`</${listType}>`);
+
+    html = result.join('\n');
+
+    // Inline formatting (applied to the whole thing, but not inside <pre>)
+    // Split on pre blocks to preserve them
+    const parts = html.split(/(<pre>[\s\S]*?<\/pre>)/);
+    html = parts.map(part => {
+        if (part.startsWith('<pre>')) return part;
+        // Bold
+        part = part.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        // Italic (single * not preceded/followed by space for safety)
+        part = part.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+        // Inline code
+        part = part.replace(/`([^`]+)`/g, '<code>$1</code>');
+        // Links
+        part = part.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+        return part;
+    }).join('');
+
+    // Clean up consecutive empty paragraphs
+    html = html.replace(/(<p><\/p>\s*){2,}/g, '');
+    // Remove empty <p></p>
+    html = html.replace(/<p><\/p>/g, '');
+
+    return html;
 }
 
 // Handle hash changes
