@@ -7,6 +7,7 @@ Reads from pipeline forecast data on disk.
 
 import os
 import sys
+import logging
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
@@ -18,6 +19,9 @@ import re
 import io
 from pathlib import Path
 from forecast_image import generate_forecast_image
+
+logger = logging.getLogger("tpcr-bot")
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] [%(levelname)-8s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 from calendar_image import generate_calendar_image
 from ask_agent import ask_agent
 
@@ -62,9 +66,29 @@ FACT_PARQUET_DIR = "/mnt/data/pipeline/fact_tables/parquet"
 _USE_DUCKDB = os.path.exists(DUCKDB_PATH)
 
 
-def get_db():
-    """Get a read-only DuckDB connection to the shared database."""
-    return duckdb.connect(DUCKDB_PATH, read_only=True)
+def get_db(max_retries: int = 5):
+    """Get a read-only DuckDB connection to the shared database (retries on lock)."""
+    import time as _time
+    for attempt in range(max_retries):
+        try:
+            return duckdb.connect(DUCKDB_PATH, read_only=True)
+        except Exception as e:
+            if "lock" in str(e).lower() and attempt < max_retries - 1:
+                logger.warning(f"⏳ DuckDB locked (attempt {attempt+1}/{max_retries}), retrying in {2*(attempt+1)}s...")
+                _time.sleep(2 * (attempt + 1))
+                continue
+            raise
+
+
+async def safe_defer(interaction: discord.Interaction) -> bool:
+    """Defer an interaction, returning False if it's already expired/handled."""
+    try:
+        await interaction.response.defer()
+        return True
+    except discord.errors.NotFound:
+        logger.warning(f"⚠️ Interaction already expired (likely duplicate from restart)")
+        return False
+
 
 # Global entity name mapping - loaded at startup
 entity_names = {}
@@ -174,7 +198,17 @@ def wti_emoji(wti: float) -> str:
     else:
         return "💀"   # Extreme — avoid at all costs
 
-def wti_label(wti: float) -> str:
+def _priority_queue_name(park_code: str = "") -> str:
+    """Return the park-appropriate priority queue product name."""
+    if park_code in ("UF", "IA", "EU", "UH"):
+        return "Universal Express"
+    elif park_code in ("TDL", "TDS"):
+        return "Priority Pass"
+    else:
+        return "Lightning Lane"
+
+def wti_label(wti: float, park_code: str = "") -> str:
+    pq = _priority_queue_name(park_code)
     if wti <= 12:
         return "Well below avg WTI — best day to visit"
     elif wti <= 18:
@@ -182,7 +216,7 @@ def wti_label(wti: float) -> str:
     elif wti <= 25:
         return "Typical day — moderate waits, plan headliners"
     elif wti <= 34:
-        return "Above average — rope drop and Lightning Lane recommended"
+        return f"Above average — rope drop and {pq} recommended"
     elif wti <= 42:
         return "Well above average — arrive early, plan strategically"
     elif wti <= 50:
@@ -232,15 +266,26 @@ def parse_date(date_str: str) -> date_type:
         raise ValueError(f"Could not parse date: {date_str}")
 
 def load_entity_names():
-    """Load entity names from DuckDB (with CSV fallback)."""
+    """Load entity names from DuckDB (with CSV fallback). Retries on lock."""
+    import time as _time
     try:
         if _USE_DUCKDB:
-            con = get_db()
-            df = con.execute("""
-                SELECT entity_code, entity_name, short_name, is_extinct, has_posted
-                FROM entities
-            """).fetchdf()
-            con.close()
+            max_retries = 5
+            for attempt in range(max_retries):
+                try:
+                    con = get_db()
+                    df = con.execute("""
+                        SELECT entity_code, entity_name, short_name, is_extinct, has_posted
+                        FROM entities
+                    """).fetchdf()
+                    con.close()
+                    break
+                except Exception as db_err:
+                    if "lock" in str(db_err).lower() and attempt < max_retries - 1:
+                        logger.warning(f"⏳ DuckDB locked loading entities (attempt {attempt+1}/{max_retries}), retrying...")
+                        _time.sleep(3 * (attempt + 1))
+                        continue
+                    raise
             mapping = {}
             for _, row in df.iterrows():
                 code = row['entity_code']
@@ -249,7 +294,7 @@ def load_entity_names():
                 extinct = bool(row['is_extinct']) if pd.notna(row['is_extinct']) else False
                 has_posted = bool(row['has_posted']) if pd.notna(row['has_posted']) else False
                 mapping[code] = (name, short, extinct, has_posted)
-            print(f"📋 Loaded {len(mapping)} entity names from DuckDB")
+            logger.info(f"📋 Loaded {len(mapping)} entity names from DuckDB")
             return mapping
 
         # Fallback: CSV
@@ -268,7 +313,7 @@ def load_entity_names():
             mapping[code] = (name, short_name, is_extinct)
         return mapping
     except Exception as e:
-        print(f"⚠️ Error loading entity names: {e}")
+        logger.error(f"⚠️ Error loading entity names: {e}")
         return {}
 
 def get_wti_score(park_code: str, target_date: date_type) -> float:
@@ -731,7 +776,7 @@ PARK_CHOICES = [
 @tree.command(name="crowd", description="Get the crowd forecast for a park on a given date")
 @app_commands.describe(
     park="Which park?",
-    date="Date to check (default: today; e.g., tomorrow, feb-15, 2026-02-20)"
+    date="Date to check (e.g., tomorrow, feb 15, 07/17/2026, 2026-02-20)"
 )
 @app_commands.choices(park=PARK_CHOICES)
 async def crowd_command(interaction: discord.Interaction, park: str, date: str = "today"):
@@ -758,7 +803,8 @@ async def crowd_command(interaction: discord.Interaction, park: str, date: str =
         return
     
     # Defer response since we're doing database queries
-    await interaction.response.defer()
+    if not await safe_defer(interaction):
+        return
     
     # For today: try archived forecasts first (yesterday's prediction for today)
     # For future: use current forecast file
@@ -817,7 +863,7 @@ async def crowd_command(interaction: discord.Interaction, park: str, date: str =
     embed = discord.Embed(
         title=f"{wti_emoji(wti_score)} {park_full} — {target_date.strftime('%b %d')}",
         url=f"https://hazeydata.ai/year-view?park={park_code}",
-        description=f"**{wti_label(wti_score)}.** WTI {wti_score:.0f} — expect {int(wti_score*0.7)}-{int(wti_score*1.2)} min on headliners.",
+        description=f"**{wti_label(wti_score, park_code)}.** WTI {wti_score:.0f} — expect {int(wti_score*0.7)}-{int(wti_score*1.2)} min on headliners.",
         color=get_embed_color(wti_score),
     )
     
@@ -829,12 +875,7 @@ async def crowd_command(interaction: discord.Interaction, park: str, date: str =
         embed.add_field(name="✨ Low Waits", value=low_wait_text, inline=True)
     
     # Park-appropriate priority queue tips
-    if park_code in ("UF", "IA", "EU", "UH"):
-        priority_tip = "Universal Express"
-    elif park_code in ("TDL", "TDS"):
-        priority_tip = "Priority Pass"
-    else:
-        priority_tip = "Lightning Lane"  # Disney WDW + DLR
+    priority_tip = _priority_queue_name(park_code)
 
     if wti_score > 50:
         tip = f"💡 Very busy day — use {priority_tip} and arrive early"
@@ -877,7 +918,8 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
         return
 
     park_code, park_full = PARK_NAMES[park_key]
-    await interaction.response.defer()
+    if not await safe_defer(interaction):
+        return
 
     from datetime import timedelta
     start = date_type.today() + timedelta(days=1)  # tomorrow
@@ -1031,7 +1073,7 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
             day_name = d["date"].strftime("%a")
             date_str = d["date"].strftime("%b %d")
             wti = d["wti_avg"]
-            label = wti_label(wti)
+            label = wti_label(wti, park_code)
             marker = "  ◄ **Best**" if d["date"] == best["date"] else ""
             day_lines.append(f"**{day_name}** {date_str} — WTI **{wti:.0f}** (*{label}*){marker}")
         description = THIN_LINE + "\n\n" + "\n".join(day_lines)
@@ -1052,7 +1094,7 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
                 day_name = d["date"].strftime("%a")
                 date_str = d["date"].strftime("%b %d")
                 wti = d["wti_avg"]
-                label = wti_label(wti)
+                label = wti_label(wti, park_code)
                 marker = "  ◄ **Best**" if d["date"] == best["date"] else ""
                 day_lines.append(f"  **{day_name}** {date_str} — WTI **{wti:.0f}** (*{label}*){marker}")
             desc_parts.append(THIN_LINE + "\n" + week_label + "\n\n" + "\n".join(day_lines))
@@ -1073,7 +1115,7 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
                 file = discord.File(cal_buf, filename="calendar.png")
                 print(f"📸 Generated image live for {park_code}_{timeframe} (no pre-gen found)")
 
-            tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg']).lower()}"
+            tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg'], park_code).lower()}"
             embed = discord.Embed(
                 title=f"📅 {park_full} — Next {timeframe} Days",
                 url=f"https://hazeydata.ai/year-view?park={park_code}",
@@ -1099,7 +1141,7 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
             week_days = weeks[week_start]
             week_end = max(d["date"] for d in week_days)
             avg_wti = sum(d["wti_avg"] for d in week_days) / len(week_days)
-            label = wti_label(avg_wti)
+            label = wti_label(avg_wti, park_code)
             week_best = min(week_days, key=lambda x: x["wti_avg"])
             best_name = week_best["date"].strftime("%a %b %d")
             best_wti_val = week_best["wti_avg"]
@@ -1120,7 +1162,7 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
             color=get_embed_color(best["wti_avg"]),
         )
 
-        tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg']).lower()}"
+        tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg'], park_code).lower()}"
         embed.set_footer(text=f"{tip}  •  Theme Park Crowd Report")
 
         await interaction.followup.send(embed=embed)
@@ -1129,7 +1171,8 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
 @tree.command(name="today", description="Quick overview of all parks today")
 async def today_command(interaction: discord.Interaction):
     print(f"📥 /today called by {interaction.user}")
-    await interaction.response.defer()
+    if not await safe_defer(interaction):
+        return
 
     target_date = date_type.today()
     date_display = target_date.strftime("%A, %B %d")
@@ -1174,7 +1217,7 @@ async def today_command(interaction: discord.Interaction):
         for park_code, park_name in parks:
             wti = get_wti_score(park_code, target_date)
             if wti is not None:
-                label = wti_label(wti)
+                label = wti_label(wti, park_code)
                 park_lines.append(f"  \u25b8 **{park_name}** \u2014 WTI **{wti:.0f}** (*{label}*)")
                 if wti < group_best_wti:
                     group_best_wti = wti
@@ -1224,7 +1267,8 @@ def _wait_dot(minutes: int) -> str:
 @app_commands.choices(park=PARK_CHOICES)
 async def now_command(interaction: discord.Interaction, park: str):
     print(f"\U0001f4e5 /now called: park='{park}' by {interaction.user}")
-    await interaction.response.defer()
+    if not await safe_defer(interaction):
+        return
 
     park_key = park.lower().strip()
     if park_key not in PARK_NAMES:
@@ -1419,51 +1463,40 @@ async def health_command(interaction: discord.Interaction):
 
 @tree.command(name="about", description="Learn about Theme Park Crowd Report")
 async def about_command(interaction: discord.Interaction):
+    THIN_LINE = "─" * 30
     embed = discord.Embed(
         title="🏰 Theme Park Crowd Report",
         description=(
-            "**The Wait Time Index (WTI)** is the #1 most consistent metric that "
-            "tells you how long you're going to wait in line.\n\n"
-            "Built by **Fred Hazelton**, former TouringPlans analyst."
-        ),
-        color=0x0A2F8F,
-    )
-    embed.add_field(
-        name="🤖 Commands",
-        value=(
-            "`/today` — All parks at a glance\n"
-            "`/crowd [park] [date]` — Detailed park forecast\n"
-            "`/best-day [park] [days]` — Find the lowest-crowd day\n"
-            "`/now [park]` — Live wait times right now\n"
-            "`/ask [question]` — Ask anything about crowds & waits\n"
-            "`/ping` — Check if I'm alive"
-        ),
-        inline=False
-    )
-    embed.add_field(
-        name="📊 What's Inside",
-        value=(
-            "• **12 parks:** WDW, Disneyland, Universal, Tokyo Disney\n"
-            "• **WTI Score:** One number = whole-park wait time level\n"
-            "• **Ride-by-ride:** Top headliners and low-wait picks\n"
-            "• **Updated daily** from real queue data"
-        ),
-        inline=False
-    )
-    embed.add_field(
-        name="📡 Data Sources",
-        value=(
+            "ML-powered crowd predictions for 12 theme parks, updated daily.\n\n"
+            "Built by **Fred Hazelton**, former TouringPlans analyst.\n\n"
+            f"{THIN_LINE}\n\n"
+            "\n"
+            "**What's Inside**\n\n"
+            "▸ **WTI Score** — one number = whole-park wait time level\n"
+            "▸ **Ride-by-ride** forecasts — top headliners and low-wait picks\n"
+            "▸ **12 parks** — WDW · Disneyland · Universal · Tokyo Disney\n"
+            "▸ **Updated daily** from real queue data\n\n"
+            f"{THIN_LINE}\n\n"
+            "\n"
+            "🤖 **Commands**\n\n"
+            "▸ `/today` — All parks at a glance\n"
+            "▸ `/crowd [park] [date]` — Detailed park forecast\n"
+            "▸ `/best-day [park] [days]` — Find lowest-crowd days\n"
+            "▸ `/now [park]` — Live wait times\n"
+            "▸ 🆕 `/ask [question]` — **AI-powered Q&A** — ask anything about "
+            "crowds, wait times, and visit planning\n\n"
+            f"{THIN_LINE}\n\n"
+            "\n"
+            "📡 **Data Sources**\n\n"
             "Our models and techniques are our own — trained on many great data sources. "
             "Big thanks to [TouringPlans](https://touringplans.com), "
             "[Queue-Times](https://queue-times.com), and "
-            "[Thrill-Data](https://www.thrill-data.com)!"
+            "[Thrill-Data](https://www.thrill-data.com)!\n\n"
+            f"{THIN_LINE}\n\n"
+            "\n"
+            "🌐 [hazeydata.ai](https://hazeydata.ai) — year-view heatmaps, park forecasts, everything in one place"
         ),
-        inline=False
-    )
-    embed.add_field(
-        name="🔗 Links",
-        value="[hazeydata.ai](https://hazeydata.ai)",
-        inline=False
+        color=0x0A2F8F,
     )
     embed.set_footer(text="Theme Park Crowd Report  •  Beta")
     await interaction.response.send_message(embed=embed)
@@ -1553,7 +1586,8 @@ async def ask_command(interaction: discord.Interaction, question: str):
         return
 
     # Defer — this will take a few seconds
-    await interaction.response.defer()
+    if not await safe_defer(interaction):
+        return
 
     try:
         answer = await ask_agent(question, str(interaction.user.id), ANTHROPIC_API_KEY, username=str(interaction.user))

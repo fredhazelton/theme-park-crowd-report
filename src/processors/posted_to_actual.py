@@ -64,20 +64,29 @@ except ImportError:
 MATCH_WINDOW_MINUTES = 15
 ROLLING_WINDOWS = [15, 30, 60]  # minutes
 
-# XGBoost params (aligned with hybrid pipeline / Julia defaults)
+# XGBoost params — aligned with per-entity Julia models (train_v2.jl)
+# Updated 2026-03-04: Previous params were over-regularized (min_child_weight=10,
+# subsample=0.5) causing the model to stop at 19 trees. Now matches the per-entity
+# pipeline settings that have proven effective.
 CONVERSION_XGB_PARAMS = {
     "objective": "reg:absoluteerror",
     "tree_method": "hist",
-    "max_depth": 6,
+    "max_depth": 8,             # Was 6. Needs depth to learn 272 entities × time × season
     "learning_rate": 0.1,
     "n_estimators": 2000,
-    "subsample": 0.5,
-    "colsample_bytree": 1.0,
-    "min_child_weight": 10,
+    "subsample": 0.8,           # Was 0.5. Matches per-entity models
+    "colsample_bytree": 0.8,    # Was 1.0. Matches per-entity models
+    "min_child_weight": 3,      # Was 10. Allows finer entity/time splits
     "random_state": 42,
     "verbosity": 0,
 }
-EARLY_STOPPING_ROUNDS = 50
+EARLY_STOPPING_ROUNDS = 20      # Was 50. Matches per-entity models
+
+# Geo-decay weighting: recent data weighted higher (same as per-entity training)
+# Half-life of 730 days (2 years): weight = 0.5^(days_old / 730)
+# This accounts for the POSTED→ACTUAL ratio changing over time (e.g., parks
+# increasingly overestimate posted times in recent years).
+GEO_DECAY_HALF_LIFE_DAYS = 730
 
 # Feature columns for the conversion model
 FEATURE_COLS = [
@@ -123,6 +132,9 @@ def build_matched_pairs(
     
     start = time.time()
     con = duckdb.connect()
+    # Limit DuckDB memory to avoid OOM on the large POSTED×ACTUAL join
+    con.execute("SET memory_limit = '40GB'")
+    con.execute("SET threads = 4")
     
     parquet_dir = output_base / "fact_tables" / "parquet"
     dim_dir = output_base / "dimension_tables"
@@ -434,12 +446,30 @@ def train_conversion_model(
     if logger:
         logger.info(f"  Features ({len(available_features)}): {available_features}")
     
+    # Step 5b: Compute geo-decay sample weights
+    # Recent observations count more — the POSTED→ACTUAL ratio changes over time
+    # (parks increasingly overestimate posted times). Same half-life as per-entity models.
+    today = pd.Timestamp.today().normalize()
+    
+    def _compute_geo_weights(date_series: pd.Series) -> np.ndarray:
+        days_old = (today - pd.to_datetime(date_series)).dt.days.values.astype(np.float32)
+        return np.power(0.5, days_old / GEO_DECAY_HALF_LIFE_DAYS).astype(np.float32)
+    
+    w_train = _compute_geo_weights(train_df['park_date'])
+    w_val = _compute_geo_weights(val_df['park_date'])
+    # No weights on test set — evaluate unweighted for honest metrics
+    
+    if logger:
+        logger.info(f"  Geo-decay weights: half-life={GEO_DECAY_HALF_LIFE_DAYS} days")
+        logger.info(f"    Train weight range: {w_train.min():.4f} – {w_train.max():.4f}")
+        logger.info(f"    Val weight range:   {w_val.min():.4f} – {w_val.max():.4f}")
+    
     # Step 6: Train XGBoost
     if logger:
         logger.info("  Training XGBoost conversion model...")
     
-    dtrain = xgb.DMatrix(X_train, label=y_train, feature_names=available_features)
-    dval = xgb.DMatrix(X_val, label=y_val, feature_names=available_features)
+    dtrain = xgb.DMatrix(X_train, label=y_train, weight=w_train, feature_names=available_features)
+    dval = xgb.DMatrix(X_val, label=y_val, weight=w_val, feature_names=available_features)
     dtest = xgb.DMatrix(X_test, label=y_test, feature_names=available_features)
     
     params = {k: v for k, v in CONVERSION_XGB_PARAMS.items() if k != 'n_estimators'}
@@ -479,6 +509,7 @@ def train_conversion_model(
         "n_entities": int(df['entity_code'].nunique()),
         "best_iteration": int(best_round),
         "avg_posted_overestimation": float((df['posted_time'] - df['actual_time']).mean()),
+        "geo_decay_half_life_days": GEO_DECAY_HALF_LIFE_DAYS,
     }
     
     if logger:

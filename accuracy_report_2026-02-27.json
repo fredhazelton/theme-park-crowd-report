@@ -1,0 +1,106 @@
+{
+  "eval_date": "2026-02-27",
+  "parks": [
+    {
+      "park_code": "CA",
+      "wti_forecast": 29.5,
+      "wti_actual": 27.5,
+      "error": 2.0,
+      "abs_error": 2.0,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "DL",
+      "wti_forecast": 14.3,
+      "wti_actual": 18.0,
+      "error": -3.6999999999999993,
+      "abs_error": 3.6999999999999993,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "EP",
+      "wti_forecast": 18.5,
+      "wti_actual": 18.0,
+      "error": 0.5,
+      "abs_error": 0.5,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "EU",
+      "wti_forecast": 35.6,
+      "wti_actual": 26.4,
+      "error": 9.200000000000003,
+      "abs_error": 9.200000000000003,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "HS",
+      "wti_forecast": 31.6,
+      "wti_actual": 26.6,
+      "error": 5.0,
+      "abs_error": 5.0,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "IA",
+      "wti_forecast": 30.7,
+      "wti_actual": 12.9,
+      "error": 17.799999999999997,
+      "abs_error": 17.799999999999997,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "MK",
+      "wti_forecast": 22.5,
+      "wti_actual": 10.6,
+      "error": 11.9,
+      "abs_error": 11.9,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "TDL",
+      "wti_forecast": 27.1,
+      "wti_actual": 24.7,
+      "error": 2.400000000000002,
+      "abs_error": 2.400000000000002,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "TDS",
+      "wti_forecast": 27.2,
+      "wti_actual": 32.5,
+      "error": -5.300000000000001,
+      "abs_error": 5.300000000000001,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "UF",
+      "wti_forecast": 18.1,
+      "wti_actual": 8.6,
+      "error": 9.500000000000002,
+      "abs_error": 9.500000000000002,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    },
+    {
+      "park_code": "UH",
+      "wti_forecast": 6.9,
+      "wti_actual": 6.0,
+      "error": 0.9000000000000004,
+      "abs_error": 0.9000000000000004,
+      "model_type": "v2+synth",
+      "made_date": "2026-02-26"
+    }
+  ],
+  "yesterday_mae": 6.2,
+  "yesterday_bias": 4.563636363636364
+}

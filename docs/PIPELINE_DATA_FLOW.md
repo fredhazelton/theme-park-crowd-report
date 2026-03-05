@@ -73,7 +73,7 @@ The whole point of the ML models is: **given a POSTED wait time + context (time 
 
 Since we only have 2.5 million ACTUAL observations but 90 million POSTED observations, there are many days and times where we have POSTED data but no ACTUAL measurement. **Synthetic actuals** are POSTED times run through a trained conversion model to estimate what the ACTUAL would have been. They fill the gaps.
 
-The conversion model (a global XGBoost model trained on all matched POSTED/ACTUAL pairs) learns the systematic bias patterns: Disney's overestimation, lag in updating signs, time-of-day effects, etc.
+The conversion model (a global XGBoost model trained on all matched POSTED/ACTUAL pairs with geo-decay weighting) learns the systematic bias patterns: Disney's overestimation, lag in updating signs, time-of-day effects, etc. Geo-decay ensures the model learns the *current* POSTED→ACTUAL relationship, since the ratio has shifted over time.
 
 ### Wait Time Index (WTI)
 
@@ -373,7 +373,7 @@ We have 90M POSTED observations but only 2.5M ACTUAL observations. Many entity-d
 
 ### How It Works:
 
-1. **Load conversion model** — A global XGBoost model (from `src/processors/posted_to_actual.py`) trained on all matched POSTED↔ACTUAL pairs across all entities.
+1. **Load conversion model** — A global XGBoost model (from `src/processors/posted_to_actual.py`) trained on all matched POSTED↔ACTUAL pairs across all entities, with geo-decay sample weights (730-day half-life) so recent patterns dominate. See `docs/XGBOOST_PARAMS.md` for full parameter details.
 2. **Compute rolling features** via DuckDB window functions:
    - `posted_delta_15m`, `posted_delta_30m`, `posted_delta_60m` (how has the posted time changed recently?)
    - `posted_rolling_mean_30m`, `posted_rolling_mean_60m` (recent average)
@@ -896,7 +896,20 @@ Each pipeline run records which steps actually executed, enabling cascade logic 
 ---
 
 <a name="decisions-log"></a>
-## Decisions Log (2026-02-18)
+## Decisions Log
+
+### 2026-03-04 — Conversion Model Overhaul
+
+Deep audit found synthetic actuals were systematically inflated (8–17 min/hour above ground truth for high-wait rides). Root cause: conversion model was over-regularized (stopped at 19 trees) and had no geo-decay weighting, so it learned a blended historical POSTED→ACTUAL ratio rather than the current one.
+
+| # | Decision | Status |
+|---|----------|--------|
+| 1 | **Add geo-decay to conversion model** — Same 730-day half-life as per-entity models. Ratio has shifted significantly over time. | ✅ **DONE** |
+| 2 | **Fix conversion model hyperparameters** — `min_child_weight` 10→3, `subsample` 0.5→0.8, `colsample_bytree` 1.0→0.8, `max_depth` 6→8, `early_stopping` 50→20. Aligned with proven per-entity settings. | ✅ **DONE** |
+| 3 | **Retrain conversion model** — Required after param changes. | ✅ **DONE** |
+| 4 | **Revisit synthetic vs real actuals weighting in actuals-first training** — Current: equal weight per row (98% synthetic drowns real signal). Need to investigate after conversion model is fixed. | 📋 TODO |
+
+### 2026-02-18 — Fred's Architecture Review
 
 Fred reviewed all open questions. Resolved decisions:
 

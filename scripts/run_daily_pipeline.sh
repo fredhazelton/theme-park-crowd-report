@@ -465,6 +465,10 @@ else
     fi
 fi
 
+# Pre-generate calendar heatmap images for Discord bot
+log_info "=== Generate calendar images ==="
+$PYTHON scripts/generate_calendar_images.py || log_info "Calendar image generation failed (non-fatal)"
+
 # Generate landing page chart (MK 7-day)
 log_info "=== Generate landing page chart ==="
 $PYTHON scripts/generate_landing_chart.py || log_info "Landing chart generation failed (non-fatal)"

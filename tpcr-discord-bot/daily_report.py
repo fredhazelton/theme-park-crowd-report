@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv(os.path.expanduser("~/.env"))
 
 BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
-CROWD_REPORTS_CHANNEL = "1471935476238651432"  # #crowd-reports
+CROWD_REPORTS_CHANNEL = "1478240066382860298"  # #crowd-reports (recreated Mar 2)
 DUCKDB_PATH = "/mnt/data/pipeline/tpcr_live.duckdb"
 WTI_PATH = "/mnt/data/pipeline/wti/wti.parquet"
 _USE_DUCKDB = os.path.exists(DUCKDB_PATH)

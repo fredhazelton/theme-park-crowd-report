@@ -334,6 +334,7 @@ Also: `build_model_aggregates.py` produces `model_aggregates.parquet` at 15-minu
 | Target | ACTUAL = f(POSTED, rolling_context, time, entity, date) | ✅ Same | ✅ |
 | Rolling features | delta_15/30/60m, rolling_mean_30/60m, volatility_30m | ✅ Computed via DuckDB window functions | ✅ |
 | Model type | XGBoost global, reg:absoluteerror | ✅ (conversion model uses MAE) | ✅ |
+| Geo-decay weights | 730-day half-life (added 2026-03-04) | ✅ `GEO_DECAY_HALF_LIFE_DAYS = 730` | ✅ |
 | Standby only filter | fastpass_booth=FALSE | ✅ `WHERE fastpass_booth = FALSE` | ✅ |
 | Min observations | ≥500 | ✅ Default 500 | ✅ |
 | Output range | Clipped 0-300 | ✅ `np.clip(predictions, 0, 300)` in processor | ✅ |

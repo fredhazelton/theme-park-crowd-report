@@ -64,6 +64,13 @@ ACTUAL = f(POSTED, rolling_context, time_features, entity_features, date_feature
 
 ### Training: Global model across all entities, all matched pairs pooled.
 
+**Why global, not per-entity?** (Documented 2026-03-04 per Fred's request)
+- Many entities have <500 matched pairs — per-entity conversion models would be impossible for most
+- The POSTED→ACTUAL relationship has shared structure across entities (Disney's overestimation buffer, lag patterns, time-of-day effects). A global model learns these shared patterns and then specializes via `entity_encoded` feature (272 unique values)
+- Per-entity conversion models would be 272 separate models to maintain and retrain monthly
+- The global model with entity as a feature effectively approximates per-entity behavior — XGBoost splits on entity when the ratio differs meaningfully between rides
+- Alternative considered but not pursued: per-park models (9 models) could capture park-specific posting behaviors; may revisit if global model accuracy plateaus
+
 ### Validation: Chronological hold-out (most recent 20% of dates). Report MAE, bias, calibration by decile. Check per-entity, per-time-of-day.
 
 ## Sample Weighting in Forecast Training
@@ -114,23 +121,31 @@ No competitor (including TouringPlans) models the systematic bias in posted wait
 Both modules use **DuckDB + Parquet** (matching `hybrid_pipeline_v2` pattern). Window functions compute rolling features in-database. No CSV loops.
 
 ### Phase 1: Conversion Model
+
+**⚠️ UPDATED 2026-03-04:** Original model was retrained with improved hyperparameters and geo-decay weighting. See below for details.
+
+**Original model (2026-02-11):**
 - **2,394,589** matched (POSTED, ACTUAL) pairs across **272 entities**
 - Date range: 2009-07-27 to 2026-02-11
 - Chronological split: 70% train / 15% val / 15% test
 - XGBoost with `reg:absoluteerror`, 2000 rounds, early stopping at 50
+- ⚠️ **No geo-decay weighting** — all historical data weighted equally
+- ⚠️ Over-regularized: `min_child_weight=10`, `subsample=0.5` → model stopped at only 19 trees
 
-| Metric | Value |
-|--------|-------|
+| Metric | Original (Feb 11) |
+|--------|-------------------|
 | MAE | 10.89 min |
 | RMSE | 16.91 min |
 | R² | 0.381 |
-| Correlation | 0.630 |
-| Bias | **-0.52 min** |
-| Training time | 103 seconds |
+| Bias | -0.52 min |
+| Trees used | **19 of 2000** |
 
-The near-zero bias is the critical metric — it means synthetic actuals won't be systematically shifted. Individual prediction noise cancels across thousands of observations.
+Despite the near-zero test bias, the model systematically overestimated synthetic actuals in production. Root cause: the POSTED→ACTUAL ratio has shifted over time (0.72–0.82 historically vs 0.58–0.70 in recent years for many entities), and without geo-decay the model learned a blended average. Combined with extreme regularization (only 19 trees), it couldn't capture entity-specific or temporal patterns.
 
-Average POSTED overestimation found: **9.0 minutes**.
+**Retrained model (2026-03-04):**
+- Same matched pairs data, now with **geo-decay sample weights** (730-day half-life)
+- Hyperparams aligned with per-entity models: `max_depth=8`, `min_child_weight=3`, `subsample=0.8`, `colsample_bytree=0.8`, `early_stopping=20`
+- See `docs/XGBOOST_PARAMS.md` for full parameter comparison
 
 ### Phase 2: Synthetic Actuals Generation
 - **433 entities** processed (all with ≥500 POSTED observations)
