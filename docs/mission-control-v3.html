@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HazeyData — Mission Control v3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <style>
+        /* ═══════════════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════════════ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: rgba(255,255,255,0.05);
+            --border-card: rgba(255,255,255,0.1);
+            --border-accent: rgba(74,144,164,0.3);
+            --accent: #4a90a4;
+            --accent-light: #6bb5c9;
+            --accent-red: #f87171;
+            --accent-orange: #fb923c;
+            --accent-green: #4ade80;
+            --accent-yellow: #facc15;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --font-text: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            min-height: 100vh;
+            font-family: var(--font-text);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════════════ */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-card);
+            background: rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 2px;
+        }
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+        .refresh-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           TABS
+           ═══════════════════════════════════════════════════ */
+        .tabs {
+            display: flex;
+            gap: 0;
+            padding: 0 24px;
+            background: rgba(0,0,0,0.15);
+            border-bottom: 1px solid var(--border-card);
+        }
+        .tab {
+            padding: 12px 24px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+            user-select: none;
+        }
+        .tab:hover { color: var(--text-secondary); }
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           TAB CONTENT
+           ═══════════════════════════════════════════════════ */
+        .tab-content { display: none; padding: 24px; }
+        .tab-content.active { display: block; }
+
+        /* ═══════════════════════════════════════════════════
+           CARDS
+           ═══════════════════════════════════════════════════ */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: var(--border-accent); }
+        .card-title {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           PIPELINE TAB
+           ═══════════════════════════════════════════════════ */
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .pipeline-grid { grid-template-columns: 1fr; }
+        }
+        .pipeline-grid .card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .status-badge.done {
+            background: rgba(74,222,128,0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(74,222,128,0.2);
+        }
+        .status-badge.medium {
+            background: rgba(250,204,21,0.15);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(250,204,21,0.2);
+        }
+        .status-badge.high {
+            background: rgba(248,113,113,0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(248,113,113,0.2);
+        }
+
+        /* Pipeline step rows */
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .pipeline-step:last-child { border-bottom: none; }
+        .pipeline-step-label {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .pipeline-step-detail {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Focus items */
+        .focus-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .focus-item:last-child { border-bottom: none; }
+        .focus-text { font-size: 14px; }
+
+        /* Key dates */
+        .key-date {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .key-date:last-child { border-bottom: none; }
+        .key-date-emoji { font-size: 18px; }
+        .key-date-info { flex: 1; }
+        .key-date-event { font-size: 14px; font-weight: 500; }
+        .key-date-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Accuracy quick stats */
+        .accuracy-quick {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        .accuracy-stat {
+            text-align: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .accuracy-stat .value {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+        .accuracy-stat .label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* Service rows */
+        .service-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .service-row:last-child { border-bottom: none; }
+        .service-name {
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+        .service-detail {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .service-status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .service-status-dot.active { background: var(--accent-green); }
+        .service-status-dot.inactive { background: var(--accent-red); }
+
+        /* ═══════════════════════════════════════════════════
+           ANALYTICS TAB
+           ═══════════════════════════════════════════════════ */
+        .analytics-layout {
+            display: grid;
+            gap: 20px;
+        }
+
+        /* Panel A — Accuracy Overview */
+        .big-numbers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .big-number-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .big-number-card .num {
+            font-family: var(--font-mono);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+        .big-number-card .num.red { color: var(--accent-red); }
+        .big-number-card .num.green { color: var(--accent-green); }
+        .big-number-card .lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            font-family: var(--font-mono);
+        }
+        .chart-wrap {
+            position: relative;
+            height: 280px;
+        }
+
+        /* Panel B — Entity Explorer */
+        .explorer-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .ctrl-group { display: flex; flex-direction: column; gap: 4px; }
+        .ctrl-group label {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .ctrl-group select,
+        .ctrl-group input[type="date"] {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 8px 12px;
+            outline: none;
+            min-width: 200px;
+        }
+        .ctrl-group select:focus,
+        .ctrl-group input[type="date"]:focus {
+            border-color: var(--accent);
+        }
+        .ctrl-group input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.7);
+        }
+        .explorer-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .explorer-stat {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+        .explorer-stat .val {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-light);
+        }
+        .explorer-stat .lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Panel C — Scoreboard */
+        .scoreboard-search {
+            margin-bottom: 12px;
+        }
+        .scoreboard-search input {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 8px 12px;
+            outline: none;
+        }
+        .scoreboard-search input:focus { border-color: var(--accent); }
+        .scoreboard-search input::placeholder { color: var(--text-muted); }
+
+        .scoreboard-table-wrap {
+            max-height: 480px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .scoreboard-table-wrap::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scoreboard-table-wrap::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+        }
+
+        table.scoreboard {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        table.scoreboard thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        table.scoreboard th {
+            background: rgba(74,144,164,0.15);
+            padding: 10px 12px;
+            text-align: left;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-accent);
+        }
+        table.scoreboard th:hover { color: var(--accent-light); }
+        table.scoreboard th .sort-arrow { margin-left: 4px; opacity: 0.5; }
+        table.scoreboard th.sorted .sort-arrow { opacity: 1; }
+        table.scoreboard td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+        table.scoreboard tr {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        table.scoreboard tbody tr:hover {
+            background: rgba(74,144,164,0.1);
+        }
+        table.scoreboard .name-cell {
+            font-family: var(--font-text);
+            font-weight: 500;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        table.scoreboard .park-cell {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+        .mae-green { color: var(--accent-green); }
+        .mae-yellow { color: var(--accent-yellow); }
+        .mae-red { color: var(--accent-red); }
+
+        /* Two-column layout for explorer + scoreboard */
+        .analytics-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 1100px) {
+            .analytics-bottom { grid-template-columns: 1fr; }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════ */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            border-top: 1px solid var(--border-card);
+            margin-top: 20px;
+        }
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           UTILITY
+           ═══════════════════════════════════════════════════ */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        .error-msg {
+            color: var(--accent-red);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 8px;
+            background: rgba(248,113,113,0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(248,113,113,0.2);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════════════════ -->
+<div class="header">
+    <div class="header-left">
+        <div>
+            <div class="logo">HAZEYDATA</div>
+            <div class="logo-sub">MISSION CONTROL v3</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <span><span class="refresh-dot"></span> AUTO-REFRESH</span>
+        <span id="lastUpdate">—</span>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TABS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="tabs">
+    <div class="tab active" data-tab="pipeline" onclick="switchTab('pipeline')">⚙ Pipeline</div>
+    <div class="tab" data-tab="analytics" onclick="switchTab('analytics')">📊 Analytics</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PIPELINE TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-pipeline" class="tab-content active">
+    <div class="pipeline-grid" id="pipelineGrid">
+        <div class="loading">Loading pipeline data...</div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ANALYTICS TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-analytics" class="tab-content">
+    <div class="analytics-layout">
+        <!-- Panel A: Accuracy Overview -->
+        <div class="card" id="panelAccuracy">
+            <div class="card-title">Accuracy Overview</div>
+            <div class="big-numbers" id="bigNumbers">
+                <div class="loading">Loading...</div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="dailyMaeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Panel B + C side by side -->
+        <div class="analytics-bottom">
+            <!-- Panel B: Entity Explorer -->
+            <div class="card" id="panelExplorer">
+                <div class="card-title">Entity Explorer</div>
+                <div class="explorer-controls">
+                    <div class="ctrl-group">
+                        <label>Entity</label>
+                        <select id="entitySelect">
+                            <option value="">Select an entity...</option>
+                        </select>
+                    </div>
+                    <div class="ctrl-group">
+                        <label>Date</label>
+                        <input type="date" id="dateSelect">
+                    </div>
+                </div>
+                <div class="chart-wrap" style="height:240px;">
+                    <canvas id="entityCurveChart"></canvas>
+                </div>
+                <div class="explorer-stats" id="explorerStats">
+                    <div class="explorer-stat"><div class="val" id="expMAE">—</div><div class="lbl">MAE</div></div>
+                    <div class="explorer-stat"><div class="val" id="expBias">—</div><div class="lbl">Bias</div></div>
+                    <div class="explorer-stat"><div class="val" id="expSlots">—</div><div class="lbl">Slots</div></div>
+                </div>
+            </div>
+
+            <!-- Panel C: Entity Scoreboard -->
+            <div class="card" id="panelScoreboard">
+                <div class="card-title">Entity Scoreboard</div>
+                <div class="scoreboard-search">
+                    <input type="text" id="scoreboardSearch" placeholder="Search entities...">
+                </div>
+                <div class="scoreboard-table-wrap">
+                    <table class="scoreboard" id="scoreboardTable">
+                        <thead>
+                            <tr>
+                                <th data-col="entity_code">Code <span class="sort-arrow">↕</span></th>
+                                <th data-col="name">Name <span class="sort-arrow">↕</span></th>
+                                <th data-col="park">Park <span class="sort-arrow">↕</span></th>
+                                <th data-col="avg_mae" class="sorted">Avg MAE <span class="sort-arrow">↑</span></th>
+                                <th data-col="avg_bias">Bias <span class="sort-arrow">↕</span></th>
+                                <th data-col="n_days">Days <span class="sort-arrow">↕</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="scoreboardBody">
+                            <tr><td colspan="6" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    HAZEYDATA MISSION CONTROL v3 · <a href="https://github.com/hazeydata/theme-park-crowd-report" target="_blank">GitHub</a> · Auto-refreshes every 60s
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const State = {
+    pipelineData: null,
+    accuracySummary: null,
+    dailyAccuracy: null,
+    entityScores: null,
+    entityList: null,
+    selectedEntity: null,
+    selectedDate: null,
+    scoreboardSort: { col: 'avg_mae', asc: true },
+    scoreboardFilter: '',
+    charts: {},
+};
+
+// ═══════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${tab}`));
+    history.replaceState(null, '', `#${tab}`);
+    // Trigger chart resize on analytics tab
+    if (tab === 'analytics') {
+        setTimeout(() => {
+            Object.values(State.charts).forEach(c => c && c.resize());
+        }, 50);
+    }
+}
+
+// Init tab from hash
+function initTabFromHash() {
+    const hash = location.hash.replace('#', '') || 'pipeline';
+    switchTab(hash);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DATA LOADING
+// ═══════════════════════════════════════════════════════════════
+const BASE = '';  // relative paths
+
+async function fetchJSON(url) {
+    const r = await fetch(url + '?t=' + Date.now());
+    if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    return r.json();
+}
+
+async function loadAllData() {
+    try {
+        const [pipeline, summary, daily, scores, entities] = await Promise.all([
+            fetchJSON(`${BASE}mission-control-content.json`),
+            fetchJSON(`${BASE}analytics-data/accuracy_summary.json`),
+            fetchJSON(`${BASE}analytics-data/daily_accuracy.json`),
+            fetchJSON(`${BASE}analytics-data/entity_scores.json`),
+            fetchJSON(`${BASE}analytics-data/entity_list.json`),
+        ]);
+        State.pipelineData = pipeline;
+        State.accuracySummary = summary;
+        State.dailyAccuracy = daily;
+        State.entityScores = scores;
+        State.entityList = entities;
+
+        renderPipeline();
+        renderAccuracyOverview();
+        renderDailyChart();
+        populateEntityDropdown();
+        renderScoreboard();
+        updateTimestamp();
+    } catch (e) {
+        console.error('Load error:', e);
+    }
+}
+
+function updateTimestamp() {
+    const now = new Date();
+    document.getElementById('lastUpdate').textContent = 
+        now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PIPELINE TAB RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderPipeline() {
+    const d = State.pipelineData;
+    if (!d) return;
+    const grid = document.getElementById('pipelineGrid');
+
+    let html = '';
+
+    // Today's Focus
+    html += `<div class="card">
+        <div class="card-title">Today's Focus</div>
+        ${d.todays_focus.map(f => `
+            <div class="focus-item">
+                <span class="status-badge ${f.status_class}">${f.status_text}</span>
+                <span class="focus-text">${f.task}</span>
+            </div>
+        `).join('')}
+    </div>`;
+
+    // Key Dates
+    html += `<div class="card">
+        <div class="card-title">Key Dates</div>
+        ${d.key_dates.map(k => `
+            <div class="key-date">
+                <span class="key-date-emoji">${k.emoji}</span>
+                <div class="key-date-info">
+                    <div class="key-date-event">${k.event}</div>
+                    <div class="key-date-date">${k.date}${k.days_out ? ` (${k.days_out}d)` : ''} ${k.urgency || ''}</div>
+                </div>
+            </div>
+        `).join('')}
+    </div>`;
+
+    // Pipeline Status
+    const steps = d.pipeline_status;
+    html += `<div class="card">
+        <div class="card-title">Pipeline Status</div>
+        ${Object.entries(steps).map(([key, s]) => `
+            <div class="pipeline-step">
+                <div>
+                    <div class="pipeline-step-label">${s.label}</div>
+                    <div class="pipeline-step-detail">${s.detail}</div>
+                </div>
+                <span class="status-badge ${s.status === 'done' ? 'done' : s.status === 'warning' ? 'medium' : 'high'}">${s.status === 'done' ? '✓' : s.status === 'warning' ? '⚠' : '✗'} ${s.status}</span>
+            </div>
+        `).join('')}
+    </div>`;
+
+    // Accuracy Quick Look
+    const a = d.accuracy;
+    html += `<div class="card">
+        <div class="card-title">Accuracy Snapshot</div>
+        <div class="accuracy-quick">
+            <div class="accuracy-stat"><div class="value">${a.entity_mae}</div><div class="label">Entity MAE</div></div>
+            <div class="accuracy-stat"><div class="value">${a.entity_bias}</div><div class="label">Entity Bias</div></div>
+            <div class="accuracy-stat"><div class="value">${a.wti_mae}</div><div class="label">WTI MAE</div></div>
+            <div class="accuracy-stat"><div class="value">${a.days_evaluated}d</div><div class="label">Days Eval</div></div>
+        </div>
+    </div>`;
+
+    // Infrastructure
+    const infra = d.infrastructure;
+    html += `<div class="card">
+        <div class="card-title">Infrastructure</div>
+        ${infra.services.map(s => `
+            <div class="service-row">
+                <div>
+                    <span class="service-status-dot ${s.status}"></span>
+                    <span class="service-name">${s.name}</span>
+                </div>
+                <span class="service-detail">${s.detail}</span>
+            </div>
+        `).join('')}
+        <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="accuracy-stat"><div class="value">${infra.disk_main_pct}%</div><div class="label">Disk Main</div></div>
+            <div class="accuracy-stat"><div class="value">${infra.disk_data_pct}%</div><div class="label">Disk Data</div></div>
+            <div class="accuracy-stat"><div class="value">${(infra.db_forecasts/1e6).toFixed(1)}M</div><div class="label">Forecasts</div></div>
+            <div class="accuracy-stat"><div class="value">${(infra.db_live_waits/1e3).toFixed(0)}K</div><div class="label">Live Waits</div></div>
+        </div>
+    </div>`;
+
+    // Ask Analytics
+    if (d.ask_analytics) {
+        const ask = d.ask_analytics;
+        html += `<div class="card">
+            <div class="card-title">/ask Analytics</div>
+            <div class="accuracy-quick">
+                <div class="accuracy-stat"><div class="value">${ask.total_questions}</div><div class="label">Questions</div></div>
+                <div class="accuracy-stat"><div class="value">${ask.unique_users}</div><div class="label">Users</div></div>
+                <div class="accuracy-stat"><div class="value">👍 ${ask.thumbs_up}</div><div class="label">Positive</div></div>
+                <div class="accuracy-stat"><div class="value">${(ask.avg_response_ms/1000).toFixed(1)}s</div><div class="label">Avg Response</div></div>
+            </div>
+        </div>`;
+    }
+
+    grid.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANALYTICS — ACCURACY OVERVIEW (Panel A)
+// ═══════════════════════════════════════════════════════════════
+function renderAccuracyOverview() {
+    const s = State.accuracySummary;
+    if (!s) return;
+
+    const biasColor = s.overall_bias > 0 ? '' : 'green';
+    document.getElementById('bigNumbers').innerHTML = `
+        <div class="big-number-card">
+            <div class="num">${s.overall_mae.toFixed(1)}</div>
+            <div class="lbl">Overall MAE</div>
+        </div>
+        <div class="big-number-card">
+            <div class="num ${biasColor}">${s.overall_bias > 0 ? '+' : ''}${s.overall_bias.toFixed(1)}</div>
+            <div class="lbl">Bias (min)</div>
+        </div>
+        <div class="big-number-card">
+            <div class="num">${s.overall_rmse.toFixed(1)}</div>
+            <div class="lbl">RMSE</div>
+        </div>
+        <div class="big-number-card">
+            <div class="num">${s.entities_evaluated}</div>
+            <div class="lbl">Entities</div>
+        </div>
+        <div class="big-number-card">
+            <div class="num">${s.dates_evaluated}</div>
+            <div class="lbl">Days Eval</div>
+        </div>
+        <div class="big-number-card">
+            <div class="num">${s.mae_1day.toFixed(1)}</div>
+            <div class="lbl">1-Day MAE</div>
+        </div>
+    `;
+}
+
+function renderDailyChart() {
+    const data = State.dailyAccuracy;
+    if (!data || data.length === 0) return;
+
+    // Last 30 entries
+    const recent = data.slice(-30);
+    const labels = recent.map(d => {
+        const parts = d.park_date.split('-');
+        return `${parts[1]}/${parts[2]}`;
+    });
+    const maeValues = recent.map(d => d.mae);
+    const biasValues = recent.map(d => d.bias);
+
+    if (State.charts.dailyMae) State.charts.dailyMae.destroy();
+
+    const ctx = document.getElementById('dailyMaeChart').getContext('2d');
+    State.charts.dailyMae = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'MAE',
+                    data: maeValues,
+                    borderColor: '#4a90a4',
+                    backgroundColor: 'rgba(74,144,164,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#4a90a4',
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Bias',
+                    data: biasValues,
+                    borderColor: '#f87171',
+                    backgroundColor: 'rgba(248,113,113,0.05)',
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    pointBackgroundColor: '#f87171',
+                    borderWidth: 1.5,
+                    borderDash: [4, 4],
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'rgba(255,255,255,0.6)',
+                        font: { family: "'JetBrains Mono'", size: 11 },
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(10,22,40,0.95)',
+                    borderColor: 'rgba(74,144,164,0.4)',
+                    borderWidth: 1,
+                    titleFont: { family: "'JetBrains Mono'", size: 12 },
+                    bodyFont: { family: "'JetBrains Mono'", size: 11 },
+                    titleColor: '#4a90a4',
+                    bodyColor: '#fff',
+                    padding: 10,
+                    cornerRadius: 8,
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 10 } },
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                },
+                y: {
+                    ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 10 } },
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    title: {
+                        display: true,
+                        text: 'Minutes',
+                        color: 'rgba(255,255,255,0.4)',
+                        font: { family: "'JetBrains Mono'", size: 10 },
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANALYTICS — ENTITY EXPLORER (Panel B)
+// ═══════════════════════════════════════════════════════════════
+function populateEntityDropdown() {
+    const sel = document.getElementById('entitySelect');
+    const list = State.entityList || [];
+    // Group by park
+    const byPark = {};
+    list.forEach(e => {
+        if (!byPark[e.park]) byPark[e.park] = [];
+        byPark[e.park].push(e);
+    });
+    let html = '<option value="">Select an entity...</option>';
+    Object.keys(byPark).sort().forEach(park => {
+        html += `<optgroup label="${park}">`;
+        byPark[park].sort((a,b) => a.name.localeCompare(b.name)).forEach(e => {
+            html += `<option value="${e.entity_code}">${e.name} (${e.entity_code})</option>`;
+        });
+        html += '</optgroup>';
+    });
+    sel.innerHTML = html;
+}
+
+async function loadEntityCurve() {
+    const entity = document.getElementById('entitySelect').value;
+    const date = document.getElementById('dateSelect').value;
+    if (!entity || !date) return;
+
+    State.selectedEntity = entity;
+    State.selectedDate = date;
+
+    try {
+        const url = `${BASE}analytics-data/entity_curves/${entity}/${date}.json`;
+        const data = await fetchJSON(url);
+        renderEntityCurve(data);
+    } catch (e) {
+        // No data for this combo
+        renderEntityCurveEmpty();
+    }
+}
+
+function renderEntityCurve(data) {
+    if (!data || data.length === 0) {
+        renderEntityCurveEmpty();
+        return;
+    }
+
+    const labels = data.map(d => {
+        const parts = d.time_slot.split(':');
+        return `${parts[0]}:${parts[1]}`;
+    });
+    const forecast = data.map(d => d.forecast_wait);
+    const actual = data.map(d => d.actual_wait);
+
+    if (State.charts.entityCurve) State.charts.entityCurve.destroy();
+
+    const ctx = document.getElementById('entityCurveChart').getContext('2d');
+    State.charts.entityCurve = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Forecast',
+                    data: forecast,
+                    borderColor: '#4a90a4',
+                    backgroundColor: 'rgba(74,144,164,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Actual',
+                    data: actual,
+                    borderColor: '#fb923c',
+                    backgroundColor: 'rgba(251,146,60,0.05)',
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    borderWidth: 2,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'rgba(255,255,255,0.6)',
+                        font: { family: "'JetBrains Mono'", size: 10 },
+                        usePointStyle: true,
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(10,22,40,0.95)',
+                    borderColor: 'rgba(74,144,164,0.4)',
+                    borderWidth: 1,
+                    titleFont: { family: "'JetBrains Mono'", size: 11 },
+                    bodyFont: { family: "'JetBrains Mono'", size: 10 },
+                    titleColor: '#4a90a4',
+                    bodyColor: '#fff',
+                    padding: 8,
+                    cornerRadius: 6,
+                    callbacks: {
+                        label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} min`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: 'rgba(255,255,255,0.4)',
+                        font: { family: "'JetBrains Mono'", size: 9 },
+                        maxTicksLimit: 12,
+                    },
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                },
+                y: {
+                    ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 9 } },
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    title: {
+                        display: true,
+                        text: 'Wait (min)',
+                        color: 'rgba(255,255,255,0.4)',
+                        font: { family: "'JetBrains Mono'", size: 9 },
+                    }
+                }
+            }
+        }
+    });
+
+    // Compute stats
+    let totalAbsErr = 0, totalSignedErr = 0, count = 0;
+    data.forEach(d => {
+        if (d.actual_wait != null && d.forecast_wait != null) {
+            totalAbsErr += Math.abs(d.forecast_wait - d.actual_wait);
+            totalSignedErr += (d.forecast_wait - d.actual_wait);
+            count++;
+        }
+    });
+    document.getElementById('expMAE').textContent = count ? (totalAbsErr / count).toFixed(1) : '—';
+    document.getElementById('expBias').textContent = count ? (totalSignedErr / count > 0 ? '+' : '') + (totalSignedErr / count).toFixed(1) : '—';
+    document.getElementById('expSlots').textContent = count || '—';
+}
+
+function renderEntityCurveEmpty() {
+    if (State.charts.entityCurve) State.charts.entityCurve.destroy();
+    State.charts.entityCurve = null;
+    document.getElementById('expMAE').textContent = '—';
+    document.getElementById('expBias').textContent = '—';
+    document.getElementById('expSlots').textContent = '—';
+    // Draw empty state on canvas
+    const canvas = document.getElementById('entityCurveChart');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = '13px JetBrains Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('No data for this entity + date', canvas.width / 2, canvas.height / 2);
+}
+
+// Set default date to latest available
+function setDefaultDate() {
+    const data = State.dailyAccuracy;
+    if (data && data.length > 0) {
+        const lastDate = data[data.length - 1].park_date;
+        document.getElementById('dateSelect').value = lastDate;
+    }
+}
+
+// Event listeners for explorer
+document.getElementById('entitySelect').addEventListener('change', loadEntityCurve);
+document.getElementById('dateSelect').addEventListener('change', loadEntityCurve);
+
+// ═══════════════════════════════════════════════════════════════
+// ANALYTICS — SCOREBOARD (Panel C)
+// ═══════════════════════════════════════════════════════════════
+function maeClass(mae) {
+    if (mae < 8) return 'mae-green';
+    if (mae <= 15) return 'mae-yellow';
+    return 'mae-red';
+}
+
+function renderScoreboard() {
+    const scores = State.entityScores;
+    if (!scores) return;
+
+    const { col, asc } = State.scoreboardSort;
+    const filter = State.scoreboardFilter.toLowerCase();
+
+    let filtered = scores;
+    if (filter) {
+        filtered = scores.filter(s =>
+            s.entity_code.toLowerCase().includes(filter) ||
+            s.name.toLowerCase().includes(filter) ||
+            s.park.toLowerCase().includes(filter)
+        );
+    }
+
+    // Sort
+    filtered = [...filtered].sort((a, b) => {
+        let va = a[col], vb = b[col];
+        if (typeof va === 'string') {
+            return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+        }
+        return asc ? (va - vb) : (vb - va);
+    });
+
+    const tbody = document.getElementById('scoreboardBody');
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No entities match</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(s => `
+        <tr data-entity="${s.entity_code}" onclick="selectEntityFromScoreboard('${s.entity_code}')">
+            <td><code>${s.entity_code}</code></td>
+            <td class="name-cell" title="${s.name}">${s.name}</td>
+            <td class="park-cell">${s.park}</td>
+            <td class="${maeClass(s.avg_mae)}">${s.avg_mae.toFixed(1)}</td>
+            <td>${s.avg_bias > 0 ? '+' : ''}${s.avg_bias.toFixed(1)}</td>
+            <td>${s.n_days}</td>
+        </tr>
+    `).join('');
+
+    // Update header sort indicators
+    document.querySelectorAll('#scoreboardTable th').forEach(th => {
+        const c = th.dataset.col;
+        th.classList.toggle('sorted', c === col);
+        const arrow = th.querySelector('.sort-arrow');
+        if (c === col) {
+            arrow.textContent = asc ? '↑' : '↓';
+        } else {
+            arrow.textContent = '↕';
+        }
+    });
+}
+
+function selectEntityFromScoreboard(entityCode) {
+    // Switch to entity explorer
+    document.getElementById('entitySelect').value = entityCode;
+    loadEntityCurve();
+    // Scroll explorer into view
+    document.getElementById('panelExplorer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Sort click handler
+document.querySelectorAll('#scoreboardTable th').forEach(th => {
+    th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (!col) return;
+        if (State.scoreboardSort.col === col) {
+            State.scoreboardSort.asc = !State.scoreboardSort.asc;
+        } else {
+            State.scoreboardSort.col = col;
+            State.scoreboardSort.asc = true;
+        }
+        renderScoreboard();
+    });
+});
+
+// Search handler
+document.getElementById('scoreboardSearch').addEventListener('input', (e) => {
+    State.scoreboardFilter = e.target.value;
+    renderScoreboard();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INIT & AUTO-REFRESH
+// ═══════════════════════════════════════════════════════════════
+async function init() {
+    initTabFromHash();
+    await loadAllData();
+    setDefaultDate();
+
+    // Auto-refresh every 60s
+    setInterval(async () => {
+        await loadAllData();
+    }, 60000);
+}
+
+// Handle hash changes
+window.addEventListener('hashchange', initTabFromHash);
+
+init();
+</script>
+</body>
+</html>
