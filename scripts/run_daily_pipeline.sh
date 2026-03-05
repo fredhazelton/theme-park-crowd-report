@@ -359,7 +359,23 @@ else
     # Non-fatal — don't stop the pipeline for accuracy tracking failures
 fi
 
-# 4c. Synthetic Actuals Generation
+# 4c. Weekly Conversion Model Refresh
+# Retrains the global POSTED→ACTUAL conversion model every Monday (or if model is missing).
+# Uses geo-decay weighted sample pairs. Model saved to models/_conversion/.
+CONVERSION_MODEL="$OUTPUT_BASE/models/_conversion/model.json"
+DOW=$(date +%u)  # 1=Monday, 7=Sunday
+if [ "$DOW" = "1" ] || [ ! -f "$CONVERSION_MODEL" ]; then
+    log_info "=== Conversion model retrain (weekly refresh) ==="
+    if run_step "Conversion model retrain" $PYTHON scripts/train_conversion_model.py --output-base "$OUTPUT_BASE"; then
+        log_info "Done: Conversion model retrain"
+    else
+        log_info "WARNING: Conversion model retrain failed (non-fatal, continuing)"
+    fi
+else
+    log_info "=== Conversion model retrain (skipped — not Monday, model exists) ==="
+fi
+
+# 4d. Synthetic Actuals Generation
 # Applies trained POSTED→ACTUAL conversion model to all historical POSTED observations.
 # Output: synthetic_actuals/{entity_code}.parquet — used by dashboard curve display.
 # NOTE: NOT used for training yet. Training integration planned for later.
