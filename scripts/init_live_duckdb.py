@@ -96,10 +96,51 @@ def init(db_path: Path, output_base: Path, logger) -> bool:
             predicted_posted DOUBLE,
             model_version   VARCHAR,
             prediction_method VARCHAR,
+            -- Lineage: model identity
+            entity_model_trained_at VARCHAR,
+            entity_model_version VARCHAR,
+            feature_set     VARCHAR,
+            n_training_samples INTEGER,
+            model_mae_at_training DOUBLE,
+            -- Lineage: training config
+            geo_decay_halflife INTEGER,
+            uses_geo_decay  BOOLEAN,
+            training_data_type VARCHAR,
+            -- Lineage: pipeline context
+            conversion_model_trained_at VARCHAR,
+            pipeline_run_date VARCHAR,
+            fallback_ratio_used DOUBLE,
+            -- Lineage: future/reserved
+            uses_quantile_mapping BOOLEAN,
+            hyperparameter_hash VARCHAR,
+            notes           VARCHAR,
             updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (entity_code, park_date, time_slot)
         )
     """)
+    
+    # ALTER TABLE to add lineage columns if table already exists (idempotent migration)
+    lineage_columns = [
+        ("entity_model_trained_at", "VARCHAR"),
+        ("entity_model_version", "VARCHAR"),
+        ("feature_set", "VARCHAR"),
+        ("n_training_samples", "INTEGER"),
+        ("model_mae_at_training", "DOUBLE"),
+        ("geo_decay_halflife", "INTEGER"),
+        ("uses_geo_decay", "BOOLEAN"),
+        ("training_data_type", "VARCHAR"),
+        ("conversion_model_trained_at", "VARCHAR"),
+        ("pipeline_run_date", "VARCHAR"),
+        ("fallback_ratio_used", "DOUBLE"),
+        ("uses_quantile_mapping", "BOOLEAN"),
+        ("hyperparameter_hash", "VARCHAR"),
+        ("notes", "VARCHAR"),
+    ]
+    for col_name, col_type in lineage_columns:
+        try:
+            con.execute(f"ALTER TABLE forecasts ADD COLUMN IF NOT EXISTS {col_name} {col_type}")
+        except duckdb.Error:
+            pass  # Column already exists or syntax not supported
 
     con.execute("""
         CREATE TABLE IF NOT EXISTS entities (
@@ -220,15 +261,39 @@ def init(db_path: Path, output_base: Path, logger) -> bool:
         logger.info("Backfilling forecasts from parquet...")
         try:
             fc_str = str(forecast_path).replace("\\", "/")
+            # Detect available columns in the parquet file
+            fc_cols = set(pd.read_parquet(forecast_path, columns=[]).columns) if forecast_path.stat().st_size > 0 else set()
+            # Build optional column selects (graceful for old parquets without lineage)
+            lineage_col_names = [
+                "entity_model_trained_at", "entity_model_version", "feature_set",
+                "n_training_samples", "model_mae_at_training",
+                "geo_decay_halflife", "uses_geo_decay", "training_data_type",
+                "conversion_model_trained_at", "pipeline_run_date", "fallback_ratio_used",
+                "uses_quantile_mapping", "hyperparameter_hash", "notes",
+            ]
+            lineage_select_parts = []
+            lineage_insert_cols = []
+            for col in lineage_col_names:
+                if col in fc_cols:
+                    lineage_select_parts.append(col)
+                    lineage_insert_cols.append(col)
+                else:
+                    lineage_select_parts.append(f"NULL AS {col}")
+                    lineage_insert_cols.append(col)
+            lineage_select = ", ".join(lineage_select_parts)
+            lineage_insert = ", ".join(lineage_insert_cols)
+            
             con.execute(f"""
                 INSERT OR IGNORE INTO forecasts 
-                    (entity_code, park_date, time_slot, predicted_actual, prediction_method, updated_at)
+                    (entity_code, park_date, time_slot, predicted_actual, prediction_method,
+                     {lineage_insert}, updated_at)
                 SELECT 
                     entity_code,
                     park_date::DATE,
                     CAST(time_slot AS VARCHAR),
                     predicted_actual,
                     COALESCE(prediction_method, 'model'),
+                    {lineage_select},
                     CURRENT_TIMESTAMP
                 FROM read_parquet('{fc_str}')
             """)

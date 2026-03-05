@@ -164,18 +164,60 @@ def _sanitize_scope_name(scope: str) -> str:
     return scope.lower().replace(" ", "_")
 
 
+# Feature set constants for lineage tracking
+FEATURES_ACTUALS_FULL = "mins_since_6am,mins_since_open,date_group_id_encoded,season_encoded,season_year_encoded"
+FEATURES_ACTUALS_LITE = "mins_since_6am,mins_since_open"
+FEATURES_V2_FULL = "posted_time,mins_since_6am,mins_since_open,hour_of_day,date_group_id_encoded,season_encoded,season_year_encoded"
+FEATURES_V2_LITE = "posted_time,mins_since_6am,mins_since_open,hour_of_day"
+FEATURES_SCOPE_SCALE = "mins_since_6am,mins_since_open,date_group_id_encoded,season_encoded,season_year_encoded,entity_code_encoded"
+
+
+def _read_entity_metadata(models_dir: Path, entity_code: str, metadata_file: str) -> dict | None:
+    """Read and return a metadata JSON file for an entity, or None on failure."""
+    import json as _json
+    path = models_dir / entity_code / metadata_file
+    if not path.exists():
+        return None
+    try:
+        with open(path) as f:
+            return _json.load(f)
+    except Exception:
+        return None
+
+
+def _read_scope_metadata(models_dir: Path, scope_value: str) -> dict | None:
+    """Read metadata for a scope_scale group model."""
+    import json as _json
+    safe_scope = _sanitize_scope_name(scope_value)
+    scope_dir = models_dir / f"_scope_scale_{safe_scope}"
+    # Prefer the actuals-specific metadata (used by forecast), fall back to general
+    for fname in ("metadata_scope_scale_actuals.json", "metadata.json"):
+        path = scope_dir / fname
+        if path.exists():
+            try:
+                with open(path) as f:
+                    return _json.load(f)
+            except Exception:
+                continue
+    return None
+
+
 def forecast_entity(args) -> tuple:
     """Generate forecast for single entity using V2 model.
     
     Args tuple: (entity_code, time_grid, models_dir, fallback_ratio,
                   agg_lookup, park_hours_lookup, p95_cap,
-                  entity_scope_value)
+                  entity_scope_value,
+                  conversion_model_trained_at, pipeline_run_date)
     
     entity_scope_value: scope_and_scale value for this entity (or None)
+    conversion_model_trained_at: ISO date string from _conversion/metadata.json (or None)
+    pipeline_run_date: ISO date string for today
     """
     (entity_code, time_grid, models_dir, fallback_ratio,
      agg_lookup, park_hours_lookup, p95_cap,
-     entity_scope_value) = args
+     entity_scope_value,
+     conversion_model_trained_at, pipeline_run_date) = args
 
     try:
         df = time_grid.copy()
@@ -227,6 +269,24 @@ def forecast_entity(args) -> tuple:
         actuals_model_path = models_dir / entity_code / "model_julia_actuals.json"
         v2_model_path = models_dir / entity_code / "model_julia_v2.json"
 
+        # ----- Lineage defaults (overridden per code path) -----
+        lineage = {
+            'entity_model_trained_at': None,
+            'entity_model_version': None,
+            'feature_set': None,
+            'n_training_samples': None,
+            'model_mae_at_training': None,
+            'geo_decay_halflife': None,
+            'uses_geo_decay': None,
+            'training_data_type': None,
+            'conversion_model_trained_at': conversion_model_trained_at,
+            'pipeline_run_date': pipeline_run_date,
+            'fallback_ratio_used': fallback_ratio,
+            'uses_quantile_mapping': None,
+            'hyperparameter_hash': None,
+            'notes': None,
+        }
+        
         if entity_scope_value is not None:
             # Scope-and-scale group model fallback (primarily for EU entities)
             # Load model from disk (can't pickle XGBoost across processes)
@@ -260,6 +320,18 @@ def forecast_entity(args) -> tuple:
                 predictions = np.clip(predictions, 0, 300)
                 df['predicted_actual'] = np.round(predictions).astype(int)
                 df['prediction_method'] = 'model_scope_scale'
+                
+                # Lineage: scope_scale
+                scope_meta = _read_scope_metadata(models_dir, entity_scope_value)
+                if scope_meta:
+                    lineage['entity_model_trained_at'] = scope_meta.get('trained_at')
+                    lineage['n_training_samples'] = scope_meta.get('n_train') or scope_meta.get('n_samples')
+                    lineage['model_mae_at_training'] = scope_meta.get('mae') or scope_meta.get('actuals_mae')
+                    lineage['geo_decay_halflife'] = scope_meta.get('geo_decay_halflife_days')
+                    lineage['uses_geo_decay'] = scope_meta.get('uses_geo_decay_weights', True)
+                lineage['entity_model_version'] = 'scope_scale'
+                lineage['feature_set'] = FEATURES_SCOPE_SCALE
+                lineage['training_data_type'] = 'scope_scale'
             else:
                 # Scope model files missing — fall through to aggregate
                 def get_fallback(row):
@@ -270,46 +342,53 @@ def forecast_entity(args) -> tuple:
                 results = df.apply(get_fallback, axis=1)
                 df['predicted_actual'] = results.apply(lambda x: int(round(x[0])))
                 df['prediction_method'] = results.apply(lambda x: x[1])
+                lineage['entity_model_version'] = 'aggregate'
+                lineage['training_data_type'] = 'none'
         elif actuals_model_path.exists():
             # Per-entity actuals-only model: 5 features, NO posted_time
             model = xgb.XGBRegressor()
             model.load_model(str(actuals_model_path))
             import json as _json
-            metadata_path = models_dir / entity_code / "metadata_julia_actuals.json"
+            actuals_meta = _read_entity_metadata(models_dir, entity_code, "metadata_julia_actuals.json")
             is_actuals_lite = False
-            if metadata_path.exists():
-                try:
-                    with open(metadata_path) as _mf:
-                        meta = _json.load(_mf)
-                    is_actuals_lite = meta.get("model_label") == "XGBOOST_ACTUALS_LITE" or meta.get("version") == "actuals_lite"
-                except Exception:
-                    pass
+            if actuals_meta:
+                is_actuals_lite = actuals_meta.get("model_label") == "XGBOOST_ACTUALS_LITE" or actuals_meta.get("version") == "actuals_lite"
             if is_actuals_lite:
                 feature_cols = ['mins_since_6am', 'mins_since_open']
+                lineage['entity_model_version'] = 'actuals_lite'
+                lineage['feature_set'] = FEATURES_ACTUALS_LITE
             else:
                 feature_cols = ['mins_since_6am', 'mins_since_open', 'date_group_id_encoded', 'season_encoded', 'season_year_encoded']
+                lineage['entity_model_version'] = 'julia_actuals'
+                lineage['feature_set'] = FEATURES_ACTUALS_FULL
             X = df[feature_cols].values.astype(np.float32)
             predictions = model.predict(X)
             predictions = np.clip(predictions, 0, 300)
             df['predicted_actual'] = np.round(predictions).astype(int)
             df['prediction_method'] = 'model_actuals'
+            
+            # Lineage: actuals model
+            if actuals_meta:
+                lineage['entity_model_trained_at'] = actuals_meta.get('trained_at')
+                lineage['n_training_samples'] = actuals_meta.get('n_samples')
+                lineage['model_mae_at_training'] = actuals_meta.get('mae')
+                lineage['geo_decay_halflife'] = actuals_meta.get('geo_decay_halflife_days')
+                lineage['uses_geo_decay'] = actuals_meta.get('uses_geo_decay_weights')
+            lineage['training_data_type'] = 'actuals_first'
         elif v2_model_path.exists():
             # Per-entity V2 model: uses posted_time
             model = xgb.XGBRegressor()
             model.load_model(str(v2_model_path))
             import json as _json
-            metadata_path = models_dir / entity_code / "metadata_julia_v2.json"
+            v2_meta = _read_entity_metadata(models_dir, entity_code, "metadata_julia_v2.json")
             is_lite = False
-            if metadata_path.exists():
-                try:
-                    with open(metadata_path) as _mf:
-                        meta = _json.load(_mf)
-                    is_lite = meta.get("model_label") == "XGBOOST_LITE_MODEL" or meta.get("version") == "lite"
-                except Exception:
-                    pass
+            if v2_meta:
+                is_lite = v2_meta.get("model_label") == "XGBOOST_LITE_MODEL" or v2_meta.get("version") == "lite"
             if is_lite:
                 feature_cols = ['posted_time', 'mins_since_6am', 'mins_since_open', 'hour_of_day']
                 method_label = 'model_lite'
+                lineage['entity_model_version'] = 'julia_lite'
+                lineage['feature_set'] = FEATURES_V2_LITE
             else:
                 feature_cols = [
                     'posted_time', 'mins_since_6am', 'mins_since_open',
@@ -317,11 +396,22 @@ def forecast_entity(args) -> tuple:
                     'season_encoded', 'season_year_encoded'
                 ]
                 method_label = 'model_v2'
+                lineage['entity_model_version'] = 'julia_v2'
+                lineage['feature_set'] = FEATURES_V2_FULL
             X = df[feature_cols].values.astype(np.float32)
             predictions = model.predict(X)
             predictions = np.clip(predictions, 0, 300)
             df['predicted_actual'] = np.round(predictions).astype(int)
             df['prediction_method'] = method_label
+            
+            # Lineage: V2 model
+            if v2_meta:
+                lineage['entity_model_trained_at'] = v2_meta.get('trained_at')
+                lineage['n_training_samples'] = v2_meta.get('n_samples')
+                lineage['model_mae_at_training'] = v2_meta.get('mae')
+                lineage['geo_decay_halflife'] = v2_meta.get('geo_decay_halflife_days')
+                lineage['uses_geo_decay'] = v2_meta.get('uses_geo_decay_weights')
+            lineage['training_data_type'] = 'posted_first'
         else:
             # No model at all - use aggregate posted median × ratio to estimate actual
             def get_fallback(row):
@@ -335,14 +425,34 @@ def forecast_entity(args) -> tuple:
             results = df.apply(get_fallback, axis=1)
             df['predicted_actual'] = results.apply(lambda x: int(round(x[0])))
             df['prediction_method'] = results.apply(lambda x: x[1])
+            
+            # Lineage: fallback/aggregate
+            lineage['entity_model_version'] = 'fallback'
+            lineage['training_data_type'] = 'none'
         
         # P95 cap REMOVED (2026-02-18, Fred's decision):
         # Models tend to underpredict, and XGBoost is impervious to outliers.
         # Capping at p95 was artificially limiting predictions on busy days.
         cap_method = ""
         
+        # Apply lineage columns to all rows
+        for col, val in lineage.items():
+            df[col] = val
+        
         # Select output columns
-        result = df[['entity_code', 'park_date', 'time_slot', 'predicted_actual', 'prediction_method']].copy()
+        output_cols = [
+            'entity_code', 'park_date', 'time_slot', 'predicted_actual', 'prediction_method',
+            # Model identity
+            'entity_model_trained_at', 'entity_model_version', 'feature_set',
+            'n_training_samples', 'model_mae_at_training',
+            # Training config
+            'geo_decay_halflife', 'uses_geo_decay', 'training_data_type',
+            # Pipeline context
+            'conversion_model_trained_at', 'pipeline_run_date', 'fallback_ratio_used',
+            # Future/reserved
+            'uses_quantile_mapping', 'hyperparameter_hash', 'notes',
+        ]
+        result = df[output_cols].copy()
         
         return entity_code, result, f"OK{cap_method}"
     
@@ -357,6 +467,7 @@ def main():
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS, help="Parallel workers")
     parser.add_argument("--days", type=int, default=None, help="Days to forecast (default: use global FORECAST_DAYS)")
     parser.add_argument("--max-entities", type=int, help="Limit entities (testing)")
+    parser.add_argument("--entities", type=str, default=None, help="Comma-separated entity codes to forecast (testing)")
     args = parser.parse_args()
 
     output_base = Path(args.output_base).resolve()
@@ -370,6 +481,21 @@ def main():
     logger.info("=" * 60)
 
     start_time = time.time()
+    
+    # Read conversion model metadata ONCE (shared across all entities)
+    import json
+    conversion_model_trained_at = None
+    conv_meta_path = models_dir / "_conversion" / "metadata.json"
+    if conv_meta_path.exists():
+        try:
+            with open(conv_meta_path) as f:
+                conv_meta = json.load(f)
+            conversion_model_trained_at = conv_meta.get("created_at")
+            logger.info(f"Conversion model trained_at: {conversion_model_trained_at}")
+        except Exception as e:
+            logger.warning(f"Could not read conversion metadata: {e}")
+    
+    pipeline_run_date = date.today().isoformat()
 
     # Date range
     start_date = date.today() + timedelta(days=1)
@@ -612,7 +738,11 @@ def main():
         logger.warning(f"  Could not check scope-scale models: {e}")
 
     entities = sorted(entity_list)
-    if args.max_entities:
+    if args.entities:
+        filter_set = set(args.entities.split(","))
+        entities = [e for e in entities if e in filter_set]
+        logger.info(f"Filtered to {len(entities)} entities: {entities}")
+    elif args.max_entities:
         entities = entities[:args.max_entities]
     
     # Generate time grid
@@ -694,7 +824,7 @@ def main():
                     scope_val = sv
             work_items.append(
                 (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None,
-                 scope_val)
+                 scope_val, conversion_model_trained_at, pipeline_run_date)
             )
         
         batch_results = []
@@ -745,6 +875,34 @@ def main():
             try:
                 import duckdb
                 live_con = duckdb.connect(str(db_path))
+                
+                # Auto-migrate: add lineage columns if they don't exist yet
+                _lineage_cols = [
+                    ("entity_model_trained_at", "VARCHAR"),
+                    ("entity_model_version", "VARCHAR"),
+                    ("feature_set", "VARCHAR"),
+                    ("n_training_samples", "INTEGER"),
+                    ("model_mae_at_training", "DOUBLE"),
+                    ("geo_decay_halflife", "INTEGER"),
+                    ("uses_geo_decay", "BOOLEAN"),
+                    ("training_data_type", "VARCHAR"),
+                    ("conversion_model_trained_at", "VARCHAR"),
+                    ("pipeline_run_date", "VARCHAR"),
+                    ("fallback_ratio_used", "DOUBLE"),
+                    ("uses_quantile_mapping", "BOOLEAN"),
+                    ("hyperparameter_hash", "VARCHAR"),
+                    ("notes", "VARCHAR"),
+                ]
+                existing_cols = {r[0] for r in live_con.execute(
+                    "SELECT column_name FROM information_schema.columns WHERE table_name = 'forecasts'"
+                ).fetchall()}
+                for col_name, col_type in _lineage_cols:
+                    if col_name not in existing_cols:
+                        try:
+                            live_con.execute(f"ALTER TABLE forecasts ADD COLUMN {col_name} {col_type}")
+                        except duckdb.Error:
+                            pass
+                
                 min_d = combined["park_date"].min()
                 max_d = combined["park_date"].max()
                 min_d = min_d.date() if hasattr(min_d, "date") else min_d
@@ -755,9 +913,23 @@ def main():
                 )
                 live_con.register("_fc_df", combined)
                 live_con.execute("""
-                    INSERT INTO forecasts (entity_code, park_date, time_slot, predicted_actual, prediction_method, updated_at)
+                    INSERT INTO forecasts (
+                        entity_code, park_date, time_slot, predicted_actual, prediction_method,
+                        entity_model_trained_at, entity_model_version, feature_set,
+                        n_training_samples, model_mae_at_training,
+                        geo_decay_halflife, uses_geo_decay, training_data_type,
+                        conversion_model_trained_at, pipeline_run_date, fallback_ratio_used,
+                        uses_quantile_mapping, hyperparameter_hash, notes,
+                        updated_at
+                    )
                     SELECT entity_code, park_date::DATE, CAST(time_slot AS VARCHAR), predicted_actual,
-                           COALESCE(prediction_method, 'model'), CURRENT_TIMESTAMP
+                           COALESCE(prediction_method, 'model'),
+                           entity_model_trained_at, entity_model_version, feature_set,
+                           n_training_samples, model_mae_at_training,
+                           geo_decay_halflife, uses_geo_decay, training_data_type,
+                           conversion_model_trained_at, pipeline_run_date, fallback_ratio_used,
+                           uses_quantile_mapping, hyperparameter_hash, notes,
+                           CURRENT_TIMESTAMP
                     FROM _fc_df
                 """)
                 live_con.execute("""
