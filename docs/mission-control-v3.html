@@ -1039,6 +1039,191 @@
         }
 
         /* ═══════════════════════════════════════════════════
+           CALENDAR TAB
+           ═══════════════════════════════════════════════════ */
+        .always-running-section {
+            margin-bottom: 24px;
+        }
+        .always-running-section h3 {
+            font-family: var(--font-text);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        .always-running-section .subtitle {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+        .always-running-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .ar-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(34,211,238,0.08);
+            border: 1px solid rgba(34,211,238,0.2);
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #22d3ee;
+            white-space: nowrap;
+        }
+        .ar-pill .ar-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #22d3ee;
+            animation: pulse 2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        .ar-pill .ar-detail {
+            color: rgba(34,211,238,0.6);
+            font-size: 11px;
+        }
+
+        .calendar-week {
+            margin-top: 8px;
+        }
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .calendar-header h3 {
+            font-family: var(--font-text);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .calendar-header .cal-week-range {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        .calendar-day {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+        .calendar-day.today {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(74,144,164,0.15);
+        }
+        .day-header {
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .day-header .day-name {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .day-header .day-date {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+        .calendar-day.today .day-header .day-name {
+            color: var(--accent);
+        }
+        .calendar-day.today .day-header .day-date {
+            color: var(--accent-light);
+        }
+        .day-events {
+            padding: 8px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .day-events::-webkit-scrollbar { width: 4px; }
+        .day-events::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+        .cal-event {
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+            transition: background 0.15s;
+        }
+        .cal-event:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .cal-event-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .cal-event-time {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .cal-event-owner {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 1px;
+            opacity: 0.7;
+        }
+        .calendar-empty {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        @media (max-width: 1100px) {
+            .calendar-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════
            FOOTER
            ═══════════════════════════════════════════════════ */
         .footer {
@@ -1127,8 +1312,8 @@
     <div class="tab disabled" data-tab="ideas">
         <span class="tab-icon">💡</span><span class="tab-label">Ideas</span>
     </div>
-    <div class="tab disabled" data-tab="schedule">
-        <span class="tab-icon">📅</span><span class="tab-label">Schedule</span>
+    <div class="tab" data-tab="calendar" onclick="switchTab('calendar')">
+        <span class="tab-icon">📅</span><span class="tab-label">Calendar</span>
     </div>
     <div class="sidebar-section">Business</div>
     <div class="tab disabled" data-tab="finance">
@@ -1327,6 +1512,31 @@
     </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     CALENDAR TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-calendar" class="tab-content">
+    <!-- Always Running Section -->
+    <div class="always-running-section">
+        <h3>⚡ Always Running</h3>
+        <div class="subtitle">Persistent services</div>
+        <div class="always-running-pills" id="alwaysRunningPills">
+            <div class="loading">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Weekly Calendar -->
+    <div class="calendar-week">
+        <div class="calendar-header">
+            <h3>📅 Weekly Schedule</h3>
+            <span class="cal-week-range" id="calWeekRange">—</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid">
+            <div class="loading" style="grid-column:1/-1">Loading calendar data...</div>
+        </div>
+    </div>
+</div>
+
 <!-- Add Task Modal -->
 <div class="modal-overlay" id="addTaskModal">
     <div class="modal-box">
@@ -1466,8 +1676,9 @@ async function loadAllData() {
         console.error('Load error:', e);
     }
 
-    // Load tasks data separately (non-blocking)
+    // Load tasks and calendar data separately (non-blocking)
     loadTasksData();
+    loadCalendarData();
 }
 
 function updateTimestamp() {
@@ -2197,6 +2408,81 @@ function showToast(msg) {
 document.getElementById('addTaskModal').addEventListener('click', function(e) {
     if (e.target === this) closeAddTaskModal();
 });
+
+// ═══════════════════════════════════════════════════════════════
+// CALENDAR TAB
+// ═══════════════════════════════════════════════════════════════
+State.calendarData = null;
+
+async function loadCalendarData() {
+    try {
+        State.calendarData = await fetchJSON(`${BASE}analytics-data/calendar.json`);
+        renderCalendar();
+    } catch (e) {
+        console.error('Calendar load error:', e);
+    }
+}
+
+function renderCalendar() {
+    const data = State.calendarData;
+    if (!data) return;
+
+    // Render always-running pills
+    const pillsEl = document.getElementById('alwaysRunningPills');
+    pillsEl.innerHTML = data.always_running.map(svc => `
+        <div class="ar-pill">
+            <span class="ar-dot"></span>
+            <span>${escHtml(svc.name)}</span>
+            <span class="ar-detail">· ${escHtml(svc.detail)}</span>
+        </div>
+    `).join('');
+
+    // Week range display
+    const weekStart = new Date(data.week_start + 'T00:00:00');
+    const weekEnd = new Date(data.week_end + 'T00:00:00');
+    const fmtOpts = { month: 'short', day: 'numeric' };
+    document.getElementById('calWeekRange').textContent =
+        `${weekStart.toLocaleDateString('en-US', fmtOpts)} — ${weekEnd.toLocaleDateString('en-US', fmtOpts)}, ${weekEnd.getFullYear()}`;
+
+    // Determine today
+    const todayDay = data.today; // "Sun", "Mon", etc.
+
+    // Render calendar grid
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const grid = document.getElementById('calendarGrid');
+
+    let html = '';
+    dayNames.forEach((dayName, idx) => {
+        const dt = new Date(weekStart);
+        dt.setDate(dt.getDate() + idx);
+        const dateNum = dt.getDate();
+        const isToday = dayName === todayDay;
+        const events = data.days[dayName] || [];
+
+        html += `<div class="calendar-day${isToday ? ' today' : ''}">`;
+        html += `<div class="day-header">`;
+        html += `<span class="day-name">${dayName}</span>`;
+        html += `<span class="day-date">${dateNum}</span>`;
+        html += `</div>`;
+        html += `<div class="day-events">`;
+
+        if (events.length === 0) {
+            html += `<div class="calendar-empty">No tasks</div>`;
+        } else {
+            events.forEach(ev => {
+                const borderColor = ev.color || 'var(--accent)';
+                html += `<div class="cal-event" style="border-left-color: ${borderColor}">`;
+                html += `<div class="cal-event-name" title="${escHtml(ev.name)}">${escHtml(ev.name)}</div>`;
+                html += `<div class="cal-event-time">${escHtml(ev.time)}</div>`;
+                html += `</div>`;
+            });
+        }
+
+        html += `</div></div>`;
+    });
+
+    grid.innerHTML = html;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // INIT & AUTO-REFRESH
