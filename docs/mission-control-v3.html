@@ -93,31 +93,102 @@
         }
 
         /* ═══════════════════════════════════════════════════
-           TABS
+           LAYOUT — SIDEBAR + MAIN
            ═══════════════════════════════════════════════════ */
-        .tabs {
+        .app-layout {
             display: flex;
-            gap: 0;
-            padding: 0 24px;
-            background: rgba(0,0,0,0.15);
-            border-bottom: 1px solid var(--border-card);
+            min-height: calc(100vh - 65px); /* below header */
         }
-        .tab {
-            padding: 12px 24px;
+
+        /* ═══════════════════════════════════════════════════
+           SIDEBAR NAV
+           ═══════════════════════════════════════════════════ */
+        .sidebar {
+            width: 200px;
+            min-width: 200px;
+            background: rgba(0,0,0,0.2);
+            border-right: 1px solid var(--border-card);
+            padding: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .sidebar-section {
             font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 16px 16px 6px;
+        }
+        .sidebar-section:first-child { padding-top: 8px; }
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-family: var(--font-text);
             font-size: 13px;
             font-weight: 500;
             color: var(--text-muted);
             cursor: pointer;
-            border-bottom: 2px solid transparent;
             transition: all 0.2s;
-            letter-spacing: 1px;
             user-select: none;
+            border-left: 3px solid transparent;
+            margin: 0;
         }
-        .tab:hover { color: var(--text-secondary); }
+        .tab:hover {
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.03);
+        }
         .tab.active {
             color: var(--accent);
-            border-bottom-color: var(--accent);
+            border-left-color: var(--accent);
+            background: rgba(74,144,164,0.08);
+        }
+        .tab-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .tab-label { white-space: nowrap; }
+        .tab.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .app-layout { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                min-width: unset;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-card);
+            }
+            .sidebar-section { display: none; }
+            .tab {
+                border-left: none;
+                border-bottom: 2px solid transparent;
+                padding: 10px 14px;
+                flex-direction: column;
+                gap: 4px;
+                font-size: 11px;
+            }
+            .tab.active {
+                border-bottom-color: var(--accent);
+                border-left-color: transparent;
+            }
         }
 
         /* ═══════════════════════════════════════════════════
@@ -557,10 +628,44 @@
 <!-- ═══════════════════════════════════════════════════════════
      TABS
      ═══════════════════════════════════════════════════════════ -->
-<div class="tabs">
-    <div class="tab active" data-tab="pipeline" onclick="switchTab('pipeline')">⚙ Pipeline</div>
-    <div class="tab" data-tab="analytics" onclick="switchTab('analytics')">📊 Analytics</div>
-</div>
+<div class="app-layout">
+<!-- ═══ SIDEBAR NAV ═══ -->
+<nav class="sidebar">
+    <div class="sidebar-section">Operations</div>
+    <div class="tab active" data-tab="pipeline" onclick="switchTab('pipeline')">
+        <span class="tab-icon">⚙️</span><span class="tab-label">Pipeline</span>
+    </div>
+    <div class="tab" data-tab="analytics" onclick="switchTab('analytics')">
+        <span class="tab-icon">📊</span><span class="tab-label">Analytics</span>
+    </div>
+    <div class="sidebar-section">Community</div>
+    <div class="tab disabled" data-tab="discord">
+        <span class="tab-icon">💬</span><span class="tab-label">Discord</span>
+    </div>
+    <div class="tab disabled" data-tab="social">
+        <span class="tab-icon">📱</span><span class="tab-label">Social</span>
+    </div>
+    <div class="sidebar-section">Management</div>
+    <div class="tab disabled" data-tab="todos">
+        <span class="tab-icon">✅</span><span class="tab-label">Todos</span>
+    </div>
+    <div class="tab disabled" data-tab="ideas">
+        <span class="tab-icon">💡</span><span class="tab-label">Ideas</span>
+    </div>
+    <div class="tab disabled" data-tab="schedule">
+        <span class="tab-icon">📅</span><span class="tab-label">Schedule</span>
+    </div>
+    <div class="sidebar-section">Business</div>
+    <div class="tab disabled" data-tab="finance">
+        <span class="tab-icon">💰</span><span class="tab-label">Finance</span>
+    </div>
+    <div class="tab disabled" data-tab="models">
+        <span class="tab-icon">🧠</span><span class="tab-label">Model Use</span>
+    </div>
+</nav>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="main-content">
 
 <!-- ═══════════════════════════════════════════════════════════
      PIPELINE TAB
@@ -641,6 +746,9 @@
         </div>
     </div>
 </div>
+
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <div class="footer">
     HAZEYDATA MISSION CONTROL v3 · <a href="https://github.com/hazeydata/theme-park-crowd-report" target="_blank">GitHub</a> · Auto-refreshes every 60s
