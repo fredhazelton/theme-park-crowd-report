@@ -670,12 +670,22 @@
             gap: 20px;
         }
 
-        /* Kanban board */
+        /* Kanban board — horizontally scrollable */
+        .kanban-scroll {
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .kanban-scroll::-webkit-scrollbar { height: 6px; }
+        .kanban-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.12);
+            border-radius: 3px;
+        }
         .kanban-board {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, minmax(200px, 1fr));
             gap: 12px;
             align-items: start;
+            min-width: 900px;
         }
         .kanban-column {
             background: rgba(255,255,255,0.03);
@@ -1017,11 +1027,11 @@
             .live-activity-panel { position: static; }
         }
         @media (max-width: 900px) {
-            .kanban-board { grid-template-columns: repeat(2, 1fr); }
+            .kanban-board { grid-template-columns: repeat(3, minmax(180px, 1fr)); min-width: 600px; }
         }
         @media (max-width: 768px) {
             .tasks-summary { grid-template-columns: repeat(2, 1fr); }
-            .kanban-board { grid-template-columns: 1fr; }
+            .kanban-board { grid-template-columns: repeat(2, minmax(180px, 1fr)); min-width: 400px; }
             .tasks-controls {
                 flex-direction: column;
                 align-items: flex-start;
@@ -1263,6 +1273,7 @@
 
     <!-- Row 3: Kanban + Live Activity -->
     <div class="tasks-main">
+        <div class="kanban-scroll">
         <div class="kanban-board" id="kanbanBoard">
             <div class="kanban-column" data-col="recurring">
                 <div class="kanban-col-header">
@@ -1292,7 +1303,15 @@
                 </div>
                 <div class="kanban-col-body" id="colReview"></div>
             </div>
+            <div class="kanban-column" data-col="done">
+                <div class="kanban-col-header">
+                    <span class="col-icon">✅</span> Done
+                    <span class="kanban-col-count" id="countDone">0</span>
+                </div>
+                <div class="kanban-col-body" id="colDone"></div>
+            </div>
         </div>
+        </div><!-- /kanban-scroll -->
 
         <div class="live-activity-panel">
             <div class="live-activity-header">
@@ -1349,10 +1368,11 @@
         <div class="modal-field">
             <label>Column</label>
             <select id="newTaskColumn">
-                <option value="backlog" selected>Backlog</option>
-                <option value="in_progress">In Progress</option>
-                <option value="review">Review</option>
-                <option value="recurring">Recurring</option>
+                <option value="backlog" selected>📋 Backlog</option>
+                <option value="in_progress">🔨 In Progress</option>
+                <option value="review">👀 Review</option>
+                <option value="done">✅ Done</option>
+                <option value="recurring">🔄 Recurring</option>
             </select>
         </div>
         <div class="modal-actions">
@@ -1980,10 +2000,10 @@ function renderTasks() {
     document.getElementById('tsCompletion').textContent = s.pct_complete + '%';
     document.getElementById('tsPctBar').style.width = s.pct_complete + '%';
 
-    // Filter tasks (exclude done from kanban)
+    // Filter tasks
     const { owner, project } = State.tasksFilter;
-    let tasks = data.tasks.filter(t => t.column !== 'done');
-    const totalTasks = tasks.length;
+    let tasks = [...data.tasks];
+    const totalTasks = tasks.filter(t => t.column !== 'done').length;
 
     if (owner !== 'all') {
         tasks = tasks.filter(t => t.owner === owner);
@@ -2000,7 +2020,7 @@ function renderTasks() {
     tasks.sort((a, b) => (prioOrder[a.priority] || 1) - (prioOrder[b.priority] || 1));
 
     // Distribute into columns
-    const columns = { recurring: [], backlog: [], in_progress: [], review: [] };
+    const columns = { recurring: [], backlog: [], in_progress: [], review: [], done: [] };
     tasks.forEach(t => {
         const col = t.is_recurring ? 'recurring' : (t.column || 'backlog');
         if (columns[col]) columns[col].push(t);
