@@ -1080,8 +1080,8 @@
 <div class="header">
     <div class="header-left">
         <div>
-            <div class="logo">HAZEYDATA</div>
-            <div class="logo-sub">MISSION CONTROL v3</div>
+            <div class="logo">🦴 HAZEYDATA</div>
+            <div class="logo-sub">MISSION CONTROL v3 · BEDROCK OPS</div>
         </div>
     </div>
     <div class="header-right">
@@ -1244,10 +1244,10 @@
         </div>
         <div class="tasks-controls-mid">
             <div class="owner-pills">
-                <span class="owner-pill active" data-owner="all" onclick="filterOwner('all')">All</span>
-                <span class="owner-pill" data-owner="Fred" onclick="filterOwner('Fred')">Fred</span>
-                <span class="owner-pill" data-owner="Wilma" onclick="filterOwner('Wilma')">Wilma</span>
-                <span class="owner-pill" data-owner="Bam-Bam" onclick="filterOwner('Bam-Bam')">Bam-Bam</span>
+                <span class="owner-pill active" data-owner="all" onclick="filterOwner('all')">🏠 All</span>
+                <span class="owner-pill" data-owner="Fred" onclick="filterOwner('Fred')">🪨 Fred</span>
+                <span class="owner-pill" data-owner="Wilma" onclick="filterOwner('Wilma')">🦴 Wilma</span>
+                <span class="owner-pill" data-owner="Bam-Bam" onclick="filterOwner('Bam-Bam')">🏏 Bam-Bam</span>
             </div>
             <select class="project-filter" id="projectFilter" onchange="filterProject()">
                 <option value="all">All Projects</option>
@@ -1323,9 +1323,9 @@
         <div class="modal-field">
             <label>Owner</label>
             <select id="newTaskOwner">
-                <option value="Fred">Fred</option>
-                <option value="Wilma" selected>Wilma</option>
-                <option value="Bam-Bam">Bam-Bam</option>
+                <option value="Fred">🪨 Fred</option>
+                <option value="Wilma" selected>🦴 Wilma</option>
+                <option value="Bam-Bam">🏏 Bam-Bam</option>
             </select>
         </div>
         <div class="modal-field">
@@ -1369,7 +1369,7 @@
 </div><!-- /app-layout -->
 
 <div class="footer">
-    HAZEYDATA MISSION CONTROL v3 · <a href="https://github.com/hazeydata/theme-park-crowd-report" target="_blank">GitHub</a> · Auto-refreshes every 60s
+    🦕 HAZEYDATA MISSION CONTROL v3 · Powered by the Flintstones Crew · <a href="https://github.com/hazeydata/theme-park-crowd-report" target="_blank">GitHub</a>
 </div>
 
 <script>
@@ -2028,7 +2028,7 @@ function renderTasks() {
             <div class="task-card" onclick="toggleTaskCard(this)">
                 <div class="task-card-title">${escHtml(t.title)}</div>
                 <div class="task-card-meta">
-                    <span class="task-owner-badge ${t.owner}">${t.owner}</span>
+                    <span class="task-owner-badge ${t.owner}">${{Fred:'🪨',Wilma:'🦴','Bam-Bam':'🏏'}[t.owner]||'👤'} ${t.owner}</span>
                     <span class="priority-dot ${t.priority}" title="${t.priority} priority"></span>
                     <span class="task-project-tag">${escHtml(t.project)}</span>
                 </div>
@@ -2055,7 +2055,8 @@ function renderLiveActivity(activities) {
     }
 
     body.innerHTML = activities.map(a => {
-        const initial = a.agent ? a.agent[0] : '?';
+        const avatarEmoji = {Fred:'🪨',Wilma:'🦴','Bam-Bam':'🏏',Dino:'🦕',Pebbles:'🎀',Betty:'✍️',Barney:'🧠'}[a.agent] || (a.agent ? a.agent[0] : '?');
+        const initial = avatarEmoji;
         const timeAgo = getTimeAgo(a.started);
         const isActive = a.status === 'active';
         return `
