@@ -990,6 +990,33 @@ Fred reviewed all open questions. Resolved decisions:
 
 ---
 
+## Three-Day Feedback Loop
+
+**Critical concept:** When making significant changes to models or training data, the first
+accuracy signal doesn't appear for **three days**.
+
+```
+Day 0: Make the change (e.g., retrain conversion model, adjust features)
+Day 1: Pipeline runs → new training data → retrains entity models → generates new forecasts
+Day 2: The forecasted day happens — actuals are observed in parks
+Day 3: Pipeline ingests Day 2 actuals → evaluates forecast vs observed → FIRST ACCURACY SIGNAL
+```
+
+**Example:** Conversion model retrained on Mar 4 (Day 0). New synthetic actuals + entity
+model retraining on Mar 5 (Day 1). Forecasts are for Mar 6+ (Day 2). Mar 6 actuals are
+observed and ingested on Mar 7 (Day 3). First evaluable accuracy: **Mar 7**.
+
+**Why this matters:**
+- Don't panic if accuracy doesn't improve the day after a fix
+- Don't stack multiple changes within a 3-day window — you won't know which one helped
+- When evaluating a change, look at accuracy starting Day 3, not before
+- Document change dates so you can correlate accuracy shifts to specific fixes
+
+**Recommendation:** Tag significant changes in the pipeline logs or a changelog so future
+accuracy analysis can overlay "change markers" on accuracy trend charts.
+
+---
+
 ## See Also
 
 - [MODELING_AND_WTI_METHODOLOGY.md](MODELING_AND_WTI_METHODOLOGY.md) — Statistical methodology and WTI formula
