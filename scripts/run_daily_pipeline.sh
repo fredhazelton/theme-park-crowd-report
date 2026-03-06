@@ -411,14 +411,32 @@ else
         TRAINING_DESC="Hybrid training V2 (Julia + geo decay)"
     fi
     
-    if run_step "$TRAINING_DESC" $TRAINING_CMD; then
+    # Retry logic for training (up to 3 attempts with 60s cooldown)
+    TRAIN_MAX_RETRIES=3
+    TRAIN_ATTEMPT=0
+    TRAIN_SUCCESS=false
+    while [ $TRAIN_ATTEMPT -lt $TRAIN_MAX_RETRIES ]; do
+        TRAIN_ATTEMPT=$((TRAIN_ATTEMPT+1))
+        if [ $TRAIN_ATTEMPT -gt 1 ]; then
+            log_info "Training retry $TRAIN_ATTEMPT/$TRAIN_MAX_RETRIES (waiting 60s)..."
+            sleep 60
+        fi
+        if run_step "$TRAINING_DESC (attempt $TRAIN_ATTEMPT/$TRAIN_MAX_RETRIES)" $TRAINING_CMD; then
+            TRAIN_SUCCESS=true
+            break
+        else
+            log_error "Training attempt $TRAIN_ATTEMPT failed"
+        fi
+    done
+    if $TRAIN_SUCCESS; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training done 2>/dev/null || true
         $PYTHON scripts/pipeline_state.py update training 2>/dev/null || true
         $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record training true "entities had new observations" 2>/dev/null || true
     else
+        log_error "Training failed after $TRAIN_MAX_RETRIES attempts"
         FAILED_ANY=true
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step training failed 2>/dev/null || true
-        $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record training false "training failed" 2>/dev/null || true
+        $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record training false "training failed after $TRAIN_MAX_RETRIES retries" 2>/dev/null || true
         $STOP_ON_ERROR && exit 1
     fi
 fi
