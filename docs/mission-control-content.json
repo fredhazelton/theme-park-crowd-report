@@ -3,27 +3,27 @@
         {
             "status_class": "active",
             "status_text": "\ud83d\udd04 Active",
-            "task": "Historical pipeline ETL load"
+            "task": "Pipeline accuracy audit follow-up"
+        },
+        {
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Mission Control v3 \u2014 remaining tabs"
+        },
+        {
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Prediction lineage tracking \u2014 verify in production"
+        },
+        {
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Promote WTI blog article"
         },
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
-            "task": "Investigate nonsensical entity values in pipeline data"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "Dashboard date range slicer redesign"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "Configure Brave Search API key"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "Replace \"Twitter\" icons and text with \"X\" icons and text"
+            "task": "Synthetic vs real actuals weighting review"
         }
     ],
     "key_dates": [
@@ -51,12 +51,12 @@
         "forecasts": {
             "status": "done",
             "label": "Forecasts",
-            "detail": "Completed today"
+            "detail": "63,919 rows, 0 MB"
         },
         "wti": {
-            "status": "pending",
+            "status": "done",
             "label": "WTI",
-            "detail": "Not started yet"
+            "detail": "55,034 park-dates"
         },
         "live_waits": {
             "status": "done",
@@ -94,7 +94,7 @@
         "services": [
             {
                 "name": "tpcr-discord-bot",
-                "status": "inactive",
+                "status": "active",
                 "detail": "Discord bot"
             },
             {
@@ -120,5 +120,5 @@
         "db_live_waits": 122998267,
         "db_wti": 55034
     },
-    "last_updated": "2026-03-05T23:16:39.862926"
+    "last_updated": "2026-03-05T23:23:54.516357"
 }

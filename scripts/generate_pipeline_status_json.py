@@ -28,9 +28,9 @@ DUCKDB_PATH = Path("/mnt/data/pipeline/tpcr_live.duckdb")
 # Pipeline steps we track and the log text that marks them done
 # Maps step_key → (label, log_done_text)
 PIPELINE_STEPS = {
-    "etl":          ("S3 ETL",       "Done: ETL"),
-    "forecasts":    ("Forecasts",    "Done: Forecast"),
-    "wti":          ("WTI",          "Done: WTI"),
+    "etl":          ("S3 ETL",       "Done: ETL (incremental)"),
+    "forecasts":    ("Forecasts",    "Done: Synthetic actuals generation"),
+    "wti":          ("WTI",          "WTI Summary:"),
     "live_waits":   ("Live Waits",   None),  # checked via process, not log
     "discord_bot":  ("Discord Bot",  None),  # checked via systemctl
     "daily_report": ("Daily Report", "Done: Wait time DB report"),
@@ -115,27 +115,32 @@ def _enrich_pipeline_details(status: dict):
         except Exception:
             pass
 
-    # Forecast file size as proxy
-    forecast_dir = output_base / "forecasts"
-    if forecast_dir.exists():
+    # Forecast count from all_forecasts.parquet
+    all_forecasts = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
+    if all_forecasts.exists():
         try:
-            pq_files = list(forecast_dir.glob("*.parquet"))
-            if pq_files:
-                total_mb = sum(f.stat().st_size for f in pq_files) / (1024 * 1024)
-                if status.get("forecasts", {}).get("status") == "done":
-                    status["forecasts"]["detail"] = f"{len(pq_files)} parks, {total_mb:.0f} MB"
+            import pyarrow.parquet as pq
+            meta = pq.read_metadata(str(all_forecasts))
+            n_rows = meta.num_rows
+            size_mb = all_forecasts.stat().st_size / (1024 * 1024)
+            if status.get("forecasts", {}).get("status") == "done":
+                status["forecasts"]["detail"] = f"{n_rows:,.0f} rows, {size_mb:.0f} MB"
+            elif status.get("forecasts", {}).get("status") != "error":
+                status["forecasts"]["detail"] = f"{n_rows:,.0f} rows"
         except Exception:
             pass
 
-    # WTI count
-    wti_dir = output_base / "wti"
-    if wti_dir.exists():
+    # WTI count from wti.parquet
+    wti_file = output_base / "wti" / "wti.parquet"
+    if wti_file.exists():
         try:
-            wti_files = list(wti_dir.glob("*.parquet"))
-            if wti_files:
-                total_mb = sum(f.stat().st_size for f in wti_files) / (1024 * 1024)
-                if status.get("wti", {}).get("status") == "done":
-                    status["wti"]["detail"] = f"{len(wti_files)} parks, {total_mb:.1f} MB"
+            import pyarrow.parquet as pq
+            meta = pq.read_metadata(str(wti_file))
+            n_rows = meta.num_rows
+            if status.get("wti", {}).get("status") == "done":
+                status["wti"]["detail"] = f"{n_rows:,.0f} park-dates"
+            elif status.get("wti", {}).get("status") != "error":
+                status["wti"]["detail"] = f"{n_rows:,.0f} park-dates"
         except Exception:
             pass
 
