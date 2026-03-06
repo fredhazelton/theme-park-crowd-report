@@ -538,5 +538,9 @@ if [[ -n "$API_PID" ]]; then
     log_info "Dashboard API restarted (new PID $!)"
 fi
 
+# Regenerate Mission Control content JSON (pipeline status, accuracy, infrastructure)
+log_info "=== Mission Control content refresh ==="
+$PYTHON scripts/generate_pipeline_status_json.py || log_info "MC content refresh failed (non-fatal)"
+
 log_info "Daily pipeline completed successfully. Log: $LOG_FILE"
 exit 0

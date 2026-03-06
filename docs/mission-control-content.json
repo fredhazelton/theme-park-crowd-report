@@ -1,92 +1,124 @@
 {
     "todays_focus": [
         {
-            "status_class": "high",
-            "status_text": "🚀 Tomorrow",
-            "task": "LAUNCH DAY — March 3, 2026"
-        },
-        {
-            "status_class": "done",
-            "status_text": "✅ Live",
-            "task": "/ask AI Q&A — Claude Sonnet + DuckDB, feedback buttons"
-        },
-        {
-            "status_class": "done",
-            "status_text": "✅ Live",
-            "task": "7 slash commands ready: /today /now /crowd /best-day /ask /about /ping"
-        },
-        {
-            "status_class": "done",
-            "status_text": "✅ Updated",
-            "task": "Landing page — new screenshots, /ask + /best-day showcased"
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Historical pipeline ETL load"
         },
         {
             "status_class": "medium",
-            "status_text": "📝 Todo",
-            "task": "Draft launch announcement for Discord #announcements"
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Investigate nonsensical entity values in pipeline data"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Dashboard date range slicer redesign"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Configure Brave Search API key"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Replace \"Twitter\" icons and text with \"X\" icons and text"
         }
     ],
     "key_dates": [
         {
-            "emoji": "🚀",
-            "event": "Alpha Launch",
-            "date": "Mar 3",
-            "days_out": 1,
-            "urgency": "tomorrow"
-        },
-        {
-            "emoji": "📊",
+            "emoji": "\ud83d\udcca",
             "event": "Pipeline running daily",
             "date": "6 AM EST",
             "days_out": 0,
             "urgency": ""
         },
         {
-            "emoji": "🤖",
-            "event": "/ask paywall (when audience grows)",
-            "date": "TBD",
-            "days_out": 0,
+            "emoji": "\ud83d\udd04",
+            "event": "Conversion model retrain",
+            "date": "Mar 9",
+            "days_out": 4,
             "urgency": ""
         }
     ],
     "pipeline_status": {
-        "etl": {"status": "done", "label": "S3 ETL", "detail": "6:00 AM daily"},
-        "forecasts": {"status": "done", "label": "Forecasts", "detail": "24.3M rows"},
-        "wti": {"status": "done", "label": "WTI", "detail": "55K park-dates"},
-        "live_waits": {"status": "done", "label": "Live Waits", "detail": "450K obs, 5-min updates"},
-        "discord_bot": {"status": "done", "label": "Discord Bot", "detail": "7 commands active"},
-        "daily_report": {"status": "done", "label": "Daily Report", "detail": "7 AM to #crowd-reports"}
+        "etl": {
+            "status": "done",
+            "label": "S3 ETL",
+            "detail": "1,710 entities tracked"
+        },
+        "forecasts": {
+            "status": "done",
+            "label": "Forecasts",
+            "detail": "Completed today"
+        },
+        "wti": {
+            "status": "pending",
+            "label": "WTI",
+            "detail": "Not started yet"
+        },
+        "live_waits": {
+            "status": "done",
+            "label": "Live Waits",
+            "detail": ""
+        },
+        "discord_bot": {
+            "status": "done",
+            "label": "Discord Bot",
+            "detail": ""
+        },
+        "daily_report": {
+            "status": "done",
+            "label": "Daily Report",
+            "detail": "Completed today"
+        }
     },
     "accuracy": {
         "entity_mae": "11.6 min",
-        "entity_bias": "+1.8 min",
+        "entity_bias": "+1.7 min",
+        "overall_rmse": "13.2",
         "wti_mae": "7.2",
         "wti_bias": "-2.7",
-        "days_evaluated": 19,
-        "yesterday_wti_mae": "6.7",
-        "yesterday_entity_mae": "11.4 min"
+        "days_evaluated": 22
     },
     "ask_analytics": {
-        "total_questions": 15,
-        "unique_users": 1,
-        "thumbs_up": 2,
+        "total_questions": 61,
+        "unique_users": 18,
+        "thumbs_up": 0,
         "thumbs_down": 0,
-        "avg_response_ms": 9868,
+        "avg_response_ms": 0,
         "model": "Claude Sonnet 4"
     },
     "infrastructure": {
         "services": [
-            {"name": "tpcr-discord-bot", "status": "active", "detail": "7 commands"},
-            {"name": "queue-times-fetcher", "status": "active", "detail": "11+ days uptime"},
-            {"name": "chat-server", "status": "active", "detail": "Stream overlay"},
-            {"name": "twitch-chat", "status": "active", "detail": "Stream overlay"}
+            {
+                "name": "tpcr-discord-bot",
+                "status": "inactive",
+                "detail": "Discord bot"
+            },
+            {
+                "name": "chat-server",
+                "status": "active",
+                "detail": "Stream overlay"
+            },
+            {
+                "name": "twitch-chat",
+                "status": "active",
+                "detail": "Stream overlay"
+            },
+            {
+                "name": "queue-times-fetcher",
+                "status": "active",
+                "detail": "Live wait times"
+            }
         ],
         "disk_main_pct": 90,
         "disk_data_pct": 4,
         "db_entities": 1710,
-        "db_forecasts": 24257000,
-        "db_live_waits": 449670,
-        "db_wti": 55011
+        "db_forecasts": 63919,
+        "db_live_waits": 122998267,
+        "db_wti": 55034
     },
-    "last_updated": "2026-03-02T10:00:00-05:00"
+    "last_updated": "2026-03-05T23:16:39.862926"
 }

@@ -211,6 +211,19 @@ def main():
     print("\n✅ All analytics JSON files generated successfully!")
     print(f"   Output: {OUT.relative_to(PROJECT_ROOT)}/")
 
+    # Also regenerate pipeline status / MC content JSON
+    print("\nAlso refreshing Mission Control pipeline status...")
+    try:
+        import subprocess
+        subprocess.run(
+            [str(PROJECT_ROOT / ".venv" / "bin" / "python3"),
+             str(PROJECT_ROOT / "scripts" / "generate_pipeline_status_json.py")],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+        )
+    except Exception as e:
+        print(f"  ⚠ MC content refresh failed: {e}")
+
 
 if __name__ == "__main__":
     main()
