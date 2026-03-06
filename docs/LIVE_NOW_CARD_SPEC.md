@@ -3,7 +3,7 @@
 > **Goal:** A beautiful, shareable image card showing current wait times with historical context. Designed for Discord (primary) and web (secondary). Every screenshot = free marketing.
 
 ## The Viral Loop
-User runs `/now mk` → gets beautiful image → screenshots → posts to Reddit/Twitter → drives traffic
+User runs `/now mk` → gets beautiful image → screenshots → posts to Reddit/X → drives traffic
 
 ## Card Layout (MK Example)
 

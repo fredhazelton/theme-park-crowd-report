@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-03-06T12:56:25Z",
+  "generated_at": "2026-03-06T13:50:43Z",
   "accounts": [
     {
-      "platform": "twitter",
-      "name": "Twitter / X",
-      "handle": "@DisneyStatsWhiz",
+      "platform": "x",
+      "name": "X",
+      "handle": "@hazeydata",
       "status": "active",
-      "url": "https://twitter.com/DisneyStatsWhiz",
+      "url": "https://x.com/hazeydata",
       "stats": [
         {
           "value": "2,872",
@@ -91,7 +91,7 @@
     "total_followers": "3,057+",
     "total_platforms": "5",
     "active_platforms": "3",
-    "primary_platform": "Twitter",
-    "notes": "\ud83e\udd95 Alpha phase \u2014 organic growth only, no ad spend. Twitter is primary discovery channel with 2.8K+ followers from TouringPlans background."
+    "primary_platform": "X",
+    "notes": "\ud83e\udd95 Alpha phase \u2014 organic growth only, no ad spend. X is primary discovery channel with 2.8K+ followers from TouringPlans background."
   }
 }

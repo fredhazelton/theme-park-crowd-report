@@ -141,7 +141,7 @@ For each overlay:
 - [ ] Set category (Software & Game Dev / Science & Tech)
 
 ### Promotion
-- [ ] Announce on Twitter/X
+- [ ] Announce on X
 - [ ] Set stream schedule
 - [ ] Create "going live" notification
 
