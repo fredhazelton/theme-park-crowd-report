@@ -307,14 +307,22 @@ def check_output_staleness() -> dict:
 
 
 def check_consecutive_failures() -> dict:
-    """Check for consecutive days of pipeline failure."""
+    """Check for consecutive days of pipeline failure.
+    
+    A day counts as a failure ONLY if it had errors AND no successful recovery run.
+    The robust re-run script logs to training_robust_*.log with a "recovery complete" marker.
+    We also check for fresh forecast/WTI outputs as evidence of successful recovery.
+    """
     issues = []
     today = datetime.now().date()
     consecutive_fail_days = 0
+    log_dir = Path(LOG_DIR)
+    output_base = Path("/home/wilma/hazeydata/pipeline")
     
     for days_ago in range(0, 30):
         check_date = today - timedelta(days=days_ago)
-        log_path = get_log_path(check_date.isoformat())
+        date_str = check_date.isoformat()
+        log_path = get_log_path(date_str)
         
         if not log_path.exists():
             break
@@ -327,7 +335,31 @@ def check_consecutive_failures() -> dict:
         )
         
         if has_failure:
-            consecutive_fail_days += 1
+            # Check if a successful recovery run happened the same day
+            recovered = False
+            
+            # Check for robust re-run logs with "recovery complete" on this date
+            date_compact = check_date.strftime("%Y%m%d")
+            for robust_log in log_dir.glob(f"training_robust_{date_compact}*.log"):
+                try:
+                    robust_text = robust_log.read_text(errors="replace")
+                    if "recovery complete" in robust_text.lower() or "pipeline recovery complete" in robust_text.lower():
+                        recovered = True
+                        break
+                except Exception:
+                    pass
+            
+            # Also check if forecast archive exists for this date (evidence of successful run)
+            if not recovered:
+                forecast_archive = output_base / "accuracy" / "archive" / f"forecast_{date_str}.parquet"
+                wti_archive = output_base / "accuracy" / "archive" / f"wti_{date_str}.parquet"
+                if forecast_archive.exists() and wti_archive.exists():
+                    recovered = True
+            
+            if not recovered:
+                consecutive_fail_days += 1
+            else:
+                break  # Recovered day breaks the streak
         else:
             break
     
@@ -423,6 +455,16 @@ def run_health_check(date_str: str = None) -> dict:
         if key not in seen:
             seen.add(key)
             unique_issues.append(issue)
+    
+    # If pipeline recovered today (consecutive failures = 0 despite errors in log),
+    # downgrade OOM_KILL and STEP_FAILED from critical to warning (they happened but were resolved)
+    consec_days = consecutive_check.get("consecutive_info", {}).get("consecutive_failure_days", 0)
+    if consec_days == 0:
+        recoverable_types = {"OOM_KILL", "STEP_FAILED"}
+        for issue in unique_issues:
+            if issue["type"] in recoverable_types and issue["severity"] == "critical":
+                issue["severity"] = "warning"
+                issue["message"] += " (recovered via re-run)"
     
     # Determine overall status
     severities = [i["severity"] for i in unique_issues]
