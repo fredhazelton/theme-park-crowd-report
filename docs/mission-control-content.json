@@ -8,22 +8,22 @@
         {
             "status_class": "active",
             "status_text": "\ud83d\udd04 Active",
-            "task": "Mission Control v3 \u2014 remaining tabs"
-        },
-        {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
-            "task": "Prediction lineage tracking \u2014 verify in production"
-        },
-        {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
             "task": "Promote WTI blog article"
         },
         {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
             "task": "Synthetic vs real actuals weighting review"
+        },
+        {
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Build Social Pulse automated feed"
+        },
+        {
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Build Competitor Watch automated feed"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123103185,
         "db_wti": 55058
     },
-    "last_updated": "2026-03-06T12:30:05.462880"
+    "last_updated": "2026-03-06T12:45:04.555749"
 }

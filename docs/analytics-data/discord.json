@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T17:30:01Z",
+  "generated_at": "2026-03-06T17:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T16:58:59.436000+00:00"
+          "last_active": "2026-03-06T17:44:24.535000+00:00"
         }
       ]
     },
@@ -63,7 +63,7 @@
           "emoji": "\ud83e\uddea",
           "purpose": "Model experiments \u2014 XGBoost tuning, accuracy analysis, feature engineering",
           "url": "https://discord.com/channels/1479350342318690505/1479351576232591491",
-          "last_active": "2026-03-06T05:38:02.996000+00:00"
+          "last_active": "2026-03-06T17:44:04.894000+00:00"
         },
         {
           "name": "alerts",
@@ -164,10 +164,32 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "**Pipeline is BACK!** \ud83c\udf89 Pushed to GitHub Pages \u2014 give MC a refresh.\n\nHere's what you'll see:\n\n**Pipeline Recovery Results:**\n- **243 models retrained** (out of 433 eligible entities)\n- **55,058 WTI...",
-      "timestamp": "2026-03-06T16:58:59.436000+00:00",
-      "message_id": "1479523704760176811",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479523704760176811"
+      "message": "Weighting experiment results are in \u2014 posted to #modeling. Key finding: **our current 3.5x weighting is actually the worst synthetic scheme.** `inverse_freq` (weight synthetic less when more real d...",
+      "timestamp": "2026-03-06T17:44:24.535000+00:00",
+      "message_id": "1479535134653939782",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479535134653939782"
+    },
+    {
+      "channel": "modeling",
+      "channel_emoji": "\ud83e\uddea",
+      "channel_id": "1479351576232591491",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udfe2 **Synthetic really helps high-error entities** \u2014 EP155: 11.36 \u2192 9.86, MK23: 9.81 \u2192 7.97. When real data is noisy, synthetic provides useful regularization.\n\n\ud83d\udfe1 **Adaptive sigmoid was a bust** \u2014 it...",
+      "timestamp": "2026-03-06T17:44:04.894000+00:00",
+      "message_id": "1479535052273484040",
+      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535052273484040"
+    },
+    {
+      "channel": "modeling",
+      "channel_emoji": "\ud83e\uddea",
+      "channel_id": "1479351576232591491",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "## \ud83e\uddea Weighting Experiment Complete \u2014 Synthetic vs Real Data\n\nJust finished running all 105 model combinations (15 entities \u00d7 7 weighting schemes). Full results: `research/weighting-experiment-resul...",
+      "timestamp": "2026-03-06T17:44:04.705000+00:00",
+      "message_id": "1479535051480760360",
+      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535051480760360"
     },
     {
       "channel": "fred-wilma",
@@ -175,21 +197,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Pipeline is fully recovered! \ud83c\udf89 Training, forecasts, AND WTI all completed successfully. Let me update Mission Control with fresh data.",
-      "timestamp": "2026-03-06T16:58:27.246000+00:00",
-      "message_id": "1479523569745662067",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479523569745662067"
+      "message": "Set for 8 AM ET daily. Both automated feeds are now on autopilot \u2014 #park-intel at 6:30 AM, #competitor-watch at 8 AM. Discord HQ is starting to feel alive. \ud83d\udd2d",
+      "timestamp": "2026-03-06T17:40:53.704000+00:00",
+      "message_id": "1479534250364633302",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479534250364633302"
     },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "OK, so where are we? Can I see the latest pipeline results on Mission control?",
-      "timestamp": "2026-03-06T16:58:11.560000+00:00",
-      "message_id": "1479523503953674240",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479523503953674240"
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Competitor Watch feed is live too \u2014 first report posted to #competitor-watch. Picked up some useful intel: TouringPlans data dump, MK After Hours selling out (demand signal), and EPCOT Flower & Gar...",
+      "timestamp": "2026-03-06T17:40:53.491000+00:00",
+      "message_id": "1479534249471119411",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479534249471119411"
     },
     {
       "channel": "mission-control",
@@ -355,33 +377,11 @@
       "timestamp": "2026-03-06T06:01:15.487000+00:00",
       "message_id": "1479358180961157174",
       "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1479358180961157174"
-    },
-    {
-      "channel": "morning-briefing",
-      "channel_emoji": "\u2600\ufe0f",
-      "channel_id": "1479351589176082526",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\u2600\ufe0f **Morning Briefing**\n\nAuto-posted every morning at 7:30am ET:\n- Pipeline run status\n- Accuracy trends\n- Calendar events\n- Open tasks summary\n- Key park conditions\n\nFirst briefing drops tomorrow ...",
-      "timestamp": "2026-03-06T05:38:03.265000+00:00",
-      "message_id": "1479352341558726757",
-      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1479352341558726757"
-    },
-    {
-      "channel": "modeling",
-      "channel_emoji": "\ud83e\uddea",
-      "channel_id": "1479351576232591491",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udcc8 **Modeling Channel**\n\nXGBoost parameters, methodology discussions, accuracy experiments, and model architecture decisions.\n\n**Current models:** Per-entity (Julia), scope-scale, conversion model\n*...",
-      "timestamp": "2026-03-06T05:38:02.996000+00:00",
-      "message_id": "1479352340430454845",
-      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479352340430454845"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 8,
+    "active_channels_today": 7,
     "messages_today": 20
   }
 }
