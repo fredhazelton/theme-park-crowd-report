@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T21:45:01Z",
+  "generated_at": "2026-03-06T22:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T20:10:41.671000+00:00"
+          "last_active": "2026-03-06T21:59:52.478000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "- Promoting the WTI blog article\n\nWhat do you want to prioritize? I'd recommend either digging into the bad-park accuracy (that's product quality) or letting me burn through the open bugs \u2014 your call.",
+      "timestamp": "2026-03-06T21:59:52.478000+00:00",
+      "message_id": "1479599424706449438",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479599424706449438"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Here's what's on the board, ranked by impact:\n\n**\ud83d\udd34 Highest value (revenue/product):**\n1. **WTI accuracy is rough for some parks** \u2014 EU (\u00b110.7 avg), AK (\u00b110.9), TDS (\u00b19.8) are consistently off by 10...",
+      "timestamp": "2026-03-06T21:59:52.278000+00:00",
+      "message_id": "1479599423867715746",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479599423867715746"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Great any other items we can tackle?",
+      "timestamp": "2026-03-06T21:59:11.519000+00:00",
+      "message_id": "1479599252911947870",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479599252911947870"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -168,39 +201,6 @@
       "timestamp": "2026-03-06T20:30:01.992000+00:00",
       "message_id": "1479576815369719899",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479576815369719899"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Done. Here's the summary:\n\n**Fixed today, not tomorrow.** The WTI accuracy eval was broken because it shared the slot-level eval's \"already done\" tracker \u2014 if WTI eval failed for a date, it was per...",
-      "timestamp": "2026-03-06T20:10:41.671000+00:00",
-      "message_id": "1479571948630708364",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479571948630708364"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me commit:",
-      "timestamp": "2026-03-06T20:10:39.845000+00:00",
-      "message_id": "1479571940971905226",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479571940971905226"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Nailed it. 15 dates backfilled, 153 new WTI park-date rows added (from 80 \u2192 233 total). WTI MAE is 6.8 \u2014 now we have the speedometer working.\n\nLet me also run the accuracy report to see today's num...",
-      "timestamp": "2026-03-06T20:10:39.680000+00:00",
-      "message_id": "1479571940279713987",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479571940279713987"
     },
     {
       "channel": "gazoo",
