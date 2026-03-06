@@ -1403,6 +1403,232 @@
         }
 
         /* ═══════════════════════════════════════════════════
+           DISCORD TAB
+           ═══════════════════════════════════════════════════ */
+        .discord-server-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .discord-server-stat {
+            text-align: center;
+            padding: 14px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .discord-server-stat .value {
+            font-family: var(--font-mono);
+            font-size: 22px;
+            font-weight: 700;
+            color: #5865f2;
+        }
+        .discord-server-stat .label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        .discord-server-name {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .discord-server-meta {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .discord-server-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 6px 14px;
+            background: rgba(88,101,242,0.15);
+            border: 1px solid rgba(88,101,242,0.3);
+            border-radius: 8px;
+            color: #8b9aff;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .discord-server-link:hover {
+            background: rgba(88,101,242,0.25);
+            border-color: rgba(88,101,242,0.5);
+            color: #a8b4ff;
+        }
+
+        /* Activity items */
+        .discord-activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .discord-activity-item:last-child { border-bottom: none; }
+        .discord-activity-emoji {
+            font-size: 20px;
+            flex-shrink: 0;
+            width: 28px;
+            text-align: center;
+        }
+        .discord-activity-info { flex: 1; min-width: 0; }
+        .discord-activity-channel {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: #5865f2;
+        }
+        .discord-activity-channel a {
+            color: #5865f2;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .discord-activity-channel a:hover { color: #8b9aff; }
+        .discord-activity-msg {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .discord-activity-meta {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* Category sections */
+        .discord-category {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .discord-category:hover { border-color: var(--border-accent); }
+        .discord-category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .discord-category-header:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .discord-category-emoji { font-size: 18px; }
+        .discord-category-name {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            flex: 1;
+        }
+        .discord-category-count {
+            background: rgba(88,101,242,0.2);
+            color: #8b9aff;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .discord-category-chevron {
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+        .discord-category.collapsed .discord-category-chevron {
+            transform: rotate(-90deg);
+        }
+        .discord-category-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 0 20px;
+            margin: 8px 0 4px;
+        }
+        .discord-category-body {
+            padding: 8px 12px 12px;
+        }
+        .discord-category.collapsed .discord-category-body,
+        .discord-category.collapsed .discord-category-desc {
+            display: none;
+        }
+
+        /* Channel cards */
+        .discord-channel {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+        .discord-channel:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .discord-channel-emoji {
+            font-size: 18px;
+            flex-shrink: 0;
+            width: 24px;
+            text-align: center;
+            margin-top: 1px;
+        }
+        .discord-channel-info { flex: 1; min-width: 0; }
+        .discord-channel-name {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .discord-channel-purpose {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+        .discord-channel-link {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: #5865f2;
+            background: rgba(88,101,242,0.1);
+            border: 1px solid rgba(88,101,242,0.2);
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-top: 2px;
+        }
+        .discord-channel-link:hover {
+            background: rgba(88,101,242,0.2);
+            border-color: rgba(88,101,242,0.4);
+            color: #8b9aff;
+        }
+
+        @media (max-width: 768px) {
+            .discord-server-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════
            FOOTER
            ═══════════════════════════════════════════════════ */
         .footer {
@@ -1765,7 +1991,7 @@
         <span class="tab-icon">📊</span><span class="tab-label">Analytics</span>
     </div>
     <div class="sidebar-section">Community</div>
-    <div class="tab disabled" data-tab="discord">
+    <div class="tab" data-tab="discord" onclick="switchTab('discord')">
         <span class="tab-icon">💬</span><span class="tab-label">Discord</span>
     </div>
     <div class="tab disabled" data-tab="social">
@@ -2022,6 +2248,30 @@
     </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     DISCORD TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-discord" class="tab-content">
+    <!-- Server Overview -->
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-title">💬 Server Overview</div>
+        <div class="discord-server-overview" id="discordServerOverview">
+            <div class="loading">Loading Discord data...</div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-title">⚡ Recent Activity</div>
+        <div id="discordRecentActivity">
+            <div class="loading">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Channel Directory -->
+    <div id="discordChannelDirectory"></div>
+</div>
+
 <!-- Add Task Modal -->
 <div class="modal-overlay" id="addTaskModal">
     <div class="modal-box">
@@ -2201,11 +2451,12 @@ async function loadAllData() {
         console.error('Load error:', e);
     }
 
-    // Load tasks, projects, calendar, and memory data separately (non-blocking)
+    // Load tasks, projects, calendar, memory, and discord data separately (non-blocking)
     loadTasksData();
     loadProjectsData();
     loadCalendarData();
     loadMemoryData();
+    loadDiscordData();
 }
 
 function updateTimestamp() {
@@ -3084,6 +3335,112 @@ function renderCalendar() {
     });
 
     grid.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DISCORD TAB
+// ═══════════════════════════════════════════════════════════════
+State.discordData = null;
+
+async function loadDiscordData() {
+    try {
+        State.discordData = await fetchJSON(`${BASE}analytics-data/discord.json`);
+        renderDiscord();
+    } catch (e) {
+        console.error('Discord load error:', e);
+    }
+}
+
+function renderDiscord() {
+    const data = State.discordData;
+    if (!data) return;
+
+    const server = data.server;
+
+    // Server Overview
+    const overviewEl = document.getElementById('discordServerOverview');
+    overviewEl.innerHTML = `
+        <div class="discord-server-name">🏛️ ${escHtml(server.name)}</div>
+        <div class="discord-server-meta">Guild ID: ${server.id}</div>
+        <a href="${server.url}" target="_blank" class="discord-server-link">🔗 Open in Discord</a>
+        <div class="discord-server-stats">
+            <div class="discord-server-stat">
+                <div class="value">${server.total_channels}</div>
+                <div class="label">Channels</div>
+            </div>
+            <div class="discord-server-stat">
+                <div class="value">${server.total_categories}</div>
+                <div class="label">Categories</div>
+            </div>
+            <div class="discord-server-stat">
+                <div class="value">✅</div>
+                <div class="label">Icon ${escHtml(server.icon_status)}</div>
+            </div>
+            <div class="discord-server-stat">
+                <div class="value">${data.recent_activity.length}</div>
+                <div class="label">Recent Events</div>
+            </div>
+        </div>
+    `;
+
+    // Recent Activity
+    const activityEl = document.getElementById('discordRecentActivity');
+    if (data.recent_activity.length === 0) {
+        activityEl.innerHTML = '<div class="empty-state"><span class="icon">🔇</span>No recent activity</div>';
+    } else {
+        activityEl.innerHTML = data.recent_activity.map(a => `
+            <div class="discord-activity-item">
+                <div class="discord-activity-emoji">${escHtml(a.channel_emoji)}</div>
+                <div class="discord-activity-info">
+                    <div class="discord-activity-channel">
+                        ${a.url ? `<a href="${a.url}" target="_blank">#${escHtml(a.channel)}</a>` : `#${escHtml(a.channel)}`}
+                    </div>
+                    <div class="discord-activity-msg">${escHtml(a.message)}</div>
+                    <div class="discord-activity-meta">${escHtml(a.agent)} · ${formatDiscordTime(a.timestamp)}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Channel Directory
+    const dirEl = document.getElementById('discordChannelDirectory');
+    dirEl.innerHTML = data.categories.map(cat => `
+        <div class="discord-category" id="discord-cat-${cat.key}">
+            <div class="discord-category-header" onclick="toggleDiscordCategory('${cat.key}')">
+                <span class="discord-category-emoji">${cat.emoji}</span>
+                <span class="discord-category-name">${escHtml(cat.display_name)}</span>
+                <span class="discord-category-count">${cat.channels.length}</span>
+                <span class="discord-category-chevron">▼</span>
+            </div>
+            <div class="discord-category-desc">${escHtml(cat.description)}</div>
+            <div class="discord-category-body">
+                ${cat.channels.map(ch => `
+                    <div class="discord-channel">
+                        <span class="discord-channel-emoji">${ch.emoji}</span>
+                        <div class="discord-channel-info">
+                            <div class="discord-channel-name">#${escHtml(ch.name)}</div>
+                            <div class="discord-channel-purpose">${escHtml(ch.purpose)}</div>
+                        </div>
+                        <a href="${ch.url}" target="_blank" class="discord-channel-link">Open →</a>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function toggleDiscordCategory(key) {
+    const el = document.getElementById('discord-cat-' + key);
+    if (el) el.classList.toggle('collapsed');
+}
+
+function formatDiscordTime(ts) {
+    if (!ts || ts === 'placeholder') return 'recently';
+    try {
+        const d = new Date(ts);
+        return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) +
+            ' · ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } catch { return ts; }
 }
 
 // ═══════════════════════════════════════════════════════════════
