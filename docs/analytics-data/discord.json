@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T22:15:01Z",
+  "generated_at": "2026-03-06T22:30:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T22:08:34.362000+00:00"
+          "last_active": "2026-03-06T22:29:50.098000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Full report at `reports/wti-accuracy-audit-2026-03-06.md`. Want me to start implementing fix #1 (excluding fallback from WTI)?",
-      "timestamp": "2026-03-06T22:08:34.362000+00:00",
-      "message_id": "1479601613646598339",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479601613646598339"
+      "message": "Now let me test by running it and comparing before vs after:",
+      "timestamp": "2026-03-06T22:29:50.098000+00:00",
+      "message_id": "1479606964471468163",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479606964471468163"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Report's done. Here's the TL;DR:\n\n**Three root causes behind the bad parks:**\n\n**1. \ud83d\udea8 Fallback entities (biggest problem)** \u2014 129 entities (50%!) use `fallback_ratio`, which predicts a flat constan...",
-      "timestamp": "2026-03-06T22:08:34.275000+00:00",
-      "message_id": "1479601613281693857",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479601613281693857"
+      "message": "Historical WTI is fine \u2014 it only includes entities that have synthetic actuals or real actuals, so the data-sparse entities naturally don't appear. The problem is only on the forecast side. Let me ...",
+      "timestamp": "2026-03-06T22:29:34.215000+00:00",
+      "message_id": "1479606897853337600",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479606897853337600"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Now I have the complete picture. Let me write the report:",
-      "timestamp": "2026-03-06T22:07:32.408000+00:00",
-      "message_id": "1479601353792950363",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479601353792950363"
+      "message": "The forecast SQL needs a `AND prediction_method != 'fallback_ratio'` filter. Let me also check if there's an equivalent issue on the historical side:",
+      "timestamp": "2026-03-06T22:29:30.545000+00:00",
+      "message_id": "1479606882460237885",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479606882460237885"
     },
     {
       "channel": "mission-control",
