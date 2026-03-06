@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T22:00:01Z",
+  "generated_at": "2026-03-06T22:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T21:59:52.478000+00:00"
+          "last_active": "2026-03-06T22:08:34.362000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "- Promoting the WTI blog article\n\nWhat do you want to prioritize? I'd recommend either digging into the bad-park accuracy (that's product quality) or letting me burn through the open bugs \u2014 your call.",
-      "timestamp": "2026-03-06T21:59:52.478000+00:00",
-      "message_id": "1479599424706449438",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479599424706449438"
+      "message": "Full report at `reports/wti-accuracy-audit-2026-03-06.md`. Want me to start implementing fix #1 (excluding fallback from WTI)?",
+      "timestamp": "2026-03-06T22:08:34.362000+00:00",
+      "message_id": "1479601613646598339",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479601613646598339"
     },
     {
       "channel": "fred-wilma",
@@ -175,21 +175,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Here's what's on the board, ranked by impact:\n\n**\ud83d\udd34 Highest value (revenue/product):**\n1. **WTI accuracy is rough for some parks** \u2014 EU (\u00b110.7 avg), AK (\u00b110.9), TDS (\u00b19.8) are consistently off by 10...",
-      "timestamp": "2026-03-06T21:59:52.278000+00:00",
-      "message_id": "1479599423867715746",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479599423867715746"
+      "message": "Report's done. Here's the TL;DR:\n\n**Three root causes behind the bad parks:**\n\n**1. \ud83d\udea8 Fallback entities (biggest problem)** \u2014 129 entities (50%!) use `fallback_ratio`, which predicts a flat constan...",
+      "timestamp": "2026-03-06T22:08:34.275000+00:00",
+      "message_id": "1479601613281693857",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479601613281693857"
     },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Great any other items we can tackle?",
-      "timestamp": "2026-03-06T21:59:11.519000+00:00",
-      "message_id": "1479599252911947870",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479599252911947870"
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now I have the complete picture. Let me write the report:",
+      "timestamp": "2026-03-06T22:07:32.408000+00:00",
+      "message_id": "1479601353792950363",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479601353792950363"
     },
     {
       "channel": "mission-control",
