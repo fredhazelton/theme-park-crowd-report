@@ -1,0 +1,97 @@
+{
+  "generated_at": "2026-03-06T12:56:25Z",
+  "accounts": [
+    {
+      "platform": "twitter",
+      "name": "Twitter / X",
+      "handle": "@DisneyStatsWhiz",
+      "status": "active",
+      "url": "https://twitter.com/DisneyStatsWhiz",
+      "stats": [
+        {
+          "value": "2,872",
+          "label": "Followers"
+        },
+        {
+          "value": "\u2713",
+          "label": "Verified"
+        }
+      ]
+    },
+    {
+      "platform": "youtube",
+      "name": "YouTube",
+      "handle": "@hazeydata-fred",
+      "status": "active",
+      "url": "https://youtube.com/@hazeydata-fred",
+      "stats": [
+        {
+          "value": "1",
+          "label": "Videos"
+        },
+        {
+          "value": "720p",
+          "label": "Quality"
+        }
+      ]
+    },
+    {
+      "platform": "tiktok",
+      "name": "TikTok",
+      "handle": "@fredhazelton",
+      "status": "active",
+      "url": "https://tiktok.com/@fredhazelton",
+      "stats": [
+        {
+          "value": "185",
+          "label": "Followers"
+        },
+        {
+          "value": "1K+",
+          "label": "Views"
+        }
+      ]
+    },
+    {
+      "platform": "twitch",
+      "name": "Twitch",
+      "handle": "hazeydata",
+      "status": "setup",
+      "url": "https://twitch.tv/hazeydata",
+      "stats": [
+        {
+          "value": "\u2014",
+          "label": "Followers"
+        },
+        {
+          "value": "Live",
+          "label": "Overlay"
+        }
+      ]
+    },
+    {
+      "platform": "reddit",
+      "name": "Reddit",
+      "handle": "r/WaltDisneyWorld",
+      "status": "planned",
+      "url": "https://reddit.com/r/WaltDisneyWorld",
+      "stats": [
+        {
+          "value": "\u2014",
+          "label": "Posts"
+        },
+        {
+          "value": "Target",
+          "label": "Launch"
+        }
+      ]
+    }
+  ],
+  "engagement_summary": {
+    "total_followers": "3,057+",
+    "total_platforms": "5",
+    "active_platforms": "3",
+    "primary_platform": "Twitter",
+    "notes": "\ud83e\udd95 Alpha phase \u2014 organic growth only, no ad spend. Twitter is primary discovery channel with 2.8K+ followers from TouringPlans background."
+  }
+}

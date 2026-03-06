@@ -1637,6 +1637,356 @@
         }
 
         /* ═══════════════════════════════════════════════════
+           SOCIAL TAB
+           ═══════════════════════════════════════════════════ */
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .social-account-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .social-account-card:hover { border-color: var(--border-accent); }
+        .social-account-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .social-account-icon {
+            font-size: 28px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        .social-account-icon.twitter { background: rgba(29,155,240,0.15); }
+        .social-account-icon.youtube { background: rgba(255,0,0,0.12); }
+        .social-account-icon.tiktok { background: rgba(255,255,255,0.08); }
+        .social-account-icon.twitch { background: rgba(145,70,255,0.15); }
+        .social-account-icon.reddit { background: rgba(255,69,0,0.12); }
+        .social-account-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+        .social-account-handle {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .social-account-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+        }
+        .social-stat {
+            text-align: center;
+            padding: 10px 6px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
+        }
+        .social-stat .val {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+        .social-stat .lbl {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+        .social-account-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid var(--border-card);
+            color: var(--text-secondary);
+            width: fit-content;
+        }
+        .social-account-link:hover {
+            border-color: var(--accent);
+            color: var(--accent-light);
+        }
+        .social-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .social-status-pill.active {
+            background: rgba(74,222,128,0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(74,222,128,0.2);
+        }
+        .social-status-pill.setup {
+            background: rgba(250,204,21,0.15);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(250,204,21,0.2);
+        }
+        .social-status-pill.planned {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           IDEAS TAB
+           ═══════════════════════════════════════════════════ */
+        .ideas-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .ideas-category-pills {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .ideas-cat-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border-card);
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .ideas-cat-pill:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        .ideas-cat-pill.active {
+            background: rgba(74,144,164,0.2);
+            border-color: var(--accent);
+            color: var(--accent-light);
+        }
+        .ideas-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 14px;
+        }
+        .idea-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 16px;
+            transition: border-color 0.2s;
+        }
+        .idea-card:hover { border-color: var(--border-accent); }
+        .idea-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+        .idea-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .idea-status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .idea-status-badge.new {
+            background: rgba(74,144,164,0.15);
+            color: var(--accent-light);
+            border: 1px solid rgba(74,144,164,0.25);
+        }
+        .idea-status-badge.exploring {
+            background: rgba(250,204,21,0.15);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(250,204,21,0.2);
+        }
+        .idea-status-badge.approved {
+            background: rgba(74,222,128,0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(74,222,128,0.2);
+        }
+        .idea-status-badge.rejected {
+            background: rgba(248,113,113,0.12);
+            color: var(--accent-red);
+            border: 1px solid rgba(248,113,113,0.2);
+        }
+        .idea-card-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .idea-card-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .idea-category-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.06);
+            color: var(--text-muted);
+        }
+        .idea-category-tag.product { color: var(--accent-light); background: rgba(74,144,164,0.1); }
+        .idea-category-tag.content { color: #c084fc; background: rgba(192,132,252,0.1); }
+        .idea-category-tag.business { color: var(--accent-green); background: rgba(74,222,128,0.1); }
+        .idea-category-tag.technical { color: var(--accent-orange); background: rgba(251,146,60,0.1); }
+        .idea-owner-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .idea-date-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           FINANCE TAB
+           ═══════════════════════════════════════════════════ */
+        .finance-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .finance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px;
+        }
+        .finance-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+        .finance-card:hover { border-color: var(--border-accent); }
+        .finance-line-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .finance-line-item:last-child { border-bottom: none; }
+        .finance-line-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .finance-line-value {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .finance-line-value.free {
+            color: var(--accent-green);
+        }
+        .finance-line-value.cost {
+            color: var(--accent-red);
+        }
+        .finance-total-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0 0;
+            margin-top: 8px;
+            border-top: 2px solid var(--border-accent);
+        }
+        .finance-total-label {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .finance-total-value {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+        .finance-note {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+        .stripe-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(99,91,255,0.12);
+            border: 1px solid rgba(99,91,255,0.25);
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #a5b4fc;
+        }
+
+        /* ═══════════════════════════════════════════════════
            FOOTER
            ═══════════════════════════════════════════════════ */
         .footer {
@@ -2002,7 +2352,7 @@
     <div class="tab" data-tab="discord" onclick="switchTab('discord')">
         <span class="tab-icon">💬</span><span class="tab-label">Discord</span>
     </div>
-    <div class="tab disabled" data-tab="social">
+    <div class="tab" data-tab="social" onclick="switchTab('social')">
         <span class="tab-icon">📱</span><span class="tab-label">Social</span>
     </div>
     <div class="sidebar-section">Management</div>
@@ -2015,7 +2365,7 @@
     <div class="tab" data-tab="memory" onclick="switchTab('memory')">
         <span class="tab-icon">🧠</span><span class="tab-label">Memory</span>
     </div>
-    <div class="tab disabled" data-tab="ideas">
+    <div class="tab" data-tab="ideas" onclick="switchTab('ideas')">
         <span class="tab-icon">💡</span><span class="tab-label">Ideas</span>
     </div>
     <div class="tab" data-tab="calendar" onclick="switchTab('calendar')">
@@ -2029,7 +2379,7 @@
         <span class="tab-icon">👥</span><span class="tab-label">Team</span>
     </a>
     <div class="sidebar-section">Business</div>
-    <div class="tab disabled" data-tab="finance">
+    <div class="tab" data-tab="finance" onclick="switchTab('finance')">
         <span class="tab-icon">💰</span><span class="tab-label">Finance</span>
     </div>
     <div class="tab disabled" data-tab="models">
@@ -2287,6 +2637,57 @@
     <div id="discordChannelDirectory"></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     SOCIAL TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-social" class="tab-content">
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-title">📱 Social Accounts</div>
+        <div class="social-grid" id="socialAccountsGrid">
+            <div class="loading">Loading social data...</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title">📊 Engagement Overview</div>
+        <div id="socialEngagement">
+            <div class="loading">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     IDEAS TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-ideas" class="tab-content">
+    <div class="ideas-summary" id="ideasSummary">
+        <div class="loading" style="grid-column:1/-1">Loading ideas...</div>
+    </div>
+    <div class="ideas-controls">
+        <div class="ideas-category-pills" id="ideasCategoryPills">
+            <span class="ideas-cat-pill active" data-cat="all" onclick="filterIdeasCategory('all')">🏠 All</span>
+            <span class="ideas-cat-pill" data-cat="product" onclick="filterIdeasCategory('product')">🎯 Product</span>
+            <span class="ideas-cat-pill" data-cat="content" onclick="filterIdeasCategory('content')">📝 Content</span>
+            <span class="ideas-cat-pill" data-cat="business" onclick="filterIdeasCategory('business')">💰 Business</span>
+            <span class="ideas-cat-pill" data-cat="technical" onclick="filterIdeasCategory('technical')">🔧 Technical</span>
+        </div>
+    </div>
+    <div class="ideas-grid" id="ideasGrid">
+        <div class="loading">Loading ideas...</div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FINANCE TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tab-finance" class="tab-content">
+    <div class="finance-summary" id="financeSummary">
+        <div class="loading" style="grid-column:1/-1">Loading finance data...</div>
+    </div>
+    <div class="finance-grid" id="financeGrid">
+        <div class="loading">Loading...</div>
+    </div>
+</div>
+
 <!-- Add Task Modal -->
 <div class="modal-overlay" id="addTaskModal">
     <div class="modal-box">
@@ -2466,12 +2867,15 @@ async function loadAllData() {
         console.error('Load error:', e);
     }
 
-    // Load tasks, projects, calendar, memory, and discord data separately (non-blocking)
+    // Load tasks, projects, calendar, memory, discord, social, ideas, finance data separately (non-blocking)
     loadTasksData();
     loadProjectsData();
     loadCalendarData();
     loadMemoryData();
     loadDiscordData();
+    loadSocialData();
+    loadIdeasData();
+    loadFinanceData();
 }
 
 function updateTimestamp() {
@@ -3456,6 +3860,268 @@ function formatDiscordTime(ts) {
         return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) +
             ' · ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     } catch { return ts; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SOCIAL TAB
+// ═══════════════════════════════════════════════════════════════
+State.socialData = null;
+
+async function loadSocialData() {
+    try {
+        State.socialData = await fetchJSON(`${BASE}analytics-data/social.json`);
+        renderSocial();
+    } catch (e) {
+        console.error('Social load error:', e);
+    }
+}
+
+function renderSocial() {
+    const data = State.socialData;
+    if (!data) return;
+
+    const iconMap = {
+        twitter: '🐦', youtube: '▶️', tiktok: '🎵',
+        twitch: '🎮', reddit: '🟠', instagram: '📸',
+        facebook: '📘', pinterest: '📌'
+    };
+
+    // Accounts grid
+    const grid = document.getElementById('socialAccountsGrid');
+    grid.innerHTML = data.accounts.map(a => {
+        const icon = iconMap[a.platform] || '🌐';
+        return `
+            <div class="social-account-card">
+                <div class="social-account-header">
+                    <div class="social-account-icon ${a.platform}">${icon}</div>
+                    <div>
+                        <div class="social-account-name">${escHtml(a.name)}</div>
+                        <div class="social-account-handle">${escHtml(a.handle)}</div>
+                    </div>
+                    <span class="social-status-pill ${a.status}" style="margin-left:auto">${a.status}</span>
+                </div>
+                <div class="social-account-stats">
+                    ${a.stats.map(s => `
+                        <div class="social-stat">
+                            <div class="val">${s.value}</div>
+                            <div class="lbl">${s.label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                ${a.url ? `<a href="${a.url}" target="_blank" class="social-account-link">🔗 View Profile</a>` : ''}
+            </div>
+        `;
+    }).join('');
+
+    // Engagement overview
+    const engEl = document.getElementById('socialEngagement');
+    if (data.engagement_summary) {
+        const e = data.engagement_summary;
+        engEl.innerHTML = `
+            <div class="big-numbers">
+                <div class="big-number-card">
+                    <div class="num">${e.total_followers}</div>
+                    <div class="lbl">Total Followers</div>
+                </div>
+                <div class="big-number-card">
+                    <div class="num">${e.total_platforms}</div>
+                    <div class="lbl">Platforms</div>
+                </div>
+                <div class="big-number-card">
+                    <div class="num">${e.active_platforms}</div>
+                    <div class="lbl">Active</div>
+                </div>
+                <div class="big-number-card">
+                    <div class="num">${e.primary_platform}</div>
+                    <div class="lbl">Primary</div>
+                </div>
+            </div>
+            ${e.notes ? `<div class="finance-note">${escHtml(e.notes)}</div>` : ''}
+        `;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// IDEAS TAB
+// ═══════════════════════════════════════════════════════════════
+State.ideasData = null;
+State.ideasFilter = 'all';
+
+async function loadIdeasData() {
+    try {
+        State.ideasData = await fetchJSON(`${BASE}analytics-data/ideas.json`);
+        renderIdeas();
+    } catch (e) {
+        console.error('Ideas load error:', e);
+    }
+}
+
+function renderIdeas() {
+    const data = State.ideasData;
+    if (!data) return;
+
+    // Summary
+    const s = data.summary;
+    document.getElementById('ideasSummary').innerHTML = `
+        <div class="big-number-card"><div class="num">${s.total}</div><div class="lbl">Total Ideas</div></div>
+        <div class="big-number-card"><div class="num" style="color:var(--accent-light)">${s.new}</div><div class="lbl">New</div></div>
+        <div class="big-number-card"><div class="num" style="color:var(--accent-yellow)">${s.exploring}</div><div class="lbl">Exploring</div></div>
+        <div class="big-number-card"><div class="num" style="color:var(--accent-green)">${s.approved}</div><div class="lbl">Approved</div></div>
+        <div class="big-number-card"><div class="num" style="color:var(--accent-red)">${s.rejected}</div><div class="lbl">Rejected</div></div>
+    `;
+
+    // Filter and render
+    const filter = State.ideasFilter;
+    let ideas = data.ideas;
+    if (filter !== 'all') {
+        ideas = ideas.filter(i => i.category === filter);
+    }
+
+    const grid = document.getElementById('ideasGrid');
+    if (ideas.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><span class="icon">💡</span>No ideas in this category</div>';
+        return;
+    }
+
+    const statusOrder = { new: 0, exploring: 1, approved: 2, rejected: 3 };
+    ideas = [...ideas].sort((a, b) => (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0));
+
+    const ownerEmoji = { Fred: '🪨', Wilma: '🦴', 'Bam-Bam': '🏏', Pebbles: '🎀', Barney: '🧠', Betty: '✍️' };
+
+    grid.innerHTML = ideas.map(i => `
+        <div class="idea-card">
+            <div class="idea-card-header">
+                <div class="idea-card-title">${escHtml(i.title)}</div>
+                <span class="idea-status-badge ${i.status}">${i.status}</span>
+            </div>
+            <div class="idea-card-desc">${escHtml(i.description)}</div>
+            <div class="idea-card-footer">
+                <span class="idea-category-tag ${i.category}">${i.category}</span>
+                ${i.owner ? `<span class="idea-owner-tag">${ownerEmoji[i.owner] || '👤'} ${escHtml(i.owner)}</span>` : ''}
+                ${i.created ? `<span class="idea-date-tag">${formatDate(i.created)}</span>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterIdeasCategory(cat) {
+    State.ideasFilter = cat;
+    document.querySelectorAll('.ideas-cat-pill').forEach(p => {
+        p.classList.toggle('active', p.dataset.cat === cat);
+    });
+    renderIdeas();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FINANCE TAB
+// ═══════════════════════════════════════════════════════════════
+State.financeData = null;
+
+async function loadFinanceData() {
+    try {
+        State.financeData = await fetchJSON(`${BASE}analytics-data/finance.json`);
+        renderFinance();
+    } catch (e) {
+        console.error('Finance load error:', e);
+    }
+}
+
+function renderFinance() {
+    const data = State.financeData;
+    if (!data) return;
+
+    // Summary cards
+    const s = data.summary;
+    document.getElementById('financeSummary').innerHTML = `
+        <div class="big-number-card">
+            <div class="num" style="color:var(--accent-green)">${escHtml(s.mrr)}</div>
+            <div class="lbl">MRR</div>
+        </div>
+        <div class="big-number-card">
+            <div class="num" style="color:var(--accent-red)">${escHtml(s.monthly_costs)}</div>
+            <div class="lbl">Monthly Costs</div>
+        </div>
+        <div class="big-number-card">
+            <div class="num">${escHtml(s.phase)}</div>
+            <div class="lbl">Phase</div>
+        </div>
+        <div class="big-number-card">
+            <div class="num">${escHtml(s.subscribers)}</div>
+            <div class="lbl">Subscribers</div>
+        </div>
+    `;
+
+    // Build cards
+    let html = '';
+
+    // Revenue card
+    if (data.revenue) {
+        const rev = data.revenue;
+        html += `<div class="finance-card">
+            <div class="card-title">💰 Revenue</div>
+            ${rev.items.map(item => `
+                <div class="finance-line-item">
+                    <span class="finance-line-label">${item.emoji || ''} ${escHtml(item.name)}</span>
+                    <span class="finance-line-value ${item.class || ''}">${escHtml(item.value)}</span>
+                </div>
+            `).join('')}
+            ${rev.note ? `<div class="finance-note">${escHtml(rev.note)}</div>` : ''}
+        </div>`;
+    }
+
+    // Costs card
+    if (data.costs) {
+        const costs = data.costs;
+        html += `<div class="finance-card">
+            <div class="card-title">📉 Monthly Costs</div>
+            ${costs.items.map(item => `
+                <div class="finance-line-item">
+                    <span class="finance-line-label">${item.emoji || ''} ${escHtml(item.name)}</span>
+                    <span class="finance-line-value cost">${escHtml(item.value)}</span>
+                </div>
+            `).join('')}
+            <div class="finance-total-row">
+                <span class="finance-total-label">Total Monthly</span>
+                <span class="finance-total-value">${escHtml(costs.total)}</span>
+            </div>
+            ${costs.note ? `<div class="finance-note">${escHtml(costs.note)}</div>` : ''}
+        </div>`;
+    }
+
+    // Stripe card
+    if (data.stripe) {
+        const stripe = data.stripe;
+        html += `<div class="finance-card">
+            <div class="card-title">💳 Stripe</div>
+            <div style="margin-bottom:12px">
+                <span class="stripe-badge">💎 ${escHtml(stripe.product_name)}</span>
+            </div>
+            ${stripe.items.map(item => `
+                <div class="finance-line-item">
+                    <span class="finance-line-label">${item.emoji || ''} ${escHtml(item.name)}</span>
+                    <span class="finance-line-value">${escHtml(item.value)}</span>
+                </div>
+            `).join('')}
+            ${stripe.note ? `<div class="finance-note">${escHtml(stripe.note)}</div>` : ''}
+        </div>`;
+    }
+
+    // Infrastructure card
+    if (data.infrastructure) {
+        const infra = data.infrastructure;
+        html += `<div class="finance-card">
+            <div class="card-title">🖥️ Infrastructure</div>
+            ${infra.items.map(item => `
+                <div class="finance-line-item">
+                    <span class="finance-line-label">${item.emoji || ''} ${escHtml(item.name)}</span>
+                    <span class="finance-line-value">${escHtml(item.value)}</span>
+                </div>
+            `).join('')}
+            ${infra.note ? `<div class="finance-note">${escHtml(infra.note)}</div>` : ''}
+        </div>`;
+    }
+
+    document.getElementById('financeGrid').innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════════════════════

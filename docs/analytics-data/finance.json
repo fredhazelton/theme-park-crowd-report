@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-03-06T12:56:25Z",
+  "summary": {
+    "mrr": "$0",
+    "monthly_costs": "~$65",
+    "phase": "Alpha",
+    "subscribers": "0"
+  },
+  "revenue": {
+    "items": [
+      {
+        "emoji": "\ud83c\udfa2",
+        "name": "TPCR Subscriptions",
+        "value": "$0 (alpha)",
+        "class": "free"
+      },
+      {
+        "emoji": "\ud83d\udcca",
+        "name": "API Access",
+        "value": "Not yet",
+        "class": ""
+      },
+      {
+        "emoji": "\ud83c\udfa5",
+        "name": "Twitch/YouTube",
+        "value": "Not yet",
+        "class": ""
+      }
+    ],
+    "note": "\ud83e\udd95 Everything is free during alpha. Focus is on accuracy and growth before monetizing. Post-alpha: Free + Pro ($5/mo) tiers planned."
+  },
+  "costs": {
+    "items": [
+      {
+        "emoji": "\ud83e\udd16",
+        "name": "Anthropic API (Claude)",
+        "value": "~$30/mo"
+      },
+      {
+        "emoji": "\ud83e\udde0",
+        "name": "OpenAI API (Codex)",
+        "value": "~$15/mo"
+      },
+      {
+        "emoji": "\u2601\ufe0f",
+        "name": "Cloudflare (Pages + R2)",
+        "value": "$0"
+      },
+      {
+        "emoji": "\ud83c\udf10",
+        "name": "Domain (hazeydata.ai)",
+        "value": "~$2/mo"
+      },
+      {
+        "emoji": "\ud83d\udcac",
+        "name": "Discord (free tier)",
+        "value": "$0"
+      },
+      {
+        "emoji": "\ud83d\udd27",
+        "name": "GitHub (free tier)",
+        "value": "$0"
+      },
+      {
+        "emoji": "\ud83d\udcbe",
+        "name": "B2 Cloud Storage",
+        "value": "~$5/mo"
+      },
+      {
+        "emoji": "\ud83d\udda5\ufe0f",
+        "name": "Server (wilma-server)",
+        "value": "Owned"
+      },
+      {
+        "emoji": "\u26a1",
+        "name": "Electricity (server)",
+        "value": "~$10/mo"
+      }
+    ],
+    "total": "~$62/mo",
+    "note": "Infrastructure is lean \u2014 self-hosted server with cloud backup. API costs are the main expense."
+  },
+  "stripe": {
+    "product_name": "TPCR Premium",
+    "items": [
+      {
+        "emoji": "\ud83d\udce6",
+        "name": "Product",
+        "value": "TPCR Premium"
+      },
+      {
+        "emoji": "\ud83d\udcb2",
+        "name": "Alpha Price",
+        "value": "$0.00"
+      },
+      {
+        "emoji": "\ud83d\udd17",
+        "name": "Checkout",
+        "value": "Live (Cloudflare)"
+      },
+      {
+        "emoji": "\ud83e\ude9d",
+        "name": "Webhooks",
+        "value": "Configured"
+      },
+      {
+        "emoji": "\ud83d\udd11",
+        "name": "Mode",
+        "value": "Test Keys"
+      }
+    ],
+    "note": "Stripe is fully wired up but using test keys. Switch to live keys when ready to charge. Checkout flow: hazeydata.ai \u2192 Cloudflare Pages Functions \u2192 Stripe."
+  },
+  "infrastructure": {
+    "items": [
+      {
+        "emoji": "\ud83d\udda5\ufe0f",
+        "name": "wilma-server",
+        "value": "NVMe 1.8TB + Data 1.8TB"
+      },
+      {
+        "emoji": "\u2601\ufe0f",
+        "name": "Cloudflare Pages",
+        "value": "Free tier"
+      },
+      {
+        "emoji": "\ud83d\udcbe",
+        "name": "B2 Cloud Backup",
+        "value": "Nightly 3am cron"
+      },
+      {
+        "emoji": "\ud83d\udce1",
+        "name": "Dropbox (rclone)",
+        "value": "Configured"
+      },
+      {
+        "emoji": "\ud83d\udc0d",
+        "name": "Pipeline",
+        "value": "Python + cron"
+      }
+    ],
+    "note": "Self-hosted on dedicated hardware. B2 backup runs nightly at 3am. Cloudflare handles CDN + serverless functions."
+  }
+}
