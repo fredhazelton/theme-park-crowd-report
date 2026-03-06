@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T18:45:01Z",
+  "generated_at": "2026-03-06T19:00:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T18:38:22.937000+00:00"
+          "last_active": "2026-03-06T18:57:00.081000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "100% agree. Most services give you \"We experienced an issue. It's been resolved.\" \u2014 which tells users absolutely nothing and feels like they're being managed, not respected.\n\nBringing people into t...",
+      "timestamp": "2026-03-06T18:57:00.081000+00:00",
+      "message_id": "1479553403137818684",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479553403137818684"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Those are **voice channels** we set up earlier today during the Discord HQ buildout. Honestly? They're not very useful right now since your team is all AI agents who can't join voice calls. \ud83d\ude04\n\nThey...",
+      "timestamp": "2026-03-06T18:56:46.303000+00:00",
+      "message_id": "1479553345348698346",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479553345348698346"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "What are these and how do we use them?",
+      "timestamp": "2026-03-06T18:56:30.495000+00:00",
+      "message_id": "1479553279045271624",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479553279045271624"
+    },
+    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -190,39 +223,6 @@
       "timestamp": "2026-03-06T18:43:00.144000+00:00",
       "message_id": "1479549880186966268",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1479549880186966268"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Working perfectly. It correctly sees \"degraded\" (pipeline log still has today's old errors, but bot + DuckDB are healthy), and since status hasn't changed it says `action: nothing` \u2014 no spam.\n\nTomo...",
-      "timestamp": "2026-03-06T18:38:22.937000+00:00",
-      "message_id": "1479548717496275189",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479548717496275189"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Service status manager is built and deployed. Let me wire it up with the current announcement message ID so it knows what to edit next time.",
-      "timestamp": "2026-03-06T18:38:22.821000+00:00",
-      "message_id": "1479548717009731585",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479548717009731585"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "I love this!! I dont know why more systems dont do this - people feel part of the community when you bring them into the weeds like that",
-      "timestamp": "2026-03-06T18:38:15.505000+00:00",
-      "message_id": "1479548686324203610",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479548686324203610"
     },
     {
       "channel": "alerts",
