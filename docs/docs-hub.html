@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HazeyData — Docs Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: rgba(255,255,255,0.05);
+            --border-card: rgba(255,255,255,0.1);
+            --border-accent: rgba(74,144,164,0.3);
+            --accent: #4a90a4;
+            --accent-light: #6bb5c9;
+            --accent-red: #f87171;
+            --accent-orange: #fb923c;
+            --accent-green: #4ade80;
+            --accent-yellow: #facc15;
+            --accent-purple: #c084fc;
+            --accent-pink: #f472b6;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --font-text: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            min-height: 100vh;
+            font-family: var(--font-text);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════════════ */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-card);
+            background: rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 2px;
+        }
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .header-right a {
+            color: var(--accent-light);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 4px 10px;
+            border: 1px solid var(--border-accent);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .header-right a:hover {
+            background: rgba(74,144,164,0.15);
+            border-color: var(--accent);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           LAYOUT
+           ═══════════════════════════════════════════════════ */
+        .main {
+            display: flex;
+            min-height: calc(100vh - 57px);
+        }
+
+        .sidebar {
+            width: 300px;
+            min-width: 300px;
+            padding: 20px;
+            border-right: 1px solid var(--border-card);
+            background: rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: sticky;
+            top: 57px;
+            height: calc(100vh - 57px);
+            overflow-y: auto;
+        }
+
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           SEARCH
+           ═══════════════════════════════════════════════════ */
+        .search-container {
+            position: relative;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+            pointer-events: none;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-text);
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+        .search-input:focus {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 3px rgba(74,144,164,0.15);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           FILTER SECTIONS
+           ═══════════════════════════════════════════════════ */
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .filter-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .filter-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            font-family: var(--font-text);
+            font-weight: 500;
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .filter-btn:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .filter-btn.active {
+            background: rgba(74,144,164,0.2);
+            border-color: var(--accent);
+            color: var(--accent-light);
+        }
+        .filter-btn .count {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-left: 4px;
+            font-family: var(--font-mono);
+        }
+        .filter-btn.active .count {
+            color: var(--accent);
+        }
+
+        /* Category color dots */
+        .cat-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .cat-dot.pipeline { background: var(--accent-green); }
+        .cat-dot.modeling { background: var(--accent-purple); }
+        .cat-dot.infrastructure { background: var(--accent-orange); }
+        .cat-dot.design { background: var(--accent-pink); }
+        .cat-dot.data { background: var(--accent); }
+        .cat-dot.api { background: var(--accent-yellow); }
+        .cat-dot.streaming { background: var(--accent-red); }
+        .cat-dot.business { background: #34d399; }
+
+        /* ═══════════════════════════════════════════════════
+           RESULTS HEADER
+           ═══════════════════════════════════════════════════ */
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .results-count {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .sort-select {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-card);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-family: var(--font-text);
+            padding: 4px 8px;
+            outline: none;
+            cursor: pointer;
+        }
+        .sort-select:focus {
+            border-color: var(--accent);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           DOC CARDS
+           ═══════════════════════════════════════════════════ */
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        .doc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.25s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .doc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--card-accent, var(--accent));
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .doc-card:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--border-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .doc-card:hover::before {
+            opacity: 1;
+        }
+        .doc-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .doc-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .doc-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .doc-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            flex: 1;
+        }
+        .doc-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: auto;
+        }
+        .doc-tag {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .doc-tag.category {
+            background: rgba(74,144,164,0.15);
+            color: var(--accent-light);
+            border: 1px solid rgba(74,144,164,0.25);
+        }
+        .doc-tag.filetype {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .doc-tag.size {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        /* Category accent colors on cards */
+        .doc-card[data-category="pipeline"] { --card-accent: var(--accent-green); }
+        .doc-card[data-category="modeling"] { --card-accent: var(--accent-purple); }
+        .doc-card[data-category="infrastructure"] { --card-accent: var(--accent-orange); }
+        .doc-card[data-category="design"] { --card-accent: var(--accent-pink); }
+        .doc-card[data-category="data"] { --card-accent: var(--accent); }
+        .doc-card[data-category="api"] { --card-accent: var(--accent-yellow); }
+        .doc-card[data-category="streaming"] { --card-accent: var(--accent-red); }
+        .doc-card[data-category="business"] { --card-accent: #34d399; }
+
+        /* ═══════════════════════════════════════════════════
+           EMPTY STATE
+           ═══════════════════════════════════════════════════ */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           CLEAR FILTERS
+           ═══════════════════════════════════════════════════ */
+        .clear-filters {
+            display: none;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--accent-light);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px 0;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .clear-filters.visible {
+            display: inline-block;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .main {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: unset;
+                position: relative;
+                top: 0;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-card);
+            }
+            .doc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           SCROLLBAR
+           ═══════════════════════════════════════════════════ */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        /* keyboard shortcut hint */
+        .kbd {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 3px;
+            padding: 1px 5px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <div>
+                <div class="logo">HAZEYDATA</div>
+                <div class="logo-sub">DOCS HUB</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="doc-count-header"></span>
+            <a href="mission-control-v3.html">← Mission Control</a>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <!-- Search -->
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search" placeholder="Search docs…  /" autocomplete="off">
+            </div>
+
+            <!-- Categories -->
+            <div class="filter-section">
+                <div class="filter-label">Categories</div>
+                <div class="filter-buttons" id="category-filters"></div>
+            </div>
+
+            <!-- File Types -->
+            <div class="filter-section">
+                <div class="filter-label">File Types</div>
+                <div class="filter-buttons" id="filetype-filters"></div>
+            </div>
+
+            <!-- Clear -->
+            <button class="clear-filters" id="clear-filters" onclick="clearAllFilters()">✕ Clear all filters</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <div class="results-header">
+                <span class="results-count" id="results-count"></span>
+                <select class="sort-select" id="sort-select" onchange="renderDocs()">
+                    <option value="name">Sort: Name A–Z</option>
+                    <option value="name-desc">Sort: Name Z–A</option>
+                    <option value="category">Sort: Category</option>
+                    <option value="size-desc">Sort: Size ↓</option>
+                    <option value="size-asc">Sort: Size ↑</option>
+                </select>
+            </div>
+            <div class="doc-grid" id="doc-grid"></div>
+            <div class="empty-state" id="empty-state" style="display:none;">
+                <div class="icon">📭</div>
+                <p>No documents match your filters</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ═══════════════════════════════════════════════════
+    // DOCUMENT DATABASE
+    // ═══════════════════════════════════════════════════
+    const docs = [
+        // ── Pipeline ──
+        {
+            title: "Pipeline Architecture Guide",
+            file: "ARCHITECTURE.md",
+            path: "ARCHITECTURE.md",
+            description: "Mandatory data access patterns, pipeline structure, and architectural rules for the project.",
+            category: "pipeline",
+            type: "md",
+            icon: "🏗️",
+            lines: 102
+        },
+        {
+            title: "Pipeline Data Flow",
+            file: "PIPELINE_DATA_FLOW.md",
+            path: "PIPELINE_DATA_FLOW.md",
+            description: "Complete documentation of every step in the daily wait time prediction pipeline. The most comprehensive pipeline doc.",
+            category: "pipeline",
+            type: "md",
+            icon: "🔄",
+            lines: 1028
+        },
+        {
+            title: "Pipeline State — Where We Are",
+            file: "PIPELINE_STATE.md",
+            path: "PIPELINE_STATE.md",
+            description: "Current pipeline setup reference: config, cron, queue-times, and dashboard setup on Linux.",
+            category: "pipeline",
+            type: "md",
+            icon: "📍",
+            lines: 214
+        },
+        {
+            title: "Pipeline Audit (Feb 19)",
+            file: "PIPELINE_AUDIT_20260219.md",
+            path: "PIPELINE_AUDIT_20260219.md",
+            description: "Full audit tracing all inputs/outputs of the pipeline, verifying against methodology docs.",
+            category: "pipeline",
+            type: "md",
+            icon: "🔍",
+            lines: 606
+        },
+        {
+            title: "Pipeline Audit Comparison",
+            file: "PIPELINE_AUDIT_COMPARISON.md",
+            path: "PIPELINE_AUDIT_COMPARISON.md",
+            description: "Independent audit by Barney comparing run_daily_pipeline.sh against Wilma's data flow docs.",
+            category: "pipeline",
+            type: "md",
+            icon: "⚖️",
+            lines: 94
+        },
+        {
+            title: "Closures Module Spec",
+            file: "CLOSURES_MODULE_SPEC.md",
+            path: "CLOSURES_MODULE_SPEC.md",
+            description: "Specification for temporary and permanent attraction closures — excluding closed rides from forecasts and WTI.",
+            category: "pipeline",
+            type: "md",
+            icon: "🚧",
+            lines: 441
+        },
+        {
+            title: "Stale observed_at — Data Quality",
+            file: "STALE_OBSERVED_AT.md",
+            path: "STALE_OBSERVED_AT.md",
+            description: "Data quality consideration: Queue-Times API can return stale last_updated timestamps.",
+            category: "pipeline",
+            type: "md",
+            icon: "⏰",
+            lines: 38
+        },
+
+        // ── Modeling ──
+        {
+            title: "Modeling & WTI Methodology",
+            file: "MODELING_AND_WTI_METHODOLOGY.md",
+            path: "MODELING_AND_WTI_METHODOLOGY.md",
+            description: "Complete methodology for ACTUAL-curve and Wait Time Index, plus data architecture and modeling roadmap.",
+            category: "modeling",
+            type: "md",
+            icon: "📊",
+            lines: 392
+        },
+        {
+            title: "XGBoost Training Parameters",
+            file: "XGBOOST_PARAMS.md",
+            path: "XGBOOST_PARAMS.md",
+            description: "All XGBoost model type params: per-entity (Julia), scope-scale, and conversion model configurations.",
+            category: "modeling",
+            type: "md",
+            icon: "🎛️",
+            lines: 154
+        },
+        {
+            title: "Synthetic Actuals Design",
+            file: "SYNTHETIC_ACTUALS_DESIGN.md",
+            path: "SYNTHETIC_ACTUALS_DESIGN.md",
+            description: "Design document for synthetic actuals generation — approved for implementation.",
+            category: "modeling",
+            type: "md",
+            icon: "🧪",
+            lines: 189
+        },
+        {
+            title: "Park Hours Versioning",
+            file: "PARK_HOURS_VERSIONING.md",
+            path: "PARK_HOURS_VERSIONING.md",
+            description: "System for versioning park hours data when future schedules change — handling limited-horizon updates.",
+            category: "modeling",
+            type: "md",
+            icon: "🕐",
+            lines: 263
+        },
+
+        // ── Data ──
+        {
+            title: "Complete Schema Documentation",
+            file: "SCHEMAS.md",
+            path: "SCHEMAS.md",
+            description: "All fact and dimension table schemas — data types, constraints, defaults, and cleaning rules.",
+            category: "data",
+            type: "md",
+            icon: "🗃️",
+            lines: 330
+        },
+        {
+            title: "Entity System",
+            file: "ENTITY_SYSTEM.md",
+            path: "ENTITY_SYSTEM.md",
+            description: "Canonical entity identification system — source-agnostic entity mapping for all parks and attractions.",
+            category: "data",
+            type: "md",
+            icon: "🏷️",
+            lines: 81
+        },
+        {
+            title: "Entity Metadata Index",
+            file: "ENTITY_INDEX.md",
+            path: "ENTITY_INDEX.md",
+            description: "SQLite database tracking per-entity metadata for efficient modeling workflows.",
+            category: "data",
+            type: "md",
+            icon: "📇",
+            lines: 169
+        },
+        {
+            title: "Column Naming Standard",
+            file: "COLUMN_NAMING_STANDARD.md",
+            path: "COLUMN_NAMING_STANDARD.md",
+            description: "Naming conventions for columns: 'call things what they are' — descriptive, clear names.",
+            category: "data",
+            type: "md",
+            icon: "📐",
+            lines: 87
+        },
+
+        // ── API ──
+        {
+            title: "Predictions API",
+            file: "PREDICTIONS-API.md",
+            path: "PREDICTIONS-API.md",
+            description: "API documentation for historical and predicted wait times — endpoints on wilma-server:8051.",
+            category: "api",
+            type: "md",
+            icon: "🔌",
+            lines: 198
+        },
+        {
+            title: "Discord Bot — DuckDB Migration",
+            file: "DISCORD_BOT_DUCKDB_MIGRATION.md",
+            path: "DISCORD_BOT_DUCKDB_MIGRATION.md",
+            description: "Migration spec for Discord bot to shared DuckDB — fixing broken data feed since Feb 5 scraper crash.",
+            category: "api",
+            type: "md",
+            icon: "🤖",
+            lines: 445
+        },
+
+        // ── Infrastructure ──
+        {
+            title: "Linux Setup Guide",
+            file: "LINUX_SETUP.md",
+            path: "LINUX_SETUP.md",
+            description: "Running the pipeline on Linux — quick start, dependencies, services, and troubleshooting.",
+            category: "infrastructure",
+            type: "md",
+            icon: "🐧",
+            lines: 203
+        },
+        {
+            title: "Mac Mini Setup Checklist",
+            file: "MAC-MINI-SETUP-CHECKLIST.md",
+            path: "MAC-MINI-SETUP-CHECKLIST.md",
+            description: "Complete setup checklist for Mac Mini — stream-ready for Twitch + YouTube cross-platform.",
+            category: "infrastructure",
+            type: "md",
+            icon: "🖥️",
+            lines: 177
+        },
+        {
+            title: "Stripe Premium Setup",
+            file: "STRIPE_PREMIUM_SETUP.md",
+            path: "STRIPE_PREMIUM_SETUP.md",
+            description: "TPCR Premium ($12/mo) subscription setup — Stripe integration with Discord Premium role.",
+            category: "business",
+            type: "md",
+            icon: "💳",
+            lines: 59
+        },
+
+        // ── Design ──
+        {
+            title: "Live Now Card Spec",
+            file: "LIVE_NOW_CARD_SPEC.md",
+            path: "LIVE_NOW_CARD_SPEC.md",
+            description: "Design & build spec for shareable current-wait-times card — Discord primary, web secondary.",
+            category: "design",
+            type: "md",
+            icon: "🎨",
+            lines: 165
+        },
+        {
+            title: "Pencil + Figma Setup",
+            file: "PENCIL_FIGMA_SETUP.md",
+            path: "PENCIL_FIGMA_SETUP.md",
+            description: "Using Pencil extension to turn Figma designs into live HTML/CSS — Cursor/VS Code integration.",
+            category: "design",
+            type: "md",
+            icon: "✏️",
+            lines: 48
+        },
+        {
+            title: "Google Doc Content",
+            file: "GOOGLE_DOC_CONTENT.md",
+            path: "GOOGLE_DOC_CONTENT.md",
+            description: "Single source of truth for shared Google Doc content — synced with project docs.",
+            category: "design",
+            type: "md",
+            icon: "📄",
+            lines: 175
+        },
+
+        // ── Streaming ──
+        {
+            title: "Stream Overlay Specs",
+            file: "stream/STREAM-OVERLAY-SPECS.md",
+            path: "stream/STREAM-OVERLAY-SPECS.md",
+            description: "Full specifications for Streamlabs overlay layout — boxes, positions, sizes, and sources.",
+            category: "streaming",
+            type: "md",
+            icon: "📺",
+            lines: null
+        },
+        {
+            title: "Stream Dashboard Analysis",
+            file: "stream/DASHBOARD_ANALYSIS.md",
+            path: "stream/DASHBOARD_ANALYSIS.md",
+            description: "Analysis of the stream dashboard layout and components.",
+            category: "streaming",
+            type: "md",
+            icon: "📈",
+            lines: null
+        },
+        {
+            title: "Wilma Server Stream Setup",
+            file: "stream/SETUP_WILMA_SERVER.md",
+            path: "stream/SETUP_WILMA_SERVER.md",
+            description: "Setting up wilma-server for streaming services and overlays.",
+            category: "streaming",
+            type: "md",
+            icon: "🖧",
+            lines: null
+        },
+        {
+            title: "Main Stream Dashboard",
+            file: "stream/main-dashboard.html",
+            path: "stream/main-dashboard.html",
+            description: "Primary stream overlay dashboard — live data display for Twitch/YouTube streams.",
+            category: "streaming",
+            type: "html",
+            icon: "📊",
+            lines: null
+        },
+        {
+            title: "Stream Dashboard",
+            file: "stream/stream-dashboard.html",
+            path: "stream/stream-dashboard.html",
+            description: "Alternative stream dashboard layout.",
+            category: "streaming",
+            type: "html",
+            icon: "📊",
+            lines: null
+        },
+        {
+            title: "Starting Soon Overlay",
+            file: "stream/starting-soon.html",
+            path: "stream/starting-soon.html",
+            description: "Pre-stream 'Starting Soon' overlay scene.",
+            category: "streaming",
+            type: "html",
+            icon: "⏳",
+            lines: null
+        },
+        {
+            title: "Stream Ending Overlay",
+            file: "stream/stream-ending.html",
+            path: "stream/stream-ending.html",
+            description: "End-of-stream overlay scene.",
+            category: "streaming",
+            type: "html",
+            icon: "👋",
+            lines: null
+        },
+        {
+            title: "Be Right Back Overlay",
+            file: "stream/be-right-back.html",
+            path: "stream/be-right-back.html",
+            description: "BRB screen overlay for stream breaks.",
+            category: "streaming",
+            type: "html",
+            icon: "⏸️",
+            lines: null
+        },
+        {
+            title: "Just Chatting Overlay",
+            file: "stream/just-chatting.html",
+            path: "stream/just-chatting.html",
+            description: "Just Chatting scene overlay for non-data stream segments.",
+            category: "streaming",
+            type: "html",
+            icon: "💬",
+            lines: null
+        },
+        {
+            title: "Daily Curve Overlay",
+            file: "stream/daily-curve.html",
+            path: "stream/daily-curve.html",
+            description: "Live daily wait time curve visualization overlay.",
+            category: "streaming",
+            type: "html",
+            icon: "📈",
+            lines: null
+        },
+        {
+            title: "Development Overlay",
+            file: "stream/development.html",
+            path: "stream/development.html",
+            description: "Development/coding scene overlay.",
+            category: "streaming",
+            type: "html",
+            icon: "🛠️",
+            lines: null
+        },
+        {
+            title: "Fred & Wilma Chat Overlay",
+            file: "stream/fred-wilma-chat.html",
+            path: "stream/fred-wilma-chat.html",
+            description: "On-stream chat overlay showing Fred & Wilma conversation.",
+            category: "streaming",
+            type: "html",
+            icon: "🦴",
+            lines: null
+        },
+
+        // ── Other top-level project docs ──
+        {
+            title: "Mission Control v3",
+            file: "mission-control-v3.html",
+            path: "mission-control-v3.html",
+            description: "The main Mission Control dashboard — pipeline status, tasks, quick links.",
+            category: "infrastructure",
+            type: "html",
+            icon: "🚀",
+            lines: null
+        },
+        {
+            title: "CronMagic Dashboard",
+            file: "cronmagic/index.html",
+            path: "cronmagic/index.html",
+            description: "Cron job management and monitoring dashboard.",
+            category: "infrastructure",
+            type: "html",
+            icon: "⏱️",
+            lines: null
+        }
+    ];
+
+    // ═══════════════════════════════════════════════════
+    // CATEGORY & TYPE CONFIG
+    // ═══════════════════════════════════════════════════
+    const categoryConfig = {
+        pipeline:       { label: "Pipeline",       color: "pipeline" },
+        modeling:        { label: "Modeling",        color: "modeling" },
+        data:            { label: "Data",            color: "data" },
+        api:             { label: "API & Bots",      color: "api" },
+        infrastructure:  { label: "Infrastructure",  color: "infrastructure" },
+        design:          { label: "Design",          color: "design" },
+        streaming:       { label: "Streaming",       color: "streaming" },
+        business:        { label: "Business",        color: "business" }
+    };
+
+    const typeConfig = {
+        md:   { label: "Markdown", icon: "📝" },
+        html: { label: "HTML",     icon: "🌐" }
+    };
+
+    // ═══════════════════════════════════════════════════
+    // STATE
+    // ═══════════════════════════════════════════════════
+    let activeCategories = new Set();
+    let activeTypes = new Set();
+    let searchQuery = "";
+
+    // ═══════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════
+    function init() {
+        buildCategoryFilters();
+        buildTypeFilters();
+        renderDocs();
+        document.getElementById("search").addEventListener("input", (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            renderDocs();
+        });
+        // / keyboard shortcut to focus search
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "/" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
+                e.preventDefault();
+                document.getElementById("search").focus();
+            }
+            if (e.key === "Escape") {
+                document.getElementById("search").blur();
+            }
+        });
+    }
+
+    function buildCategoryFilters() {
+        const container = document.getElementById("category-filters");
+        const counts = {};
+        docs.forEach(d => { counts[d.category] = (counts[d.category] || 0) + 1; });
+
+        Object.entries(categoryConfig).forEach(([key, cfg]) => {
+            if (!counts[key]) return;
+            const btn = document.createElement("button");
+            btn.className = "filter-btn";
+            btn.dataset.category = key;
+            btn.innerHTML = `<span class="cat-dot ${cfg.color}"></span>${cfg.label}<span class="count">${counts[key]}</span>`;
+            btn.onclick = () => toggleFilter("category", key, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function buildTypeFilters() {
+        const container = document.getElementById("filetype-filters");
+        const counts = {};
+        docs.forEach(d => { counts[d.type] = (counts[d.type] || 0) + 1; });
+
+        Object.entries(typeConfig).forEach(([key, cfg]) => {
+            if (!counts[key]) return;
+            const btn = document.createElement("button");
+            btn.className = "filter-btn";
+            btn.dataset.type = key;
+            btn.innerHTML = `${cfg.icon} ${cfg.label}<span class="count">${counts[key]}</span>`;
+            btn.onclick = () => toggleFilter("type", key, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function toggleFilter(kind, value, btn) {
+        const set = kind === "category" ? activeCategories : activeTypes;
+        if (set.has(value)) {
+            set.delete(value);
+            btn.classList.remove("active");
+        } else {
+            set.add(value);
+            btn.classList.add("active");
+        }
+        updateClearButton();
+        renderDocs();
+    }
+
+    function clearAllFilters() {
+        activeCategories.clear();
+        activeTypes.clear();
+        searchQuery = "";
+        document.getElementById("search").value = "";
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        updateClearButton();
+        renderDocs();
+    }
+
+    function updateClearButton() {
+        const btn = document.getElementById("clear-filters");
+        const hasFilters = activeCategories.size > 0 || activeTypes.size > 0 || searchQuery;
+        btn.classList.toggle("visible", hasFilters);
+    }
+
+    // ═══════════════════════════════════════════════════
+    // RENDER
+    // ═══════════════════════════════════════════════════
+    function renderDocs() {
+        let filtered = docs.filter(d => {
+            if (activeCategories.size > 0 && !activeCategories.has(d.category)) return false;
+            if (activeTypes.size > 0 && !activeTypes.has(d.type)) return false;
+            if (searchQuery) {
+                const hay = (d.title + " " + d.description + " " + d.file + " " + d.category).toLowerCase();
+                return hay.includes(searchQuery);
+            }
+            return true;
+        });
+
+        // Sort
+        const sortBy = document.getElementById("sort-select").value;
+        filtered.sort((a, b) => {
+            if (sortBy === "name") return a.title.localeCompare(b.title);
+            if (sortBy === "name-desc") return b.title.localeCompare(a.title);
+            if (sortBy === "category") return a.category.localeCompare(b.category) || a.title.localeCompare(b.title);
+            if (sortBy === "size-desc") return (b.lines || 0) - (a.lines || 0);
+            if (sortBy === "size-asc") return (a.lines || 0) - (b.lines || 0);
+            return 0;
+        });
+
+        const grid = document.getElementById("doc-grid");
+        const empty = document.getElementById("empty-state");
+
+        if (filtered.length === 0) {
+            grid.innerHTML = "";
+            empty.style.display = "block";
+        } else {
+            empty.style.display = "none";
+            grid.innerHTML = filtered.map(d => {
+                const catCfg = categoryConfig[d.category];
+                const typeCfg = typeConfig[d.type];
+                const sizeStr = d.lines ? `${d.lines} lines` : "";
+                // GitHub Pages raw link for markdown, direct for HTML
+                const url = d.type === "html"
+                    ? d.path
+                    : `https://github.com/hazeydata/theme-park-crowd-report/blob/main/docs/${d.path}`;
+
+                return `<a class="doc-card" data-category="${d.category}" href="${url}" target="_blank">
+                    <div class="doc-card-header">
+                        <span class="doc-icon">${d.icon}</span>
+                        <div class="doc-title">${highlightMatch(d.title)}</div>
+                    </div>
+                    <div class="doc-description">${highlightMatch(d.description)}</div>
+                    <div class="doc-meta">
+                        <span class="doc-tag category"><span class="cat-dot ${catCfg.color}"></span>${catCfg.label}</span>
+                        <span class="doc-tag filetype">${typeCfg.icon} ${d.type.toUpperCase()}</span>
+                        ${sizeStr ? `<span class="doc-tag size">${sizeStr}</span>` : ""}
+                    </div>
+                </a>`;
+            }).join("");
+        }
+
+        // Update counts
+        document.getElementById("results-count").textContent =
+            `${filtered.length} of ${docs.length} documents`;
+        document.getElementById("doc-count-header").textContent =
+            `${docs.length} docs`;
+        updateClearButton();
+    }
+
+    function highlightMatch(text) {
+        if (!searchQuery) return text;
+        const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<mark style="background:rgba(74,144,164,0.35);color:#fff;border-radius:2px;padding:0 2px;">$1</mark>');
+    }
+
+    // GO
+    init();
+    </script>
+</body>
+</html>
