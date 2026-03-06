@@ -4,7 +4,7 @@
     {
       "id": "fred",
       "name": "Fred",
-      "icon": "🧔",
+      "icon": "\ud83e\uddd4",
       "state": "working",
       "zone": "desk-2",
       "task": "Reviewing bugs & Office page",
@@ -13,7 +13,7 @@
     {
       "id": "wilma",
       "name": "Wilma",
-      "icon": "🦴",
+      "icon": "\ud83e\uddb4",
       "state": "working",
       "zone": "desk-1",
       "task": "Fixing Office activity tracking",
@@ -22,7 +22,7 @@
     {
       "id": "barney",
       "name": "Barney",
-      "icon": "🪨",
+      "icon": "\ud83e\udea8",
       "state": "idle",
       "zone": "tarpit-2",
       "task": "Available on claude.ai",
@@ -31,16 +31,25 @@
     {
       "id": "bambam",
       "name": "Bam-Bam",
-      "icon": "🔨",
+      "icon": "\ud83d\udd28",
       "state": "working",
       "zone": "desk-3",
       "task": "Pushed 3 commits recently",
       "color": "#c084fc"
     },
     {
+      "id": "mr-slate",
+      "name": "Mr. Slate",
+      "icon": "\ud83d\udcbc",
+      "state": "idle",
+      "zone": "corner-office",
+      "task": "Reviewing the quarterly numbers",
+      "color": "#fb923c"
+    },
+    {
       "id": "dino",
       "name": "Dino",
-      "icon": "🦕",
+      "icon": "\ud83e\udd95",
       "state": "idle",
       "zone": "pen-1",
       "task": "Waiting for a task",
@@ -49,7 +58,7 @@
     {
       "id": "pebbles",
       "name": "Pebbles",
-      "icon": "🎀",
+      "icon": "\ud83c\udf80",
       "state": "idle",
       "zone": "pen-2",
       "task": "Waiting for a task",
@@ -58,7 +67,7 @@
     {
       "id": "betty",
       "name": "Betty",
-      "icon": "✍️",
+      "icon": "\u270d\ufe0f",
       "state": "idle",
       "zone": "pen-3",
       "task": "Waiting for a task",
@@ -67,10 +76,10 @@
     {
       "id": "gazoo",
       "name": "Gazoo",
-      "icon": "👽",
+      "icon": "\ud83d\udc7d",
       "state": "idle",
       "zone": "float-1",
-      "task": "Observing the dum-dums…",
+      "task": "Observing the dum-dums\u2026",
       "color": "#34d399"
     }
   ],
@@ -93,7 +102,7 @@
     {
       "time": "08:34",
       "agent": "fred",
-      "text": "Morning check-in — reviewing The Office page"
+      "text": "Morning check-in \u2014 reviewing The Office page"
     },
     {
       "time": "23:58",

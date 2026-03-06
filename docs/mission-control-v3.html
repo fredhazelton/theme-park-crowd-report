@@ -776,6 +776,7 @@
         .task-owner-badge.Fred { background: rgba(96,165,250,0.2); color: #60a5fa; }
         .task-owner-badge.Wilma { background: rgba(34,211,238,0.2); color: #22d3ee; }
         .task-owner-badge.Bam-Bam { background: rgba(251,146,60,0.2); color: #fb923c; }
+        .task-owner-badge.Mr-Slate { background: rgba(251,146,60,0.2); color: #fb923c; }
         .priority-dot {
             width: 8px; height: 8px;
             border-radius: 50%;
@@ -1671,7 +1672,7 @@
             border-radius: 10px;
             flex-shrink: 0;
         }
-        .social-account-icon.twitter { background: rgba(29,155,240,0.15); }
+        .social-account-icon.x { background: rgba(29,155,240,0.15); }
         .social-account-icon.youtube { background: rgba(255,0,0,0.12); }
         .social-account-icon.tiktok { background: rgba(255,255,255,0.08); }
         .social-account-icon.twitch { background: rgba(145,70,255,0.15); }
@@ -2506,6 +2507,7 @@
                 <span class="owner-pill" data-owner="Fred" onclick="filterOwner('Fred')">🪨 Fred</span>
                 <span class="owner-pill" data-owner="Wilma" onclick="filterOwner('Wilma')">🦴 Wilma</span>
                 <span class="owner-pill" data-owner="Bam-Bam" onclick="filterOwner('Bam-Bam')">🏏 Bam-Bam</span>
+                <span class="owner-pill" data-owner="Mr. Slate" onclick="filterOwner('Mr. Slate')">💼 Mr. Slate</span>
             </div>
             <select class="project-filter" id="projectFilter" onchange="filterProject()">
                 <option value="all">All Projects</option>
@@ -2706,6 +2708,7 @@
                 <option value="Fred">🪨 Fred</option>
                 <option value="Wilma" selected>🦴 Wilma</option>
                 <option value="Bam-Bam">🏏 Bam-Bam</option>
+                <option value="Mr. Slate">💼 Mr. Slate</option>
             </select>
         </div>
         <div class="modal-field">
@@ -3456,7 +3459,7 @@ function renderTasks() {
             <div class="task-card" onclick="toggleTaskCard(this)">
                 <div class="task-card-title">${escHtml(t.title)}</div>
                 <div class="task-card-meta">
-                    <span class="task-owner-badge ${t.owner}">${{Fred:'🪨',Wilma:'🦴','Bam-Bam':'🏏'}[t.owner]||'👤'} ${t.owner}</span>
+                    <span class="task-owner-badge ${t.owner}">${{Fred:'🪨',Wilma:'🦴','Bam-Bam':'🏏','Mr. Slate':'💼'}[t.owner]||'👤'} ${t.owner}</span>
                     <span class="priority-dot ${t.priority}" title="${t.priority} priority"></span>
                     <span class="task-project-tag">${escHtml(t.project)}</span>
                 </div>
@@ -3483,7 +3486,7 @@ function renderLiveActivity(activities) {
     }
 
     body.innerHTML = activities.map(a => {
-        const avatarEmoji = {Fred:'🪨',Wilma:'🦴','Bam-Bam':'🏏',Dino:'🦕',Pebbles:'🎀',Betty:'✍️',Barney:'🧠'}[a.agent] || (a.agent ? a.agent[0] : '?');
+        const avatarEmoji = {Fred:'🪨',Wilma:'🦴','Bam-Bam':'🏏','Mr. Slate':'💼',Dino:'🦕',Pebbles:'🎀',Betty:'✍️',Barney:'🧠'}[a.agent] || (a.agent ? a.agent[0] : '?');
         const initial = avatarEmoji;
         const timeAgo = getTimeAgo(a.started);
         const isActive = a.status === 'active';
@@ -3628,7 +3631,7 @@ function renderProjects() {
     document.getElementById('projectsSubtitle').textContent =
         `${s.total} total · ${s.active} active · ${s.planning} planning`;
 
-    const ownerEmoji = { Fred: '🪨', Wilma: '🦴', 'Bam-Bam': '🏏' };
+    const ownerEmoji = { Fred: '🪨', Wilma: '🦴', 'Bam-Bam': '🏏', 'Mr. Slate': '💼' };
 
     const grid = document.getElementById('projectsGrid');
     grid.innerHTML = data.projects.map(p => {
@@ -3881,7 +3884,7 @@ function renderSocial() {
     if (!data) return;
 
     const iconMap = {
-        twitter: '🐦', youtube: '▶️', tiktok: '🎵',
+        x: '𝕏', youtube: '▶️', tiktok: '🎵',
         twitch: '🎮', reddit: '🟠', instagram: '📸',
         facebook: '📘', pinterest: '📌'
     };
@@ -3986,7 +3989,7 @@ function renderIdeas() {
     const statusOrder = { new: 0, exploring: 1, approved: 2, rejected: 3 };
     ideas = [...ideas].sort((a, b) => (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0));
 
-    const ownerEmoji = { Fred: '🪨', Wilma: '🦴', 'Bam-Bam': '🏏', Pebbles: '🎀', Barney: '🧠', Betty: '✍️' };
+    const ownerEmoji = { Fred: '🪨', Wilma: '🦴', 'Bam-Bam': '🏏', 'Mr. Slate': '💼', Pebbles: '🎀', Barney: '🧠', Betty: '✍️' };
 
     grid.innerHTML = ideas.map(i => `
         <div class="idea-card">

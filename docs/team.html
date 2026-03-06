@@ -228,6 +228,7 @@
         .agent-card.design { --card-accent: var(--accent-pink); }
         .agent-card.writer { --card-accent: var(--accent-red); }
         .agent-card.critic { --card-accent: #34d399; }
+        .agent-card.business { --card-accent: var(--accent-orange); }
 
         /* Wide variant for Fred & Wilma */
         .agent-card.wide {
@@ -508,7 +509,7 @@
         <div style="text-align:center;margin-bottom:50px;">
             <div class="page-title">Meet the Flintstones Crew</div>
             <div class="page-stats" style="margin-bottom:24px;">
-                <span>1</span> human · <span>3</span> core agents · <span>4</span> sub-agents · <span>2</span> machines
+                <span>1</span> human · <span>4</span> core agents · <span>4</span> sub-agents · <span>2</span> machines
             </div>
 
             <!-- Mission Statement -->
@@ -764,6 +765,43 @@
                         <strong>Reports to:</strong> Fred & Wilma
                     </div>
                 </div>
+
+                <!-- MR. SLATE -->
+                <div class="agent-card business">
+                    <div class="card-header">
+                        <div class="card-avatar">💼</div>
+                        <div>
+                            <div class="card-name">Mr. Slate</div>
+                            <div class="card-title">Chief Business Officer</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        The Roy Disney to our Walt. Tracks every dollar in and out, validates that work maps
+                        to revenue, and keeps the team honest about business fundamentals.
+                        If it doesn't make money, Slate wants to know why.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag orange">Finance</span>
+                        <span class="skill-tag orange">Revenue</span>
+                        <span class="skill-tag green">Business Strategy</span>
+                        <span class="skill-tag green">ROI Analysis</span>
+                        <span class="skill-tag orange">Cost Tracking</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🐧</span> wilma-server</div>
+                        <div class="card-detail"><span class="icon">🤖</span> Claude · Sub-agent</div>
+                        <div class="card-detail"><span class="status-dot on-demand"></span> On-demand</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Model:</strong> Claude (spawned by Wilma via Clawdbot)<br>
+                        <strong>Tracks:</strong> All expenses and revenue. Monthly business reviews.<br>
+                        <strong>Enforces:</strong> ROI on new initiatives — every idea gets a business case<br>
+                        <strong>Goal:</strong> Guide company toward $3-5M/yr revenue<br><br>
+                        <strong>Catchphrase:</strong> "FLINTSTONE! What's the revenue impact?"<br>
+                        <strong>Reports to:</strong> Fred
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -945,6 +983,7 @@
                         <div>🧔 Fred ↔ 🔨 Bam-Bam <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via Cursor IDE</span></div>
                         <div>🦴 Wilma ↔ 🔨 Bam-Bam <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via WILMA-BAMBAM.md</span></div>
                         <div>🦴 Wilma → 🦕🎀✍️👽 Sub-agents <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via sessions_spawn</span></div>
+                        <div>💼 Mr. Slate → 🧔 Fred, 🦴 Wilma <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via Discord #mr-slate</span></div>
                         <div>👽 Gazoo → Everyone <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> nightly review (read-only)</span></div>
                     </div>
                 </div>
