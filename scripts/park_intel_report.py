@@ -27,6 +27,9 @@ import duckdb
 
 WTI_PARQUET = "/mnt/data/pipeline/wti/wti.parquet"
 
+# Park codes to always ignore (water parks, etc.)
+IGNORE_PARKS = {"BB"}  # BB = Blizzard Beach
+
 PARK_NAMES = {
     "MK":  "Magic Kingdom",
     "EP":  "EPCOT",
