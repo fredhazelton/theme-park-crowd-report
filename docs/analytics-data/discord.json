@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T16:30:01Z",
+  "generated_at": "2026-03-06T16:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-06T16:00:02.093000+00:00"
+          "last_active": "2026-03-06T16:30:01.379000+00:00"
         },
         {
           "name": "daily-digest",
@@ -165,6 +165,17 @@
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
       "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-06T16:30:01.379000+00:00",
+      "message_id": "1479516414821011582",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479516414821011582"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
       "timestamp": "2026-03-06T16:00:02.093000+00:00",
       "message_id": "1479508868068278282",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479508868068278282"
@@ -245,17 +256,6 @@
       "timestamp": "2026-03-06T15:08:38.494000+00:00",
       "message_id": "1479495934516658178",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479495934516658178"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "#3 for sure - all of the acticity in the office shoudl be activity based",
-      "timestamp": "2026-03-06T14:55:29.582000+00:00",
-      "message_id": "1479492625580167252",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479492625580167252"
     },
     {
       "channel": "alerts",
