@@ -14,6 +14,7 @@ Output: wti/wti.parquet with columns:
 
 import argparse
 import logging
+import os
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -30,13 +31,16 @@ def setup_logging() -> logging.Logger:
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / f"calculate_wti_simple_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
     
+    handlers = [logging.StreamHandler(sys.stdout)]
+    # Only add file handler when NOT running under the pipeline's tee
+    # (PIPELINE_LOG env var is set by run_daily_pipeline.sh)
+    if not os.environ.get("PIPELINE_LOG"):
+        handlers.append(logging.FileHandler(log_file, encoding="utf-8"))
+    
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[
-            logging.FileHandler(log_file, encoding="utf-8"),
-            logging.StreamHandler(sys.stdout),
-        ],
+        handlers=handlers,
     )
     return logging.getLogger(__name__)
 

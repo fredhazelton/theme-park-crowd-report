@@ -192,6 +192,7 @@ if $SKIP_IF_UNCHANGED; then
 fi
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Daily pipeline started. Output base: $OUTPUT_BASE" >> "$LOG_FILE"
+export PIPELINE_LOG="$LOG_FILE"  # Tells Python scripts to skip file handlers (tee handles it)
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 run_step() {
