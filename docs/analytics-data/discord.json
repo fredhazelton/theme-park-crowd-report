@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T17:45:01Z",
+  "generated_at": "2026-03-06T18:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-06T16:30:01.379000+00:00"
+          "last_active": "2026-03-06T18:00:01.576000+00:00"
         },
         {
           "name": "daily-digest",
@@ -159,6 +159,17 @@
   ],
   "recent_activity": [
     {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-06T18:00:01.576000+00:00",
+      "message_id": "1479539064888885329",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479539064888885329"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -267,17 +278,6 @@
       "timestamp": "2026-03-06T15:11:19.031000+00:00",
       "message_id": "1479496607857774673",
       "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479496607857774673"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-06T15:08:38.494000+00:00",
-      "message_id": "1479495934516658178",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479495934516658178"
     },
     {
       "channel": "alerts",
