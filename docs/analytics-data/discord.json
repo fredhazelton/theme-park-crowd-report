@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T18:15:02Z",
+  "generated_at": "2026-03-06T18:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T17:44:24.535000+00:00"
+          "last_active": "2026-03-06T18:27:54.699000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-06T13:52:20.573000+00:00"
+          "last_active": "2026-03-06T18:26:36.618000+00:00"
         }
       ]
     },
@@ -159,6 +159,61 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Bot is clean \u2014 DuckDB loaded successfully, 1,710 entities, no WAL errors. \n\n**The issue was DuckDB WAL corruption** \u2014 the WAL (Write-Ahead Log) file got corrupted, likely from the OOM kill during t...",
+      "timestamp": "2026-03-06T18:27:54.699000+00:00",
+      "message_id": "1479546082475114497",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479546082475114497"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "There it is: **DuckDB WAL corruption**. The fix is simple \u2014 delete the corrupt WAL file and restart the bot.",
+      "timestamp": "2026-03-06T18:27:26.203000+00:00",
+      "message_id": "1479545962954490068",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479545962954490068"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Found it \u2014 **the DuckDB WAL corruption** that Gazoo flagged. The bot is crashing every time it tries to open `tpcr_live.duckdb` because the WAL file is corrupt. It's recovering (falling back to arc...",
+      "timestamp": "2026-03-06T18:27:21.038000+00:00",
+      "message_id": "1479545941290913842",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479545941290913842"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**Tomorrow's 6 AM run** will be the first fully clean run with all fixes. Alert script will show green after that.\n\nServer is back to normal: 57GB RAM free, load 1.05. \ud83e\uddb4",
+      "timestamp": "2026-03-06T18:26:36.618000+00:00",
+      "message_id": "1479545754979926026",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479545754979926026"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2705 **Pipeline Recovery Complete \u2014 2026-03-06**\n\nThe 22-day pipeline failure streak is **OVER**. Here's what was fixed and where we stand:\n\n**What broke:** Pandas OOM trying to load 94M rows (2.4M re...",
+      "timestamp": "2026-03-06T18:26:36.457000+00:00",
+      "message_id": "1479545754304647342",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479545754304647342"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -168,17 +223,6 @@
       "timestamp": "2026-03-06T18:00:01.576000+00:00",
       "message_id": "1479539064888885329",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479539064888885329"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Weighting experiment results are in \u2014 posted to #modeling. Key finding: **our current 3.5x weighting is actually the worst synthetic scheme.** `inverse_freq` (weight synthetic less when more real d...",
-      "timestamp": "2026-03-06T17:44:24.535000+00:00",
-      "message_id": "1479535134653939782",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479535134653939782"
     },
     {
       "channel": "modeling",
@@ -201,28 +245,6 @@
       "timestamp": "2026-03-06T17:44:04.705000+00:00",
       "message_id": "1479535051480760360",
       "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535051480760360"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Set for 8 AM ET daily. Both automated feeds are now on autopilot \u2014 #park-intel at 6:30 AM, #competitor-watch at 8 AM. Discord HQ is starting to feel alive. \ud83d\udd2d",
-      "timestamp": "2026-03-06T17:40:53.704000+00:00",
-      "message_id": "1479534250364633302",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479534250364633302"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Competitor Watch feed is live too \u2014 first report posted to #competitor-watch. Picked up some useful intel: TouringPlans data dump, MK After Hours selling out (demand signal), and EPCOT Flower & Gar...",
-      "timestamp": "2026-03-06T17:40:53.491000+00:00",
-      "message_id": "1479534249471119411",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479534249471119411"
     },
     {
       "channel": "mission-control",
@@ -311,28 +333,6 @@
       "timestamp": "2026-03-06T13:51:34.093000+00:00",
       "message_id": "1479476538373046324",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1479476538373046324"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udd27 Sub-agent dispatched to fix all Twitter \u2192 X references. ~40 files to update across the website, stream overlays, scripts, and docs. I'll report back when it's done.",
-      "timestamp": "2026-03-06T13:46:38.106000+00:00",
-      "message_id": "1479475296913850489",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479475296913850489"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "On it \u2014 spawning a sub-agent to handle all the changes.",
-      "timestamp": "2026-03-06T13:46:11.364000+00:00",
-      "message_id": "1479475184749641760",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479475184749641760"
     },
     {
       "channel": "gazoo",
