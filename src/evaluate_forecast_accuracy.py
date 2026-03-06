@@ -198,172 +198,180 @@ def evaluate_accuracy(
         entity_df: per-entity-date accuracy (aggregated)
         wti_df: per-park-date WTI accuracy
     """
-    if not eval_dates:
-        return None, None, None
+    slot_df = None
+    entity_df = None
     
-    # Find the archived forecast that would have predicted these dates
-    archive_dir = os.path.join(output_base, "accuracy", "archive")
-    archive_files = sorted([
-        os.path.join(archive_dir, f)
-        for f in os.listdir(archive_dir)
-        if f.startswith("forecast_") and f.endswith(".parquet")
-    ])
-    
-    if not archive_files:
-        log.warning("No archived forecasts found — first run. Archiving current forecast.")
-        return None, None, None
-    
-    # Use the most recent archive that was made BEFORE the earliest eval date
-    # (i.e., the forecast that was predicting these dates ahead of time)
-    earliest_eval = min(eval_dates)
-    valid_archives = [
-        f for f in archive_files 
-        if os.path.basename(f).replace("forecast_", "").replace(".parquet", "") < earliest_eval
-    ]
-    forecast_archive = valid_archives[-1] if valid_archives else archive_files[0]
-    log.info("Using archived forecast: %s", os.path.basename(forecast_archive))
-    
-    # Load fact tables for eval dates
-    fact_dir = os.path.join(output_base, "fact_tables", "parquet")
-    recent_parquets = sorted([
-        os.path.join(fact_dir, f)
-        for f in os.listdir(fact_dir)
-        if f.endswith(".parquet") and f >= "2026-01"
-    ])[-3:]
-    
-    parquet_glob = "', '".join(recent_parquets)
-    date_list = "', '".join(eval_dates)
-    synth_dir = os.path.join(output_base, "synthetic_actuals")
-    synth_glob = synth_dir.replace("\\", "/") + "/*.parquet"
+    if eval_dates:
+        # === SLOT-LEVEL AND ENTITY-LEVEL ACCURACY ===
+        # Find the archived forecast that would have predicted these dates
+        archive_dir = os.path.join(output_base, "accuracy", "archive")
+        archive_files = sorted([
+            os.path.join(archive_dir, f)
+            for f in os.listdir(archive_dir)
+            if f.startswith("forecast_") and f.endswith(".parquet")
+        ])
+        
+        if not archive_files:
+            log.warning("No archived forecasts found — first run. Archiving current forecast.")
+            return None, None, None
+        
+        # Use the most recent archive that was made BEFORE the earliest eval date
+        # (i.e., the forecast that was predicting these dates ahead of time)
+        earliest_eval = min(eval_dates)
+        valid_archives = [
+            f for f in archive_files 
+            if os.path.basename(f).replace("forecast_", "").replace(".parquet", "") < earliest_eval
+        ]
+        forecast_archive = valid_archives[-1] if valid_archives else archive_files[0]
+        log.info("Using archived forecast: %s", os.path.basename(forecast_archive))
+        
+        # Load fact tables for eval dates
+        fact_dir = os.path.join(output_base, "fact_tables", "parquet")
+        recent_parquets = sorted([
+            os.path.join(fact_dir, f)
+            for f in os.listdir(fact_dir)
+            if f.endswith(".parquet") and f >= "2026-01"
+        ])[-3:]
+        
+        parquet_glob = "', '".join(recent_parquets)
+        date_list = "', '".join(eval_dates)
+        synth_dir = os.path.join(output_base, "synthetic_actuals")
+        synth_glob = synth_dir.replace("\\", "/") + "/*.parquet"
 
-    # actuals_raw: raw ACTUAL from fact tables
-    # actuals_synth: synthetic actuals (POSTED→converted) — increases coverage
-    # actuals_bucketed: prefer raw when available, else synthetic
-    actuals_cte = f"""
-        WITH actuals_raw AS (
+        # actuals_raw: raw ACTUAL from fact tables
+        # actuals_synth: synthetic actuals (POSTED→converted) — increases coverage
+        # actuals_bucketed: prefer raw when available, else synthetic
+        actuals_cte = f"""
+            WITH actuals_raw AS (
+                SELECT
+                    entity_code,
+                    park_date::VARCHAR as park_date,
+                    TIME_BUCKET(INTERVAL '5 minutes',
+                        (observed_at_ts::TIMESTAMP + INTERVAL '2 minutes 30 seconds'))::TIME as time_slot,
+                    AVG(wait_time_minutes) as actual_wait,
+                    COUNT(*) as n_obs
+                FROM read_parquet(['{parquet_glob}'])
+                WHERE wait_time_type = 'ACTUAL'
+                AND park_date::VARCHAR IN ('{date_list}')
+                GROUP BY entity_code, park_date, time_slot
+            )"""
+        synth_parquets = [f for f in (os.listdir(synth_dir) or []) if f.endswith(".parquet")] if os.path.exists(synth_dir) else []
+        if synth_parquets:
+            # Include synthetic actuals for slots without raw — dramatically increases coverage
+            actuals_cte += f""",
+            actuals_synth AS (
+                SELECT
+                    entity_code,
+                    park_date::VARCHAR as park_date,
+                    TIME_BUCKET(INTERVAL '5 minutes',
+                        (CAST(observed_at AS TIMESTAMP) + INTERVAL '2 minutes 30 seconds'))::TIME as time_slot,
+                    AVG(synthetic_actual) as actual_wait,
+                    COUNT(*) as n_obs
+                FROM read_parquet('{synth_glob}')
+                WHERE park_date::VARCHAR IN ('{date_list}')
+                AND synthetic_actual > 0
+                GROUP BY entity_code, park_date, time_slot
+            ),
+            actuals_bucketed AS (
+                SELECT
+                    COALESCE(r.entity_code, s.entity_code) as entity_code,
+                    COALESCE(r.park_date, s.park_date) as park_date,
+                    COALESCE(r.time_slot, s.time_slot) as time_slot,
+                    COALESCE(r.actual_wait, s.actual_wait) as actual_wait,
+                    COALESCE(r.n_obs, 0) + COALESCE(s.n_obs, 0) as n_obs
+                FROM actuals_raw r
+                FULL OUTER JOIN actuals_synth s
+                    ON r.entity_code = s.entity_code
+                    AND r.park_date = s.park_date
+                    AND r.time_slot = s.time_slot
+            )"""
+        else:
+            actuals_cte += """,
+            actuals_bucketed AS (
+                SELECT entity_code, park_date, time_slot, actual_wait, n_obs FROM actuals_raw
+            )"""
+
+        # === SLOT-LEVEL ACCURACY ===
+        slot_df = con.execute(f"""
+            {actuals_cte},
+            forecasts AS (
+                SELECT
+                    entity_code,
+                    park_date::VARCHAR as park_date,
+                    time_slot,
+                    predicted_actual as forecast_wait,
+                    prediction_method,
+                    forecast_made_date
+                FROM read_parquet('{forecast_archive}')
+                WHERE park_date::VARCHAR IN ('{date_list}')
+            )
             SELECT
-                entity_code,
-                park_date::VARCHAR as park_date,
-                TIME_BUCKET(INTERVAL '5 minutes',
-                    (observed_at_ts::TIMESTAMP + INTERVAL '2 minutes 30 seconds'))::TIME as time_slot,
-                AVG(wait_time_minutes) as actual_wait,
-                COUNT(*) as n_obs
-            FROM read_parquet(['{parquet_glob}'])
-            WHERE wait_time_type = 'ACTUAL'
-            AND park_date::VARCHAR IN ('{date_list}')
-            GROUP BY entity_code, park_date, time_slot
-        )"""
-    synth_parquets = [f for f in (os.listdir(synth_dir) or []) if f.endswith(".parquet")] if os.path.exists(synth_dir) else []
-    if synth_parquets:
-        # Include synthetic actuals for slots without raw — dramatically increases coverage
-        actuals_cte += f""",
-        actuals_synth AS (
-            SELECT
-                entity_code,
-                park_date::VARCHAR as park_date,
-                TIME_BUCKET(INTERVAL '5 minutes',
-                    (CAST(observed_at AS TIMESTAMP) + INTERVAL '2 minutes 30 seconds'))::TIME as time_slot,
-                AVG(synthetic_actual) as actual_wait,
-                COUNT(*) as n_obs
-            FROM read_parquet('{synth_glob}')
-            WHERE park_date::VARCHAR IN ('{date_list}')
-            AND synthetic_actual > 0
-            GROUP BY entity_code, park_date, time_slot
-        ),
-        actuals_bucketed AS (
-            SELECT
-                COALESCE(r.entity_code, s.entity_code) as entity_code,
-                COALESCE(r.park_date, s.park_date) as park_date,
-                COALESCE(r.time_slot, s.time_slot) as time_slot,
-                COALESCE(r.actual_wait, s.actual_wait) as actual_wait,
-                COALESCE(r.n_obs, 0) + COALESCE(s.n_obs, 0) as n_obs
-            FROM actuals_raw r
-            FULL OUTER JOIN actuals_synth s
-                ON r.entity_code = s.entity_code
-                AND r.park_date = s.park_date
-                AND r.time_slot = s.time_slot
-        )"""
+                f.entity_code,
+                f.park_date,
+                f.time_slot,
+                f.forecast_wait,
+                a.actual_wait,
+                a.n_obs,
+                f.prediction_method,
+                f.forecast_made_date,
+                -- Error metrics
+                (f.forecast_wait - a.actual_wait) as signed_error,
+                ABS(f.forecast_wait - a.actual_wait) as absolute_error,
+                CASE WHEN a.actual_wait > 0 
+                     THEN ABS(f.forecast_wait - a.actual_wait) / a.actual_wait * 100 
+                     ELSE NULL END as pct_error,
+                -- Horizon
+                DATEDIFF('day', f.forecast_made_date::DATE, f.park_date::DATE) as horizon_days,
+                '{run_date}' as evaluation_date
+            FROM forecasts f
+            INNER JOIN actuals_bucketed a
+                ON f.entity_code = a.entity_code
+                AND f.park_date = a.park_date
+                AND f.time_slot = a.time_slot
+        """).fetchdf()
+        
+        if slot_df.empty:
+            log.warning("No matching forecast-actual pairs found for eval dates: %s", eval_dates)
+            slot_df = None
+        else:
+            log.info("Slot-level matches: %d rows across %d entity-dates", 
+                     len(slot_df), slot_df.groupby(["entity_code", "park_date"]).ngroups)
+            
+            # === ENTITY-DATE LEVEL (aggregated) ===
+            entity_df = con.execute("""
+                SELECT
+                    entity_code,
+                    park_date,
+                    evaluation_date,
+                    forecast_made_date,
+                    horizon_days,
+                    prediction_method,
+                    COUNT(*) as n_slots,
+                    AVG(forecast_wait) as avg_forecast,
+                    AVG(actual_wait) as avg_actual,
+                    AVG(signed_error) as bias,
+                    AVG(absolute_error) as mae,
+                    SQRT(AVG(signed_error * signed_error)) as rmse,
+                    AVG(pct_error) as mape,
+                    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY absolute_error) as median_ae
+                FROM slot_df
+                GROUP BY entity_code, park_date, evaluation_date, forecast_made_date, 
+                         horizon_days, prediction_method
+            """).fetchdf()
+            
+            log.info("Entity-date accuracy: %d rows, MAE=%.1f min, bias=%.1f min, MAPE=%.1f%%",
+                     len(entity_df), entity_df["mae"].mean(), entity_df["bias"].mean(), 
+                     entity_df["mape"].mean())
     else:
-        actuals_cte += """,
-        actuals_bucketed AS (
-            SELECT entity_code, park_date, time_slot, actual_wait, n_obs FROM actuals_raw
-        )"""
-
-    # === SLOT-LEVEL ACCURACY ===
-    slot_df = con.execute(f"""
-        {actuals_cte},
-        forecasts AS (
-            SELECT
-                entity_code,
-                park_date::VARCHAR as park_date,
-                time_slot,
-                predicted_actual as forecast_wait,
-                prediction_method,
-                forecast_made_date
-            FROM read_parquet('{forecast_archive}')
-            WHERE park_date::VARCHAR IN ('{date_list}')
-        )
-        SELECT
-            f.entity_code,
-            f.park_date,
-            f.time_slot,
-            f.forecast_wait,
-            a.actual_wait,
-            a.n_obs,
-            f.prediction_method,
-            f.forecast_made_date,
-            -- Error metrics
-            (f.forecast_wait - a.actual_wait) as signed_error,
-            ABS(f.forecast_wait - a.actual_wait) as absolute_error,
-            CASE WHEN a.actual_wait > 0 
-                 THEN ABS(f.forecast_wait - a.actual_wait) / a.actual_wait * 100 
-                 ELSE NULL END as pct_error,
-            -- Horizon
-            DATEDIFF('day', f.forecast_made_date::DATE, f.park_date::DATE) as horizon_days,
-            '{run_date}' as evaluation_date
-        FROM forecasts f
-        INNER JOIN actuals_bucketed a
-            ON f.entity_code = a.entity_code
-            AND f.park_date = a.park_date
-            AND f.time_slot = a.time_slot
-    """).fetchdf()
-    
-    if slot_df.empty:
-        log.warning("No matching forecast-actual pairs found for eval dates: %s", eval_dates)
-        return None, None, None
-    
-    log.info("Slot-level matches: %d rows across %d entity-dates", 
-             len(slot_df), slot_df.groupby(["entity_code", "park_date"]).ngroups)
-    
-    # === ENTITY-DATE LEVEL (aggregated) ===
-    entity_df = con.execute("""
-        SELECT
-            entity_code,
-            park_date,
-            evaluation_date,
-            forecast_made_date,
-            horizon_days,
-            prediction_method,
-            COUNT(*) as n_slots,
-            AVG(forecast_wait) as avg_forecast,
-            AVG(actual_wait) as avg_actual,
-            AVG(signed_error) as bias,
-            AVG(absolute_error) as mae,
-            SQRT(AVG(signed_error * signed_error)) as rmse,
-            AVG(pct_error) as mape,
-            PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY absolute_error) as median_ae
-        FROM slot_df
-        GROUP BY entity_code, park_date, evaluation_date, forecast_made_date, 
-                 horizon_days, prediction_method
-    """).fetchdf()
-    
-    log.info("Entity-date accuracy: %d rows, MAE=%.1f min, bias=%.1f min, MAPE=%.1f%%",
-             len(entity_df), entity_df["mae"].mean(), entity_df["bias"].mean(), 
-             entity_df["mape"].mean())
+        log.info("No new slot-level dates — skipping to WTI evaluation")
     
     # === WTI LEVEL ===
     # Compare ARCHIVED forecast WTI vs current historical WTI
     # The archived WTI contains what we predicted; historical WTI is computed from actuals
+    #
+    # NOTE: WTI eval tracks its own "already done" dates independently from slot-level eval.
+    # This allows backfilling WTI accuracy for dates that were evaluated at slot level
+    # but where WTI eval failed (e.g., no wti archive existed at that time).
     wti_path = os.path.join(output_base, "wti", "wti.parquet")
     wti_archive_dir = os.path.join(output_base, "accuracy", "archive")
     wti_archives = sorted([
@@ -374,51 +382,93 @@ def evaluate_accuracy(
     
     wti_df = None
     if wti_archives and os.path.exists(wti_path):
-        # Use the archived WTI made before the earliest eval date
-        earliest_eval = min(eval_dates)
-        valid_wti_archives = [
-            f for f in wti_archives
-            if os.path.basename(f).replace("wti_", "").replace(".parquet", "") < earliest_eval
-        ]
-        wti_archive = valid_wti_archives[-1] if valid_wti_archives else wti_archives[0]
-        log.info("Using archived WTI: %s", os.path.basename(wti_archive))
+        # Build the full set of dates that need WTI evaluation:
+        # 1. Current eval_dates (from slot-level eval)
+        # 2. PLUS any dates that have entity accuracy but are missing WTI accuracy (backfill)
+        wti_eval_dates = set(eval_dates)
         
-        try:
-            wti_df = con.execute(f"""
-                WITH forecast_wti AS (
-                    SELECT park_code, park_date::DATE::VARCHAR as park_date, wti as forecast_wti,
-                           wti_made_date
-                    FROM read_parquet('{wti_archive}')
-                    WHERE park_date::DATE::VARCHAR IN ('{date_list}')
-                ),
-                actual_wti AS (
-                    SELECT park_code, park_date::DATE::VARCHAR as park_date, wti as actual_wti
-                    FROM read_parquet('{wti_path}')
-                    WHERE source = 'historical' AND park_date::DATE::VARCHAR IN ('{date_list}')
+        wti_accuracy_path = os.path.join(output_base, "accuracy", "wti_accuracy.parquet")
+        entity_accuracy_path = os.path.join(output_base, "accuracy", "entity_daily_accuracy.parquet")
+        if os.path.exists(entity_accuracy_path):
+            try:
+                all_entity_dates = set(
+                    con.execute(f"""
+                        SELECT DISTINCT park_date::DATE::VARCHAR as park_date
+                        FROM read_parquet('{entity_accuracy_path}')
+                    """).fetchdf()["park_date"].astype(str).tolist()
                 )
-                SELECT
-                    f.park_code,
-                    f.park_date,
-                    f.forecast_wti,
-                    a.actual_wti,
-                    f.wti_made_date,
-                    (f.forecast_wti - a.actual_wti) as wti_error,
-                    ABS(f.forecast_wti - a.actual_wti) as wti_abs_error,
-                    '{run_date}' as evaluation_date
-                FROM forecast_wti f
-                INNER JOIN actual_wti a
-                    ON f.park_code = a.park_code AND f.park_date = a.park_date
-            """).fetchdf()
+                wti_done_dates = set()
+                if os.path.exists(wti_accuracy_path):
+                    wti_done_dates = set(
+                        con.execute(f"""
+                            SELECT DISTINCT park_date::DATE::VARCHAR as park_date
+                            FROM read_parquet('{wti_accuracy_path}')
+                        """).fetchdf()["park_date"].astype(str).tolist()
+                    )
+                wti_backfill_dates = all_entity_dates - wti_done_dates
+                if wti_backfill_dates:
+                    log.info("WTI backfill: %d dates have entity accuracy but missing WTI accuracy",
+                             len(wti_backfill_dates))
+                    wti_eval_dates = wti_eval_dates | wti_backfill_dates
+            except Exception as e:
+                log.warning("Failed to compute WTI backfill dates: %s", e)
+        
+        if not wti_eval_dates:
+            log.info("No dates need WTI evaluation")
+        else:
+            wti_date_list = sorted(wti_eval_dates)
+            log.info("WTI evaluation for %d dates: %s to %s", 
+                     len(wti_date_list), wti_date_list[0], wti_date_list[-1])
             
-            if not wti_df.empty:
-                log.info("WTI accuracy: %d park-dates, avg WTI abs error=%.1f",
-                         len(wti_df), wti_df["wti_abs_error"].mean())
+            # For each eval date, find the best (most recent) archived WTI made before that date
+            # and collect all forecast-vs-actual pairs
+            all_wti_pairs = []
+            for eval_d in wti_date_list:
+                valid_wti_archives = [
+                    f for f in wti_archives
+                    if os.path.basename(f).replace("wti_", "").replace(".parquet", "") < eval_d
+                ]
+                if not valid_wti_archives:
+                    continue
+                best_archive = valid_wti_archives[-1]
+                try:
+                    pair_df = con.execute(f"""
+                        WITH forecast_wti AS (
+                            SELECT park_code, park_date::DATE::VARCHAR as park_date, wti as forecast_wti,
+                                   wti_made_date
+                            FROM read_parquet('{best_archive}')
+                            WHERE park_date::DATE::VARCHAR = '{eval_d}'
+                        ),
+                        actual_wti AS (
+                            SELECT park_code, park_date::DATE::VARCHAR as park_date, wti as actual_wti
+                            FROM read_parquet('{wti_path}')
+                            WHERE source = 'historical' AND park_date::DATE::VARCHAR = '{eval_d}'
+                        )
+                        SELECT
+                            f.park_code,
+                            f.park_date,
+                            f.forecast_wti,
+                            a.actual_wti,
+                            f.wti_made_date,
+                            (f.forecast_wti - a.actual_wti) as wti_error,
+                            ABS(f.forecast_wti - a.actual_wti) as wti_abs_error,
+                            '{run_date}' as evaluation_date
+                        FROM forecast_wti f
+                        INNER JOIN actual_wti a
+                            ON f.park_code = a.park_code AND f.park_date = a.park_date
+                    """).fetchdf()
+                    if not pair_df.empty:
+                        all_wti_pairs.append(pair_df)
+                except Exception as e:
+                    log.warning("WTI accuracy failed for date %s: %s", eval_d, e)
+            
+            if all_wti_pairs:
+                wti_df = pd.concat(all_wti_pairs, ignore_index=True)
+                log.info("WTI accuracy: %d park-dates across %d eval dates, avg WTI abs error=%.1f",
+                         len(wti_df), wti_df["park_date"].nunique(), wti_df["wti_abs_error"].mean())
             else:
-                log.info("No WTI forecast-vs-actual matches found for eval dates")
+                log.info("No WTI forecast-vs-actual matches found for any eval dates")
                 wti_df = None
-        except Exception as e:
-            log.warning("WTI accuracy computation failed: %s", e)
-            wti_df = None
     else:
         if not wti_archives:
             log.info("No archived WTI files yet — WTI accuracy will start tomorrow")
@@ -550,15 +600,44 @@ def main():
     log.info("Step 2: Finding evaluation dates...")
     eval_dates = get_evaluation_dates(output_base, con)
     
+    # Check if WTI backfill is needed even if no new slot-level dates
+    wti_backfill_needed = False
     if not eval_dates:
+        wti_accuracy_path = os.path.join(output_base, "accuracy", "wti_accuracy.parquet")
+        entity_accuracy_path = os.path.join(output_base, "accuracy", "entity_daily_accuracy.parquet")
+        if os.path.exists(entity_accuracy_path):
+            try:
+                all_entity_dates = set(
+                    con.execute(f"""
+                        SELECT DISTINCT park_date::DATE::VARCHAR as park_date
+                        FROM read_parquet('{entity_accuracy_path}')
+                    """).fetchdf()["park_date"].astype(str).tolist()
+                )
+                wti_done_dates = set()
+                if os.path.exists(wti_accuracy_path):
+                    wti_done_dates = set(
+                        con.execute(f"""
+                            SELECT DISTINCT park_date::DATE::VARCHAR as park_date
+                            FROM read_parquet('{wti_accuracy_path}')
+                        """).fetchdf()["park_date"].astype(str).tolist()
+                    )
+                wti_backfill_needed = bool(all_entity_dates - wti_done_dates)
+                if wti_backfill_needed:
+                    log.info("No new slot-level dates, but %d dates need WTI backfill",
+                             len(all_entity_dates - wti_done_dates))
+            except Exception:
+                pass
+    
+    if not eval_dates and not wti_backfill_needed:
         log.info("No new dates to evaluate (forecast starts in the future, no overlap with actuals yet)")
         log.info("This is normal for the first run — tomorrow's run will evaluate today's forecast.")
         log.info("=" * 60)
         return
     
-    log.info("Evaluating %d dates: %s", len(eval_dates), eval_dates)
+    if eval_dates:
+        log.info("Evaluating %d dates: %s", len(eval_dates), eval_dates)
     
-    # Step 3: Compare forecast vs actuals
+    # Step 3: Compare forecast vs actuals (also handles WTI backfill internally)
     log.info("Step 3: Computing accuracy metrics...")
     slot_df, entity_df, wti_df = evaluate_accuracy(output_base, con, eval_dates, run_date)
     
