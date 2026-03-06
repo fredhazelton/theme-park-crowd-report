@@ -36,7 +36,7 @@ PARK_NAMES = {
     "CA": "DCA",
     "DL": "Disneyland",
     "EP": "EPCOT",
-    "EU": "Europa Park",
+    "EU": "Epic Universe",
     "HS": "Hollywood Studios",
     "IA": "Islands of Adv.",
     "MK": "Magic Kingdom",

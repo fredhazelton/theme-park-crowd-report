@@ -36,7 +36,7 @@ PARK_NAMES = {
     "CA":  "California Adventure",
     "IA":  "Islands of Adventure",
     "UF":  "Universal Florida",
-    "EU":  "Europa Park",
+    "EU":  "Epic Universe",
     "UH":  "Universal Hollywood",
     "TDL": "Tokyo Disneyland",
     "TDS": "Tokyo DisneySea",
@@ -46,8 +46,8 @@ PARK_NAMES = {
 PARK_GROUPS = {
     "🏰 Walt Disney World": ["MK", "EP", "HS", "AK"],
     "🎆 Disneyland Resort": ["DL", "CA"],
-    "🦖 Universal": ["UF", "IA", "UH"],
-    "🌍 International": ["EU", "TDL", "TDS"],
+    "🦖 Universal": ["UF", "IA", "EU", "UH"],
+    "🌍 International": ["TDL", "TDS"],
 }
 
 # Benedictus color-scale emoji thresholds
