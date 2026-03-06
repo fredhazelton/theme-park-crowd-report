@@ -398,11 +398,31 @@ def get_ask_analytics() -> dict:
                     total_questions += count
                     unique_users.add(user_id)
 
+        # Read feedback from ask_feedback.jsonl
+        thumbs_up = 0
+        thumbs_down = 0
+        feedback_file = ASK_USAGE_JSON.parent / "ask_feedback.jsonl"
+        if feedback_file.exists():
+            try:
+                with open(feedback_file) as ff:
+                    for line in ff:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        entry = json.loads(line)
+                        rating = entry.get("rating", "")
+                        if rating == "up":
+                            thumbs_up += 1
+                        elif rating == "down":
+                            thumbs_down += 1
+            except Exception:
+                pass
+
         return {
             "total_questions": total_questions,
             "unique_users": len(unique_users),
-            "thumbs_up": 0,  # Not tracked in this file
-            "thumbs_down": 0,
+            "thumbs_up": thumbs_up,
+            "thumbs_down": thumbs_down,
             "avg_response_ms": 0,
             "model": "Claude Sonnet 4",
         }
