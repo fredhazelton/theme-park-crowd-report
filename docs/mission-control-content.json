@@ -51,7 +51,7 @@
         "forecasts": {
             "status": "done",
             "label": "Forecasts",
-            "detail": "29,263,674 rows, 9 MB"
+            "detail": "29,263,674 rows, 10 MB"
         },
         "wti": {
             "status": "done",
@@ -120,5 +120,5 @@
         "db_live_waits": 123103185,
         "db_wti": 54699
     },
-    "last_updated": "2026-03-06T18:00:04.388377"
+    "last_updated": "2026-03-06T18:15:03.583620"
 }

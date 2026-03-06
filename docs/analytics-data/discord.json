@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T23:00:01Z",
+  "generated_at": "2026-03-06T23:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-06T20:30:01.992000+00:00"
+          "last_active": "2026-03-06T23:00:01.586000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T22:47:32.423000+00:00"
+          "last_active": "2026-03-06T23:06:44.419000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "- Log duplication fix \u2014 identified the cause (double file handler + tee), will fix next pipeline run\n- Content review nudge\n\nI'll keep crunching through these. The forecast regen is the big one \u2014 o...",
-      "timestamp": "2026-03-06T22:47:32.423000+00:00",
-      "message_id": "1479611420185198795",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479611420185198795"
+      "message": "**\ud83d\udd04 Running now:**\n- Forecast regeneration (400/568 entities done, ~7 min remaining)\n- WTI recalculation queued after forecast completes\n\n**\ud83d\udccb Bugs triaged:**\n- 4/5 threads already resolved from ear...",
+      "timestamp": "2026-03-06T23:06:44.419000+00:00",
+      "message_id": "1479616252006764734",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479616252006764734"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Forecast is crunching through 568 entities. That'll take ~30 min. Let me give Fred an update:\n\nHere's where we stand \u2014 a lot got done:\n\n**\u2705 Completed:**\n1. **Fallback entities excluded from WTI** \u2014...",
-      "timestamp": "2026-03-06T22:47:32.098000+00:00",
-      "message_id": "1479611418822054001",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479611418822054001"
+      "message": "Still 11 processes running. It's just `tee` buffering. The forecast is still crunching. At 0.4 entities/sec, 168 remaining entities \u2248 7 more minutes. Let me keep going \u2014 I'll check back when it fin...",
+      "timestamp": "2026-03-06T23:06:44.080000+00:00",
+      "message_id": "1479616250584764597",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479616250584764597"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "The Discord forum tag and role setup tasks require Discord API permissions that might need Fred's manual action (bot permissions). Let me focus on what I can definitely do and update Fred on progre...",
-      "timestamp": "2026-03-06T22:46:58.175000+00:00",
-      "message_id": "1479611276538675372",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479611276538675372"
+      "message": "The log file hasn't been written to in ~1 minute. The worker processes are still active (I saw them earlier with high CPU). The `tee` is buffering output. Let me check:",
+      "timestamp": "2026-03-06T23:06:30.177000+00:00",
+      "message_id": "1479616192271351990",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479616192271351990"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-06T23:00:01.586000+00:00",
+      "message_id": "1479614562402828462",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479614562402828462"
     },
     {
       "channel": "mission-control",
@@ -300,17 +311,6 @@
       "timestamp": "2026-03-06T17:44:04.705000+00:00",
       "message_id": "1479535051480760360",
       "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535051480760360"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-06T16:30:01.379000+00:00",
-      "message_id": "1479516414821011582",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479516414821011582"
     },
     {
       "channel": "bam-bam",
