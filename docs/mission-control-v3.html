@@ -31,12 +31,17 @@
             --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
         }
 
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+        }
         body {
             background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
-            min-height: 100vh;
             font-family: var(--font-text);
             color: var(--text-primary);
             line-height: 1.5;
+            display: flex;
+            flex-direction: column;
         }
 
         /* ═══════════════════════════════════════════════════
@@ -46,13 +51,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 24px;
+            padding: 12px 24px;
             border-bottom: 1px solid var(--border-card);
             background: rgba(0,0,0,0.2);
-            position: sticky;
-            top: 0;
             z-index: 100;
             backdrop-filter: blur(12px);
+            flex-shrink: 0;
         }
         .header-left {
             display: flex;
@@ -97,7 +101,9 @@
            ═══════════════════════════════════════════════════ */
         .app-layout {
             display: flex;
-            min-height: calc(100vh - 65px); /* below header */
+            flex: 1;
+            min-height: 0; /* allow flex shrinking */
+            overflow: hidden;
         }
 
         /* ═══════════════════════════════════════════════════
@@ -112,6 +118,7 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
+            overflow-y: auto;
         }
         .sidebar-section {
             font-family: var(--font-mono);
@@ -162,6 +169,7 @@
         .main-content {
             flex: 1;
             min-width: 0;
+            min-height: 0;
             overflow-y: auto;
         }
 
@@ -194,7 +202,7 @@
         /* ═══════════════════════════════════════════════════
            TAB CONTENT
            ═══════════════════════════════════════════════════ */
-        .tab-content { display: none; padding: 24px; }
+        .tab-content { display: none; padding: 20px; }
         .tab-content.active { display: block; }
 
         /* ═══════════════════════════════════════════════════
@@ -1633,12 +1641,12 @@
            ═══════════════════════════════════════════════════ */
         .footer {
             text-align: center;
-            padding: 20px;
-            font-size: 11px;
+            padding: 6px 20px;
+            font-size: 10px;
             color: var(--text-muted);
             font-family: var(--font-mono);
             border-top: 1px solid var(--border-card);
-            margin-top: 20px;
+            flex-shrink: 0;
         }
         .footer a {
             color: var(--accent);
@@ -1677,7 +1685,7 @@
         #tab-memory { padding: 0; }
         .memory-layout {
             display: flex;
-            height: calc(100vh - 65px);
+            height: 100%;
         }
         .memory-left {
             width: 30%;
@@ -2013,6 +2021,13 @@
     <div class="tab" data-tab="calendar" onclick="switchTab('calendar')">
         <span class="tab-icon">📅</span><span class="tab-label">Calendar</span>
     </div>
+    <div class="sidebar-section">Workspace</div>
+    <a class="tab" href="office.html" style="text-decoration:none;color:inherit;">
+        <span class="tab-icon">🏢</span><span class="tab-label">Office</span>
+    </a>
+    <a class="tab" href="team.html" style="text-decoration:none;color:inherit;">
+        <span class="tab-icon">👥</span><span class="tab-label">Team</span>
+    </a>
     <div class="sidebar-section">Business</div>
     <div class="tab disabled" data-tab="finance">
         <span class="tab-icon">💰</span><span class="tab-label">Finance</span>
@@ -3575,7 +3590,7 @@ function selectDailyEntry(index) {
     document.getElementById('memoryContentMeta').innerHTML =
         `<span>${entry.words.toLocaleString()} words</span>` +
         `<span>${entry.size_kb} KB</span>` +
-        `<span>Modified ${timeAgo(entry.updated)}</span>`;
+        `<span>Modified ${getTimeAgo(entry.updated)}</span>`;
 
     let rendered = renderMarkdown(entry.content);
     // Highlight search term in content
