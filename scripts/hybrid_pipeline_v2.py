@@ -577,31 +577,97 @@ def step2_train_julia(logger, use_synthetic: bool = False) -> tuple[int, float]:
     
     start = time.time()
     
-    # Run Julia training with 4 threads
-    result = subprocess.run(
-        [str(JULIA_BIN), f"--project={PROJECT_ROOT / 'julia-ml'}", "--threads=4", str(script_to_run)],
-        cwd=str(PROJECT_ROOT / "julia-ml"),
-        capture_output=True,
-        text=True,
-    )
+    # ================================================================
+    # OOM-SAFE: Split combined parquet into per-park chunks and train
+    # one park at a time. 94M rows × 16 cols ≈ 33-50GB in memory;
+    # per-park max is ~3GB (MK) which fits comfortably in 62GB RAM.
+    # ================================================================
+    if use_synthetic:
+        logger.info("  Splitting combined pairs into per-park chunks for OOM-safe training...")
+        park_chunks_dir = MATCHED_PAIRS_DIR / "park_chunks"
+        park_chunks_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Use DuckDB to discover parks and write per-park parquets
+        con_split = duckdb.connect()
+        try:
+            # Detect parks from entity_code prefix (alpha prefix, e.g. MK from MK23)
+            parks = con_split.execute(f"""
+                SELECT DISTINCT regexp_extract(entity_code, '^[A-Za-z]+') as park
+                FROM read_parquet('{combined_pairs_path}')
+                ORDER BY park
+            """).fetchall()
+            park_codes = [p[0] for p in parks]
+            logger.info(f"  Found {len(park_codes)} parks: {', '.join(park_codes)}")
+            
+            for park in park_codes:
+                chunk_path = park_chunks_dir / f"combined_{park}.parquet"
+                con_split.execute(f"""
+                    COPY (
+                        SELECT * FROM read_parquet('{combined_pairs_path}')
+                        WHERE regexp_extract(entity_code, '^[A-Za-z]+') = '{park}'
+                    ) TO '{chunk_path}' (FORMAT PARQUET, COMPRESSION ZSTD)
+                """)
+                row_count = con_split.execute(f"SELECT COUNT(*) FROM read_parquet('{chunk_path}')").fetchone()[0]
+                logger.info(f"    {park}: {row_count:,} rows → {chunk_path.name}")
+        finally:
+            con_split.close()
+    else:
+        # No synthetic = only ~2.4M real pairs, fits in memory fine
+        park_codes = None
+    
+    total_successful = 0
+    
+    if park_codes is not None:
+        # Train per-park: call Julia once per park with --data-path pointing to chunk
+        for i, park in enumerate(park_codes):
+            chunk_path = park_chunks_dir / f"combined_{park}.parquet"
+            logger.info(f"  [{i+1}/{len(park_codes)}] Training park {park}...")
+            
+            park_result = subprocess.run(
+                [str(JULIA_BIN), f"--project={PROJECT_ROOT / 'julia-ml'}", "--threads=4",
+                 str(script_to_run), "--data-path", str(chunk_path)],
+                cwd=str(PROJECT_ROOT / "julia-ml"),
+                capture_output=True,
+                text=True,
+            )
+            
+            if park_result.returncode != 0:
+                logger.error(f"  Julia training failed for park {park}:\n{park_result.stderr[-500:]}")
+                continue
+            
+            logger.info(park_result.stdout)
+            
+            # Extract successful count from this park
+            for line in park_result.stdout.split("\n"):
+                if "Successful:" in line:
+                    try:
+                        total_successful += int(line.split(":")[1].strip())
+                    except:
+                        pass
+    else:
+        # Non-synthetic: single Julia call (small dataset)
+        result = subprocess.run(
+            [str(JULIA_BIN), f"--project={PROJECT_ROOT / 'julia-ml'}", "--threads=4", str(script_to_run)],
+            cwd=str(PROJECT_ROOT / "julia-ml"),
+            capture_output=True,
+            text=True,
+        )
+        
+        if result.returncode != 0:
+            logger.error(f"Julia training failed:\n{result.stderr}")
+            return 0, time.time() - start
+        
+        logger.info(result.stdout)
+        
+        for line in result.stdout.split("\n"):
+            if "Successful:" in line:
+                try:
+                    total_successful += int(line.split(":")[1].strip())
+                except:
+                    pass
     
     elapsed = time.time() - start
-    
-    if result.returncode != 0:
-        logger.error(f"Julia training failed:\n{result.stderr}")
-        return 0, elapsed
-    
-    output = result.stdout
-    logger.info(output)
-    
-    # Extract successful count
-    successful = 0
-    for line in output.split("\n"):
-        if "Successful:" in line:
-            try:
-                successful = int(line.split(":")[1].strip())
-            except:
-                pass
+    successful = total_successful
     
     logger.info(f"  ⏱️  Julia training: {elapsed:.1f}s ({successful} models)")
 

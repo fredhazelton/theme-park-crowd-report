@@ -258,13 +258,29 @@ function train_single_entity_lite(entity_code::String, matched_df::DataFrame, mo
 end
 
 function main()
+    # Parse --data-path argument if provided (for per-park chunked training)
+    explicit_data_path = nothing
+    args = ARGS
+    for i in eachindex(args)
+        if args[i] == "--data-path" && i < length(args)
+            explicit_data_path = args[i+1]
+            break
+        end
+    end
+    
     # Try combined pairs first (real + synthetic), then V2, then V1
     combined_pairs = "/home/wilma/hazeydata/pipeline/matched_pairs/combined_pairs_v2.parquet"
     matched_pairs_v2 = "/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs_v2.parquet"
     matched_pairs_v1 = "/home/wilma/hazeydata/pipeline/matched_pairs/all_pairs.parquet"
     
     use_synthetic = false
-    if isfile(combined_pairs)
+    if explicit_data_path !== nothing
+        # Explicit path provided (per-park chunk from Python wrapper)
+        matched_pairs_path = explicit_data_path
+        # Detect if this is a combined (real+synthetic) chunk by checking for is_synthetic column
+        use_synthetic = true  # chunks are always from combined data
+        println("Using explicit data path: $matched_pairs_path (per-park chunk)")
+    elseif isfile(combined_pairs)
         matched_pairs_path = combined_pairs
         use_synthetic = true
         println("Using combined pairs (real + synthetic) with balanced weighting")
