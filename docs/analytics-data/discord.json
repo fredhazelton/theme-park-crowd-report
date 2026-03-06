@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T22:45:01Z",
+  "generated_at": "2026-03-06T23:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T22:45:02.390000+00:00"
+          "last_active": "2026-03-06T22:47:32.423000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Now let me investigate AK bias while the EU change is fresh:",
-      "timestamp": "2026-03-06T22:45:02.390000+00:00",
-      "message_id": "1479610790901190810",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479610790901190810"
+      "message": "- Log duplication fix \u2014 identified the cause (double file handler + tee), will fix next pipeline run\n- Content review nudge\n\nI'll keep crunching through these. The forecast regen is the big one \u2014 o...",
+      "timestamp": "2026-03-06T22:47:32.423000+00:00",
+      "message_id": "1479611420185198795",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479611420185198795"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Found the forcing logic (line ~818):\n\n```python\n# For EU entities: ALWAYS use scope_scale group model (until 1 year of data)\n# EU opened May 2025 \u2014 per-entity models have limited, novelty-affected ...",
-      "timestamp": "2026-03-06T22:44:52.640000+00:00",
-      "message_id": "1479610750006988971",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479610750006988971"
+      "message": "Forecast is crunching through 568 entities. That'll take ~30 min. Let me give Fred an update:\n\nHere's where we stand \u2014 a lot got done:\n\n**\u2705 Completed:**\n1. **Fallback entities excluded from WTI** \u2014...",
+      "timestamp": "2026-03-06T22:47:32.098000+00:00",
+      "message_id": "1479611418822054001",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479611418822054001"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Key finding: 13 EU entities have per-entity models but are forced into scope_scale. The code explicitly forces EU entities to scope_scale. Let me check:",
-      "timestamp": "2026-03-06T22:44:37.178000+00:00",
-      "message_id": "1479610685154525257",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479610685154525257"
+      "message": "The Discord forum tag and role setup tasks require Discord API permissions that might need Fred's manual action (bot permissions). Let me focus on what I can definitely do and update Fred on progre...",
+      "timestamp": "2026-03-06T22:46:58.175000+00:00",
+      "message_id": "1479611276538675372",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479611276538675372"
     },
     {
       "channel": "mission-control",
