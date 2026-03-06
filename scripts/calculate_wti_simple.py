@@ -247,6 +247,11 @@ def main():
             posted_join_fc = "JOIN posted_entities pe ON f.entity_code = pe.entity_code" if use_posted_filter else ""
             posted_join_fc_bare = "JOIN posted_entities pe ON entity_code = pe.entity_code" if use_posted_filter else ""
 
+            # Exclude fallback_ratio entities from WTI — they predict flat constants
+            # (no trained model, no meaningful signal). Only include entities with
+            # real predictive models (model_v2, model_actuals, aggregate, etc.)
+            EXCLUDED_METHODS = "('fallback_ratio')"
+
             if use_oc:
                 forecast_sql = f"""
                     SELECT 
@@ -262,6 +267,7 @@ def main():
                     {posted_join_fc}
                     WHERE f.predicted_actual > 0
                       AND oc.is_operating = TRUE
+                      AND f.prediction_method NOT IN {EXCLUDED_METHODS}
                     GROUP BY {pc_f}, f.park_date
                     ORDER BY park_code, f.park_date
                 """
@@ -276,6 +282,7 @@ def main():
                     FROM read_parquet('{forecast_str}')
                     {posted_join_fc_bare}
                     WHERE predicted_actual > 0
+                      AND prediction_method NOT IN {EXCLUDED_METHODS}
                     GROUP BY {pc_bare}, park_date
                     ORDER BY park_code, park_date
                 """
@@ -289,10 +296,11 @@ def main():
                     FROM read_parquet('{forecast_str}')
                     {posted_join_fc_bare}
                     WHERE predicted_actual > 0
+                      AND prediction_method NOT IN {EXCLUDED_METHODS}
                     GROUP BY {pc_bare}, park_date ORDER BY park_code, park_date
                 """).fetchdf()
             
-            logger.info(f"  Forecast WTI: {len(forecast_wti):,} park-dates")
+            logger.info(f"  Forecast WTI: {len(forecast_wti):,} park-dates (excluding fallback_ratio entities)")
             results.append(forecast_wti)
         else:
             logger.warning(f"  Forecast file not found: {forecast_file}")
