@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T22:30:02Z",
+  "generated_at": "2026-03-06T22:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T22:29:50.098000+00:00"
+          "last_active": "2026-03-06T22:45:02.390000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Now let me test by running it and comparing before vs after:",
-      "timestamp": "2026-03-06T22:29:50.098000+00:00",
-      "message_id": "1479606964471468163",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479606964471468163"
+      "message": "Now let me investigate AK bias while the EU change is fresh:",
+      "timestamp": "2026-03-06T22:45:02.390000+00:00",
+      "message_id": "1479610790901190810",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479610790901190810"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Historical WTI is fine \u2014 it only includes entities that have synthetic actuals or real actuals, so the data-sparse entities naturally don't appear. The problem is only on the forecast side. Let me ...",
-      "timestamp": "2026-03-06T22:29:34.215000+00:00",
-      "message_id": "1479606897853337600",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479606897853337600"
+      "message": "Found the forcing logic (line ~818):\n\n```python\n# For EU entities: ALWAYS use scope_scale group model (until 1 year of data)\n# EU opened May 2025 \u2014 per-entity models have limited, novelty-affected ...",
+      "timestamp": "2026-03-06T22:44:52.640000+00:00",
+      "message_id": "1479610750006988971",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479610750006988971"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "The forecast SQL needs a `AND prediction_method != 'fallback_ratio'` filter. Let me also check if there's an equivalent issue on the historical side:",
-      "timestamp": "2026-03-06T22:29:30.545000+00:00",
-      "message_id": "1479606882460237885",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479606882460237885"
+      "message": "Key finding: 13 EU entities have per-entity models but are forced into scope_scale. The code explicitly forces EU entities to scope_scale. Let me check:",
+      "timestamp": "2026-03-06T22:44:37.178000+00:00",
+      "message_id": "1479610685154525257",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479610685154525257"
     },
     {
       "channel": "mission-control",
