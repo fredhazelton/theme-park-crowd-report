@@ -7,7 +7,8 @@
     {"id": "bambam", "name": "Bam-Bam", "icon": "🔨", "state": "offline", "zone": "offsite", "task": "", "color": "#c084fc"},
     {"id": "dino", "name": "Dino", "icon": "🦕", "state": "idle", "zone": "pen", "task": "Napping in the dino pen", "color": "#fb923c"},
     {"id": "pebbles", "name": "Pebbles", "icon": "🎀", "state": "idle", "zone": "pen", "task": "Waiting for a design task", "color": "#f472b6"},
-    {"id": "betty", "name": "Betty", "icon": "✍️", "state": "idle", "zone": "pen", "task": "Waiting for a writing task", "color": "#f87171"}
+    {"id": "betty", "name": "Betty", "icon": "✍️", "state": "idle", "zone": "pen", "task": "Waiting for a writing task", "color": "#f87171"},
+    {"id": "gazoo", "name": "Gazoo", "icon": "👽", "state": "idle", "zone": "float-1", "task": "Observing the dum-dums…", "color": "#34d399"}
   ],
   "activity": [
     {"time": "23:58", "agent": "wilma", "text": "Started building the Office page"},

@@ -627,6 +627,31 @@
             50% { transform: translateY(-2px) scale(1.05); }
         }
 
+        /* Gazoo floating special effect */
+        .agent.gazoo-float .agent-sprite {
+            animation: gazoo-hover 3s ease-in-out infinite !important;
+            box-shadow: 0 0 20px rgba(52,211,153,0.3);
+        }
+        .agent.gazoo-float::after {
+            content: '✨';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            animation: sparkle 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes gazoo-hover {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(3deg); }
+            75% { transform: translateY(-4px) rotate(-3deg); }
+        }
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(0.8); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+        }
+
         /* Zzz for resting */
         .zzz {
             position: absolute;
@@ -967,6 +992,12 @@
         'rest':    { x: 82, y: 76, jitter: 5 },
         'rest-1':  { x: 80, y: 74, jitter: 3 },
         'rest-2':  { x: 88, y: 78, jitter: 3 },
+        // Gazoo floats — teleports between spots
+        'float-1': { x: 55, y: 15, jitter: 5 },
+        'float-2': { x: 70, y: 55, jitter: 5 },
+        'float-3': { x: 35, y: 65, jitter: 5 },
+        'float-4': { x: 20, y: 25, jitter: 5 },
+        'float-5': { x: 60, y: 40, jitter: 5 },
         // Offsite (hidden)
         'offsite': { x: -10, y: 50, jitter: 0 }
     };
@@ -1031,7 +1062,8 @@
             }
 
             // Set state class
-            el.className = `agent state-${agent.state}${agent.zone === 'offsite' ? ' offsite' : ''}`;
+            const isGazoo = agent.id === 'gazoo';
+            el.className = `agent state-${agent.state}${agent.zone === 'offsite' ? ' offsite' : ''}${isGazoo && agent.state !== 'offline' ? ' gazoo-float' : ''}`;
 
             // Position
             const zone = zonePositions[agent.zone] || zonePositions['offsite'];
@@ -1049,6 +1081,19 @@
     function setupWander(id, zone, state) {
         if (wanderIntervals[id]) clearInterval(wanderIntervals[id]);
         if (zone === 'offsite' || state === 'offline') return;
+
+        // Gazoo teleports between float points
+        if (id === 'gazoo' && state !== 'offline') {
+            wanderIntervals[id] = setInterval(() => {
+                const el = document.getElementById('agent-gazoo');
+                if (!el) return;
+                const spots = ['float-1','float-2','float-3','float-4','float-5'];
+                const spot = zonePositions[spots[Math.floor(Math.random() * spots.length)]];
+                el.style.left = (spot.x + (Math.random()-0.5)*4) + '%';
+                el.style.top = (spot.y + (Math.random()-0.5)*4) + '%';
+            }, 6000 + Math.random() * 4000);
+            return;
+        }
 
         const interval = state === 'working' ? 8000 : state === 'idle' ? 5000 : 12000;
 

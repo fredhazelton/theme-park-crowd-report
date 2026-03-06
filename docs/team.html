@@ -227,6 +227,7 @@
         .agent-card.tasks { --card-accent: var(--accent-orange); }
         .agent-card.design { --card-accent: var(--accent-pink); }
         .agent-card.writer { --card-accent: var(--accent-red); }
+        .agent-card.critic { --card-accent: #34d399; }
 
         /* Wide variant for Fred & Wilma */
         .agent-card.wide {
@@ -507,7 +508,7 @@
         <div style="text-align:center;margin-bottom:50px;">
             <div class="page-title">Meet the Flintstones Crew</div>
             <div class="page-stats" style="margin-bottom:24px;">
-                <span>1</span> human · <span>3</span> core agents · <span>3</span> sub-agents · <span>2</span> machines
+                <span>1</span> human · <span>3</span> core agents · <span>4</span> sub-agents · <span>2</span> machines
             </div>
 
             <!-- Mission Statement -->
@@ -774,7 +775,7 @@
              ═══════════════════════════════════════════════ -->
         <div class="tier">
             <div class="tier-label">
-                <div class="tier-label-text"><span class="tier-icon">🔧</span> SUB-AGENTS · <span style="color:var(--text-muted)">SPAWNED ON DEMAND BY WILMA</span></div>
+                <div class="tier-label-text"><span class="tier-icon">🔧</span> SUB-AGENTS · <span style="color:var(--text-muted)">SPAWNED ON DEMAND</span></div>
             </div>
             <div class="card-row">
 
@@ -877,6 +878,44 @@
                         <strong>Reports to:</strong> Wilma
                     </div>
                 </div>
+
+                <!-- THE GREAT GAZOO -->
+                <div class="agent-card critic">
+                    <div class="card-header">
+                        <div class="card-avatar">👽</div>
+                        <div>
+                            <div class="card-name">The Great Gazoo</div>
+                            <div class="card-title">Nightly Critic / Devil's Advocate</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        "Hello, dum-dums!" A snarky, hyper-intelligent alien banished to Earth. Every night he reviews
+                        the entire team's work and delivers brutally honest (but constructive) criticism.
+                        Keeps everyone aligned with goals. Grudgingly invested in our success.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag green">Critical Review</span>
+                        <span class="skill-tag green">Goal Alignment</span>
+                        <span class="skill-tag green">Blind Spot Detection</span>
+                        <span class="skill-tag">Accountability</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🐧</span> wilma-server</div>
+                        <div class="card-detail"><span class="icon">🤖</span> Claude · Sub-agent</div>
+                        <div class="card-detail"><span class="status-dot on-demand"></span> Nightly</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Model:</strong> Claude (spawned by Wilma nightly via Clawdbot)<br>
+                        <strong>Schedule:</strong> Runs every night — reviews the full day's work<br>
+                        <strong>Reviews:</strong> Memory logs, task progress, git commits, pipeline health, goal alignment<br>
+                        <strong>Output:</strong> <code>gazoo-reviews/YYYY-MM-DD.md</code> — snarky but actionable daily review<br>
+                        <strong>Catchphrases:</strong> "Hello, dum-dums!", "How quaint.", "Even a caveman could see that..."<br><br>
+                        <strong>Personality:</strong> Knows nothing about data science — his critiques are strategic, not technical.
+                        Secretly cares about the team's success but would never admit it.<br><br>
+                        <strong>Reports to:</strong> Fred (and the universe)
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -905,7 +944,8 @@
                         <div>🧔 Fred ↔ 🪨 Barney <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via claude.ai</span></div>
                         <div>🧔 Fred ↔ 🔨 Bam-Bam <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via Cursor IDE</span></div>
                         <div>🦴 Wilma ↔ 🔨 Bam-Bam <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via WILMA-BAMBAM.md</span></div>
-                        <div>🦴 Wilma → 🦕🎀✍️ Sub-agents <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via sessions_spawn</span></div>
+                        <div>🦴 Wilma → 🦕🎀✍️👽 Sub-agents <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via sessions_spawn</span></div>
+                        <div>👽 Gazoo → Everyone <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> nightly review (read-only)</span></div>
                     </div>
                 </div>
 
@@ -929,7 +969,7 @@
                             <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;"> — Pipeline, API, Clawdbot, 24/7</span>
                         </div>
                         <div style="padding-left:16px;color:var(--text-muted);font-size:11px;">
-                            Home to: Wilma, Dino, Pebbles, Betty
+                            Home to: Wilma, Dino, Pebbles, Betty, Gazoo
                         </div>
                         <div style="margin-top:4px;">🖥️ <strong>Mac Mini</strong> (macOS)
                             <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;"> — Streaming, design, coding</span>
