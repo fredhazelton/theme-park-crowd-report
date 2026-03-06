@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-03-06T12:56:25Z",
+  "generated_at": "2026-03-06T15:08:56Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
     "icon_status": "configured",
-    "total_channels": 24,
+    "total_channels": 29,
     "total_categories": 6,
     "url": "https://discord.com/channels/1479350342318690505"
   },
@@ -21,21 +21,24 @@
           "id": "1479351570121621569",
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
-          "url": "https://discord.com/channels/1479350342318690505/1479351570121621569"
+          "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
+          "last_active": "2026-03-06T15:08:38.494000+00:00"
         },
         {
           "name": "daily-digest",
           "id": "1479351571656474756",
           "emoji": "\ud83d\udcf0",
           "purpose": "Automated daily summary \u2014 pipeline health, accuracy metrics, task progress",
-          "url": "https://discord.com/channels/1479350342318690505/1479351571656474756"
+          "url": "https://discord.com/channels/1479350342318690505/1479351571656474756",
+          "last_active": ""
         },
         {
           "name": "fred-wilma",
           "id": "1479351572386414675",
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
-          "url": "https://discord.com/channels/1479350342318690505/1479351572386414675"
+          "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
+          "last_active": "2026-03-06T14:52:16.860000+00:00"
         }
       ]
     },
@@ -51,21 +54,24 @@
           "id": "1479351574177513576",
           "emoji": "\ud83d\udd27",
           "purpose": "Pipeline monitoring \u2014 ETL status, forecast runs, data quality checks",
-          "url": "https://discord.com/channels/1479350342318690505/1479351574177513576"
+          "url": "https://discord.com/channels/1479350342318690505/1479351574177513576",
+          "last_active": "2026-03-06T05:38:02.716000+00:00"
         },
         {
           "name": "modeling",
           "id": "1479351576232591491",
           "emoji": "\ud83e\uddea",
           "purpose": "Model experiments \u2014 XGBoost tuning, accuracy analysis, feature engineering",
-          "url": "https://discord.com/channels/1479350342318690505/1479351576232591491"
+          "url": "https://discord.com/channels/1479350342318690505/1479351576232591491",
+          "last_active": "2026-03-06T05:38:02.996000+00:00"
         },
         {
           "name": "alerts",
-          "id": "1479351577528762439",
+          "id": "1479471928262529088",
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
-          "url": "https://discord.com/channels/1479350342318690505/1479351577528762439"
+          "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
+          "last_active": "2026-03-06T13:52:20.573000+00:00"
         }
       ]
     },
@@ -81,202 +87,301 @@
           "id": "1479351579185250436",
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
-          "url": "https://discord.com/channels/1479350342318690505/1479351579185250436"
+          "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
+          "last_active": "2026-03-06T06:04:04.840000+00:00"
         },
         {
           "name": "bam-bam",
           "id": "1479351580347072675",
           "emoji": "\ud83c\udfcf",
           "purpose": "Bam-Bam's workspace \u2014 coding tasks, Discord bot development",
-          "url": "https://discord.com/channels/1479350342318690505/1479351580347072675"
+          "url": "https://discord.com/channels/1479350342318690505/1479351580347072675",
+          "last_active": "2026-03-06T15:08:49.540000+00:00"
         },
         {
           "name": "barney",
           "id": "1479351581873803386",
           "emoji": "\ud83e\udde0",
           "purpose": "Barney's workspace \u2014 research, analysis, deep thinking tasks",
-          "url": "https://discord.com/channels/1479350342318690505/1479351581873803386"
+          "url": "https://discord.com/channels/1479350342318690505/1479351581873803386",
+          "last_active": ""
         },
         {
           "name": "dino",
           "id": "1479351582872043580",
           "emoji": "\ud83e\udd96",
           "purpose": "Dino's workspace \u2014 lightweight automation, fetch tasks, monitoring",
-          "url": "https://discord.com/channels/1479350342318690505/1479351582872043580"
+          "url": "https://discord.com/channels/1479350342318690505/1479351582872043580",
+          "last_active": ""
         },
         {
           "name": "pebbles",
           "id": "1479351583908171937",
           "emoji": "\ud83c\udf80",
           "purpose": "Pebbles' workspace \u2014 creative content, social media, design tasks",
-          "url": "https://discord.com/channels/1479350342318690505/1479351583908171937"
+          "url": "https://discord.com/channels/1479350342318690505/1479351583908171937",
+          "last_active": ""
         },
         {
           "name": "betty",
           "id": "1479351584977846325",
           "emoji": "\u270d\ufe0f",
           "purpose": "Betty's workspace \u2014 writing, documentation, content editing",
-          "url": "https://discord.com/channels/1479350342318690505/1479351584977846325"
+          "url": "https://discord.com/channels/1479350342318690505/1479351584977846325",
+          "last_active": ""
         },
         {
           "name": "gazoo",
           "id": "1479351587129262232",
           "emoji": "\ud83d\udc7d",
-          "purpose": "Gazoo's workspace \u2014 experimental features, moonshot ideas, R&D",
-          "url": "https://discord.com/channels/1479350342318690505/1479351587129262232"
+          "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
+          "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
+          "last_active": "2026-03-06T13:51:42.038000+00:00"
         },
         {
           "name": "morning-briefing",
           "id": "1479351589176082526",
           "emoji": "\u2600\ufe0f",
           "purpose": "Automated morning briefings \u2014 daily agenda, weather, key metrics",
-          "url": "https://discord.com/channels/1479350342318690505/1479351589176082526"
-        }
-      ]
-    },
-    {
-      "key": "automated-feeds",
-      "id": "1479351566191296605",
-      "display_name": "Automated Feeds",
-      "emoji": "\ud83d\udce1",
-      "description": "Auto-populated intel channels \u2014 competitor data, park updates, social monitoring",
-      "channels": [
-        {
-          "name": "competitor-watch",
-          "id": "1479351590052823164",
-          "emoji": "\ud83d\udc41\ufe0f",
-          "purpose": "Competitor monitoring \u2014 Touring Plans, Thrill Data, market moves",
-          "url": "https://discord.com/channels/1479350342318690505/1479351590052823164"
+          "url": "https://discord.com/channels/1479350342318690505/1479351589176082526",
+          "last_active": "2026-03-06T05:38:03.265000+00:00"
         },
         {
-          "name": "park-intel",
-          "id": "1479351592108036249",
-          "emoji": "\ud83c\udfa2",
-          "purpose": "Park intelligence \u2014 closures, events, crowd patterns, ride updates",
-          "url": "https://discord.com/channels/1479350342318690505/1479351592108036249"
-        },
-        {
-          "name": "social-pulse",
-          "id": "1479351593865318432",
-          "emoji": "\ud83d\udcca",
-          "purpose": "Social media monitoring \u2014 mentions, sentiment, trending topics",
-          "url": "https://discord.com/channels/1479350342318690505/1479351593865318432"
-        }
-      ]
-    },
-    {
-      "key": "projects",
-      "id": "1479351567256649950",
-      "display_name": "Projects",
-      "emoji": "\ud83d\udcc2",
-      "description": "Active project channels \u2014 website, streaming, Discord bot, business",
-      "channels": [
-        {
-          "name": "website",
-          "id": "1479351595035791503",
-          "emoji": "\ud83c\udf10",
-          "purpose": "Website project \u2014 hazeydata.ai updates, SEO, content publishing",
-          "url": "https://discord.com/channels/1479350342318690505/1479351595035791503"
-        },
-        {
-          "name": "streaming",
-          "id": "1479351595836772434",
-          "emoji": "\ud83c\udfa5",
-          "purpose": "Streaming project \u2014 Twitch/YouTube overlays, schedule, content",
-          "url": "https://discord.com/channels/1479350342318690505/1479351595836772434"
-        },
-        {
-          "name": "discord-bot",
-          "id": "1479351596742869086",
-          "emoji": "\ud83e\udd16",
-          "purpose": "TPCR Discord bot \u2014 development, testing, user feedback",
-          "url": "https://discord.com/channels/1479350342318690505/1479351596742869086"
-        },
-        {
-          "name": "business",
-          "id": "1479351598437236840",
-          "emoji": "\ud83d\udcb0",
-          "purpose": "Business strategy \u2014 monetization, partnerships, revenue planning",
-          "url": "https://discord.com/channels/1479350342318690505/1479351598437236840"
-        }
-      ]
-    },
-    {
-      "key": "creative",
-      "id": "1479351568313614449",
-      "display_name": "Creative",
-      "emoji": "\ud83d\udca1",
-      "description": "Idea brainstorming, content planning, and review workflows",
-      "channels": [
-        {
-          "name": "ideas",
-          "id": "1479351600178008125",
-          "emoji": "\ud83d\udca1",
-          "purpose": "Idea dump \u2014 raw ideas, shower thoughts, quick captures",
-          "url": "https://discord.com/channels/1479350342318690505/1479351600178008125"
-        },
-        {
-          "name": "content-ideas",
-          "id": "1479351603193450648",
-          "emoji": "\ud83d\udcdd",
-          "purpose": "Content planning \u2014 blog posts, videos, infographics pipeline",
-          "url": "https://discord.com/channels/1479350342318690505/1479351603193450648"
-        },
-        {
-          "name": "content-review",
-          "id": "1479351605051654215",
-          "emoji": "\ud83d\udc40",
-          "purpose": "Content review \u2014 drafts ready for feedback, approval workflow",
-          "url": "https://discord.com/channels/1479350342318690505/1479351605051654215"
+          "name": "mr-slate",
+          "id": "1479479110878105600",
+          "emoji": "\ud83e\udea8",
+          "purpose": "Mr. Slate \u2014 CBO, executive oversight",
+          "url": "https://discord.com/channels/1479350342318690505/1479479110878105600",
+          "last_active": ""
         }
       ]
     }
   ],
   "recent_activity": [
     {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "It's going through the dimension steps (can't skip those with --skip-training). It'll reach forecast/WTI in a few minutes. Let me respond to Fred:\n\nNot stuck at all \u2014 training just **completed succ...",
+      "timestamp": "2026-03-06T15:08:49.540000+00:00",
+      "message_id": "1479495980846944399",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479495980846944399"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
-      "agent": "Wilma",
-      "message": "Pipeline run complete \u2014 all 6 parks updated",
-      "timestamp": "2026-03-06T12:56:25Z",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569"
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-06T15:08:38.494000+00:00",
+      "message_id": "1479495934516658178",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479495934516658178"
     },
     {
-      "channel": "daily-digest",
-      "channel_emoji": "\ud83d\udcf0",
-      "channel_id": "1479351571656474756",
-      "agent": "Wilma",
-      "message": "Daily digest posted \u2014 MAE 11.2, 47 entities evaluated",
-      "timestamp": "2026-03-06T12:56:25Z",
-      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756"
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "There's a second run that somehow loaded the full file again (94M). But it actually succeeded this time because memory was free. The first run (my per-park chunked one) completed with 243 models. N...",
+      "timestamp": "2026-03-06T15:08:25.654000+00:00",
+      "message_id": "1479495880661794918",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479495880661794918"
+    },
+    {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Woohoo!",
+      "timestamp": "2026-03-06T15:08:20.741000+00:00",
+      "message_id": "1479495860055310366",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479495860055310366"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "#3 for sure - all of the acticity in the office shoudl be activity based",
+      "timestamp": "2026-03-06T14:55:29.582000+00:00",
+      "message_id": "1479492625580167252",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479492625580167252"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Because it's a **static JSON file** \u2014 I hardcoded you as sleeping when I built The Office last night, and there's nothing auto-updating it based on time of day.\n\nFixed it now. You're showing as **w...",
+      "timestamp": "2026-03-06T14:54:54.413000+00:00",
+      "message_id": "1479492478070423655",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479492478070423655"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Done. The daily 6 AM pipeline will now automatically retry training up to 3 times with a 60-second cooldown between attempts. No more silent 22-day failures. If all 3 retries fail, the pipeline ale...",
+      "timestamp": "2026-03-06T14:52:16.860000+00:00",
+      "message_id": "1479491817245380702",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479491817245380702"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now I see the structure. The training step is at step 5. Let me add retry logic specifically around the training step since that's what's been failing:",
+      "timestamp": "2026-03-06T14:51:59.579000+00:00",
+      "message_id": "1479491744763482152",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479491744763482152"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Good idea \u2014 let me bake the retry logic into the daily pipeline itself so it's permanent.",
+      "timestamp": "2026-03-06T14:51:43.046000+00:00",
+      "message_id": "1479491675419181067",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479491675419181067"
     },
     {
       "channel": "alerts",
       "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479351577528762439",
-      "agent": "System",
-      "message": "All systems nominal \u2014 no alerts in last 24h",
-      "timestamp": "2026-03-06T12:56:25Z",
-      "url": "https://discord.com/channels/1479350342318690505/1479351577528762439"
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2705 **Twitter \u2192 X rebrand complete.** Updated ~46 references across the website, stream overlays, scripts, planning docs, and data generators. Only things left saying \"Twitter\" are the `twitter:card`...",
+      "timestamp": "2026-03-06T13:52:20.573000+00:00",
+      "message_id": "1479476733324300298",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479476733324300298"
     },
     {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Wilma",
-      "message": "Forecast generation completed for tomorrow",
-      "timestamp": "2026-03-06T12:56:25Z",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576"
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Good call. Redundancy creep is a real risk with multiple agents working in parallel \u2014 Bam-Bam builds something, Wilma builds something similar, nobody notices until there are three scripts doing th...",
+      "timestamp": "2026-03-06T13:51:42.038000+00:00",
+      "message_id": "1479476571697053749",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1479476571697053749"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "You should also check for redundancy when you do your review. A little bit of redundancy is probably OK but if you feel the redundancy is a real duplication of work or is otherwise excessive that s...",
+      "timestamp": "2026-03-06T13:51:34.093000+00:00",
+      "message_id": "1479476538373046324",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1479476538373046324"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udd27 Sub-agent dispatched to fix all Twitter \u2192 X references. ~40 files to update across the website, stream overlays, scripts, and docs. I'll report back when it's done.",
+      "timestamp": "2026-03-06T13:46:38.106000+00:00",
+      "message_id": "1479475296913850489",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479475296913850489"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "On it \u2014 spawning a sub-agent to handle all the changes.",
+      "timestamp": "2026-03-06T13:46:11.364000+00:00",
+      "message_id": "1479475184749641760",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479475184749641760"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**The Ugly:**\nNot one of you set up a pipeline failure alert. Training has been dying and the only notification system you built was... an animated quarry with wandering sprites.\n\n**Tomorrow's ONE ...",
+      "timestamp": "2026-03-06T12:23:41.036000+00:00",
+      "message_id": "1479454421569241192",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1479454421569241192"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Discord tab is live on Mission Control \u2705 Channel directory with all 24 channels organized by category, quick-open links, server overview \u2014 the whole thing. Check it when you wake up: the two are sy...",
+      "timestamp": "2026-03-06T06:04:04.840000+00:00",
+      "message_id": "1479358891279126670",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1479358891279126670"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Sub-agent's on it \u2014 building the Discord tab for Mission Control right now. It'll:\n\n1. \u2705 Create a data generator script for Discord channel info\n2. \u2705 Enable the Discord tab in MC v3 with a full cha...",
+      "timestamp": "2026-03-06T06:01:37.202000+00:00",
+      "message_id": "1479358272040468610",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1479358272040468610"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Good. Now I understand the full architecture. Let me spawn a sub-agent to build the Discord tab for MC and wire up the sync \u2014 this is a coding task that shouldn't burn Opus tokens.",
+      "timestamp": "2026-03-06T06:01:15.487000+00:00",
+      "message_id": "1479358180961157174",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1479358180961157174"
     },
     {
       "channel": "morning-briefing",
       "channel_emoji": "\u2600\ufe0f",
       "channel_id": "1479351589176082526",
-      "agent": "Wilma",
-      "message": "Morning briefing delivered \u2014 3 tasks scheduled today",
-      "timestamp": "2026-03-06T12:56:25Z",
-      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526"
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2600\ufe0f **Morning Briefing**\n\nAuto-posted every morning at 7:30am ET:\n- Pipeline run status\n- Accuracy trends\n- Calendar events\n- Open tasks summary\n- Key park conditions\n\nFirst briefing drops tomorrow ...",
+      "timestamp": "2026-03-06T05:38:03.265000+00:00",
+      "message_id": "1479352341558726757",
+      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1479352341558726757"
+    },
+    {
+      "channel": "modeling",
+      "channel_emoji": "\ud83e\uddea",
+      "channel_id": "1479351576232591491",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udcc8 **Modeling Channel**\n\nXGBoost parameters, methodology discussions, accuracy experiments, and model architecture decisions.\n\n**Current models:** Per-entity (Julia), scope-scale, conversion model\n*...",
+      "timestamp": "2026-03-06T05:38:02.996000+00:00",
+      "message_id": "1479352340430454845",
+      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479352340430454845"
     }
-  ]
+  ],
+  "stats": {
+    "messages_shown": 20,
+    "active_channels_today": 8,
+    "messages_today": 20
+  }
 }
