@@ -1,8 +1,8 @@
 {
-  "updated": "2026-03-06T04:58:00Z",
+  "updated": "2026-03-06T14:54:00Z",
   "agents": [
-    {"id": "fred", "name": "Fred", "icon": "🧔", "state": "resting", "zone": "rest", "task": "Sleeping — it's late!", "color": "#facc15"},
-    {"id": "wilma", "name": "Wilma", "icon": "🦴", "state": "working", "zone": "desk-1", "task": "Building the Office page", "color": "#4a90a4"},
+    {"id": "fred", "name": "Fred", "icon": "🧔", "state": "working", "zone": "desk-0", "task": "Morning check-in", "color": "#facc15"},
+    {"id": "wilma", "name": "Wilma", "icon": "🦴", "state": "working", "zone": "desk-1", "task": "Updating Office state", "color": "#4a90a4"},
     {"id": "barney", "name": "Barney", "icon": "🪨", "state": "offline", "zone": "offsite", "task": "", "color": "#4ade80"},
     {"id": "bambam", "name": "Bam-Bam", "icon": "🔨", "state": "offline", "zone": "offsite", "task": "", "color": "#c084fc"},
     {"id": "dino", "name": "Dino", "icon": "🦕", "state": "idle", "zone": "pen", "task": "Napping in the dino pen", "color": "#fb923c"},
