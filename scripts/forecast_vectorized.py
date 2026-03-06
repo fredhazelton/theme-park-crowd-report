@@ -813,15 +813,18 @@ def main():
             if grid is None or (hasattr(grid, '__len__') and len(grid) == 0):
                 continue
             entity_ratio = fallback_ratios.get(entity, global_ratio)
-            # For EU entities: ALWAYS use scope_scale group model (until 1 year of data)
-            # EU opened May 2025 — per-entity models have limited, novelty-affected data.
-            # Group models trained on millions of established observations are more reliable.
-            # TODO: Remove this override after May 2026 (1-year mark)
+            # For EU entities: use scope_scale group model ONLY if no per-entity model exists.
+            # Originally forced all EU to scope_scale (EU opened May 2025, limited data).
+            # As of Mar 2026, 13 EU entities have per-entity models with much better accuracy
+            # (per-entity MAE ~2-15 vs scope_scale MAE ~21.6). Let per-entity models win.
             scope_val = None
             if entity.startswith("EU"):
-                sv = entity_scope_map.get(entity)
-                if sv and sv in scope_scale_models:
-                    scope_val = sv
+                has_per_entity = (models_dir / entity / "model_julia_actuals.json").exists() or \
+                                 (models_dir / entity / "model_julia_v2.json").exists()
+                if not has_per_entity:
+                    sv = entity_scope_map.get(entity)
+                    if sv and sv in scope_scale_models:
+                        scope_val = sv
             work_items.append(
                 (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None,
                  scope_val, conversion_model_trained_at, pipeline_run_date)
