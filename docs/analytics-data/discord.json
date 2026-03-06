@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T16:00:01Z",
+  "generated_at": "2026-03-06T16:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-06T15:08:38.494000+00:00"
+          "last_active": "2026-03-06T16:00:02.093000+00:00"
         },
         {
           "name": "daily-digest",
@@ -159,6 +159,17 @@
   ],
   "recent_activity": [
     {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-06T16:00:02.093000+00:00",
+      "message_id": "1479508868068278282",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479508868068278282"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -245,17 +256,6 @@
       "timestamp": "2026-03-06T14:55:29.582000+00:00",
       "message_id": "1479492625580167252",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479492625580167252"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Because it's a **static JSON file** \u2014 I hardcoded you as sleeping when I built The Office last night, and there's nothing auto-updating it based on time of day.\n\nFixed it now. You're showing as **w...",
-      "timestamp": "2026-03-06T14:54:54.413000+00:00",
-      "message_id": "1479492478070423655",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479492478070423655"
     },
     {
       "channel": "alerts",
