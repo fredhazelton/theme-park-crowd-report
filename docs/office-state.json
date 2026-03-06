@@ -1,0 +1,18 @@
+{
+  "updated": "2026-03-06T04:58:00Z",
+  "agents": [
+    {"id": "fred", "name": "Fred", "icon": "🧔", "state": "resting", "zone": "rest", "task": "Sleeping — it's late!", "color": "#facc15"},
+    {"id": "wilma", "name": "Wilma", "icon": "🦴", "state": "working", "zone": "desk-1", "task": "Building the Office page", "color": "#4a90a4"},
+    {"id": "barney", "name": "Barney", "icon": "🪨", "state": "offline", "zone": "offsite", "task": "", "color": "#4ade80"},
+    {"id": "bambam", "name": "Bam-Bam", "icon": "🔨", "state": "offline", "zone": "offsite", "task": "", "color": "#c084fc"},
+    {"id": "dino", "name": "Dino", "icon": "🦕", "state": "idle", "zone": "pen", "task": "Napping in the dino pen", "color": "#fb923c"},
+    {"id": "pebbles", "name": "Pebbles", "icon": "🎀", "state": "idle", "zone": "pen", "task": "Waiting for a design task", "color": "#f472b6"},
+    {"id": "betty", "name": "Betty", "icon": "✍️", "state": "idle", "zone": "pen", "task": "Waiting for a writing task", "color": "#f87171"}
+  ],
+  "activity": [
+    {"time": "23:58", "agent": "wilma", "text": "Started building the Office page"},
+    {"time": "23:51", "agent": "wilma", "text": "Built the Team org chart page"},
+    {"time": "23:47", "agent": "wilma", "text": "Built the Docs Hub with search & filters"},
+    {"time": "23:00", "agent": "wilma", "text": "Updated Mission Control v3 tabs"}
+  ]
+}
