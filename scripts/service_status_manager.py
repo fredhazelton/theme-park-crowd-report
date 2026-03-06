@@ -298,107 +298,311 @@ def auto_fix(bot: dict, duckdb: dict) -> list:
 
 
 # ── Announcement Message Formatting ──────────────────────────────────
+#
+# Fred's rule: be transparent. Users appreciate honesty.
+# Tell people what happened and why, just skip the internal jargon.
+# Tone: friendly, technical-but-accessible, like a dev blog post.
+
+
+def _describe_pipeline_issues(pipeline: dict) -> list:
+    """
+    Translate raw pipeline issues into plain-language explanations.
+    Returns a list of human-readable strings (no internal jargon).
+    """
+    descriptions = []
+    issues = pipeline.get("issues", [])
+    issue_types = {i["type"] for i in issues}
+
+    if "OOM_KILL" in issue_types or "MEMORY_ERROR" in issue_types or "OOM_ERROR" in issue_types:
+        descriptions.append(
+            "Our forecast models ran out of memory during training. "
+            "These models crunch a lot of historical park data at once, "
+            "and sometimes that exceeds what our server can handle."
+        )
+    elif "STEP_FAILED" in issue_types or "NONZERO_EXIT" in issue_types:
+        descriptions.append(
+            "One of the steps in our data processing pipeline hit an error "
+            "and couldn't finish. This means new forecast data wasn't generated."
+        )
+
+    if "PROLONGED_FAILURE" in issue_types:
+        consec = pipeline.get("consecutive_failures", 0)
+        descriptions.append(
+            f"This has been an ongoing issue — our pipeline has been struggling "
+            f"for about {consec} days now. We're actively working on a fix "
+            f"(likely adjusting how much data we process at once)."
+        )
+    elif "MULTI_DAY_FAILURE" in issue_types or "REPEATED_FAILURE" in issue_types:
+        consec = pipeline.get("consecutive_failures", 0)
+        descriptions.append(
+            f"This issue has persisted for {consec} days. "
+            f"We're investigating the root cause."
+        )
+
+    if "WTI_STALE" in issue_types or "WTI_MISSING" in issue_types:
+        descriptions.append(
+            "The Wait Time Index (the crowd level scores you see for each park) "
+            "hasn't been refreshed recently, so the numbers may be out of date."
+        )
+
+    if "FORECAST_STALE" in issue_types or "FORECAST_MISSING" in issue_types:
+        descriptions.append(
+            "Our crowd forecasts haven't been updated with the latest data, "
+            "so predictions may be less accurate than usual."
+        )
+
+    if "VALIDATION_FAIL" in issue_types:
+        descriptions.append(
+            "Our automated quality checks flagged some issues with the output data. "
+            "The forecasts were generated but may not meet our accuracy standards."
+        )
+
+    # Fallback if none of the above matched
+    if not descriptions and issues:
+        descriptions.append(
+            "Our data processing pipeline ran into a technical issue. "
+            "We're looking into it."
+        )
+
+    return descriptions
+
+
+def _describe_db_issue(duckdb: dict) -> str:
+    """Translate DB issues into plain language."""
+    if duckdb.get("wal_corrupt", False):
+        return (
+            "The bot's database had a write log that got corrupted — "
+            "think of it like a scratch file that got garbled. "
+            "This prevented the bot from reading park data."
+        )
+    return (
+        "The bot couldn't access its database where all the park data is stored. "
+        "Without that data, it can't answer questions about wait times or crowds."
+    )
+
+
+def _format_duration(downtime_start: str) -> str | None:
+    """Calculate and format a human-readable duration string."""
+    if not downtime_start:
+        return None
+    try:
+        start = datetime.fromisoformat(downtime_start)
+        now = datetime.now(timezone.utc)
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=timezone.utc)
+        total_seconds = (now - start).total_seconds()
+        if total_seconds < 60:
+            return "under a minute"
+        elif total_seconds < 3600:
+            mins = int(total_seconds / 60)
+            return f"about {mins} minute{'s' if mins != 1 else ''}"
+        elif total_seconds < 86400:
+            hours = total_seconds / 3600
+            if hours < 2:
+                return "about an hour"
+            return f"about {hours:.0f} hours"
+        else:
+            days = (now - start).days
+            return f"about {days} day{'s' if days != 1 else ''}"
+    except (ValueError, TypeError):
+        return None
+
+
+def _describe_fixes(fixes: list) -> list:
+    """Translate auto-fix actions into plain language."""
+    descriptions = []
+    for fix in (fixes or []):
+        action = fix.get("action", "")
+        if action == "bot_restarted" and fix.get("success"):
+            descriptions.append("We restarted the bot service and it came back up successfully.")
+        elif action == "bot_restarted" and not fix.get("success"):
+            descriptions.append(
+                "We tried restarting the bot but it didn't come back cleanly — "
+                "we're investigating further."
+            )
+        elif action == "wal_removed":
+            descriptions.append(
+                "We cleared a corrupted database write log and restored the database to a clean state."
+            )
+        elif action == "bot_restart_failed":
+            descriptions.append(
+                "We attempted to restart the bot but ran into an error. "
+                "We're looking into it manually."
+            )
+    return descriptions
+
 
 def format_degraded_message(pipeline: dict, bot: dict, duckdb: dict) -> str:
-    """Format announcement for degraded status (pipeline issues)."""
+    """Format announcement for degraded status (pipeline issues, bot still works)."""
     lines = [
-        "🛠️ **Service Notice**",
+        "🛠️ **Service Notice — Data Pipeline Issues**",
         "",
-        "Our forecast data pipeline is currently experiencing issues. "
-        "The bot is online and responding to commands, but some data may be outdated.",
+        "Hey everyone — quick heads up on what's going on.",
         "",
     ]
 
-    # Describe impact without internal details
-    consec = pipeline.get("consecutive_failures", 0)
-    if consec > 1:
-        lines.append(
-            f"We've been working on resolving data processing issues "
-            f"that started {consec} days ago."
-        )
-    else:
-        lines.append("We're working to resolve this as quickly as possible.")
+    # Explain what happened
+    lines.append("**What happened:**")
+    descriptions = _describe_pipeline_issues(pipeline)
+    for desc in descriptions:
+        lines.append(desc)
+    lines.append("")
 
-    lines.extend([
-        "",
-        "**What this means for you:**",
-        "• The bot will still respond to commands",
-        "• Wait time estimates and crowd forecasts may not reflect the latest data",
-        "• Historical data and park information remain available",
-        "",
-        "We'll update this message when everything is back to normal. 🔧",
-    ])
+    # Explain what still works
+    lines.append("**What still works:**")
+    lines.append("• The bot is online and responding to commands ✅")
+    lines.append("• Historical wait time data and park info are still available")
+    lines.append("• `/now` live wait times from the parks are unaffected (those come directly from the parks)")
+    lines.append("")
+
+    # Explain what's affected
+    lines.append("**What's affected:**")
+    issue_types = {i["type"] for i in pipeline.get("issues", [])}
+    if "WTI_STALE" in issue_types or "WTI_MISSING" in issue_types:
+        lines.append("• Wait Time Index scores may be out of date")
+    if "FORECAST_STALE" in issue_types or "FORECAST_MISSING" in issue_types:
+        lines.append("• Crowd level forecasts may not reflect the most recent trends")
+    if not any(t in issue_types for t in ("WTI_STALE", "WTI_MISSING", "FORECAST_STALE", "FORECAST_MISSING")):
+        lines.append("• Crowd forecasts and Wait Time Index data may not be fully up to date")
+    lines.append("")
+
+    lines.append("We're working on it and will update this message when it's resolved. 🔧")
 
     return "\n".join(lines)
 
 
 def format_down_message(pipeline: dict, bot: dict, duckdb: dict) -> str:
     """Format announcement for down status (bot or DB unavailable)."""
+    bot_down = not bot.get("running", True)
+    db_down = not duckdb.get("healthy", True)
+
     lines = [
         "🔴 **Service Interruption**",
         "",
+        "Hey everyone — we're having some issues right now. Here's what's going on:",
+        "",
     ]
 
-    if not bot.get("running", True):
+    # Explain what happened — be specific
+    lines.append("**What happened:**")
+
+    if bot_down and db_down:
         lines.append(
-            "The TPCR bot is currently offline. "
-            "We're aware of the issue and working to restore service."
+            "The bot process went down, and we're also seeing issues with "
+            "the underlying database. We're working on bringing everything back up."
         )
-    elif not duckdb.get("healthy", True):
+        # Add DB-specific context
+        lines.append(_describe_db_issue(duckdb))
+    elif bot_down:
+        # Check journal for clues about why
+        journal = bot.get("journal_snippet", "")
+        if "memory" in journal.lower() or "killed" in journal.lower() or "oom" in journal.lower():
+            lines.append(
+                "The bot ran out of memory and crashed. This can happen during "
+                "heavy usage or when our data processing pipeline is running "
+                "at the same time. We're restarting it now."
+            )
+        elif "error" in journal.lower() or "exception" in journal.lower():
+            lines.append(
+                "The bot hit an unexpected error and stopped running. "
+                "We're looking at the logs to figure out what went wrong "
+                "and getting it back online."
+            )
+        else:
+            lines.append(
+                "The bot stopped running. We're not sure of the exact cause yet "
+                "but we're restarting it and investigating."
+            )
+    elif db_down:
         lines.append(
-            "The TPCR bot is having trouble accessing its data. "
-            "Commands may not work correctly until this is resolved."
+            "The bot is running, but it can't access its data right now. "
+            "That means commands that need park data (crowd forecasts, "
+            "wait time history, etc.) won't work correctly."
         )
+        lines.append(_describe_db_issue(duckdb))
     else:
         lines.append(
-            "We're experiencing a service interruption. "
-            "Some features may be unavailable."
+            "We're seeing multiple issues across our systems. "
+            "The bot may not respond correctly to commands."
         )
+    lines.append("")
 
-    lines.extend([
-        "",
-        "**What this means for you:**",
-        "• Bot commands may not work or may return errors",
-        "• We're actively working on a fix",
-        "",
-        "We'll update this message once service is restored. 🔧",
-    ])
+    # What's affected
+    lines.append("**What this means for you:**")
+    if bot_down:
+        lines.append("• Bot commands won't work until we get it restarted")
+        lines.append("• This is usually a quick fix — we'll have it back shortly")
+    elif db_down:
+        lines.append("• Commands like `/crowd`, `/today`, and `/ask` may return errors")
+        lines.append("• `/now` (live wait times) might still work since it pulls directly from parks")
+    else:
+        lines.append("• Some commands may not work or may return errors")
+    lines.append("")
+
+    lines.append(
+        "We're on it and will update this message as soon as things are back to normal. 🔧"
+    )
 
     return "\n".join(lines)
 
 
 def format_restored_message(
-    previous_status: str, downtime_start: str
+    previous_status: str,
+    downtime_start: str,
+    pipeline: dict | None = None,
+    bot: dict | None = None,
+    duckdb: dict | None = None,
+    fixes: list | None = None,
 ) -> str:
     """Format announcement for restored status (edit over the old message)."""
     lines = [
         "✅ **Service Restored**",
         "",
-        "All systems are back to normal! The bot is online and data is up to date.",
-        "",
     ]
 
-    # Add downtime duration if we know when it started
-    if downtime_start:
-        try:
-            start = datetime.fromisoformat(downtime_start)
-            now = datetime.now(timezone.utc)
-            if start.tzinfo is None:
-                start = start.replace(tzinfo=timezone.utc)
-            duration = now - start
-            hours = duration.total_seconds() / 3600
-            if hours < 1:
-                dur_str = f"{int(duration.total_seconds() / 60)} minutes"
-            elif hours < 24:
-                dur_str = f"{hours:.1f} hours"
-            else:
-                dur_str = f"{duration.days} days"
-            lines.append(f"*Issue lasted approximately {dur_str}.*")
-            lines.append("")
-        except (ValueError, TypeError):
-            pass
+    # Duration
+    dur_str = _format_duration(downtime_start)
 
-    lines.append("Thank you for your patience! 🎢")
+    # Explain what happened and how it was fixed
+    lines.append("**What happened:**")
+
+    if previous_status == "down":
+        # Describe what was wrong
+        bot_was_down = bot and not bot.get("was_running_before_fix", True)
+        db_was_down = duckdb and not duckdb.get("was_healthy_before_fix", True)
+
+        # Use fix descriptions if we have them
+        fix_descriptions = _describe_fixes(fixes)
+
+        if fix_descriptions:
+            for desc in fix_descriptions:
+                lines.append(desc)
+        elif previous_status == "down":
+            lines.append(
+                "The bot experienced a service interruption and needed to be restarted."
+            )
+        lines.append("")
+    elif previous_status == "degraded":
+        lines.append(
+            "Our data pipeline was having trouble processing new forecast data. "
+            "The models have now completed their run and everything is fresh again."
+        )
+        lines.append("")
+
+    if dur_str:
+        lines.append(f"*The issue lasted {dur_str}.*")
+        lines.append("")
+
+    # What's working now
+    lines.append("**Current status:**")
+    lines.append("• Bot is online and responding to commands ✅")
+    if pipeline and pipeline.get("status") == "ok":
+        lines.append("• Data pipeline is healthy — forecasts and crowd data are up to date ✅")
+    if duckdb and duckdb.get("healthy"):
+        lines.append("• Database is healthy ✅")
+    lines.append("")
+
+    lines.append("Thanks for your patience — and sorry for the interruption! 🎢")
 
     return "\n".join(lines)
 
@@ -425,6 +629,10 @@ def run_check(do_fix: bool = False) -> dict:
     pipeline = check_pipeline()
     bot = check_bot_service()
     duckdb = check_duckdb()
+
+    # Snapshot pre-fix state so recovery messages can describe what was wrong
+    pre_fix_bot = dict(bot)
+    pre_fix_duckdb = dict(duckdb)
 
     # Auto-fix if requested (before determining status, so fixes can improve status)
     fixes = []
@@ -464,11 +672,18 @@ def run_check(do_fix: bool = False) -> dict:
         logger.info(f"Status change: {old_status} → {new_status} — posting announcement")
 
     elif old_status in ("degraded", "down") and new_status == "operational":
-        # Recovered → edit existing announcement
+        # Recovered → edit existing announcement with full context
         if message_id:
             action = "edit"
+            # Pull outage context from state for the recovery narrative
+            outage_ctx = state.get("outage_context", {})
             message_content = format_restored_message(
-                old_status, state.get("last_status_change")
+                previous_status=old_status,
+                downtime_start=state.get("last_status_change"),
+                pipeline=pipeline,
+                bot=bot,
+                duckdb=duckdb,
+                fixes=outage_ctx.get("fixes", fixes),
             )
             logger.info(
                 f"Status change: {old_status} → {new_status} — "
@@ -513,6 +728,40 @@ def run_check(do_fix: bool = False) -> dict:
     status_changed = old_status != new_status
     if status_changed:
         state["last_status_change"] = now
+
+        # When entering a bad state, save outage context so recovery
+        # messages can explain what happened and how it was fixed
+        if new_status in ("degraded", "down"):
+            state["outage_context"] = {
+                "entered_at": now,
+                "entered_status": new_status,
+                "pipeline_issues": [
+                    {"type": i["type"], "message": i["message"]}
+                    for i in pipeline.get("issues", [])
+                ],
+                "bot_was_running": pre_fix_bot.get("running", True),
+                "db_was_healthy": pre_fix_duckdb.get("healthy", True),
+                "db_wal_corrupt": pre_fix_duckdb.get("wal_corrupt", False),
+                "fixes": [
+                    {"action": f["action"], "success": f.get("success", True)}
+                    for f in fixes
+                ] if fixes else [],
+            }
+        elif new_status == "operational":
+            # Clear outage context on recovery (already used for message)
+            state.pop("outage_context", None)
+
+    # Accumulate fixes into outage context even on subsequent checks
+    if fixes and new_status in ("degraded", "down"):
+        ctx = state.get("outage_context", {})
+        existing_fixes = ctx.get("fixes", [])
+        existing_fixes.extend(
+            {"action": f["action"], "success": f.get("success", True)}
+            for f in fixes
+        )
+        ctx["fixes"] = existing_fixes
+        state["outage_context"] = ctx
+
     state["current_status"] = new_status
     state["last_check"] = now
     state["check_details"] = {
