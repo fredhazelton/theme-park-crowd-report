@@ -75,13 +75,15 @@ function train_single_entity_v2(entity_code::String, matched_df::DataFrame, mode
         n_real = sum(.!is_synthetic)
         n_synthetic = sum(is_synthetic)
         
-        # Uniform ratio: Real = 3.5x, Synthetic = 1.0x (both get geo_decay)
-        # Real observations: weight = 3.5 × geo_decay_weight
-        # Synthetic observations: weight = 1.0 × geo_decay_weight
-        weights = geo_weights .* ifelse.(is_synthetic, 1.0f0, 3.5f0)
+        # Inverse frequency weighting: synthetic weight decreases as real data increases
+        # synth_weight = 1.0 / log2(n_real + 1) — entities with more real data rely less on synthetic
+        # Real observations always get weight 1.0 × geo_decay
+        # Tested 7 schemes on 15 entities (Mar 6 2026): inverse_freq won (MAE 6.96 vs 7.04 uniform_3.5)
+        synth_mult = n_real > 0 ? Float32(1.0 / log2(n_real + 1)) : 1.0f0
+        weights = geo_weights .* ifelse.(is_synthetic, synth_mult, 1.0f0)
         
         if n_real > 0 && n_synthetic > 0
-            println("  Entity $entity_code: $n_real real (3.5x weight), $n_synthetic synthetic (1.0x weight)")
+            println("  Entity $entity_code: $n_real real (1.0x weight), $n_synthetic synthetic ($(round(synth_mult, digits=4))x weight)")
         end
     else
         weights = geo_weights

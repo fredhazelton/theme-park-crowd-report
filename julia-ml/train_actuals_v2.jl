@@ -57,14 +57,17 @@ function train_single_entity_actuals(entity_code::String, df::DataFrame, models_
     ))
     y = Float32.(entity_df.actual_time)
 
-    # Geo decay + real/synthetic weight (real=3.5x, synthetic=1.0x)
+    # Geo decay + inverse frequency weighting for synthetic data
+    # synth_weight = 1.0 / log2(n_real + 1) — less synthetic influence when more real data exists
     today_date = Dates.today()
     park_dates = Date.(string.(entity_df.park_date))
     days_old = Float32.(Dates.value.(today_date .- park_dates))
     geo_weights = Float32.(0.5 .^ (days_old ./ 730.0))
 
     if "is_synthetic" in names(entity_df)
-        weights = geo_weights .* ifelse.(entity_df.is_synthetic, 1.0f0, 3.5f0)
+        n_real = sum(.!entity_df.is_synthetic)
+        synth_mult = n_real > 0 ? Float32(1.0 / log2(n_real + 1)) : 1.0f0
+        weights = geo_weights .* ifelse.(entity_df.is_synthetic, synth_mult, 1.0f0)
     else
         weights = geo_weights
     end
@@ -237,7 +240,7 @@ function main()
     println("JULIA XGBOOST TRAINING - ACTUALS-ONLY ($MODEL_LABEL)")
     println("=" ^ 60)
     println("Features: ", join(string.(FEATURE_COLS_ACTUALS), ", "), " (NO posted_time)")
-    println("Weights: geo_decay + real(3.5x) / synthetic(1.0x)")
+    println("Weights: geo_decay + inverse_freq (real=1.0x, synthetic=1/log2(n_real+1))")
     println("OOM-safe: ", use_park_chunks ? "per-park chunks" : "single file")
     println("Threads: ", Threads.nthreads())
 
