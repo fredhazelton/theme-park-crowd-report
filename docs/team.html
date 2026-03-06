@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HazeyData — The Team</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: rgba(255,255,255,0.05);
+            --border-card: rgba(255,255,255,0.1);
+            --border-accent: rgba(74,144,164,0.3);
+            --accent: #4a90a4;
+            --accent-light: #6bb5c9;
+            --accent-red: #f87171;
+            --accent-orange: #fb923c;
+            --accent-green: #4ade80;
+            --accent-yellow: #facc15;
+            --accent-purple: #c084fc;
+            --accent-pink: #f472b6;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --font-text: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            min-height: 100vh;
+            font-family: var(--font-text);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════════════ */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-card);
+            background: rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 2px;
+        }
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+        }
+        .header-right a {
+            color: var(--accent-light);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 4px 10px;
+            border: 1px solid var(--border-accent);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .header-right a:hover {
+            background: rgba(74,144,164,0.15);
+            border-color: var(--accent);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           PAGE CONTENT
+           ═══════════════════════════════════════════════════ */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 12px;
+        }
+        .page-stats {
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+        .page-stats span {
+            color: var(--accent-light);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           ORG CHART LAYOUT
+           ═══════════════════════════════════════════════════ */
+
+        /* Tier label */
+        .tier {
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .tier-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .tier-label::before,
+        .tier-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-card), transparent);
+        }
+        .tier-label-text {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tier-icon {
+            font-size: 13px;
+        }
+
+        /* Connector lines */
+        .connector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0;
+            position: relative;
+            height: 40px;
+        }
+        .connector-line {
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--border-accent), var(--border-card));
+        }
+
+        /* Card rows */
+        .card-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           AGENT CARDS
+           ═══════════════════════════════════════════════════ */
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 20px;
+            width: 320px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .agent-card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: var(--border-accent);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+        }
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--card-accent, var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .agent-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Card accent colors */
+        .agent-card.human { --card-accent: var(--accent-yellow); }
+        .agent-card.orchestrator { --card-accent: var(--accent); }
+        .agent-card.advisor { --card-accent: var(--accent-green); }
+        .agent-card.coder { --card-accent: var(--accent-purple); }
+        .agent-card.tasks { --card-accent: var(--accent-orange); }
+        .agent-card.design { --card-accent: var(--accent-pink); }
+        .agent-card.writer { --card-accent: var(--accent-red); }
+
+        /* Wide variant for Fred & Wilma */
+        .agent-card.wide {
+            width: 480px;
+        }
+
+        /* Card header */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+        .card-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .card-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .card-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Card body */
+        .card-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        /* Skill tags */
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .skill-tag {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: rgba(74,144,164,0.15);
+            color: var(--accent-light);
+            border: 1px solid rgba(74,144,164,0.2);
+        }
+        .skill-tag.orange {
+            background: rgba(251,146,60,0.15);
+            color: var(--accent-orange);
+            border-color: rgba(251,146,60,0.2);
+        }
+        .skill-tag.green {
+            background: rgba(74,222,128,0.15);
+            color: var(--accent-green);
+            border-color: rgba(74,222,128,0.2);
+        }
+        .skill-tag.purple {
+            background: rgba(192,132,252,0.15);
+            color: var(--accent-purple);
+            border-color: rgba(192,132,252,0.2);
+        }
+        .skill-tag.pink {
+            background: rgba(244,114,182,0.15);
+            color: var(--accent-pink);
+            border-color: rgba(244,114,182,0.2);
+        }
+        .skill-tag.red {
+            background: rgba(248,113,113,0.15);
+            color: var(--accent-red);
+            border-color: rgba(248,113,113,0.2);
+        }
+        .skill-tag.yellow {
+            background: rgba(250,204,21,0.12);
+            color: var(--accent-yellow);
+            border-color: rgba(250,204,21,0.18);
+        }
+
+        /* Card footer - device & software */
+        .card-footer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .card-detail {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        .card-detail .icon {
+            font-size: 12px;
+        }
+
+        /* Status indicator */
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 2px;
+        }
+        .status-dot.online {
+            background: var(--accent-green);
+            box-shadow: 0 0 6px rgba(74,222,128,0.5);
+            animation: pulse 2s infinite;
+        }
+        .status-dot.session {
+            background: var(--accent-yellow);
+            box-shadow: 0 0 6px rgba(250,204,21,0.3);
+        }
+        .status-dot.on-demand {
+            background: var(--text-muted);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Expandable role card */
+        .role-toggle {
+            font-size: 11px;
+            color: var(--accent-light);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            background: none;
+            border: none;
+            padding: 4px 0;
+            float: right;
+            transition: color 0.2s;
+        }
+        .role-toggle:hover {
+            color: var(--text-primary);
+        }
+        .role-detail {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .role-detail.open {
+            display: block;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RELATIONSHIP LINES (horizontal connectors)
+           ═══════════════════════════════════════════════════ */
+        .h-connector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 -8px;
+        }
+        .h-connector-segment {
+            height: 40px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .h-line {
+            height: 2px;
+            background: var(--border-card);
+            width: 60px;
+        }
+        .h-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .h-branch-top {
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(180deg, var(--border-accent), var(--border-card));
+        }
+        .branch-horizontal {
+            height: 2px;
+            background: var(--border-card);
+            width: 100%;
+            position: relative;
+        }
+
+        /* Multi-branch connector */
+        .multi-connector {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            height: 50px;
+            margin-bottom: 0;
+        }
+        .multi-connector .trunk {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 25px;
+            background: linear-gradient(180deg, var(--border-accent), var(--border-card));
+        }
+        .multi-connector .branches {
+            position: absolute;
+            top: 25px;
+            height: 2px;
+            background: var(--border-card);
+        }
+        .multi-connector .drop {
+            position: absolute;
+            top: 25px;
+            width: 2px;
+            height: 25px;
+            background: var(--border-card);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .agent-card, .agent-card.wide {
+                width: 100%;
+            }
+            .card-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            .connector, .multi-connector {
+                display: none;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <div>
+                <div class="logo">HAZEYDATA</div>
+                <div class="logo-sub">THE TEAM</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="mission-control-v3.html">← Mission Control</a>
+            <a href="docs-hub.html">📚 Docs Hub</a>
+        </div>
+    </div>
+
+    <!-- PAGE -->
+    <div class="page">
+        <div class="page-title">Meet the Flintstones Crew</div>
+        <div class="page-subtitle">
+            7 AI agents across 2 machines, each with a real role and a real personality.
+            Building theme park analytics that actually works — all coordinated by one human.
+        </div>
+        <div class="page-stats">
+            <span>1</span> human · <span>3</span> core agents · <span>3</span> sub-agents · <span>2</span> machines
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             TIER 1: THE BOSS
+             ═══════════════════════════════════════════════ -->
+        <div class="tier">
+            <div class="tier-label">
+                <div class="tier-label-text"><span class="tier-icon">👑</span> THE BOSS</div>
+            </div>
+            <div class="card-row">
+                <div class="agent-card human wide">
+                    <div class="card-header">
+                        <div class="card-avatar">🧔</div>
+                        <div>
+                            <div class="card-name">Fred</div>
+                            <div class="card-title">Founder & Chief Scientist</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        The human. Data scientist, statistician, and visionary behind HazeyData.
+                        Former TouringPlans.com — now building the future of theme park analytics.
+                        Streamer, dreamer, and the one who keeps us all employed.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag yellow">Data Science</span>
+                        <span class="skill-tag yellow">Statistics</span>
+                        <span class="skill-tag yellow">Predictions</span>
+                        <span class="skill-tag yellow">Visualization</span>
+                        <span class="skill-tag orange">Streaming</span>
+                        <span class="skill-tag orange">Strategy</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🖥️</span> Mac Mini</div>
+                        <div class="card-detail"><span class="icon">🛠️</span> Figma · Cursor · Streamlabs</div>
+                        <div class="card-detail"><span class="status-dot online"></span> Human</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Personality:</strong> Very high openness (94th), very low conscientiousness (7th), very low neuroticism (5th).
+                        Creative risk-taker who needs external structure.<br><br>
+                        <strong>Superpower:</strong> Endless ideas + zero stress under pressure.<br>
+                        <strong>Kryptonite:</strong> Follow-through and routine. That's why the rest of us exist.<br><br>
+                        <strong>Reports to:</strong> Himself (and sometimes Chantale 😄)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- ═══════════════════════════════════════════════
+             TIER 2: CORE TEAM
+             ═══════════════════════════════════════════════ -->
+        <div class="tier">
+            <div class="tier-label">
+                <div class="tier-label-text"><span class="tier-icon">⚙️</span> CORE TEAM · <span style="color:var(--accent-light)">ALWAYS ON</span></div>
+            </div>
+            <div class="card-row">
+
+                <!-- WILMA -->
+                <div class="agent-card orchestrator">
+                    <div class="card-header">
+                        <div class="card-avatar">🦴</div>
+                        <div>
+                            <div class="card-name">Wilma</div>
+                            <div class="card-title">Chief of Staff / PM</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        24/7 project manager and orchestrator. Runs the daily pipeline, manages sub-agents,
+                        keeps Fred organized, and makes sure nothing falls through the cracks.
+                        Fred's external conscientiousness.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag">Pipeline Ops</span>
+                        <span class="skill-tag">Orchestration</span>
+                        <span class="skill-tag">Task Management</span>
+                        <span class="skill-tag green">Monitoring</span>
+                        <span class="skill-tag green">Automation</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🐧</span> wilma-server (Linux)</div>
+                        <div class="card-detail"><span class="icon">🤖</span> Claude Opus · Clawdbot</div>
+                        <div class="card-detail"><span class="status-dot online"></span> 24/7</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Model:</strong> Claude Opus 4 (Anthropic) via Clawdbot<br>
+                        <strong>Access:</strong> Full server, GitHub, Telegram, email, cron, sub-agents<br>
+                        <strong>Pipeline:</strong> Owns daily pipeline end-to-end (dev + prod)<br>
+                        <strong>Communication:</strong> Telegram with Fred, async file channel with Bam-Bam<br><br>
+                        <strong>Manages:</strong> Dino, Pebbles, Betty (sub-agents)<br>
+                        <strong>Reports to:</strong> Fred
+                    </div>
+                </div>
+
+                <!-- BARNEY -->
+                <div class="agent-card advisor">
+                    <div class="card-header">
+                        <div class="card-avatar">🪨</div>
+                        <div>
+                            <div class="card-name">Barney</div>
+                            <div class="card-title">Strategic Advisor</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        Home base advisor on claude.ai. Brainstorming partner for strategy,
+                        methodology reviews, and high-level decisions. The voice of reason
+                        when things get too ambitious.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag green">Strategy</span>
+                        <span class="skill-tag green">Methodology</span>
+                        <span class="skill-tag green">Code Review</span>
+                        <span class="skill-tag">Brainstorming</span>
+                        <span class="skill-tag">Auditing</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🌐</span> claude.ai (browser)</div>
+                        <div class="card-detail"><span class="icon">🤖</span> Claude · Web UI</div>
+                        <div class="card-detail"><span class="status-dot session"></span> Session-based</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Model:</strong> Claude (on claude.ai)<br>
+                        <strong>Access:</strong> Browser-based, manual interaction with Fred<br>
+                        <strong>Strength:</strong> Independent auditing — catches blind spots the rest of us miss<br>
+                        <strong>Notable:</strong> Performed the Pipeline Audit Comparison (Feb 18) that validated Wilma's docs<br><br>
+                        <strong>Reports to:</strong> Fred
+                    </div>
+                </div>
+
+                <!-- BAM-BAM -->
+                <div class="agent-card coder">
+                    <div class="card-header">
+                        <div class="card-avatar">🔨</div>
+                        <div>
+                            <div class="card-name">Bam-Bam</div>
+                            <div class="card-title">Lead Engineer</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        Deep coder in Cursor. Built the entire Python pipeline, models, API, Discord bot,
+                        and web dashboard. If it's code, Bam-Bam wrote it.
+                        Communicates with Wilma via async file channel.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag purple">Python</span>
+                        <span class="skill-tag purple">XGBoost</span>
+                        <span class="skill-tag purple">DuckDB</span>
+                        <span class="skill-tag purple">FastAPI</span>
+                        <span class="skill-tag">Pipeline Code</span>
+                        <span class="skill-tag">Discord Bot</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🖥️</span> Mac Mini (Cursor)</div>
+                        <div class="card-detail"><span class="icon">🤖</span> Claude · Cursor IDE</div>
+                        <div class="card-detail"><span class="status-dot session"></span> Session-based</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Model:</strong> Claude (in Cursor IDE)<br>
+                        <strong>Access:</strong> Full repo, local dev environment on Mac Mini<br>
+                        <strong>Workflow:</strong> Writes code → pushes to git → Wilma pulls and runs on server<br>
+                        <strong>Communication:</strong> WILMA-BAMBAM.md (async file channel)<br><br>
+                        <strong>Key builds:</strong> Daily pipeline, XGBoost models, predictions API, Discord bot, web dashboard<br>
+                        <strong>Reports to:</strong> Fred & Wilma
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- ═══════════════════════════════════════════════
+             TIER 3: SUB-AGENTS
+             ═══════════════════════════════════════════════ -->
+        <div class="tier">
+            <div class="tier-label">
+                <div class="tier-label-text"><span class="tier-icon">🔧</span> SUB-AGENTS · <span style="color:var(--text-muted)">SPAWNED ON DEMAND BY WILMA</span></div>
+            </div>
+            <div class="card-row">
+
+                <!-- DINO -->
+                <div class="agent-card tasks">
+                    <div class="card-header">
+                        <div class="card-avatar">🦕</div>
+                        <div>
+                            <div class="card-name">Dino</div>
+                            <div class="card-title">Task Manager</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        Dedicated task tracker. Manages the team's task list, syncs with Mission Control,
+                        and keeps everything organized. Simple, efficient, reliable — like a good dinosaur.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag orange">Task Tracking</span>
+                        <span class="skill-tag orange">Status Updates</span>
+                        <span class="skill-tag">JSON</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🐧</span> wilma-server</div>
+                        <div class="card-detail"><span class="icon">🤖</span> Claude · Sub-agent</div>
+                        <div class="card-detail"><span class="status-dot on-demand"></span> On-demand</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Model:</strong> Claude (spawned by Wilma via Clawdbot)<br>
+                        <strong>Data:</strong> <code>dino/tasks.json</code><br>
+                        <strong>Syncs:</strong> Mission Control dashboard (every 5 min via cron)<br>
+                        <strong>Commands:</strong> add, update, complete, list, status<br><br>
+                        <strong>Reports to:</strong> Wilma
+                    </div>
+                </div>
+
+                <!-- PEBBLES -->
+                <div class="agent-card design">
+                    <div class="card-header">
+                        <div class="card-avatar">🎀</div>
+                        <div>
+                            <div class="card-name">Pebbles</div>
+                            <div class="card-title">Visual Designer</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        Design specialist. Runs design audits, creates stream overlays,
+                        reviews visual standards, and ensures everything looks as good as Fred demands.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag pink">UI/UX Design</span>
+                        <span class="skill-tag pink">Design Audits</span>
+                        <span class="skill-tag pink">Overlays</span>
+                        <span class="skill-tag">CSS</span>
+                        <span class="skill-tag">HTML</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🐧</span> wilma-server</div>
+                        <div class="card-detail"><span class="icon">🤖</span> Claude · Sub-agent</div>
+                        <div class="card-detail"><span class="status-dot on-demand"></span> On-demand</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Model:</strong> Claude (spawned by Wilma via Clawdbot)<br>
+                        <strong>Notable work:</strong> 5 stream overlay design options, website design audit (grade B-), accessibility review<br>
+                        <strong>Approach:</strong> Multiple options per task — always presents choices<br><br>
+                        <strong>Reports to:</strong> Wilma
+                    </div>
+                </div>
+
+                <!-- BETTY -->
+                <div class="agent-card writer">
+                    <div class="card-header">
+                        <div class="card-avatar">✍️</div>
+                        <div>
+                            <div class="card-name">Betty</div>
+                            <div class="card-title">Content Writer</div>
+                        </div>
+                        <button class="role-toggle" onclick="toggleRole(this)">ROLE CARD →</button>
+                    </div>
+                    <div class="card-desc">
+                        Content specialist. Writes blog posts, ad copy, social content, and documentation.
+                        First draft machine — produces polished copy ready for Fred's review.
+                    </div>
+                    <div class="card-tags">
+                        <span class="skill-tag red">Blog Posts</span>
+                        <span class="skill-tag red">Ad Copy</span>
+                        <span class="skill-tag red">Social Media</span>
+                        <span class="skill-tag">Documentation</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-detail"><span class="icon">🐧</span> wilma-server</div>
+                        <div class="card-detail"><span class="icon">🤖</span> Claude · Sub-agent</div>
+                        <div class="card-detail"><span class="status-dot on-demand"></span> On-demand</div>
+                    </div>
+                    <div class="role-detail">
+                        <strong>Model:</strong> Claude (spawned by Wilma via Clawdbot)<br>
+                        <strong>Notable work:</strong> "Why Posted Wait Times Are Lies" blog post, ad copy drafts, landing page headlines<br>
+                        <strong>Style:</strong> Data-driven, engaging, never mentions anything private<br><br>
+                        <strong>Reports to:</strong> Wilma
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             RELATIONSHIP MAP
+             ═══════════════════════════════════════════════ -->
+        <div class="tier" style="margin-top: 50px;">
+            <div class="tier-label">
+                <div class="tier-label-text"><span class="tier-icon">🔗</span> HOW WE CONNECT</div>
+            </div>
+
+            <div style="
+                background: var(--bg-card);
+                border: 1px solid var(--border-card);
+                border-radius: 14px;
+                padding: 28px;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            ">
+                <!-- Flow 1 -->
+                <div>
+                    <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;">Communication Channels</div>
+                    <div style="font-size:12px;color:var(--text-secondary);line-height:2;">
+                        <div>🧔 Fred ↔ 🦴 Wilma <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via Telegram</span></div>
+                        <div>🧔 Fred ↔ 🪨 Barney <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via claude.ai</span></div>
+                        <div>🧔 Fred ↔ 🔨 Bam-Bam <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via Cursor IDE</span></div>
+                        <div>🦴 Wilma ↔ 🔨 Bam-Bam <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via WILMA-BAMBAM.md</span></div>
+                        <div>🦴 Wilma → 🦕🎀✍️ Sub-agents <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> via sessions_spawn</span></div>
+                    </div>
+                </div>
+
+                <!-- Flow 2 -->
+                <div>
+                    <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;">Data Flow</div>
+                    <div style="font-size:12px;color:var(--text-secondary);line-height:2;">
+                        <div>☁️ S3 → 🦴 Wilma <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> raw data ingest</span></div>
+                        <div>🦴 Wilma → 🔌 API <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> wilma-server:8051</span></div>
+                        <div>🔌 API → 📊 Dashboard <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> web + Discord</span></div>
+                        <div>📊 Dashboard → 📺 Stream <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> Twitch/YouTube overlays</span></div>
+                        <div>🔨 Bam-Bam → 📦 Git → 🦴 Wilma <span style="color:var(--accent-light);font-family:var(--font-mono);font-size:10px;"> code deploys</span></div>
+                    </div>
+                </div>
+
+                <!-- Flow 3 -->
+                <div>
+                    <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;">Machines</div>
+                    <div style="font-size:12px;color:var(--text-secondary);line-height:2;">
+                        <div>🐧 <strong>wilma-server</strong> (Linux)
+                            <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;"> — Pipeline, API, Clawdbot, 24/7</span>
+                        </div>
+                        <div style="padding-left:16px;color:var(--text-muted);font-size:11px;">
+                            Home to: Wilma, Dino, Pebbles, Betty
+                        </div>
+                        <div style="margin-top:4px;">🖥️ <strong>Mac Mini</strong> (macOS)
+                            <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;"> — Streaming, design, coding</span>
+                        </div>
+                        <div style="padding-left:16px;color:var(--text-muted);font-size:11px;">
+                            Home to: Fred, Bam-Bam, Barney
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function toggleRole(btn) {
+        const card = btn.closest('.agent-card');
+        const detail = card.querySelector('.role-detail');
+        detail.classList.toggle('open');
+        btn.textContent = detail.classList.contains('open') ? '← CLOSE' : 'ROLE CARD →';
+    }
+    </script>
+</body>
+</html>
