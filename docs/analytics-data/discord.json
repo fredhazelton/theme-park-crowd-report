@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T15:08:56Z",
+  "generated_at": "2026-03-06T15:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -96,7 +96,7 @@
           "emoji": "\ud83c\udfcf",
           "purpose": "Bam-Bam's workspace \u2014 coding tasks, Discord bot development",
           "url": "https://discord.com/channels/1479350342318690505/1479351580347072675",
-          "last_active": "2026-03-06T15:08:49.540000+00:00"
+          "last_active": "2026-03-06T15:13:49.285000+00:00"
         },
         {
           "name": "barney",
@@ -164,6 +164,28 @@
       "channel_id": "1479351580347072675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "Forecast is running \u2014 processing 568 entities. This will take a few minutes.",
+      "timestamp": "2026-03-06T15:13:49.285000+00:00",
+      "message_id": "1479497238068859153",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479497238068859153"
+    },
+    {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Pipeline process is gone again. The impute step seems to silently exit or crash. Let me run forecast + WTI directly:",
+      "timestamp": "2026-03-06T15:11:19.031000+00:00",
+      "message_id": "1479496607857774673",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479496607857774673"
+    },
+    {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "It's going through the dimension steps (can't skip those with --skip-training). It'll reach forecast/WTI in a few minutes. Let me respond to Fred:\n\nNot stuck at all \u2014 training just **completed succ...",
       "timestamp": "2026-03-06T15:08:49.540000+00:00",
       "message_id": "1479495980846944399",
@@ -179,28 +201,6 @@
       "timestamp": "2026-03-06T15:08:38.494000+00:00",
       "message_id": "1479495934516658178",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479495934516658178"
-    },
-    {
-      "channel": "bam-bam",
-      "channel_emoji": "\ud83c\udfcf",
-      "channel_id": "1479351580347072675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "There's a second run that somehow loaded the full file again (94M). But it actually succeeded this time because memory was free. The first run (my per-park chunked one) completed with 243 models. N...",
-      "timestamp": "2026-03-06T15:08:25.654000+00:00",
-      "message_id": "1479495880661794918",
-      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479495880661794918"
-    },
-    {
-      "channel": "bam-bam",
-      "channel_emoji": "\ud83c\udfcf",
-      "channel_id": "1479351580347072675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Woohoo!",
-      "timestamp": "2026-03-06T15:08:20.741000+00:00",
-      "message_id": "1479495860055310366",
-      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479495860055310366"
     },
     {
       "channel": "mission-control",
