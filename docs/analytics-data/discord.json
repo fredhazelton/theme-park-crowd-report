@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T16:45:01Z",
+  "generated_at": "2026-03-06T17:00:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T15:16:04.540000+00:00"
+          "last_active": "2026-03-06T16:58:59.436000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**Pipeline is BACK!** \ud83c\udf89 Pushed to GitHub Pages \u2014 give MC a refresh.\n\nHere's what you'll see:\n\n**Pipeline Recovery Results:**\n- **243 models retrained** (out of 433 eligible entities)\n- **55,058 WTI...",
+      "timestamp": "2026-03-06T16:58:59.436000+00:00",
+      "message_id": "1479523704760176811",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479523704760176811"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Pipeline is fully recovered! \ud83c\udf89 Training, forecasts, AND WTI all completed successfully. Let me update Mission Control with fresh data.",
+      "timestamp": "2026-03-06T16:58:27.246000+00:00",
+      "message_id": "1479523569745662067",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479523569745662067"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "OK, so where are we? Can I see the latest pipeline results on Mission control?",
+      "timestamp": "2026-03-06T16:58:11.560000+00:00",
+      "message_id": "1479523503953674240",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479523503953674240"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -181,17 +214,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479508868068278282"
     },
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Locked in. Here's what's now in place for pipeline reliability:\n\n**Automated defenses:**\n- \u2705 Auto-retry on failure (3 attempts, 60s cooldown) in daily pipeline\n- \u2705 Pipeline alerting to #alerts on e...",
-      "timestamp": "2026-03-06T15:16:04.540000+00:00",
-      "message_id": "1479497805369184256",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479497805369184256"
-    },
-    {
       "channel": "bam-bam",
       "channel_emoji": "\ud83c\udfcf",
       "channel_id": "1479351580347072675",
@@ -201,28 +223,6 @@
       "timestamp": "2026-03-06T15:15:52.603000+00:00",
       "message_id": "1479497755301773322",
       "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479497755301773322"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Also let me update WILMA-BAMBAM so Bam-Bam knows pipeline fixes are his top priority too:",
-      "timestamp": "2026-03-06T15:15:46.123000+00:00",
-      "message_id": "1479497728122949808",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479497728122949808"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me update HEARTBEAT.md to make pipeline the first check and add the Bam-Bam escalation:",
-      "timestamp": "2026-03-06T15:15:33.004000+00:00",
-      "message_id": "1479497673097613445",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479497673097613445"
     },
     {
       "channel": "bam-bam",
