@@ -78,8 +78,8 @@
         "entity_mae": "11.6 min",
         "entity_bias": "+1.7 min",
         "overall_rmse": "13.2",
-        "wti_mae": "7.2",
-        "wti_bias": "-2.7",
+        "wti_mae": "6.8",
+        "wti_bias": "1.4",
         "days_evaluated": 23
     },
     "ask_analytics": {
@@ -120,5 +120,5 @@
         "db_live_waits": 123103185,
         "db_wti": 55058
     },
-    "last_updated": "2026-03-06T15:00:07.516599"
+    "last_updated": "2026-03-06T15:15:04.775591"
 }

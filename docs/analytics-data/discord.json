@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T20:00:02Z",
+  "generated_at": "2026-03-06T20:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T19:20:48.245000+00:00"
+          "last_active": "2026-03-06T20:10:41.671000+00:00"
         }
       ]
     },
@@ -164,10 +164,32 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Gazoo's afternoon review is in \u2014 team went from 4/10 to 8/10 today after resolving all the 2 AM issues. Pipeline's healthy again with 243 models trained and 29M forecasts generated. Only lingering ...",
-      "timestamp": "2026-03-06T19:20:48.245000+00:00",
-      "message_id": "1479559393292058705",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479559393292058705"
+      "message": "Done. Here's the summary:\n\n**Fixed today, not tomorrow.** The WTI accuracy eval was broken because it shared the slot-level eval's \"already done\" tracker \u2014 if WTI eval failed for a date, it was per...",
+      "timestamp": "2026-03-06T20:10:41.671000+00:00",
+      "message_id": "1479571948630708364",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479571948630708364"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me commit:",
+      "timestamp": "2026-03-06T20:10:39.845000+00:00",
+      "message_id": "1479571940971905226",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479571940971905226"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Nailed it. 15 dates backfilled, 153 new WTI park-date rows added (from 80 \u2192 233 total). WTI MAE is 6.8 \u2014 now we have the speedometer working.\n\nLet me also run the accuracy report to see today's num...",
+      "timestamp": "2026-03-06T20:10:39.680000+00:00",
+      "message_id": "1479571940279713987",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479571940279713987"
     },
     {
       "channel": "gazoo",
@@ -190,28 +212,6 @@
       "timestamp": "2026-03-06T19:20:34.390000+00:00",
       "message_id": "1479559335179714682",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1479559335179714682"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Gazoo's running now \u2014 should drop his afternoon review in #gazoo in about 3-4 minutes. The cron fired at 2 PM but the heartbeat timing missed it again. I need to figure out a more reliable way to e...",
-      "timestamp": "2026-03-06T19:18:16.337000+00:00",
-      "message_id": "1479558756143468808",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479558756143468808"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The cron fired but the review never actually ran \u2014 same heartbeat timing issue as last night. Let me spawn Gazoo now and he should be done in about 3-4 minutes.",
-      "timestamp": "2026-03-06T19:17:58.877000+00:00",
-      "message_id": "1479558682910920889",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479558682910920889"
     },
     {
       "channel": "gazoo",
