@@ -511,36 +511,43 @@ def step2_train_julia(logger, use_synthetic: bool = False) -> tuple[int, float]:
             logger.error("Run build_synthetic_pairs.py first")
             return 0, 0.0
         
-        # Load and combine pairs
-        real_df = pd.read_parquet(real_pairs_path)
-        synthetic_df = pd.read_parquet(synthetic_pairs_path)
-        
-        # Add is_synthetic column to real pairs
-        real_df['is_synthetic'] = False
-        
-        # Ensure columns match exactly
-        real_columns = set(real_df.columns)
-        synthetic_columns = set(synthetic_df.columns)
-        
-        if real_columns != synthetic_columns:
-            logger.error(f"Column mismatch between real and synthetic pairs!")
-            logger.error(f"Real: {sorted(real_columns)}")
-            logger.error(f"Synthetic: {sorted(synthetic_columns)}")
-            return 0, 0.0
-        
-        # Combine dataframes
-        combined_df = pd.concat([real_df, synthetic_df], ignore_index=True)
-        
-        # Normalize park_date to string (synthetic has Timestamps, real has strings; PyArrow fails on mixed types)
-        combined_df['park_date'] = pd.to_datetime(combined_df['park_date']).dt.strftime('%Y-%m-%d')
-        
-        # Save combined pairs for Julia
-        combined_df.to_parquet(combined_pairs_path, index=False)
-        
-        logger.info(f"  Real pairs: {len(real_df):,}")
-        logger.info(f"  Synthetic pairs: {len(synthetic_df):,}")
-        logger.info(f"  Combined pairs: {len(combined_df):,}")
-        logger.info(f"  Saved to: {combined_pairs_path}")
+        # Use DuckDB to combine real + synthetic pairs without loading into pandas
+        # (91M+ synthetic rows would OOM in pandas)
+        con = duckdb.connect()
+        try:
+            con.execute(f"""
+                COPY (
+                    SELECT entity_code, observed_at, observed_at_ts, 
+                           CAST(park_date AS VARCHAR) as park_date,
+                           CAST(actual_time AS BIGINT) as actual_time, posted_time,
+                           date_group_id, season, season_year,
+                           hour_of_day, mins_since_6am, mins_since_open,
+                           date_group_id_encoded, season_encoded, season_year_encoded,
+                           false AS is_synthetic
+                    FROM read_parquet('{real_pairs_path}')
+                    UNION ALL
+                    SELECT entity_code, observed_at, observed_at_ts,
+                           strftime(park_date, '%Y-%m-%d') as park_date,
+                           CAST(actual_time AS BIGINT) as actual_time, posted_time,
+                           date_group_id, season, season_year,
+                           hour_of_day, mins_since_6am, mins_since_open,
+                           date_group_id_encoded, season_encoded, season_year_encoded,
+                           is_synthetic
+                    FROM read_parquet('{synthetic_pairs_path}')
+                ) TO '{combined_pairs_path}' (FORMAT PARQUET, COMPRESSION ZSTD)
+            """)
+            
+            # Get row counts for logging
+            real_count = con.execute(f"SELECT COUNT(*) FROM read_parquet('{real_pairs_path}')").fetchone()[0]
+            synth_count = con.execute(f"SELECT COUNT(*) FROM read_parquet('{synthetic_pairs_path}')").fetchone()[0]
+            combined_count = con.execute(f"SELECT COUNT(*) FROM read_parquet('{combined_pairs_path}')").fetchone()[0]
+            
+            logger.info(f"  Real pairs: {real_count:,}")
+            logger.info(f"  Synthetic pairs: {synth_count:,}")
+            logger.info(f"  Combined pairs: {combined_count:,}")
+            logger.info(f"  Saved to: {combined_pairs_path}")
+        finally:
+            con.close()
         
         # Update Julia script path to use combined pairs (will be handled in Julia script)
     
