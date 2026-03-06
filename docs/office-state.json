@@ -1,19 +1,119 @@
 {
-  "updated": "2026-03-06T14:54:00Z",
+  "updated": "2026-03-06T14:59:05.037551+00:00",
   "agents": [
-    {"id": "fred", "name": "Fred", "icon": "🧔", "state": "working", "zone": "desk-0", "task": "Morning check-in", "color": "#facc15"},
-    {"id": "wilma", "name": "Wilma", "icon": "🦴", "state": "working", "zone": "desk-1", "task": "Updating Office state", "color": "#4a90a4"},
-    {"id": "barney", "name": "Barney", "icon": "🪨", "state": "offline", "zone": "offsite", "task": "", "color": "#4ade80"},
-    {"id": "bambam", "name": "Bam-Bam", "icon": "🔨", "state": "offline", "zone": "offsite", "task": "", "color": "#c084fc"},
-    {"id": "dino", "name": "Dino", "icon": "🦕", "state": "idle", "zone": "pen", "task": "Napping in the dino pen", "color": "#fb923c"},
-    {"id": "pebbles", "name": "Pebbles", "icon": "🎀", "state": "idle", "zone": "pen", "task": "Waiting for a design task", "color": "#f472b6"},
-    {"id": "betty", "name": "Betty", "icon": "✍️", "state": "idle", "zone": "pen", "task": "Waiting for a writing task", "color": "#f87171"},
-    {"id": "gazoo", "name": "Gazoo", "icon": "👽", "state": "idle", "zone": "float-1", "task": "Observing the dum-dums…", "color": "#34d399"}
+    {
+      "id": "fred",
+      "name": "Fred",
+      "icon": "🧔",
+      "state": "working",
+      "zone": "desk-2",
+      "task": "Reviewing bugs & Office page",
+      "color": "#facc15"
+    },
+    {
+      "id": "wilma",
+      "name": "Wilma",
+      "icon": "🦴",
+      "state": "working",
+      "zone": "desk-1",
+      "task": "Fixing Office activity tracking",
+      "color": "#4a90a4"
+    },
+    {
+      "id": "barney",
+      "name": "Barney",
+      "icon": "🪨",
+      "state": "idle",
+      "zone": "tarpit-2",
+      "task": "Available on claude.ai",
+      "color": "#4ade80"
+    },
+    {
+      "id": "bambam",
+      "name": "Bam-Bam",
+      "icon": "🔨",
+      "state": "working",
+      "zone": "desk-3",
+      "task": "Pushed 3 commits recently",
+      "color": "#c084fc"
+    },
+    {
+      "id": "dino",
+      "name": "Dino",
+      "icon": "🦕",
+      "state": "idle",
+      "zone": "pen-1",
+      "task": "Waiting for a task",
+      "color": "#fb923c"
+    },
+    {
+      "id": "pebbles",
+      "name": "Pebbles",
+      "icon": "🎀",
+      "state": "idle",
+      "zone": "pen-2",
+      "task": "Waiting for a task",
+      "color": "#f472b6"
+    },
+    {
+      "id": "betty",
+      "name": "Betty",
+      "icon": "✍️",
+      "state": "idle",
+      "zone": "pen-3",
+      "task": "Waiting for a task",
+      "color": "#f87171"
+    },
+    {
+      "id": "gazoo",
+      "name": "Gazoo",
+      "icon": "👽",
+      "state": "idle",
+      "zone": "float-1",
+      "task": "Observing the dum-dums…",
+      "color": "#34d399"
+    }
   ],
   "activity": [
-    {"time": "23:58", "agent": "wilma", "text": "Started building the Office page"},
-    {"time": "23:51", "agent": "wilma", "text": "Built the Team org chart page"},
-    {"time": "23:47", "agent": "wilma", "text": "Built the Docs Hub with search & filters"},
-    {"time": "23:00", "agent": "wilma", "text": "Updated Mission Control v3 tabs"}
+    {
+      "time": "09:57",
+      "agent": "fred",
+      "text": "Reported Office status bug in #bugs-feedback"
+    },
+    {
+      "time": "09:57",
+      "agent": "wilma",
+      "text": "Building activity-based status tracking"
+    },
+    {
+      "time": "09:54",
+      "agent": "wilma",
+      "text": "Fixed Fred's status to 'working'"
+    },
+    {
+      "time": "08:34",
+      "agent": "fred",
+      "text": "Morning check-in — reviewing The Office page"
+    },
+    {
+      "time": "23:58",
+      "agent": "wilma",
+      "text": "Started building the Office page"
+    },
+    {
+      "time": "23:51",
+      "agent": "wilma",
+      "text": "Built the Team org chart page"
+    },
+    {
+      "time": "23:47",
+      "agent": "wilma",
+      "text": "Built the Docs Hub with search & filters"
+    },
+    {
+      "time": "23:00",
+      "agent": "wilma",
+      "text": "Updated Mission Control v3 tabs"
+    }
   ]
 }

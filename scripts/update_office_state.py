@@ -1,126 +1,269 @@
 #!/usr/bin/env python3
 """
-Update office-state.json with real agent activity.
-Called by Wilma during heartbeats or via cron.
+Update office-state.json with REAL agent activity.
 
-Checks:
-- Wilma: always working (Clawdbot is 24/7)
-- Fred: time-based (resting at night, working during day)
-- Bam-Bam: check WILMA-BAMBAM.md for recent activity
-- Barney: check if claude.ai session referenced recently
-- Sub-agents: check recent session spawns
+Activity-based detection:
+- Fred: Discord message recency (via Clawdbot message tool isn't available here,
+        so we check a breadcrumb file that Wilma updates)
+- Wilma: Always working (24/7)
+- Bam-Bam: Recent git commits or WILMA-BAMBAM.md activity
+- Barney: Breadcrumb from Wilma
+- Sub-agents: Session spawn recency from breadcrumb
+- Gazoo: Has his own review schedule
+
+Called by Wilma during heartbeats or via cron.
+Wilma should call update_office_activity() first to write breadcrumbs,
+then run this script to generate the JSON.
 """
 
 import json
 import os
-from datetime import datetime, timezone
+import subprocess
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
+ET = ZoneInfo("America/Toronto")
 STATE_FILE = Path(__file__).parent.parent / "docs" / "office-state.json"
-BAMBAM_FILE = Path.home() / "theme-park-crowd-report" / "WILMA-BAMBAM.md"
+ACTIVITY_FILE = Path(__file__).parent.parent / "docs" / "office-activity.json"
 
-def get_hour():
-    """Get current hour in ET."""
-    from zoneinfo import ZoneInfo
-    return datetime.now(ZoneInfo("America/Toronto")).hour
+def now_et():
+    return datetime.now(ET)
 
-def determine_fred_state():
-    """Fred's state based on time of day."""
-    h = get_hour()
-    if 1 <= h < 9:
+def load_activity():
+    """Load the activity breadcrumb file that Wilma maintains."""
+    if ACTIVITY_FILE.exists():
+        try:
+            return json.loads(ACTIVITY_FILE.read_text())
+        except:
+            pass
+    return {}
+
+def minutes_since(iso_str):
+    """Minutes since an ISO timestamp."""
+    if not iso_str:
+        return 9999
+    try:
+        ts = datetime.fromisoformat(iso_str)
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        delta = datetime.now(timezone.utc) - ts
+        return delta.total_seconds() / 60
+    except:
+        return 9999
+
+def check_git_activity(minutes=60):
+    """Check for recent git commits (Bam-Bam indicator)."""
+    try:
+        result = subprocess.run(
+            ["git", "log", "--oneline", f"--since={minutes} minutes ago", "--all"],
+            capture_output=True, text=True, timeout=10,
+            cwd=str(Path.home() / "theme-park-crowd-report")
+        )
+        lines = [l for l in result.stdout.strip().split('\n') if l.strip()]
+        return len(lines)
+    except:
+        return 0
+
+def determine_fred_state(activity_data):
+    """Fred's state based on real activity signals."""
+    h = now_et().hour
+    fred_data = activity_data.get("fred", {})
+    last_seen = fred_data.get("last_active")
+    mins = minutes_since(last_seen)
+    task = fred_data.get("task", "")
+
+    # Night time and no recent activity
+    if 1 <= h < 8 and mins > 60:
         return "resting", "rest", "Sleeping 😴"
-    elif 9 <= h < 12:
-        return "working", "desk-2", "Morning deep work"
-    elif 12 <= h < 13:
-        return "idle", "tarpit-1", "Lunch break"
-    elif 13 <= h < 23:
-        return "working", "desk-2", "Working on HazeyData"
-    else:
-        return "working", "desk-2", "Night owl mode 🦉"
 
-def determine_wilma_state():
+    # Active in the last 15 minutes
+    if mins < 15:
+        zone = "desk-2"
+        if not task:
+            if h < 12:
+                task = "Morning work session"
+            elif h < 17:
+                task = "Afternoon work session"
+            else:
+                task = "Evening work session"
+        return "working", zone, task
+
+    # Active in last 30 min — still working
+    if mins < 30:
+        return "working", "desk-2", task or "Working on HazeyData"
+
+    # Active in last hour — idle
+    if mins < 60:
+        return "idle", "tarpit-1", "Stepped away briefly"
+
+    # Active in last 2 hours — idle at rest
+    if mins < 120:
+        return "idle", "tarpit-1", "Away"
+
+    # No activity for 2+ hours during the day
+    if 8 <= h < 23:
+        return "idle", "rest", "Away"
+
+    # Late night, no activity
+    return "resting", "rest", "Sleeping 😴"
+
+
+def determine_wilma_state(activity_data):
     """Wilma is always working."""
-    return "working", "desk-1", "Monitoring pipeline & managing tasks"
+    wilma_data = activity_data.get("wilma", {})
+    task = wilma_data.get("task", "Monitoring pipeline & managing tasks")
+    return "working", "desk-1", task
 
-def determine_barney_state():
-    """Barney is session-based on claude.ai."""
-    h = get_hour()
+
+def determine_barney_state(activity_data):
+    """Barney — session-based on claude.ai."""
+    barney_data = activity_data.get("barney", {})
+    last_seen = barney_data.get("last_active")
+    mins = minutes_since(last_seen)
+
+    if mins < 30:
+        task = barney_data.get("task", "Active on claude.ai")
+        return "working", "tarpit-2", task
+    elif mins < 120:
+        return "idle", "tarpit-2", "Recently active on claude.ai"
+
+    h = now_et().hour
     if 1 <= h < 9:
         return "offline", "offsite", ""
     return "idle", "tarpit-2", "Available on claude.ai"
 
-def determine_bambam_state():
-    """Check WILMA-BAMBAM.md for recent Bam-Bam activity."""
-    h = get_hour()
+
+def determine_bambam_state(activity_data):
+    """Bam-Bam — check git commits + breadcrumb."""
+    bambam_data = activity_data.get("bambam", {})
+    last_seen = bambam_data.get("last_active")
+    mins = minutes_since(last_seen)
+
+    # Check recent git commits as a secondary signal
+    recent_commits = check_git_activity(30)
+
+    if mins < 30 or recent_commits > 0:
+        task = bambam_data.get("task", "Coding in Cursor")
+        if recent_commits > 0:
+            task = f"Pushed {recent_commits} commit{'s' if recent_commits > 1 else ''} recently"
+        return "working", "desk-3", task
+    elif mins < 120:
+        return "idle", "desk-3", "Cursor IDE — recently active"
+
+    h = now_et().hour
     if 1 <= h < 9:
         return "offline", "offsite", ""
-    # Default: idle at desk
     return "idle", "desk-3", "Cursor IDE — ready for code tasks"
 
-def determine_subagent_state(name):
-    """Sub-agents are in the pen unless recently spawned."""
-    return "idle", "pen", f"Waiting for a task"
+
+def determine_gazoo_state(activity_data):
+    """Gazoo — the critic. Active during review times."""
+    gazoo_data = activity_data.get("gazoo", {})
+    last_seen = gazoo_data.get("last_active")
+    mins = minutes_since(last_seen)
+
+    if mins < 30:
+        task = gazoo_data.get("task", "Reviewing the dum-dums' work")
+        return "working", "float-1", task
+
+    # Gazoo is always lurking
+    return "idle", "float-1", "Observing the dum-dums…"
+
+
+def determine_subagent_state(name, agent_id, activity_data):
+    """Sub-agents — check if recently spawned."""
+    data = activity_data.get(agent_id, {})
+    last_seen = data.get("last_active")
+    mins = minutes_since(last_seen)
+
+    if mins < 15:
+        task = data.get("task", f"Working on a task")
+        return "working", f"build-1" if agent_id == "dino" else "pen", task
+    elif mins < 60:
+        task = data.get("task", "Recently completed a task")
+        return "idle", "pen", task
+
+    return "idle", "pen", "Waiting for a task"
+
 
 def build_state():
+    activity_data = load_activity()
     agents = []
 
     # Fred
-    state, zone, task = determine_fred_state()
+    state, zone, task = determine_fred_state(activity_data)
     agents.append({
         "id": "fred", "name": "Fred", "icon": "🧔",
         "state": state, "zone": zone, "task": task, "color": "#facc15"
     })
 
     # Wilma
-    state, zone, task = determine_wilma_state()
+    state, zone, task = determine_wilma_state(activity_data)
     agents.append({
         "id": "wilma", "name": "Wilma", "icon": "🦴",
         "state": state, "zone": zone, "task": task, "color": "#4a90a4"
     })
 
     # Barney
-    state, zone, task = determine_barney_state()
+    state, zone, task = determine_barney_state(activity_data)
     agents.append({
         "id": "barney", "name": "Barney", "icon": "🪨",
         "state": state, "zone": zone, "task": task, "color": "#4ade80"
     })
 
     # Bam-Bam
-    state, zone, task = determine_bambam_state()
+    state, zone, task = determine_bambam_state(activity_data)
     agents.append({
         "id": "bambam", "name": "Bam-Bam", "icon": "🔨",
         "state": state, "zone": zone, "task": task, "color": "#c084fc"
     })
 
     # Dino
-    state, zone, task = determine_subagent_state("Dino")
+    state, zone, task = determine_subagent_state("Dino", "dino", activity_data)
     agents.append({
         "id": "dino", "name": "Dino", "icon": "🦕",
-        "state": state, "zone": "pen-1", "task": task, "color": "#fb923c"
+        "state": state, "zone": "pen-1" if zone == "pen" else zone,
+        "task": task, "color": "#fb923c"
     })
 
     # Pebbles
-    state, zone, task = determine_subagent_state("Pebbles")
+    state, zone, task = determine_subagent_state("Pebbles", "pebbles", activity_data)
     agents.append({
         "id": "pebbles", "name": "Pebbles", "icon": "🎀",
-        "state": state, "zone": "pen-2", "task": task, "color": "#f472b6"
+        "state": state, "zone": "pen-2" if zone == "pen" else zone,
+        "task": task, "color": "#f472b6"
     })
 
     # Betty
-    state, zone, task = determine_subagent_state("Betty")
+    state, zone, task = determine_subagent_state("Betty", "betty", activity_data)
     agents.append({
         "id": "betty", "name": "Betty", "icon": "✍️",
-        "state": state, "zone": "pen-3", "task": task, "color": "#f87171"
+        "state": state, "zone": "pen-3" if zone == "pen" else zone,
+        "task": task, "color": "#f87171"
     })
 
-    # Try to preserve recent activity log
+    # Gazoo
+    state, zone, task = determine_gazoo_state(activity_data)
+    agents.append({
+        "id": "gazoo", "name": "Gazoo", "icon": "👽",
+        "state": state, "zone": zone, "task": task, "color": "#34d399"
+    })
+
+    # Preserve + append activity log
     existing_activity = []
     if STATE_FILE.exists():
         try:
             existing = json.loads(STATE_FILE.read_text())
-            existing_activity = existing.get("activity", [])[:10]
+            existing_activity = existing.get("activity", [])[:20]
         except:
             pass
+
+    # Add new activity entries from breadcrumb
+    new_activities = activity_data.get("_recent_activity", [])
+    if new_activities:
+        existing_activity = new_activities[:5] + existing_activity
+        existing_activity = existing_activity[:20]
 
     return {
         "updated": datetime.now(timezone.utc).isoformat(),
@@ -128,10 +271,14 @@ def build_state():
         "activity": existing_activity
     }
 
+
 def main():
     state = build_state()
     STATE_FILE.write_text(json.dumps(state, indent=2, ensure_ascii=False))
     print(f"✅ Updated office state: {len(state['agents'])} agents")
+    for a in state['agents']:
+        print(f"   {a['icon']} {a['name']}: {a['state']} — {a['task']}")
+
 
 if __name__ == "__main__":
     main()
