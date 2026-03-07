@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T05:30:01Z",
+  "generated_at": "2026-03-07T05:45:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T05:29:46.043000+00:00"
+          "last_active": "2026-03-07T05:41:18.973000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Done! Here's what I adapted from the self-improving agent:\n\n**Added to our system:**\n\n1. **\ud83d\udccb Correction tracking** (`memory/corrections.md`) \u2014 When you correct me, I log it with before/after. Three...",
+      "timestamp": "2026-03-07T05:41:18.973000+00:00",
+      "message_id": "1479715550283436032",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479715550283436032"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me update the heartbeat memory maintenance section to include the new tiered system:",
+      "timestamp": "2026-03-07T05:40:54.315000+00:00",
+      "message_id": "1479715446860288075",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479715446860288075"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me create the enhanced memory system. I'll update AGENTS.md with the new protocols and create the corrections tracking file:",
+      "timestamp": "2026-03-07T05:40:20.981000+00:00",
+      "message_id": "1479715307047223492",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479715307047223492"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -168,39 +201,6 @@
       "timestamp": "2026-03-07T05:30:01.646000+00:00",
       "message_id": "1479712709368086561",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479712709368086561"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Yes! I love this. We already have gazoo\u2019s report which will tell us where we might need to improve something and then you just need to improve it.\n\nThat functionality sounds familiar though don\u2019t w...",
-      "timestamp": "2026-03-07T05:29:46.043000+00:00",
-      "message_id": "1479712643924099126",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479712643924099126"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The 2am Gazoo review would feed directly into this \u2014 he finds the weakness, I fix it the same night. That's a pretty tight loop.",
-      "timestamp": "2026-03-07T05:27:33.689000+00:00",
-      "message_id": "1479712088791453769",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479712088791453769"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "We have pieces but not exactly this. Here's what exists:\n\n**Close but not quite:**\n- **Gazoo (2am cron)** \u2014 Reviews and *critiques* the pipeline nightly, but doesn't *fix or build* anything. He's t...",
-      "timestamp": "2026-03-07T05:27:33.565000+00:00",
-      "message_id": "1479712088271355944",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479712088271355944"
     },
     {
       "channel": "mission-control",
