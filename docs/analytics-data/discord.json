@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T01:00:01Z",
+  "generated_at": "2026-03-07T01:15:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-06T23:06:44.419000+00:00"
+          "last_active": "2026-03-07T01:07:45.495000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Betty dropped 5 tweet drafts in #content-review for you \ud83d\udc26 \u2014 covers accuracy wins, the pipeline fix, bot monitoring, and Gazoo. Take a look and \u2705 the ones you like!",
+      "timestamp": "2026-03-07T01:07:45.495000+00:00",
+      "message_id": "1479646707166871848",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479646707166871848"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Betty's on it! \ud83d\udc26 She's drafting 4-5 tweet options based on today's work and will post them to #content-review for you to approve. Lots of good material \u2014 the accuracy improvements and pipeline fixe...",
+      "timestamp": "2026-03-07T01:07:23.479000+00:00",
+      "message_id": "1479646614825209937",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479646614825209937"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "No dedicated Betty agent \u2014 I'll spawn a sub-agent to draft the tweets. Today was packed with meaningful improvements, perfect for content.",
+      "timestamp": "2026-03-07T01:07:06.279000+00:00",
+      "message_id": "1479646542683177010",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479646542683177010"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -168,39 +201,6 @@
       "timestamp": "2026-03-06T23:30:01.573000+00:00",
       "message_id": "1479622112095244348",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479622112095244348"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**\ud83d\udd04 Running now:**\n- Forecast regeneration (400/568 entities done, ~7 min remaining)\n- WTI recalculation queued after forecast completes\n\n**\ud83d\udccb Bugs triaged:**\n- 4/5 threads already resolved from ear...",
-      "timestamp": "2026-03-06T23:06:44.419000+00:00",
-      "message_id": "1479616252006764734",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479616252006764734"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Still 11 processes running. It's just `tee` buffering. The forecast is still crunching. At 0.4 entities/sec, 168 remaining entities \u2248 7 more minutes. Let me keep going \u2014 I'll check back when it fin...",
-      "timestamp": "2026-03-06T23:06:44.080000+00:00",
-      "message_id": "1479616250584764597",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479616250584764597"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The log file hasn't been written to in ~1 minute. The worker processes are still active (I saw them earlier with high CPU). The `tee` is buffering output. Let me check:",
-      "timestamp": "2026-03-06T23:06:30.177000+00:00",
-      "message_id": "1479616192271351990",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479616192271351990"
     },
     {
       "channel": "mission-control",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 0,
-    "messages_today": 0
+    "active_channels_today": 1,
+    "messages_today": 3
   }
 }
