@@ -16,7 +16,8 @@ import logging
 import os
 import sys
 import time
-from concurrent.futures import ProcessPoolExecutor, as_completed
+# ProcessPoolExecutor removed — sequential processing avoids forking the ~320MB
+# agg_lookup dict into each worker (copy-on-write gets dirty from refcount updates)
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -36,7 +37,7 @@ except ImportError:
     xgb = None
 
 # Constants
-DEFAULT_WORKERS = 8
+DEFAULT_WORKERS = 2
 SLOTS_PER_DAY = 288  # 5-minute intervals
 DEFAULT_FALLBACK_RATIO = 0.678  # Fallback if ratios file missing; overridden by state/fallback_ratios.json
 
@@ -230,42 +231,52 @@ def forecast_entity(args) -> tuple:
         # Extract park code from entity (handles TDL, TDS, USH correctly)
         park_code = entity_code_to_park_code(entity_code)
         
-        # Filter time grid to this park's operating hours per day
-        def is_within_park_hours(row):
-            key = (park_code, row['park_date'])
+        # Compute current_mins for each row (vectorized)
+        time_minutes = np.array([t.minute if hasattr(t, 'minute') else 0 for t in df['time_slot'].values])
+        current_mins = df['hour_of_day'].values * 60 + time_minutes
+        
+        # Vectorized park hours filtering: build open/close arrays from lookup
+        open_arr = np.full(len(df), -1, dtype=np.int32)
+        close_arr = np.full(len(df), 99999, dtype=np.int32)
+        has_hours = np.zeros(len(df), dtype=bool)
+        
+        # Group by park_date to avoid per-row lookup
+        for park_date_val, idx_group in df.groupby('park_date').groups.items():
+            key = (park_code, park_date_val)
             hours_tuple = park_hours_lookup.get(key)
             if hours_tuple is not None:
-                open_mins, close_mins = hours_tuple
-                current_mins = row['hour_of_day'] * 60 + (row['time_slot'].minute if hasattr(row['time_slot'], 'minute') else 0)
-                if open_mins is not None and close_mins is not None:
-                    return open_mins <= current_mins <= close_mins
-            return True  # Keep all slots if no park hours available
+                om, cm = hours_tuple
+                if om is not None and cm is not None:
+                    idx_arr = idx_group.values if hasattr(idx_group, 'values') else np.array(idx_group)
+                    open_arr[idx_arr] = om
+                    close_arr[idx_arr] = cm
+                    has_hours[idx_arr] = True
         
-        mask = df.apply(is_within_park_hours, axis=1)
+        # Filter: keep rows within park hours OR rows without park hours data
+        mask = (~has_hours) | ((current_mins >= open_arr) & (current_mins <= close_arr))
         df = df[mask].reset_index(drop=True)
+        current_mins = current_mins[mask]
+        open_arr = open_arr[mask]
+        has_hours = has_hours[mask]
         
         if len(df) == 0:
             return (entity_code, None, "no_operating_slots")
         
-        # Get estimated posted_time from aggregates for each row
-        def get_posted_estimate(row):
-            key = (entity_code, row['date_group_id'], row['time_slot_15min'])
-            return agg_lookup.get(key, 5.0)  # Default 5 if no data (sparse entities are low-wait)
+        # Vectorized posted_time from aggregates
+        posted_keys = list(zip(
+            [entity_code] * len(df),
+            df['date_group_id'].values,
+            df['time_slot_15min'].values
+        ))
+        df['posted_time'] = np.array([agg_lookup.get(k, 5.0) for k in posted_keys], dtype=np.float32)
         
-        df['posted_time'] = df.apply(get_posted_estimate, axis=1)
-        
-        # Get mins_since_open from park hours
-        def get_mins_since_open(row):
-            key = (park_code, row['park_date'])
-            hours_tuple = park_hours_lookup.get(key)
-            if hours_tuple is not None:
-                opening_mins = hours_tuple[0] if isinstance(hours_tuple, tuple) else hours_tuple
-                if opening_mins is not None:
-                    current_mins = row['hour_of_day'] * 60 + (row['time_slot'].minute if hasattr(row['time_slot'], 'minute') else 0)
-                    return max(0, current_mins - opening_mins)
-            return row['mins_since_6am']  # Fallback
-        
-        df['mins_since_open'] = df.apply(get_mins_since_open, axis=1)
+        # Vectorized mins_since_open
+        mins_since_open = np.where(
+            has_hours & (open_arr >= 0),
+            np.maximum(0, current_mins - open_arr),
+            df['mins_since_6am'].values
+        )
+        df['mins_since_open'] = mins_since_open
         
         # Model selection priority:
         # - If entity_scope_value is set (EU entities forced to scope_scale): use group model FIRST
@@ -783,6 +794,7 @@ def main():
         return time_grid_full[time_grid_full["park_date"].isin(entity_dates)]
 
     # Process entities
+    import gc
     logger.info("Generating forecasts...")
     forecast_dir.mkdir(parents=True, exist_ok=True)
 
@@ -801,32 +813,44 @@ def main():
         logger.info(f"Skipped {skipped_extinct} extinct/closed entities (no operating dates)")
     
     total_entities = len(entity_queue)
-    logger.info(f"Processing {total_entities} entities in batches of 50...")
     
-    # Process in batches to control memory — flush each batch to a temp parquet file
-    BATCH_SIZE = 50
+    # Group entities by park prefix for sequential park-by-park processing.
+    # This keeps memory bounded: only one park's worth of results in RAM at a time.
+    park_groups: dict[str, list[str]] = {}
+    for entity in entity_queue:
+        pc = entity_code_to_park_code(entity)
+        park_groups.setdefault(pc, []).append(entity)
+    logger.info(f"Processing {total_entities} entities across {len(park_groups)} parks sequentially...")
+    for pc in sorted(park_groups):
+        logger.info(f"  Park {pc}: {len(park_groups[pc])} entities")
+    
+    # Process park-by-park, entities within a park run sequentially (no forking).
+    # This avoids the ~320MB agg_lookup being duplicated per worker process.
+    BATCH_SIZE = 30  # Flush to parquet every N entities to bound in-memory results
     temp_dir = forecast_dir / "_temp_batches"
     temp_dir.mkdir(parents=True, exist_ok=True)
+    # Clean up any leftover temp files from prior interrupted runs
+    for old_file in temp_dir.glob("batch_*.parquet"):
+        old_file.unlink()
     batch_files = []
     successful = 0
     failed = 0
     processed = 0
+    batch_idx = 0
     
-    for batch_start in range(0, total_entities, BATCH_SIZE):
-        batch_end = min(batch_start + BATCH_SIZE, total_entities)
-        batch_entities = entity_queue[batch_start:batch_end]
+    for park_code_group in sorted(park_groups):
+        park_entities = park_groups[park_code_group]
+        logger.info(f"  Park {park_code_group}: forecasting {len(park_entities)} entities...")
         
-        # Build work items for this batch only (grids built lazily here)
-        work_items = []
-        for entity in batch_entities:
+        batch_results = []
+        
+        for entity in park_entities:
             grid = get_entity_time_grid(entity)
             if grid is None or (hasattr(grid, '__len__') and len(grid) == 0):
+                processed += 1
                 continue
             entity_ratio = fallback_ratios.get(entity, global_ratio)
             # For EU entities: use scope_scale group model ONLY if no per-entity model exists.
-            # Originally forced all EU to scope_scale (EU opened May 2025, limited data).
-            # As of Mar 2026, 13 EU entities have per-entity models with much better accuracy
-            # (per-entity MAE ~2-15 vs scope_scale MAE ~21.6). Let per-entity models win.
             scope_val = None
             if entity.startswith("EU"):
                 has_per_entity = (models_dir / entity / "model_julia_actuals.json").exists() or \
@@ -835,59 +859,97 @@ def main():
                     sv = entity_scope_map.get(entity)
                     if sv and sv in scope_scale_models:
                         scope_val = sv
-            work_items.append(
-                (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None,
-                 scope_val, conversion_model_trained_at, pipeline_run_date)
-            )
-        
-        batch_results = []
-        with ProcessPoolExecutor(max_workers=args.workers) as executor:
-            futures = {executor.submit(forecast_entity, item): item[0] for item in work_items}
             
-            for future in as_completed(futures):
-                entity = futures[future]
-                entity_code, result_df, msg = future.result()
-                
-                if result_df is not None:
-                    batch_results.append(result_df)
-                    successful += 1
-                else:
-                    failed += 1
-                    logger.warning(f"  {entity_code}: {msg}")
+            work_item = (entity, grid, models_dir, entity_ratio, agg_lookup, park_hours_lookup, None,
+                         scope_val, conversion_model_trained_at, pipeline_run_date)
+            
+            entity_code, result_df, msg = forecast_entity(work_item)
+            
+            if result_df is not None:
+                batch_results.append(result_df)
+                successful += 1
+            else:
+                failed += 1
+                logger.warning(f"    {entity_code}: {msg}")
+            
+            processed += 1
+            
+            # Flush batch to disk periodically to keep memory bounded
+            if len(batch_results) >= BATCH_SIZE:
+                batch_df = pd.concat(batch_results, ignore_index=True)
+                batch_file = temp_dir / f"batch_{batch_idx:04d}.parquet"
+                batch_df.to_parquet(batch_file, index=False)
+                batch_files.append(batch_file)
+                del batch_df, batch_results
+                batch_results = []
+                batch_idx += 1
+                gc.collect()
         
-        # Flush this batch to a temp parquet file
+        # Flush remaining results for this park
         if batch_results:
             batch_df = pd.concat(batch_results, ignore_index=True)
-            batch_file = temp_dir / f"batch_{batch_start:04d}.parquet"
+            batch_file = temp_dir / f"batch_{batch_idx:04d}.parquet"
             batch_df.to_parquet(batch_file, index=False)
             batch_files.append(batch_file)
             del batch_df, batch_results
+            batch_idx += 1
         
-        # Free the grid references for this batch
-        for i in range(batch_start, batch_end):
-            entity_queue[i] = (entity_queue[i][0], None)  # Release grid memory
-        
-        processed += len(batch_entities)
+        gc.collect()
         elapsed = time.time() - start_time
         rate = processed / elapsed if elapsed > 0 else 0
         logger.info(f"  Progress: {processed}/{total_entities} ({rate:.1f} entities/sec, {elapsed/60:.1f} min)")
     
-    # Combine batch files into final output
+    # Free large shared data structures before combination step
+    del agg_lookup, park_hours_lookup, time_grid_full, operating_by_entity, operating_set
+    del date_features, all_calendar_entities
+    gc.collect()
+    
+    # Combine batch files into final output using DuckDB (streams from parquet, no pandas concat)
     logger.info(f"Combining {len(batch_files)} batch files...")
     if batch_files:
-        chunks = [pd.read_parquet(f) for f in batch_files]
-        combined = pd.concat(chunks, ignore_index=True)
-        del chunks
-
         output_file = forecast_dir / "all_forecasts.parquet"
-        combined.to_parquet(output_file, index=False)
+        temp_glob = str(temp_dir / "batch_*.parquet")
+        
+        import duckdb as _ddb
+        combine_con = _ddb.connect()
+        combine_con.execute("SET memory_limit = '4GB'")
+        combine_con.execute(f"""
+            COPY (SELECT * FROM read_parquet('{temp_glob}'))
+            TO '{output_file}' (FORMAT PARQUET)
+        """)
+        
+        # Get stats via DuckDB (no need to load into pandas)
+        stats = combine_con.execute(f"""
+            SELECT 
+                COUNT(*) as total_predictions,
+                prediction_method,
+                COUNT(*) as method_count
+            FROM read_parquet('{output_file}')
+            GROUP BY prediction_method
+        """).fetchdf()
+        total_predictions = int(stats['method_count'].sum())
+        
+        # Get date range for DuckDB live write
+        date_range = combine_con.execute(f"""
+            SELECT MIN(park_date) as min_d, MAX(park_date) as max_d
+            FROM read_parquet('{output_file}')
+        """).fetchone()
+        min_d, max_d = date_range[0], date_range[1]
+        combine_con.close()
+        
+        logger.info(f"  Saved {total_predictions:,} predictions to {output_file}")
+        logger.info(f"  File size: {output_file.stat().st_size / 1024 / 1024:.1f} MB")
+        logger.info("  By method:")
+        for _, row in stats.iterrows():
+            logger.info(f"    {row['prediction_method']}: {int(row['method_count']):,}")
         
         # Dual-write to DuckDB for bot + dashboard
+        # Note: this can be slow/heavy on a 9GB+ database. Set memory limit to avoid OOM.
         db_path = output_base / "tpcr_live.duckdb"
         if db_path.exists():
             try:
-                import duckdb
-                live_con = duckdb.connect(str(db_path))
+                live_con = _ddb.connect(str(db_path))
+                live_con.execute("SET memory_limit = '8GB'")
                 
                 # Auto-migrate: add lineage columns if they don't exist yet
                 _lineage_cols = [
@@ -913,19 +975,14 @@ def main():
                     if col_name not in existing_cols:
                         try:
                             live_con.execute(f"ALTER TABLE forecasts ADD COLUMN {col_name} {col_type}")
-                        except duckdb.Error:
+                        except _ddb.Error:
                             pass
                 
-                min_d = combined["park_date"].min()
-                max_d = combined["park_date"].max()
-                min_d = min_d.date() if hasattr(min_d, "date") else min_d
-                max_d = max_d.date() if hasattr(max_d, "date") else max_d
                 live_con.execute(
                     "DELETE FROM forecasts WHERE park_date >= ? AND park_date <= ?",
                     [min_d, max_d],
                 )
-                live_con.register("_fc_df", combined)
-                live_con.execute("""
+                live_con.execute(f"""
                     INSERT INTO forecasts (
                         entity_code, park_date, time_slot, predicted_actual, prediction_method,
                         entity_model_trained_at, entity_model_version, feature_set,
@@ -943,36 +1000,46 @@ def main():
                            conversion_model_trained_at, pipeline_run_date, fallback_ratio_used,
                            uses_quantile_mapping, hyperparameter_hash, notes,
                            CURRENT_TIMESTAMP
-                    FROM _fc_df
+                    FROM read_parquet('{output_file}')
                 """)
+                # Backfill long-range forecasts from all_forecasts.parquet
+                # (daily pipeline only generates ~14 days, but the full parquet has ~365)
+                all_fc_path = output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
+                if all_fc_path.exists():
+                    all_fc_str = str(all_fc_path).replace("\\", "/")
+                    live_con.execute(f"""
+                        INSERT OR IGNORE INTO forecasts 
+                            (entity_code, park_date, time_slot, predicted_actual, prediction_method, updated_at)
+                        SELECT 
+                            entity_code,
+                            park_date::DATE,
+                            CAST(time_slot AS VARCHAR),
+                            predicted_actual,
+                            COALESCE(prediction_method, 'model'),
+                            CURRENT_TIMESTAMP
+                        FROM read_parquet('{all_fc_str}')
+                        WHERE park_date > ?
+                    """, [max_d])
+
                 live_con.execute("""
                     INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
                     VALUES ('forecasts', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM forecasts), 'pipeline')
                 """)
                 live_con.close()
-                logger.info(f"  Wrote {len(combined):,} predictions to tpcr_live.duckdb")
+                logger.info(f"  Wrote {total_predictions:,} predictions to tpcr_live.duckdb")
             except Exception as e:
                 logger.warning(f"  DuckDB write failed: {e}")
         
-        # Stats
-        method_counts = combined['prediction_method'].value_counts()
-        total_predictions = len(combined)
-        
-        logger.info(f"  Saved {total_predictions:,} predictions to {output_file}")
-        logger.info(f"  File size: {output_file.stat().st_size / 1024 / 1024:.1f} MB")
-        logger.info("  By method:")
-        for method, count in method_counts.items():
-            logger.info(f"    {method}: {count:,}")
-        
-        del combined
-        
         # Clean up temp files
         for f in batch_files:
-            f.unlink()
+            try:
+                f.unlink()
+            except OSError:
+                pass
         try:
             temp_dir.rmdir()
         except OSError:
-            pass  # May have leftover files from prior interrupted run
+            pass
     else:
         total_predictions = 0
     
