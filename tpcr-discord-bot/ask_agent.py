@@ -14,6 +14,48 @@ from typing import Optional
 
 DUCKDB_PATH = "/mnt/data/pipeline/tpcr_live.duckdb"
 
+# Failure patterns that trigger immediate self-healing
+_FAILURE_PATTERNS = [
+    "data is updating right now",
+    "try again in a minute",
+    "database is temporarily busy",
+    "i wasn't able to fully answer",
+    "try rephrasing or asking something more specific",
+    "query error:",
+    "unable to access",
+    "no data available",
+]
+
+
+def _is_bad_response(answer: str) -> bool:
+    """Check if an answer matches a known failure pattern."""
+    answer_lower = answer.lower()
+    return any(p in answer_lower for p in _FAILURE_PATTERNS)
+
+
+def _trigger_self_heal(question: str, user_id: str, username: str, answer: str):
+    """Fire the ask_response_monitor in the background to diagnose and fix."""
+    import subprocess
+    import os
+    script = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "scripts", "ask_response_monitor.py"
+    )
+    venv_python = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        ".venv", "bin", "python"
+    )
+    try:
+        subprocess.Popen(
+            [venv_python, script, "--fix", "--since-minutes", "5", "--json"],
+            stdout=open("/tmp/ask_self_heal.log", "a"),
+            stderr=subprocess.STDOUT,
+            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            start_new_session=True,  # Detach from bot process
+        )
+    except Exception:
+        pass  # Never let self-heal crash the bot
+
 # Schema context for the AI agent
 SCHEMA_CONTEXT = """You are a theme park data analyst for the Theme Park Crowd Report (TPCR).
 You answer questions about theme park crowds, wait times, and visit planning using real forecast data.
@@ -306,9 +348,18 @@ async def ask_agent(question: str, user_id: str, api_key: str, username: str = "
 
             duration_ms = int((_time.monotonic() - _start) * 1000)
             log_question(user_id, username, question, answer, duration_ms)
+
+            # Immediate self-heal on bad response
+            if _is_bad_response(answer):
+                _trigger_self_heal(question, user_id, username, answer)
+
             return answer
 
     fallback = "I wasn't able to fully answer that question. Try rephrasing or asking something more specific!"
     duration_ms = int((_time.monotonic() - _start) * 1000)
     log_question(user_id, username, question, fallback, duration_ms)
+
+    # Fallback always triggers self-heal
+    _trigger_self_heal(question, user_id, username, fallback)
+
     return fallback
