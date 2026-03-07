@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T15:30:01Z",
+  "generated_at": "2026-03-07T15:38:59Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-07T15:00:01.937000+00:00"
+          "last_active": "2026-03-07T15:30:01.469000+00:00"
         },
         {
           "name": "daily-digest",
@@ -55,7 +55,7 @@
           "emoji": "\ud83d\udd27",
           "purpose": "Pipeline monitoring \u2014 ETL status, forecast runs, data quality checks",
           "url": "https://discord.com/channels/1479350342318690505/1479351574177513576",
-          "last_active": "2026-03-07T15:04:14.509000+00:00"
+          "last_active": "2026-03-07T15:38:03.675000+00:00"
         },
         {
           "name": "modeling",
@@ -159,6 +159,50 @@
   ],
   "recent_activity": [
     {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Building it now \u2014 sub-agent is on it. Every 3 minutes, the script will check health and post/edit the Discord announcement on its own, no heartbeat needed. I'll report back when it's done. \ud83e\uddb4",
+      "timestamp": "2026-03-07T15:38:03.675000+00:00",
+      "message_id": "1479865726088122511",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479865726088122511"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "On it \u2014 every 3 minutes, fully autonomous. Spawning a sub-agent to build this.",
+      "timestamp": "2026-03-07T15:37:45.189000+00:00",
+      "message_id": "1479865648552087725",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479865648552087725"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Yes, go ahead and build that and I might even suggest more often than five minutes maybe three minutes",
+      "timestamp": "2026-03-07T15:37:40.874000+00:00",
+      "message_id": "1479865630453793024",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479865630453793024"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-07T15:30:01.469000+00:00",
+      "message_id": "1479863703569436844",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479863703569436844"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -192,28 +236,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479859026148987124"
     },
     {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Barney",
-      "is_bot": true,
-      "message": "## \ud83e\udea8 IA Overprediction Analysis\n\nTraced IA's error trajectory across available accuracy reports:\n\n| Date | Forecast WTI | Actual WTI | Error |\n|------|-------------|-----------|-------|\n| Feb 25 | ...",
-      "timestamp": "2026-03-07T15:04:14.509000+00:00",
-      "message_id": "1479857215149183119",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479857215149183119"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Barney",
-      "is_bot": true,
-      "message": "## \ud83e\udea8 MAPE 91% \u2014 Confirmed Calculation Bug (not real accuracy)\n\nInvestigated `src/evaluate_forecast_accuracy.py`. The MAPE calculation:\n\n```sql\nCASE WHEN a.actual_wait > 0 \n  THEN ABS(f.forecast_wai...",
-      "timestamp": "2026-03-07T15:03:47.546000+00:00",
-      "message_id": "1479857102057902241",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479857102057902241"
-    },
-    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -223,17 +245,6 @@
       "timestamp": "2026-03-07T15:00:01.937000+00:00",
       "message_id": "1479856155785429068",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479856155785429068"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Barney",
-      "is_bot": true,
-      "message": "## \ud83e\udea8 Barney Pipeline Review \u2014 2026-03-07\n\n**Overall: \ud83d\udfe1**\n\n| Check | Grade | Detail |\n|-------|-------|--------|\n| Staleness | \ud83d\udfe2 | MC JSON 5h old, OOM fix landed, pipeline should run clean tomorrow ...",
-      "timestamp": "2026-03-07T14:59:50.699000+00:00",
-      "message_id": "1479856108649709639",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479856108649709639"
     },
     {
       "channel": "mission-control",
@@ -278,17 +289,6 @@
       "timestamp": "2026-03-07T13:49:06.348000+00:00",
       "message_id": "1479838306551464098",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1479838306551464098"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-07T11:30:01.393000+00:00",
-      "message_id": "1479803305273200723",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479803305273200723"
     },
     {
       "channel": "gazoo",
