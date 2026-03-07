@@ -83,7 +83,7 @@
         "days_evaluated": 24
     },
     "ask_analytics": {
-        "total_questions": 61,
+        "total_questions": 67,
         "unique_users": 18,
         "thumbs_up": 6,
         "thumbs_down": 0,
@@ -94,17 +94,17 @@
         "services": [
             {
                 "name": "tpcr-discord-bot",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Discord bot"
             },
             {
                 "name": "chat-server",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Stream overlay"
             },
             {
                 "name": "twitch-chat",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Stream overlay"
             },
             {
@@ -120,5 +120,5 @@
         "db_live_waits": 123206991,
         "db_wti": 54712
     },
-    "last_updated": "2026-03-07T10:45:06.671543"
+    "last_updated": "2026-03-07T14:40:50.785405"
 }
