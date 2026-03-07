@@ -3,8 +3,7 @@
 TPCR Service Status Manager
 
 Monitors overall service health and manages public Discord announcements
-for the TPCR community server. Designed to be called by Wilma (Clawdbot)
-who handles the actual Discord message tool calls.
+for the TPCR community server.
 
 Health checks:
   1. Pipeline status (via pipeline_alert_check.py --json)
@@ -17,13 +16,18 @@ Overall status levels:
   - down: bot or data not available
 
 Usage:
-  python3 service_status_manager.py --check   # Health check → JSON output
-  python3 service_status_manager.py --fix     # Health check + auto-fixes
+  python3 service_status_manager.py --check   # Health check → JSON output (for Wilma)
+  python3 service_status_manager.py --fix     # Health check + auto-fixes → JSON output
+  python3 service_status_manager.py --auto    # Health check + fixes + Discord post/edit (for cron)
   python3 service_status_manager.py --status  # Show current status from state file
 
-Output:
+Output (--check/--fix):
   JSON with action field: "post", "edit", or "nothing"
   Wilma reads the action and executes the Discord message tool calls.
+
+Output (--auto):
+  Runs the check, applies auto-fixes, and directly posts/edits Discord
+  announcements via the REST API. Designed for cron execution.
 """
 
 import argparse
@@ -32,6 +36,7 @@ import os
 import subprocess
 import sys
 import logging
+import requests
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -54,6 +59,150 @@ PYTHON = Path(__file__).parent.parent / ".venv" / "bin" / "python3"
 SERVICE_NAME = "tpcr-discord-bot"
 
 logger = logging.getLogger("service-status")
+
+DISCORD_API_BASE = "https://discord.com/api/v10"
+
+
+def _get_discord_token() -> str | None:
+    """Load the Discord bot token from environment."""
+    token = os.environ.get("DISCORD_BOT_TOKEN")
+    if not token:
+        logger.error("DISCORD_BOT_TOKEN not set in environment")
+    return token
+
+
+def discord_post_message(channel_id: str, content: str) -> dict | None:
+    """
+    Post a new message to a Discord channel via REST API.
+    Returns the message object on success, None on failure.
+    """
+    token = _get_discord_token()
+    if not token:
+        return None
+
+    url = f"{DISCORD_API_BASE}/channels/{channel_id}/messages"
+    headers = {
+        "Authorization": f"Bot {token}",
+        "Content-Type": "application/json",
+    }
+    payload = {"content": content}
+
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=15)
+        if resp.status_code in (200, 201):
+            data = resp.json()
+            logger.info(f"Discord: Posted message {data['id']} to channel {channel_id}")
+            return data
+        else:
+            logger.error(
+                f"Discord POST failed: {resp.status_code} — {resp.text[:300]}"
+            )
+            return None
+    except Exception as e:
+        logger.error(f"Discord POST exception: {e}")
+        return None
+
+
+def discord_edit_message(channel_id: str, message_id: str, content: str) -> dict | None:
+    """
+    Edit an existing Discord message via REST API.
+    Returns the updated message object on success, None on failure.
+    """
+    token = _get_discord_token()
+    if not token:
+        return None
+
+    url = f"{DISCORD_API_BASE}/channels/{channel_id}/messages/{message_id}"
+    headers = {
+        "Authorization": f"Bot {token}",
+        "Content-Type": "application/json",
+    }
+    payload = {"content": content}
+
+    try:
+        resp = requests.patch(url, headers=headers, json=payload, timeout=15)
+        if resp.status_code == 200:
+            data = resp.json()
+            logger.info(f"Discord: Edited message {message_id} in channel {channel_id}")
+            return data
+        elif resp.status_code == 404:
+            logger.warning(
+                f"Discord PATCH 404: Message {message_id} not found — may need new post"
+            )
+            return None
+        else:
+            logger.error(
+                f"Discord PATCH failed: {resp.status_code} — {resp.text[:300]}"
+            )
+            return None
+    except Exception as e:
+        logger.error(f"Discord PATCH exception: {e}")
+        return None
+
+
+def execute_discord_action(result: dict) -> bool:
+    """
+    Execute the Discord action determined by run_check().
+    Posts or edits the announcement message and saves the message_id to state.
+    Returns True if the action was executed successfully (or nothing to do).
+    """
+    action = result.get("action", "nothing")
+    channel_id = result.get("channel_id", TPCR_ANNOUNCEMENTS_CHANNEL)
+    message_content = result.get("message_content")
+
+    if action == "nothing":
+        logger.info("Auto: No Discord action needed")
+        return True
+
+    if not message_content:
+        logger.error("Auto: Action requires message_content but none provided")
+        return False
+
+    if action == "post":
+        resp = discord_post_message(channel_id, message_content)
+        if resp and "id" in resp:
+            # Save the new message ID to state so future edits target it
+            state = load_state()
+            state["announcement_message_id"] = resp["id"]
+            save_state(state)
+            logger.info(f"Auto: Posted announcement, saved message_id={resp['id']}")
+            return True
+        else:
+            logger.error("Auto: Failed to post announcement")
+            return False
+
+    elif action == "edit":
+        message_id = result.get("message_id")
+        if not message_id:
+            logger.warning("Auto: Edit requested but no message_id — falling back to post")
+            resp = discord_post_message(channel_id, message_content)
+            if resp and "id" in resp:
+                state = load_state()
+                state["announcement_message_id"] = resp["id"]
+                save_state(state)
+                logger.info(f"Auto: Fallback post, saved message_id={resp['id']}")
+                return True
+            return False
+
+        resp = discord_edit_message(channel_id, message_id, message_content)
+        if resp:
+            logger.info(f"Auto: Edited announcement {message_id}")
+            return True
+        else:
+            # Edit failed (maybe message was deleted) — fall back to new post
+            logger.warning("Auto: Edit failed, falling back to new post")
+            resp = discord_post_message(channel_id, message_content)
+            if resp and "id" in resp:
+                state = load_state()
+                state["announcement_message_id"] = resp["id"]
+                save_state(state)
+                logger.info(f"Auto: Fallback post after edit fail, message_id={resp['id']}")
+                return True
+            return False
+
+    else:
+        logger.warning(f"Auto: Unknown action '{action}'")
+        return False
 
 
 def setup_logging():
@@ -409,10 +558,16 @@ def _format_duration(downtime_start: str) -> str | None:
 
 
 def _describe_fixes(fixes: list) -> list:
-    """Translate auto-fix actions into plain language."""
+    """Translate auto-fix actions into plain language (deduplicated)."""
     descriptions = []
+    seen_actions = set()
     for fix in (fixes or []):
         action = fix.get("action", "")
+        # Deduplicate: only describe each action type once
+        action_key = f"{action}:{fix.get('success', '')}"
+        if action_key in seen_actions:
+            continue
+        seen_actions.add(action_key)
         if action == "bot_restarted" and fix.get("success"):
             descriptions.append("We restarted the bot service and it came back up successfully.")
         elif action == "bot_restarted" and not fix.get("success"):
@@ -831,6 +986,11 @@ def main():
         help="Run health check + attempt auto-fixes",
     )
     group.add_argument(
+        "--auto",
+        action="store_true",
+        help="Run health check + fixes + execute Discord actions (for cron)",
+    )
+    group.add_argument(
         "--status",
         action="store_true",
         help="Show current status from state file",
@@ -858,6 +1018,13 @@ def main():
         result = run_check(do_fix=False)
     elif args.fix:
         result = run_check(do_fix=True)
+    elif args.auto:
+        result = run_check(do_fix=True)
+        # Execute the Discord action directly
+        success = execute_discord_action(result)
+        result["auto_executed"] = success
+        if not success:
+            logger.error("Auto: Discord action failed")
     else:
         parser.print_help()
         sys.exit(1)
