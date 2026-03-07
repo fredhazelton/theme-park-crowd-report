@@ -46,11 +46,14 @@ def _trigger_self_heal(question: str, user_id: str, username: str, answer: str):
         ".venv", "bin", "python"
     )
     try:
+        # Pass current environment so subprocess has API keys, bot tokens, etc.
+        env = os.environ.copy()
         subprocess.Popen(
             [venv_python, script, "--fix", "--since-minutes", "5", "--json"],
             stdout=open("/tmp/ask_self_heal.log", "a"),
             stderr=subprocess.STDOUT,
             cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            env=env,
             start_new_session=True,  # Detach from bot process
         )
     except Exception:
