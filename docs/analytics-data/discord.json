@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T15:00:01Z",
+  "generated_at": "2026-03-07T15:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-07T14:30:01.985000+00:00"
+          "last_active": "2026-03-07T15:00:01.937000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T14:55:33.104000+00:00"
+          "last_active": "2026-03-07T15:12:23.840000+00:00"
         }
       ]
     },
@@ -55,7 +55,7 @@
           "emoji": "\ud83d\udd27",
           "purpose": "Pipeline monitoring \u2014 ETL status, forecast runs, data quality checks",
           "url": "https://discord.com/channels/1479350342318690505/1479351574177513576",
-          "last_active": "2026-03-07T14:59:50.699000+00:00"
+          "last_active": "2026-03-07T15:04:14.509000+00:00"
         },
         {
           "name": "modeling",
@@ -159,6 +159,72 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Yes! I'm here and everything just came together. \ud83c\udf89\n\n**Pipeline is LIVE:**\n- \u2705 **Forecast:** 426 entities, 23.6M predictions, 0 failures, 8.5 min runtime\n- \u2705 **WTI:** 54,712 park-dates written to Du...",
+      "timestamp": "2026-03-07T15:12:23.840000+00:00",
+      "message_id": "1479859267551891457",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479859267551891457"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Forecast completed! Now WTI + DuckDB:",
+      "timestamp": "2026-03-07T15:11:56.619000+00:00",
+      "message_id": "1479859153378738176",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479859153378738176"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Are you back?",
+      "timestamp": "2026-03-07T15:11:26.285000+00:00",
+      "message_id": "1479859026148987124",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479859026148987124"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Barney",
+      "is_bot": true,
+      "message": "## \ud83e\udea8 IA Overprediction Analysis\n\nTraced IA's error trajectory across available accuracy reports:\n\n| Date | Forecast WTI | Actual WTI | Error |\n|------|-------------|-----------|-------|\n| Feb 25 | ...",
+      "timestamp": "2026-03-07T15:04:14.509000+00:00",
+      "message_id": "1479857215149183119",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479857215149183119"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Barney",
+      "is_bot": true,
+      "message": "## \ud83e\udea8 MAPE 91% \u2014 Confirmed Calculation Bug (not real accuracy)\n\nInvestigated `src/evaluate_forecast_accuracy.py`. The MAPE calculation:\n\n```sql\nCASE WHEN a.actual_wait > 0 \n  THEN ABS(f.forecast_wai...",
+      "timestamp": "2026-03-07T15:03:47.546000+00:00",
+      "message_id": "1479857102057902241",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479857102057902241"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-07T15:00:01.937000+00:00",
+      "message_id": "1479856155785429068",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479856155785429068"
+    },
+    {
       "channel": "pipeline",
       "channel_emoji": "\ud83d\udd27",
       "channel_id": "1479351574177513576",
@@ -168,61 +234,6 @@
       "timestamp": "2026-03-07T14:59:50.699000+00:00",
       "message_id": "1479856108649709639",
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479856108649709639"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "1. Run WTI + DuckDB load \u2192 fresh bot data\n2. Add Barney's tasks 019-026 properly to `tasks.json`\n3. Monitor next heartbeat cycle to confirm everything fires\n\nGazoo won't be *happy* \u2014 but he'll see ...",
-      "timestamp": "2026-03-07T14:55:33.104000+00:00",
-      "message_id": "1479855028217843786",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479855028217843786"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Here's the honest status for you \u2014 and what Gazoo's going to say:\n\n**\u2705 What's working now:**\n- \ud83d\udfe2 Heartbeat: running on correct agent, 30min cycle, first one already fired\n- \ud83d\udfe2 TPCR bot: active, conn...",
-      "timestamp": "2026-03-07T14:55:32.998000+00:00",
-      "message_id": "1479855027773247578",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479855027773247578"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "OK, is everythgin churnign along properly now? Will Gazoo be happy this afternoon after his review?",
-      "timestamp": "2026-03-07T14:54:41.683000+00:00",
-      "message_id": "1479854812542533683",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479854812542533683"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Barney",
-      "is_bot": true,
-      "message": "## \ud83e\udea8 Forecast OOM \u2014 Fix Options (ranked)\n\n**Option A: Reduce workers 8\u21922** *(5 min fix, safest)*\nIn `run_daily_pipeline.sh` change forecast call to `--workers 2`. Cuts peak memory ~60%. Forecast ru...",
-      "timestamp": "2026-03-07T14:32:42.166000+00:00",
-      "message_id": "1479849278087102606",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479849278087102606"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Barney",
-      "is_bot": true,
-      "message": "## \ud83e\udea8 Forecast OOM Analysis \u2014 Root Cause\n\n**The problem**: `forecast_vectorized.py` OOM-kills at ~49GB RSS on a 62GB machine.\n\n**Why**: I've read the full script. The memory math:\n\n- **Time grid**: ...",
-      "timestamp": "2026-03-07T14:32:32.941000+00:00",
-      "message_id": "1479849239394783347",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479849239394783347"
     },
     {
       "channel": "mission-control",
@@ -278,17 +289,6 @@
       "timestamp": "2026-03-07T11:30:01.393000+00:00",
       "message_id": "1479803305273200723",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479803305273200723"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-07T09:30:01.361000+00:00",
-      "message_id": "1479773106150178816",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479773106150178816"
     },
     {
       "channel": "gazoo",
