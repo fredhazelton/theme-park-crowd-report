@@ -2378,6 +2378,475 @@
             }
             .memory-right { min-height: 60vh; }
         }
+
+        /* ═══════════════════════════════════════════════════
+           FULL RESPONSIVE PASS — TABLET (481-768px) + MOBILE (≤480px)
+           ═══════════════════════════════════════════════════ */
+
+        /* --- TABLET (≤768px) --- */
+        @media (max-width: 768px) {
+
+            /* PIPELINE: service rows — prevent overflow on narrow screens */
+            .pipeline-step {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .pipeline-step-label {
+                font-size: 13px;
+            }
+            .service-row {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .accuracy-quick {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            /* ANALYTICS: chart heights reduced */
+            .chart-wrap {
+                height: 220px;
+            }
+
+            /* TASKS: tasks-main stacks, kanban scrollable */
+            .tasks-main {
+                grid-template-columns: 1fr;
+            }
+            .live-activity-panel {
+                position: static;
+            }
+            .tasks-controls-left,
+            .tasks-controls-mid,
+            .tasks-controls-right {
+                width: 100%;
+            }
+            .tasks-controls-mid {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .owner-pills {
+                flex-wrap: wrap;
+            }
+            .project-filter {
+                width: 100%;
+            }
+            .btn-add-task {
+                width: 100%;
+                justify-content: center;
+                padding: 12px 16px;
+                min-height: 44px;
+            }
+
+            /* TASKS: modal nearly full-screen */
+            .modal-box {
+                width: 100%;
+                max-width: 100vw;
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                padding: 16px;
+            }
+            .modal-overlay.open {
+                align-items: stretch;
+            }
+            .modal-btn {
+                padding: 12px 18px;
+                min-height: 44px;
+            }
+
+            /* CALENDAR: day cards — limit height */
+            .calendar-day {
+                min-height: 140px;
+            }
+            .day-events {
+                max-height: 200px;
+            }
+            .cal-event-name {
+                white-space: normal;
+            }
+            .calendar-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            /* DISCORD: long messages don't overflow */
+            .discord-activity-msg {
+                word-break: break-word;
+                overflow-wrap: break-word;
+            }
+            .discord-channel-purpose {
+                word-break: break-word;
+            }
+            .discord-category-header {
+                padding: 12px 14px;
+                gap: 8px;
+            }
+            .discord-category-body {
+                padding: 6px 8px 10px;
+            }
+            .discord-channel {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            /* SOCIAL: grid goes 1-col on tablet */
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* IDEAS: grid goes 1-col */
+            .ideas-grid {
+                grid-template-columns: 1fr;
+            }
+            .ideas-summary {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            /* FINANCE: summary 2-col, grid 1-col */
+            .finance-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .finance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* MEMORY: content header compact */
+            .memory-content-header {
+                padding: 14px 16px 12px;
+            }
+            .memory-content-body {
+                padding: 16px;
+            }
+            .memory-content-title {
+                font-size: 16px;
+            }
+            .memory-md h1 {
+                font-size: 18px;
+            }
+            .memory-md h2 {
+                font-size: 16px;
+            }
+
+            /* Touch targets — ensure minimum 44px for interactive elements */
+            .tab {
+                min-height: 44px;
+            }
+            .owner-pill,
+            .ideas-cat-pill {
+                min-height: 36px;
+                display: inline-flex;
+                align-items: center;
+            }
+
+            /* PROJECTS: card adjustments */
+            .project-card {
+                padding: 16px;
+            }
+            .project-card-header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            /* Scrollbar hint for kanban */
+            .kanban-scroll {
+                position: relative;
+            }
+            .kanban-scroll::after {
+                content: '→ scroll';
+                position: absolute;
+                bottom: 0;
+                right: 8px;
+                font-family: var(--font-mono);
+                font-size: 10px;
+                color: var(--text-muted);
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            /* Tables: horizontal scroll wrapper */
+            .scoreboard-table-wrap {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Toast repositioned for mobile */
+            .toast {
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+                text-align: center;
+            }
+
+            /* Footer compact */
+            .footer {
+                padding: 8px 12px;
+                font-size: 9px;
+            }
+        }
+
+        /* --- MOBILE (≤480px) --- */
+        @media (max-width: 480px) {
+
+            /* Tab bar: hide labels, icon only */
+            .tab-label {
+                display: none;
+            }
+            .tab {
+                padding: 8px 10px;
+                min-width: 40px;
+            }
+            .tab-icon {
+                font-size: 18px;
+            }
+
+            /* Header further compact */
+            .header {
+                padding: 6px 10px;
+            }
+            .logo {
+                font-size: 12px;
+            }
+            .logo-sub {
+                font-size: 8px;
+            }
+
+            /* Tab content: tighter padding */
+            .tab-content {
+                padding: 10px;
+            }
+
+            /* Cards: tighter */
+            .card {
+                padding: 12px;
+                border-radius: 8px;
+            }
+            .card-title {
+                font-size: 10px;
+                margin-bottom: 12px;
+            }
+
+            /* PIPELINE: 1-col already set, compact items */
+            .focus-item {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .accuracy-quick {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .accuracy-stat {
+                padding: 8px;
+            }
+            .accuracy-stat .value {
+                font-size: 16px;
+            }
+
+            /* ANALYTICS: big numbers 2-col, smaller */
+            .big-numbers {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .big-number-card {
+                padding: 12px;
+            }
+            .big-number-card .num {
+                font-size: 22px;
+            }
+            .chart-wrap {
+                height: 180px;
+            }
+            .explorer-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            .explorer-stat {
+                padding: 8px;
+            }
+            .explorer-stat .val {
+                font-size: 15px;
+            }
+            /* Scoreboard: hide park column, shrink name */
+            table.scoreboard .park-cell {
+                display: none;
+            }
+            table.scoreboard .name-cell {
+                max-width: 100px;
+            }
+            table.scoreboard th,
+            table.scoreboard td {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+            .scoreboard-table-wrap {
+                max-height: 280px;
+            }
+
+            /* TASKS: summary 2-col, kanban min-width reduced */
+            .tasks-summary {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .tasks-summary .big-number-card .num {
+                font-size: 22px;
+            }
+            .kanban-board {
+                grid-template-columns: repeat(5, minmax(160px, 1fr));
+                min-width: 750px;
+                gap: 8px;
+            }
+            .kanban-col-header {
+                padding: 10px 10px;
+                font-size: 10px;
+            }
+            .kanban-col-body {
+                padding: 6px;
+                max-height: 400px;
+                gap: 6px;
+            }
+            .task-card {
+                padding: 10px;
+            }
+            .task-card-title {
+                font-size: 12px;
+            }
+            .task-card-meta {
+                gap: 4px;
+            }
+
+            /* PROJECTS: tighter cards */
+            .projects-header h2 {
+                font-size: 16px;
+            }
+            .project-card-name {
+                font-size: 14px;
+            }
+            .project-card-desc {
+                font-size: 12px;
+            }
+
+            /* CALENDAR: 1-col already set, tighten */
+            .calendar-day {
+                min-height: 100px;
+            }
+            .day-header {
+                padding: 8px 10px;
+            }
+            .day-header .day-date {
+                font-size: 15px;
+            }
+            .day-events {
+                max-height: 160px;
+                padding: 6px;
+            }
+            .ar-pill {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            /* DISCORD: stats 2-col, tighter */
+            .discord-server-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .discord-server-stat {
+                padding: 10px;
+            }
+            .discord-server-stat .value {
+                font-size: 18px;
+            }
+            .discord-server-name {
+                font-size: 15px;
+            }
+            .discord-category-header {
+                padding: 10px 12px;
+                gap: 6px;
+            }
+            .discord-category-name {
+                font-size: 11px;
+            }
+
+            /* SOCIAL: account stats 2-col */
+            .social-account-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .social-account-header {
+                gap: 8px;
+            }
+            .social-account-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 22px;
+            }
+
+            /* IDEAS: summary smaller */
+            .ideas-summary {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .ideas-category-pills {
+                gap: 6px;
+            }
+            .idea-card {
+                padding: 12px;
+            }
+            .idea-card-title {
+                font-size: 13px;
+            }
+            .idea-card-footer {
+                gap: 6px;
+            }
+
+            /* FINANCE: summary + grid 1-col */
+            .finance-summary {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .finance-card {
+                padding: 14px;
+            }
+            .finance-line-label {
+                font-size: 12px;
+            }
+            .finance-line-value {
+                font-size: 13px;
+            }
+
+            /* MEMORY: left panel shorter, content tighter */
+            .memory-left {
+                max-height: 220px;
+            }
+            .memory-search {
+                padding: 10px;
+            }
+            .memory-search input {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            .memory-lt-card {
+                margin: 8px 10px;
+                padding: 10px;
+            }
+            .memory-content-header {
+                padding: 12px;
+            }
+            .memory-content-body {
+                padding: 12px;
+            }
+            .memory-content-title {
+                font-size: 15px;
+            }
+            .memory-md {
+                font-size: 13px;
+            }
+            .memory-md pre {
+                padding: 10px;
+                font-size: 11px;
+            }
+
+            /* Global: prevent any horizontal overflow */
+            .main-content {
+                overflow-x: hidden;
+            }
+        }
     </style>
 </head>
 <body>
