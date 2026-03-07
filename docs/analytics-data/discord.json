@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T03:30:01Z",
+  "generated_at": "2026-03-07T03:45:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T02:03:04.741000+00:00"
+          "last_active": "2026-03-07T03:40:15.760000+00:00"
         }
       ]
     },
@@ -164,21 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Great question from Annette! That's actually a really smart data angle.\n\n**What we track now:** Standby posted wait times across WDW, Universal, and other parks.\n\n**What she's asking about:** Premi...",
-      "timestamp": "2026-03-07T02:03:04.741000+00:00",
-      "message_id": "1479660629093515504",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479660629093515504"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Question from Annette",
-      "timestamp": "2026-03-07T02:02:45.708000+00:00",
-      "message_id": "1479660549263589459",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479660549263589459"
+      "message": "- Fallback ratio trending up?\n\n**Phase 3 \u2014 Freshness Validation (every 6 hours)**\n- Are actuals flowing in? How many entities have recent data?\n- Any \"silent gaps\" where data stops without an error...",
+      "timestamp": "2026-03-07T03:40:15.760000+00:00",
+      "message_id": "1479685086159831151",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479685086159831151"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +175,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Betty dropped 5 tweet drafts in #content-review for you \ud83d\udc26 \u2014 covers accuracy wins, the pipeline fix, bot monitoring, and Gazoo. Take a look and \u2705 the ones you like!",
-      "timestamp": "2026-03-07T01:07:45.495000+00:00",
-      "message_id": "1479646707166871848",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479646707166871848"
+      "message": "You're seeing the pattern clearly. Today alone we found:\n\n1. **Fallback entities** \u2014 82 data-sparse entities predicting flat constants, polluting WTI\n2. **EU model override** \u2014 legacy code forcing ...",
+      "timestamp": "2026-03-07T03:40:15.502000+00:00",
+      "message_id": "1479685085077704899",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479685085077704899"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me log this and respond properly.",
+      "timestamp": "2026-03-07T03:39:49.766000+00:00",
+      "message_id": "1479684977133355089",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479684977133355089"
     },
     {
       "channel": "mission-control",

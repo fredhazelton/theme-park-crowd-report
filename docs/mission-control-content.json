@@ -75,9 +75,9 @@
         }
     },
     "accuracy": {
-        "entity_mae": "11.6 min",
-        "entity_bias": "+1.7 min",
-        "overall_rmse": "13.2",
+        "entity_mae": "9.4 min",
+        "entity_bias": "+2.6 min",
+        "overall_rmse": "10.7",
         "wti_mae": "6.8",
         "wti_bias": "1.4",
         "days_evaluated": 23
@@ -120,5 +120,5 @@
         "db_live_waits": 123103185,
         "db_wti": 54699
     },
-    "last_updated": "2026-03-06T22:30:04.065626"
+    "last_updated": "2026-03-06T22:45:06.109691"
 }
