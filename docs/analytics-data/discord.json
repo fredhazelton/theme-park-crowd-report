@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T03:45:02Z",
+  "generated_at": "2026-03-07T04:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-06T23:30:01.573000+00:00"
+          "last_active": "2026-03-07T04:00:01.338000+00:00"
         },
         {
           "name": "daily-digest",
@@ -159,6 +159,17 @@
   ],
   "recent_activity": [
     {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-07T04:00:01.338000+00:00",
+      "message_id": "1479690058834509894",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479690058834509894"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -212,17 +223,6 @@
       "timestamp": "2026-03-06T23:00:01.586000+00:00",
       "message_id": "1479614562402828462",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479614562402828462"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-06T20:30:01.992000+00:00",
-      "message_id": "1479576815369719899",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479576815369719899"
     },
     {
       "channel": "gazoo",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 1,
-    "messages_today": 3
+    "active_channels_today": 2,
+    "messages_today": 4
   }
 }
