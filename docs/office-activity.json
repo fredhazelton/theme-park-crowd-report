@@ -4,8 +4,8 @@
     "task": "Morning check-in, reviewing overnight issues"
   },
   "wilma": {
-    "last_active": "2026-03-07T13:48:45.657935+00:00",
-    "task": "Running missed morning checks, fixing forecast pipeline bug, heartbeat config fix"
+    "last_active": "2026-03-07T13:50:21.942249+00:00",
+    "task": "Heartbeat check - restarted pipeline due to forecast error"
   },
   "barney": {},
   "bambam": {},

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-07T13:48:45.710225+00:00",
+  "updated": "2026-03-07T13:50:24.337056+00:00",
   "agents": [
     {
       "id": "fred",
@@ -16,7 +16,7 @@
       "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "Running missed morning checks, fixing forecast pipeline bug, heartbeat config fix",
+      "task": "Heartbeat check - restarted pipeline due to forecast error",
       "color": "#4a90a4"
     },
     {
@@ -34,7 +34,7 @@
       "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
-      "task": "Pushed 3 commits recently",
+      "task": "Pushed 4 commits recently",
       "color": "#c084fc"
     },
     {
@@ -75,6 +75,26 @@
     }
   ],
   "activity": [
+    {
+      "time": "09:57",
+      "agent": "fred",
+      "text": "Reported Office status bug in #bugs-feedback"
+    },
+    {
+      "time": "09:57",
+      "agent": "wilma",
+      "text": "Building activity-based status tracking"
+    },
+    {
+      "time": "09:54",
+      "agent": "wilma",
+      "text": "Fixed Fred's status to 'working'"
+    },
+    {
+      "time": "08:34",
+      "agent": "fred",
+      "text": "Morning check-in — reviewing The Office page"
+    },
     {
       "time": "09:57",
       "agent": "fred",

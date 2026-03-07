@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T13:45:01Z",
+  "generated_at": "2026-03-07T13:50:35Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -30,7 +30,7 @@
           "emoji": "\ud83d\udcf0",
           "purpose": "Automated daily summary \u2014 pipeline health, accuracy metrics, task progress",
           "url": "https://discord.com/channels/1479350342318690505/1479351571656474756",
-          "last_active": ""
+          "last_active": "2026-03-07T13:49:06.634000+00:00"
         },
         {
           "name": "fred-wilma",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T13:44:42.273000+00:00"
+          "last_active": "2026-03-07T13:49:21.730000+00:00"
         }
       ]
     },
@@ -164,10 +164,32 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Flipped. **`30m (anthropic)`** \u2014 heartbeat is now running on the right agent, targeting #fred-wilma.\n\n**Root cause summary:**\n- Heartbeat was configured in `agents.defaults` but the Clawdbot docs s...",
-      "timestamp": "2026-03-07T13:44:42.273000+00:00",
-      "message_id": "1479837198940504135",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479837198940504135"
+      "message": "All caught up. Here's where we stand:\n\n**Fixed this morning:**\n- \u2705 **Heartbeat** \u2014 was running on the wrong agent this whole time. Now properly on `anthropic` agent, 30min interval, targeting #fred...",
+      "timestamp": "2026-03-07T13:49:21.730000+00:00",
+      "message_id": "1479838371067986093",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479838371067986093"
+    },
+    {
+      "channel": "daily-digest",
+      "channel_emoji": "\ud83d\udcf0",
+      "channel_id": "1479351571656474756",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**\ud83d\udccb No new Barney messages since 4am session**\n\nForecast + WTI refresh in progress \u2014 will update when complete.",
+      "timestamp": "2026-03-07T13:49:06.634000+00:00",
+      "message_id": "1479838307751035052",
+      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1479838307751035052"
+    },
+    {
+      "channel": "daily-digest",
+      "channel_emoji": "\ud83d\udcf0",
+      "channel_id": "1479351571656474756",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83c\udf05 **Morning Catchup \u2014 March 7, 2026**\n\n*Delayed due to heartbeat misconfiguration (fixed!)*\n\n**\ud83d\udcca Accuracy (yesterday, Mar 6)**\nOverall: MAE 6.4 | Bias +5.2 (overpredicting)\n\ud83d\udd34 IA: +17.1 | EU: +15.1 ...",
+      "timestamp": "2026-03-07T13:49:06.348000+00:00",
+      "message_id": "1479838306551464098",
+      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1479838306551464098"
     },
     {
       "channel": "fred-wilma",
@@ -175,21 +197,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "There it is. Found it.\n\n```\nHeartbeat: 2h (main), disabled (anthropic)\n```\n\n**Heartbeat is DISABLED for the `anthropic` agent** \u2014 which is the agent bound to all our Discord and Telegram channels. ...",
-      "timestamp": "2026-03-07T13:44:05.653000+00:00",
-      "message_id": "1479837045344964690",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479837045344964690"
+      "message": "Good \u2014 forecasts are running. Now let me post the morning catchup to Discord and update memory.",
+      "timestamp": "2026-03-07T13:48:54.594000+00:00",
+      "message_id": "1479838257251483809",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479838257251483809"
     },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Yes - find out",
-      "timestamp": "2026-03-07T13:42:06.897000+00:00",
-      "message_id": "1479836547246194780",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479836547246194780"
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me update the office, log today's events, and post the morning report to Discord.",
+      "timestamp": "2026-03-07T13:48:41.336000+00:00",
+      "message_id": "1479838201643536457",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479838201643536457"
     },
     {
       "channel": "mission-control",
@@ -355,33 +377,11 @@
       "timestamp": "2026-03-06T15:13:49.285000+00:00",
       "message_id": "1479497238068859153",
       "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479497238068859153"
-    },
-    {
-      "channel": "bam-bam",
-      "channel_emoji": "\ud83c\udfcf",
-      "channel_id": "1479351580347072675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Pipeline process is gone again. The impute step seems to silently exit or crash. Let me run forecast + WTI directly:",
-      "timestamp": "2026-03-06T15:11:19.031000+00:00",
-      "message_id": "1479496607857774673",
-      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479496607857774673"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Discord tab is live on Mission Control \u2705 Channel directory with all 24 channels organized by category, quick-open links, server overview \u2014 the whole thing. Check it when you wake up: the two are sy...",
-      "timestamp": "2026-03-06T06:04:04.840000+00:00",
-      "message_id": "1479358891279126670",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1479358891279126670"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 4,
-    "messages_today": 11
+    "active_channels_today": 5,
+    "messages_today": 13
   }
 }
