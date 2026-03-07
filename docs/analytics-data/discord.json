@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T09:15:01Z",
+  "generated_at": "2026-03-07T09:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-07T05:30:01.646000+00:00"
+          "last_active": "2026-03-07T09:30:01.361000+00:00"
         },
         {
           "name": "daily-digest",
@@ -159,6 +159,17 @@
   ],
   "recent_activity": [
     {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-07T09:30:01.361000+00:00",
+      "message_id": "1479773106150178816",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479773106150178816"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -269,17 +280,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479690058834509894"
     },
     {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-06T23:30:01.573000+00:00",
-      "message_id": "1479622112095244348",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479622112095244348"
-    },
-    {
       "channel": "alerts",
       "channel_emoji": "\ud83d\udea8",
       "channel_id": "1479471928262529088",
@@ -382,6 +382,6 @@
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 4,
-    "messages_today": 10
+    "messages_today": 11
   }
 }
