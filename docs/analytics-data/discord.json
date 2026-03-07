@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T14:15:02Z",
+  "generated_at": "2026-03-07T14:24:31Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T13:51:52.324000+00:00"
+          "last_active": "2026-03-07T14:22:59.603000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "There it is. **OOM kill** \u2014 the forecast script is eating 50GB+ of RAM (`anon-rss:51336332kB` = ~49GB). Same OOM issue from yesterday.\n\nThe forecast is trying to load all models + generate 729 days...",
+      "timestamp": "2026-03-07T14:22:59.603000+00:00",
+      "message_id": "1479846834640785671",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479846834640785671"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Yes! It ran. **`agent:anthropic:main`** fired 1 minute ago using Sonnet, replied `HEARTBEAT_OK` \u2014 meaning it ran the checks and found nothing new to alert on (which makes sense since I'd just handl...",
+      "timestamp": "2026-03-07T14:21:22.234000+00:00",
+      "message_id": "1479846426245599413",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479846426245599413"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Did the latest heartbeat run?",
+      "timestamp": "2026-03-07T14:21:00.684000+00:00",
+      "message_id": "1479846335858348032",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479846335858348032"
+    },
+    {
       "channel": "pipeline",
       "channel_emoji": "\ud83d\udd27",
       "channel_id": "1479351574177513576",
@@ -168,28 +201,6 @@
       "timestamp": "2026-03-07T13:58:34.053000+00:00",
       "message_id": "1479840687678689412",
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479840687678689412"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**\ud83d\udd34 Pipeline Issue Fixed** \u2014 Restarted pipeline after detecting forecast step failure (missing `os` import error). Currently running in background.\n\n**\u2705 Task Completed** \u2014 Verified `task-019` accur...",
-      "timestamp": "2026-03-07T13:51:52.324000+00:00",
-      "message_id": "1479839002705264748",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479839002705264748"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "All caught up. Here's where we stand:\n\n**Fixed this morning:**\n- \u2705 **Heartbeat** \u2014 was running on the wrong agent this whole time. Now properly on `anthropic` agent, 30min interval, targeting #fred...",
-      "timestamp": "2026-03-07T13:49:21.730000+00:00",
-      "message_id": "1479838371067986093",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479838371067986093"
     },
     {
       "channel": "daily-digest",
@@ -212,17 +223,6 @@
       "timestamp": "2026-03-07T13:49:06.348000+00:00",
       "message_id": "1479838306551464098",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1479838306551464098"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good \u2014 forecasts are running. Now let me post the morning catchup to Discord and update memory.",
-      "timestamp": "2026-03-07T13:48:54.594000+00:00",
-      "message_id": "1479838257251483809",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479838257251483809"
     },
     {
       "channel": "mission-control",

@@ -1,13 +1,13 @@
 {
-  "updated": "2026-03-07T13:50:24.337056+00:00",
+  "updated": "2026-03-07T14:24:28.353178+00:00",
   "agents": [
     {
       "id": "fred",
       "name": "Fred",
       "icon": "🧔",
-      "state": "working",
-      "zone": "desk-2",
-      "task": "Morning check-in, reviewing overnight issues",
+      "state": "idle",
+      "zone": "tarpit-1",
+      "task": "Stepped away briefly",
       "color": "#facc15"
     },
     {
@@ -16,16 +16,16 @@
       "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "Heartbeat check - restarted pipeline due to forecast error",
+      "task": "Running heartbeat checks, monitoring pipeline recovery",
       "color": "#4a90a4"
     },
     {
       "id": "barney",
       "name": "Barney",
       "icon": "🪨",
-      "state": "offline",
-      "zone": "offsite",
-      "task": "",
+      "state": "idle",
+      "zone": "tarpit-2",
+      "task": "Available on claude.ai",
       "color": "#4ade80"
     },
     {
@@ -34,7 +34,7 @@
       "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
-      "task": "Pushed 4 commits recently",
+      "task": "Pushed 2 commits recently",
       "color": "#c084fc"
     },
     {
@@ -75,6 +75,26 @@
     }
   ],
   "activity": [
+    {
+      "time": "09:57",
+      "agent": "fred",
+      "text": "Reported Office status bug in #bugs-feedback"
+    },
+    {
+      "time": "09:57",
+      "agent": "wilma",
+      "text": "Building activity-based status tracking"
+    },
+    {
+      "time": "09:54",
+      "agent": "wilma",
+      "text": "Fixed Fred's status to 'working'"
+    },
+    {
+      "time": "08:34",
+      "agent": "fred",
+      "text": "Morning check-in — reviewing The Office page"
+    },
     {
       "time": "09:57",
       "agent": "fred",
