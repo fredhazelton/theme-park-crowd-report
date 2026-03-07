@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Ask Response Quality Monitor
+Ask Response Quality Monitor + Self-Healer
 
-Scans ask_questions.jsonl for bad bot responses and diagnoses the root cause.
-When a user gets a failure response, this script:
-  1. Detects the failure pattern
-  2. Investigates the likely cause (DB locks, missing data, stale data)
-  3. Attempts to fix it
-  4. Reports findings
+Triggered INSTANTLY by the bot on every bad response. Flow:
+  1. Detect the failure pattern
+  2. Diagnose the root cause (DB locks, missing data, stale data)
+  3. Fix it automatically
+  4. Re-run the user's question
+  5. Post the corrected answer to Discord, pinging the user
 
 Run: python scripts/ask_response_monitor.py [--json] [--fix] [--since-minutes N]
 """
@@ -16,16 +16,34 @@ import json
 import sys
 import os
 import time
+import logging
 import argparse
 import subprocess
+import requests
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+# Load env from ~/.env if not already set
+_env_file = Path.home() / ".env"
+if _env_file.exists():
+    for line in _env_file.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip())
+
+logger = logging.getLogger("ask_monitor")
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
 # Paths
 QUESTION_LOG = Path("/home/wilma/theme-park-crowd-report/tpcr-discord-bot/ask_questions.jsonl")
 STATE_FILE = Path("/mnt/data/pipeline/state/ask_monitor_state.json")
 DUCKDB_PATH = "/mnt/data/pipeline/tpcr_live.duckdb"
 ALL_FORECASTS = "/mnt/data/pipeline/curves/forecast_parquet/all_forecasts.parquet"
+
+# Discord
+TPCR_BOT_COMMANDS_CHANNEL = "1478240248361128079"
+DISCORD_API_BASE = "https://discord.com/api/v10"
 
 # Failure patterns — if a response contains any of these, it's flagged
 FAILURE_PATTERNS = [
@@ -284,6 +302,70 @@ def attempt_fix(diagnosis):
     return diagnosis
 
 
+def retry_question(question: str, user_id: str, username: str) -> str | None:
+    """Re-run a user's question through ask_agent and return the answer."""
+    try:
+        sys.path.insert(0, str(Path(__file__).parent.parent / "tpcr-discord-bot"))
+        from ask_agent import ask_agent
+        import asyncio
+
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            logger.warning("No ANTHROPIC_API_KEY — can't retry question")
+            return None
+
+        # Run the async function
+        loop = asyncio.new_event_loop()
+        answer = loop.run_until_complete(ask_agent(question, user_id, api_key, username))
+        loop.close()
+
+        # Check if the retry also failed
+        from ask_agent import _is_bad_response
+        if _is_bad_response(answer):
+            logger.warning(f"Retry also returned bad response: {answer[:100]}")
+            return None
+
+        return answer
+    except Exception as e:
+        logger.warning(f"Retry failed: {e}")
+        return None
+
+
+def notify_user_discord(user_id: str, question: str, answer: str):
+    """Post the corrected answer to #bot-commands, pinging the user."""
+    token = os.environ.get("DISCORD_BOT_TOKEN")
+    if not token:
+        logger.warning("No DISCORD_BOT_TOKEN — can't notify user")
+        return False
+
+    message = (
+        f"Hey <@{user_id}>! Sorry about the earlier hiccup — "
+        f"we fixed the issue and re-ran your question:\n\n"
+        f"> {question[:200]}\n\n"
+        f"{answer}"
+    )
+
+    # Trim to Discord limit
+    if len(message) > 1950:
+        message = message[:1950] + "..."
+
+    url = f"{DISCORD_API_BASE}/channels/{TPCR_BOT_COMMANDS_CHANNEL}/messages"
+    headers = {"Authorization": f"Bot {token}", "Content-Type": "application/json"}
+    payload = {"content": message}
+
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=15)
+        if resp.status_code in (200, 201):
+            logger.info(f"Notified user {user_id} in #bot-commands")
+            return True
+        else:
+            logger.warning(f"Discord POST failed: {resp.status_code} {resp.text[:200]}")
+            return False
+    except Exception as e:
+        logger.warning(f"Discord notify failed: {e}")
+        return False
+
+
 def format_alert(failures, diagnoses):
     """Format an alert message for Discord."""
     if not failures:
@@ -336,11 +418,48 @@ def main():
 
     # Diagnose each failure
     diagnoses = []
+    already_notified = set(state.get("notified_timestamps", []))
+
     for f in failures:
         diag = diagnose_failure(f)
         if args.fix and diag.get("auto_fixable"):
             diag = attempt_fix(diag)
         diagnoses.append(diag)
+
+    # After all fixes applied, retry failed questions and notify users
+    if args.fix:
+        for f, diag in zip(failures, diagnoses):
+            ts = f.get("timestamp", "")
+            if ts in already_notified:
+                continue  # Don't re-notify for the same failure
+
+            # Wait a beat for any DB operations to settle
+            time.sleep(1)
+
+            # Retry the question
+            new_answer = retry_question(
+                f.get("question", ""),
+                f.get("user_id", ""),
+                f.get("username", ""),
+            )
+
+            if new_answer:
+                # Notify the user with the corrected answer
+                notified = notify_user_discord(
+                    f.get("user_id", ""),
+                    f.get("question", ""),
+                    new_answer,
+                )
+                if notified:
+                    already_notified.add(ts)
+                    diag["user_notified"] = True
+                    diag["corrected_answer"] = new_answer[:200]
+                    logger.info(f"✅ Re-answered @{f.get('username')}'s question and notified them")
+                else:
+                    diag["user_notified"] = False
+            else:
+                logger.warning(f"Retry still failed for @{f.get('username')}'s question — needs manual investigation")
+                diag["user_notified"] = False
 
     # Update state
     if questions:
@@ -348,6 +467,8 @@ def main():
         state["last_checked_timestamp"] = latest_ts.isoformat()
     state["last_check_time"] = datetime.now(timezone.utc).isoformat()
     state["failures_found"] = len(failures)
+    # Keep last 100 notified timestamps to avoid re-notifying
+    state["notified_timestamps"] = list(already_notified)[-100:]
     save_state(state)
 
     # Output
