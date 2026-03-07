@@ -142,19 +142,21 @@ def _write_to_live_duckdb(
         if df.empty:
             return False
         con = duckdb.connect(str(db_path))
-        con.register("_live_df", df)
-        con.execute("""
-            INSERT OR IGNORE INTO live_waits 
-                (entity_code, observed_at, wait_time_type, wait_time_minutes, park_date)
-            SELECT entity_code, observed_at::TIMESTAMPTZ, wait_time_type, 
-                   wait_time_minutes::INTEGER, park_date::DATE
-            FROM _live_df
-        """)
-        con.execute("""
-            INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
-            VALUES ('scraper', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM live_waits), 'queue-times')
-        """)
-        con.close()
+        try:
+            con.register("_live_df", df)
+            con.execute("""
+                INSERT OR IGNORE INTO live_waits 
+                    (entity_code, observed_at, wait_time_type, wait_time_minutes, park_date)
+                SELECT entity_code, observed_at::TIMESTAMPTZ, wait_time_type, 
+                       wait_time_minutes::INTEGER, park_date::DATE
+                FROM _live_df
+            """)
+            con.execute("""
+                INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
+                VALUES ('scraper', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM live_waits), 'queue-times')
+            """)
+        finally:
+            con.close()  # Always close — minimize write lock duration
         logger.debug(f"Wrote {len(df)} rows to live_waits")
         return True
     except Exception as e:

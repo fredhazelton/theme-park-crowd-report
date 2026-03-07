@@ -175,11 +175,16 @@ def log_question(user_id: str, username: str, question: str, answer: str, durati
         f.write(json.dumps(entry) + "\n")
 
 
-def run_duckdb_query(sql: str, max_retries: int = 3) -> str:
-    """Execute a read-only DuckDB query and return results as string."""
+def run_duckdb_query(sql: str, max_retries: int = 8) -> str:
+    """Execute a read-only DuckDB query and return results as string.
+    
+    Retries aggressively on lock/busy errors since the scraper write
+    to tpcr_live.duckdb typically finishes in under 1 second.
+    """
     import time
 
     for attempt in range(max_retries):
+        con = None
         try:
             con = duckdb.connect(DUCKDB_PATH, read_only=True)
             result = con.execute(sql).fetchall()
@@ -200,9 +205,20 @@ def run_duckdb_query(sql: str, max_retries: int = 3) -> str:
 
             return "\n".join(lines)
         except Exception as e:
+            if con:
+                try:
+                    con.close()
+                except Exception:
+                    pass
             error_str = str(e).lower()
-            if ("lock" in error_str or "busy" in error_str) and attempt < max_retries - 1:
-                time.sleep(2 * (attempt + 1))  # Back off: 2s, 4s, 6s
+            # Retry on any lock, busy, or IO errors (scraper write collisions)
+            is_lock_error = any(kw in error_str for kw in ("lock", "busy", "io error", "could not set", "blocked"))
+            if is_lock_error and attempt < max_retries - 1:
+                time.sleep(0.5 * (attempt + 1))  # Back off: 0.5s, 1s, 1.5s, 2s, ...
+                continue
+            if attempt < max_retries - 1:
+                # Even for non-lock errors, retry once with a brief pause
+                time.sleep(1)
                 continue
             return f"Query error: {str(e)}"
 
