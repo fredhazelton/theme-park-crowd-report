@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-03-06T11:58:41",
+  "generated_at": "2026-03-06T18:05:55",
   "summary": {
     "total": 18,
     "this_week": 18,
-    "in_progress": 4,
+    "in_progress": 6,
     "completed_this_week": 0,
     "pct_complete": 0
   },
@@ -26,29 +26,29 @@
       "id": "task-002",
       "title": "Mission Control v3 \u2014 remaining tabs",
       "description": "Build out Discord, Social, Ideas, Finance, Model Use tabs",
-      "status": "in_progress",
-      "column": "in_progress",
+      "status": "done",
+      "column": "done",
       "priority": "high",
       "owner": "Wilma",
       "project": "Mission Control",
       "is_recurring": false,
       "created": "2026-03-05T06:00:00",
-      "updated": "2026-03-05T23:00:00",
-      "notes": "6 tabs live: Pipeline, Analytics, Tasks, Calendar, Projects, Memory. Remaining: Discord, Social, Ideas, Finance, Model Use."
+      "updated": "2026-03-06T08:00:00",
+      "notes": "All 10 tabs live: Pipeline, Analytics, Tasks, Calendar, Projects, Memory, Social, Ideas, Finance, Discord. Plus Office + Team as sidebar links."
     },
     {
       "id": "task-003",
       "title": "Prediction lineage tracking \u2014 verify in production",
       "description": "Confirm 14 lineage columns populate correctly in tomorrow's pipeline run",
-      "status": "in_progress",
-      "column": "in_progress",
+      "status": "done",
+      "column": "done",
       "priority": "medium",
       "owner": "Wilma",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-05T08:00:00",
-      "updated": "2026-03-05T08:30:00",
-      "notes": "Tested on MK191, all columns working. Need to verify full pipeline run."
+      "updated": "2026-03-06T15:30:00",
+      "notes": "Verified 2026-03-06. All 14 columns present in all_forecasts.parquet (29.3M rows, 426 entities). 11 active columns fully populated for model-based predictions. 3 placeholders (quantile_mapping, hyperparameter_hash, notes) structurally in place. ~19.2% nulls on model-specific cols are correct (fallback_ratio + aggregate methods). Report: research/lineage-verification-2026-03-06.md"
     },
     {
       "id": "task-004",
@@ -61,8 +61,8 @@
       "project": "Website",
       "is_recurring": false,
       "created": "2026-02-02T13:14:00",
-      "updated": "2026-03-07T12:00:00",
-      "notes": "Completed: website footers, meta tags, stream overlays, generate_social_json.py, panel-4-socials.html, twitch-bot.py, launch content, AGENTS.md, SOUL.md, and 20+ other files."
+      "updated": "2026-03-06T09:00:00",
+      "notes": "Full rebrand: 46+ files across both repos. Completed by sub-agent."
     },
     {
       "id": "task-005",
@@ -96,56 +96,56 @@
       "id": "task-007",
       "title": "Synthetic vs real actuals weighting review",
       "description": "After conversion model fix settles, revisit how synthetic and real actuals are weighted in training",
-      "status": "todo",
-      "column": "backlog",
+      "status": "in_progress",
+      "column": "in_progress",
       "priority": "medium",
       "owner": "Wilma",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-04T10:00:00",
-      "updated": "2026-03-04T10:00:00",
-      "notes": "Waiting for 3-day feedback loop on conversion model fix. Review after Mar 7."
+      "updated": "2026-03-06T12:34:00",
+      "notes": "Experiment framework built. Full run with 7 weighting schemes now executing."
     },
     {
       "id": "task-008",
       "title": "Build Social Pulse automated feed",
       "description": "Automated feed for #social-pulse \u2014 trending theme park tweets/posts, viral content, Discord community activity, new subscriber signups. Runs every 4 hours.",
-      "status": "todo",
-      "column": "backlog",
+      "status": "in_progress",
+      "column": "in_progress",
       "priority": "medium",
       "owner": "Wilma",
       "project": "Discord HQ",
       "is_recurring": false,
       "created": "2026-03-06T08:19:00",
-      "updated": "2026-03-06T08:19:00",
+      "updated": "2026-03-06T12:34:00",
       "notes": "From Discord workflow report. Needs: web scraping for trending content, Discord bot activity tracking, subscriber webhook integration. Posts to #social-pulse channel."
     },
     {
       "id": "task-009",
       "title": "Build Competitor Watch automated feed",
       "description": "Daily automated feed for #competitor-watch \u2014 monitor TouringPlans, Thrill Data, Undercover Tourist, theme park news, HazeyData mentions, new crowd tools, Reddit discussions. Runs daily at 8am.",
-      "status": "todo",
+      "status": "in_progress",
       "column": "recurring",
       "priority": "medium",
       "owner": "Wilma",
       "project": "Discord HQ",
       "is_recurring": true,
       "created": "2026-03-06T08:19:00",
-      "updated": "2026-03-06T08:19:00",
+      "updated": "2026-03-06T12:34:00",
       "notes": "From Discord workflow report. Needs: RSS/web scraping for competitor blogs, Reddit API for r/WaltDisneyWorld + r/UniversalOrlando, web search for HazeyData mentions. Posts to #competitor-watch channel."
     },
     {
       "id": "task-010",
       "title": "Build Park Intel automated feed",
       "description": "Daily automated feed for #park-intel \u2014 today's operating hours across all 12 parks, last-minute closures/schedule changes, special events, yesterday's actuals vs predictions. Runs daily at 6:30am.",
-      "status": "todo",
+      "status": "in_progress",
       "column": "recurring",
       "priority": "medium",
       "owner": "Wilma",
       "project": "Discord HQ",
       "is_recurring": true,
       "created": "2026-03-06T08:19:00",
-      "updated": "2026-03-06T08:19:00",
+      "updated": "2026-03-06T12:34:00",
       "notes": "From Discord workflow report. Needs: park hours API/scraping, event calendar integration, accuracy comparison from pipeline outputs. Posts to #park-intel channel."
     },
     {
