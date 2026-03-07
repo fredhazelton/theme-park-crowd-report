@@ -35,6 +35,12 @@
             height: 100vh;
             overflow: hidden;
         }
+        @media (max-width: 768px) {
+            html, body {
+                height: auto;
+                overflow: auto;
+            }
+        }
         body {
             background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
             font-family: var(--font-text);
@@ -91,6 +97,24 @@
             display: inline-block;
             animation: pulse 2s ease-in-out infinite;
         }
+        @media (max-width: 768px) {
+            .header {
+                padding: 8px 12px;
+            }
+            .header-right {
+                display: none;
+            }
+            .logo {
+                font-size: 14px;
+            }
+            .logo-sub {
+                font-size: 9px;
+            }
+            .card {
+                padding: 14px;
+                border-radius: 8px;
+            }
+        }
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
@@ -104,6 +128,13 @@
             flex: 1;
             min-height: 0; /* allow flex shrinking */
             overflow: hidden;
+        }
+        @media (max-width: 768px) {
+            .app-layout {
+                overflow: visible;
+                flex: none;
+                min-height: auto;
+            }
         }
 
         /* ═══════════════════════════════════════════════════
@@ -446,6 +477,37 @@
         }
         .ctrl-group input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(0.7);
+        }
+        @media (max-width: 768px) {
+            .explorer-controls {
+                flex-direction: column;
+            }
+            .ctrl-group select,
+            .ctrl-group input[type="date"] {
+                min-width: unset;
+                width: 100%;
+            }
+            .ctrl-group {
+                width: 100%;
+            }
+            .tab-content {
+                padding: 12px;
+            }
+            .big-numbers {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .explorer-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .scoreboard-table-wrap {
+                max-height: 320px;
+            }
+            table.scoreboard .name-cell {
+                max-width: 120px;
+            }
+            table.scoreboard .park-cell {
+                display: none;
+            }
         }
         .explorer-stats {
             display: grid;
@@ -2430,7 +2492,9 @@
                     </div>
                     <div class="ctrl-group">
                         <label>Date</label>
-                        <input type="date" id="dateSelect">
+                        <select id="dateSelect">
+                            <option value="">Select entity first...</option>
+                        </select>
                     </div>
                 </div>
                 <div class="chart-wrap" style="height:240px;">
@@ -2806,6 +2870,7 @@ const State = {
     dailyAccuracy: null,
     entityScores: null,
     entityList: null,
+    entityDatesIndex: null, // maps entity_code → [available dates]
     selectedEntity: null,
     selectedDate: null,
     scoreboardSort: { col: 'avg_mae', asc: true },
@@ -2847,18 +2912,20 @@ async function fetchJSON(url) {
 
 async function loadAllData() {
     try {
-        const [pipeline, summary, daily, scores, entities] = await Promise.all([
+        const [pipeline, summary, daily, scores, entities, datesIndex] = await Promise.all([
             fetchJSON(`${BASE}mission-control-content.json`),
             fetchJSON(`${BASE}analytics-data/accuracy_summary.json`),
             fetchJSON(`${BASE}analytics-data/daily_accuracy.json`),
             fetchJSON(`${BASE}analytics-data/entity_scores.json`),
             fetchJSON(`${BASE}analytics-data/entity_list.json`),
+            fetchJSON(`${BASE}analytics-data/entity_dates_index.json`).catch(() => null),
         ]);
         State.pipelineData = pipeline;
         State.accuracySummary = summary;
         State.dailyAccuracy = daily;
         State.entityScores = scores;
         State.entityList = entities;
+        State.entityDatesIndex = datesIndex;
 
         renderPipeline();
         renderAccuracyOverview();
@@ -3137,10 +3204,38 @@ function populateEntityDropdown() {
     sel.innerHTML = html;
 }
 
+function populateDateDropdown(entityCode) {
+    const sel = document.getElementById('dateSelect');
+    const dates = (State.entityDatesIndex && State.entityDatesIndex[entityCode]) || [];
+    if (dates.length === 0) {
+        sel.innerHTML = '<option value="">No dates available</option>';
+        return;
+    }
+    // Show dates newest-first
+    const sorted = [...dates].sort().reverse();
+    sel.innerHTML = sorted.map(d => `<option value="${d}">${d}</option>`).join('');
+    // Default to most recent date
+    sel.value = sorted[0];
+}
+
+function onEntityChange() {
+    const entity = document.getElementById('entitySelect').value;
+    if (!entity) {
+        document.getElementById('dateSelect').innerHTML = '<option value="">Select entity first...</option>';
+        renderEntityCurveEmpty();
+        return;
+    }
+    populateDateDropdown(entity);
+    loadEntityCurve();
+}
+
 async function loadEntityCurve() {
     const entity = document.getElementById('entitySelect').value;
     const date = document.getElementById('dateSelect').value;
-    if (!entity || !date) return;
+    if (!entity || !date) {
+        renderEntityCurveEmpty();
+        return;
+    }
 
     State.selectedEntity = entity;
     State.selectedDate = date;
@@ -3278,17 +3373,10 @@ function renderEntityCurveEmpty() {
     ctx.fillText('No data for this entity + date', canvas.width / 2, canvas.height / 2);
 }
 
-// Set default date to latest available
-function setDefaultDate() {
-    const data = State.dailyAccuracy;
-    if (data && data.length > 0) {
-        const lastDate = data[data.length - 1].park_date;
-        document.getElementById('dateSelect').value = lastDate;
-    }
-}
+// setDefaultDate no longer needed — dates populate per entity selection
 
 // Event listeners for explorer
-document.getElementById('entitySelect').addEventListener('change', loadEntityCurve);
+document.getElementById('entitySelect').addEventListener('change', onEntityChange);
 document.getElementById('dateSelect').addEventListener('change', loadEntityCurve);
 
 // ═══════════════════════════════════════════════════════════════
@@ -3356,8 +3444,9 @@ function renderScoreboard() {
 }
 
 function selectEntityFromScoreboard(entityCode) {
-    // Switch to entity explorer
+    // Switch to entity explorer, populate dates, then load
     document.getElementById('entitySelect').value = entityCode;
+    populateDateDropdown(entityCode);
     loadEntityCurve();
     // Scroll explorer into view
     document.getElementById('panelExplorer').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -4133,7 +4222,7 @@ function renderFinance() {
 async function init() {
     initTabFromHash();
     await loadAllData();
-    setDefaultDate();
+    // Date selection is now per-entity (no global default needed)
 
     // Auto-refresh every 60s
     setInterval(async () => {

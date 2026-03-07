@@ -175,6 +175,16 @@ def gen_entity_curves(slots: pd.DataFrame):
 
     print(f"  ✓ entity_curves/  ({count:,} curve files)")
 
+    # Generate dates index for frontend (so it knows which entity+date combos exist)
+    index = {}
+    for entity_dir in sorted(CURVES_DIR.iterdir()):
+        if entity_dir.is_dir():
+            dates = sorted(f.stem for f in entity_dir.glob("*.json"))
+            if dates:
+                index[entity_dir.name] = dates
+    write_json(OUT / "entity_dates_index.json", index)
+    print(f"  ✓ entity_dates_index.json  ({len(index)} entities)")
+
 
 def main():
     print("=" * 60)
