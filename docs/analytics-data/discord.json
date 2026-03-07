@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T04:45:01Z",
+  "generated_at": "2026-03-07T05:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T04:37:08.804000+00:00"
+          "last_active": "2026-03-07T04:47:20.316000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "All three validation scripts are built, tested, and deployed:\n\n- **Data Completeness** \u2014 runs after each pipeline run (already showing a warning, which means it's catching things \u2705)\n- **Freshness C...",
+      "timestamp": "2026-03-07T04:47:20.316000+00:00",
+      "message_id": "1479701966371291217",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479701966371291217"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "Sub-agent is building all three phases now. It'll read the existing pipeline scripts to understand the data model, build the three validation scripts, set up crons, and integrate them into the work...",
       "timestamp": "2026-03-07T04:37:08.804000+00:00",
       "message_id": "1479699401504063608",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-07T04:36:40.525000+00:00",
       "message_id": "1479699282893209671",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479699282893209671"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Yes - good ideas - do it",
-      "timestamp": "2026-03-07T04:36:32.994000+00:00",
-      "message_id": "1479699251305906216",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479699251305906216"
     },
     {
       "channel": "mission-control",
