@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T11:30:01Z",
+  "generated_at": "2026-03-07T11:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-07T09:30:01.361000+00:00"
+          "last_active": "2026-03-07T11:30:01.393000+00:00"
         },
         {
           "name": "daily-digest",
@@ -165,6 +165,17 @@
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
       "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-07T11:30:01.393000+00:00",
+      "message_id": "1479803305273200723",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479803305273200723"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
       "timestamp": "2026-03-07T09:30:01.361000+00:00",
       "message_id": "1479773106150178816",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479773106150178816"
@@ -267,17 +278,6 @@
       "timestamp": "2026-03-07T05:30:01.646000+00:00",
       "message_id": "1479712709368086561",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479712709368086561"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-07T04:00:01.338000+00:00",
-      "message_id": "1479690058834509894",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479690058834509894"
     },
     {
       "channel": "alerts",
