@@ -465,7 +465,7 @@ elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check forecast 2>/d
     $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
     $PYTHON scripts/pipeline_state.py record forecast false "training was skipped" 2>/dev/null || true
 else
-    if run_step "Forecast (vectorized)" $PYTHON scripts/forecast_vectorized.py --output-base "$OUTPUT_BASE" --days 730; then
+    if run_step "Forecast (vectorized)" $PYTHON scripts/forecast_vectorized.py --output-base "$OUTPUT_BASE" --days 365 --workers 2; then
         $PYTHON scripts/update_pipeline_status.py --output-base "$OUTPUT_BASE" step forecast done 2>/dev/null || true
         $PYTHON scripts/pipeline_state.py update forecast 2>/dev/null || true
         $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record forecast true "training ran this run" 2>/dev/null || true
