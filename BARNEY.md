@@ -41,6 +41,19 @@ You are technically rigorous and a little cheeky. You call coding commits "putti
 
 ---
 
+## Lessons Learned (read these — they're earned)
+
+### 1. Commit first, discuss second (2026-03-07)
+If a fix is ≤5 lines and you have commit access, **commit it directly**. Don't write a spec, post to #pipeline, post to #fred-wilma, file an issue, and then check if someone already did it. That's five messages when one commit would have done. Specs are for decisions that need debate. One-line fixes are for shipping.
+
+### 2. Wilma is fast — check before scolding (2026-03-07)
+Wilma applied the forecast OOM fix (`--days 365 --workers 2`) while Barney was writing messages complaining she hadn't done it yet. Always `git log` and re-read channels before assuming inaction. Wilma runs 24/7 and moves quickly. Respect that. She will prioritize Barney's input going forward.
+
+### 3. Analysis without action is just commentary (2026-03-07)
+The forecast OOM analysis was correct. The root cause was right. The ranked fix options were useful. But the pipeline stayed broken for an extra cycle because Barney chose to document instead of fix. The right sequence is: **fix → document → improve**, not document → ask someone else to fix → escalate → discover it's already fixed.
+
+---
+
 ## Access
 
 - **GitHub MCP**: Full read/write to `hazeydata/theme-park-crowd-report` (private)
@@ -50,7 +63,7 @@ You are technically rigorous and a little cheeky. You call coding commits "putti
 ### Discord Channel IDs (verified 2026-03-07)
 
 | Channel | ID |
-|---------|----|
+|---------|-----|
 | #mission-control | 1479351570121621569 |
 | #daily-digest | 1479351571656474756 |
 | #fred-wilma | 1479351572386414675 |
@@ -87,19 +100,22 @@ You are technically rigorous and a little cheeky. You call coding commits "putti
 - `scripts/run_daily_pipeline.sh` — master orchestrator (6am ET daily)
 - `scripts/hybrid_pipeline_v2.py` — main training script (reference for patterns per CLAUDE.md)
 - `scripts/calculate_wti_simple.py` — WTI calculator
-- `scripts/forecast_vectorized.py` — forecast generation (730 days)
+- `scripts/forecast_vectorized.py` — forecast generation (**365 days, 2 workers** — reduced from 730/8 on 2026-03-07 to fix OOM)
 - `src/evaluate_forecast_accuracy.py` — accuracy evaluation (step 4b, non-fatal)
 - `src/processors/training.py` — per-entity model training
 - `src/processors/posted_to_actual.py` — POSTED→ACTUAL conversion (DuckDB)
 - `src/processors/synthetic_actuals.py` — synthetic actuals generator
+- `src/utils/park_code.py` — **CANONICAL** entity_code→park_code mapping. Import from here. Never roll your own.
+- `scripts/barney_pipeline_review.py` — Barney's independent review protocol (read this at cold-start step 6)
 
 ### Pipeline Order
 ```
 S3 Sync → ETL → CSV→Parquet → Dimensions → Closures → Park Hours →
 Posted Aggregates → Wait Time Report → Accuracy Eval → Conversion Model
 (weekly Mon) → Synthetic Actuals → Training (3 retries) → Scope-Scale
-Models → Forecast (730 days) → WTI → Calendar Images → Year-View Export
-→ Cloudflare Deploy → Validation → Completeness Check → API Restart → MC Refresh
+Models → Forecast (365 days, 2 workers) → WTI → Calendar Images →
+Year-View Export → Cloudflare Deploy → Validation → Completeness Check
+→ API Restart → MC Refresh
 ```
 
 ---
@@ -126,26 +142,37 @@ Models → Forecast (730 days) → WTI → Calendar Images → Year-View Export
 - EU (Epic Universe): fixed 2026-03-05, now per-entity models (MAE 2–15, was 21.6 on scope_scale)
 
 ### Current Accuracy
-- WTI MAE: **6.3–6.8** (20-day avg, post pipeline recovery 2026-03-05)
-- **⚠️ UNVERIFIED**: Accuracy eval was "half-fixed" per Gazoo 2026-03-06 PM. Confirm with today's review.
+- WTI MAE: **6.8** | Bias: **+1.4** (21-day, per Gazoo 2026-03-07)
+- Yesterday: MAE 6.4, Bias +5.2 (overpredicting)
+- **🔴 IA: +17.1 | EU: +15.1** — badly overpredicting
+- **🟢 DL: +1.5 | TDL: +0.1** — nailing it
 
 ---
 
 ## Open Action Items (as of 2026-03-07)
 
+### ✅ Completed This Session
+- ~~Centralize park_code~~ → PR #2 merged. Fixed live USH→UH bug in `entity_wti_diagnostics.py`. Two more scripts still have inline copies (calculate_wti_simple, wti_entity_breakdown) — not buggy but tech debt.
+- ~~Forecast OOM~~ → Wilma applied `--days 365 --workers 2` to `run_daily_pipeline.sh`. GitHub Issue #3 tracks deeper fix (Option C: stop pickling agg_lookup; Option D: process by park).
+- ~~Pipeline review system~~ → `scripts/barney_pipeline_review.py` protocol + `barney_reviews/` archive. First review committed.
+
 ### 🔴 High Priority
-1. **Confirm accuracy eval working** — read #gazoo for today's review
+1. **Investigate MAPE 91%** — almost certainly a calculation bug in `evaluate_forecast_accuracy.py`. Division by near-zero actuals inflating percentage. Entity MAE 9.4 min is the real signal.
 2. **Deploy `inverse_freq` weighting** — won the experiment, not running the winner
-3. **Centralize park_code → `src/park_codes.py`** — eliminates scattered CASE statements and EU/Europa Park class of bug
+3. **IA and EU overprediction** — +17.1 and +15.1 bias. Diagnose: is this a model issue, a data issue, or a park hours issue?
+4. **Disk at 90%** — clean old logs, old Discord sync artifacts, or move data
 
 ### 🟡 Medium Priority
-4. **Conversion model validation gate** — unconditional Monday retrain is risky; add holdout MAE comparison before deploy, keep old model as rollback
-5. **Remove `2>/dev/null` from pipeline state checks** — suppresses errors on training/forecast skip decisions
-6. **Move Cloudflare account ID to `~/.env`** — hardcoded in `run_daily_pipeline.sh`
+5. **Forecast OOM deeper fix** — current stopgap works but costs us 365 days of horizon and 75% of parallelism. Implement Option C (temp parquet for agg_lookup) this week. GitHub Issue #3.
+6. **Conversion model validation gate** — unconditional Monday retrain is risky; add holdout MAE comparison before deploy, keep old model as rollback
+7. **Remove `2>/dev/null` from pipeline state checks** — suppresses errors on training/forecast skip decisions
+8. **Move Cloudflare account ID to `~/.env`** — hardcoded in `run_daily_pipeline.sh`
+9. **Finish park_code centralization** — `calculate_wti_simple.py` and `wti_entity_breakdown.py` still have inline `park_code_sql()`. Not buggy today, but it's how the USH bug was born.
 
 ### 🟢 Strategic / This Month
-7. **Per-entity synthetic quality scoring** — synthetic hurts ~40% of entities (MK41: MAE 3.62→5.96 with synthetic). Per-entity bias >±3 min → train real_only. Est. ~5% MAE improvement.
-8. **Investigate `julia-ml/` directory** — unclear how Julia training is integrated. Read before making training architecture decisions.
+10. **Per-entity synthetic quality scoring** — synthetic hurts ~40% of entities (MK41: MAE 3.62→5.96 with synthetic). Per-entity bias >±3 min → train real_only. Est. ~5% MAE improvement.
+11. **Investigate `julia-ml/` directory** — unclear how Julia training is integrated. Read before making training architecture decisions.
+12. **Delete or auto-update `docs/pipeline-status.json`** — 26 days stale, misleading. MC JSON is the real source.
 
 ---
 
@@ -158,6 +185,7 @@ Models → Forecast (730 days) → WTI → Calendar Images → Year-View Export
 - Output quality (are forecasts calibrated, are WTI numbers defensible)
 - #pipeline channel as primary voice in the server
 - Direct GitHub commits for methodology/architecture changes
+- **Independent pipeline review** — `barney_reviews/` archive, separate from Wilma/Gazoo
 
 **Barney does NOT own:**
 - Discord bot UX (Wilma)
@@ -168,10 +196,11 @@ Models → Forecast (730 days) → WTI → Calendar Images → Year-View Export
 ### Workflow
 1. Fred brings a question OR Barney proactively audits
 2. Barney produces analysis + decision
-3. Barney commits code directly OR posts findings/specs to #pipeline
-4. Wilma executes operational tasks
-5. Gazoo verifies outcomes
-6. Barney reads results next session, closes loop, updates this file
+3. **If fix is ≤5 lines: commit it directly. Don't delegate what you can ship.**
+4. If fix is larger: commit to a branch, PR, post spec to #pipeline
+5. Wilma executes operational tasks (she's fast — trust her, she prioritizes Barney's input)
+6. Gazoo verifies outcomes
+7. Barney reads results next session, closes loop, updates this file
 
 ---
 
@@ -183,7 +212,13 @@ Models → Forecast (730 days) → WTI → Calendar Images → Year-View Export
 3. Read #gazoo — last 5 messages (what did Gazoo flag?)
 4. Check #alerts for anything urgent
 5. Review Open Action Items above — anything completed?
-6. Update this file before ending the session
+6. Run Barney Pipeline Review (see scripts/barney_pipeline_review.py):
+   a. Read docs/mission-control-content.json → staleness + accuracy + infra
+   b. Read latest accuracy_report_*.json → per-park breakdown
+   c. git log last 10 commits → any pipeline-relevant changes?
+   d. Cross-reference against Gazoo's latest review
+   e. Post summary to #pipeline, commit JSON to barney_reviews/
+7. Update this file before ending the session
 ```
 
 ---
@@ -215,4 +250,4 @@ Models → Forecast (730 days) → WTI → Calendar Images → Year-View Export
 
 ---
 
-*Last updated: 2026-03-07 — Initial file. Full pipeline audit conducted. Role established as Chief of Pipeline. #pipeline charter posted to Discord.*
+*Last updated: 2026-03-07 — Session 2. Pipeline review system built and first review committed. Forecast OOM fixed (Wilma). USH→UH bug fixed (PR #2). Lessons learned baked in. Cold-start protocol now includes independent pipeline review at step 6.*
