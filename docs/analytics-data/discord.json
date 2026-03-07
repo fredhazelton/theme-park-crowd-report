@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T04:30:01Z",
+  "generated_at": "2026-03-07T04:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T03:40:15.760000+00:00"
+          "last_active": "2026-03-07T04:37:08.804000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Sub-agent is building all three phases now. It'll read the existing pipeline scripts to understand the data model, build the three validation scripts, set up crons, and integrate them into the work...",
+      "timestamp": "2026-03-07T04:37:08.804000+00:00",
+      "message_id": "1479699401504063608",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479699401504063608"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "On it. Spawning a sub-agent to build the full pipeline validation system.",
+      "timestamp": "2026-03-07T04:36:40.525000+00:00",
+      "message_id": "1479699282893209671",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479699282893209671"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Yes - good ideas - do it",
+      "timestamp": "2026-03-07T04:36:32.994000+00:00",
+      "message_id": "1479699251305906216",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479699251305906216"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -168,39 +201,6 @@
       "timestamp": "2026-03-07T04:00:01.338000+00:00",
       "message_id": "1479690058834509894",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479690058834509894"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "- Fallback ratio trending up?\n\n**Phase 3 \u2014 Freshness Validation (every 6 hours)**\n- Are actuals flowing in? How many entities have recent data?\n- Any \"silent gaps\" where data stops without an error...",
-      "timestamp": "2026-03-07T03:40:15.760000+00:00",
-      "message_id": "1479685086159831151",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479685086159831151"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "You're seeing the pattern clearly. Today alone we found:\n\n1. **Fallback entities** \u2014 82 data-sparse entities predicting flat constants, polluting WTI\n2. **EU model override** \u2014 legacy code forcing ...",
-      "timestamp": "2026-03-07T03:40:15.502000+00:00",
-      "message_id": "1479685085077704899",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479685085077704899"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me log this and respond properly.",
-      "timestamp": "2026-03-07T03:39:49.766000+00:00",
-      "message_id": "1479684977133355089",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479684977133355089"
     },
     {
       "channel": "mission-control",
