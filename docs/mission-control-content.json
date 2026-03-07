@@ -56,7 +56,7 @@
         "wti": {
             "status": "done",
             "label": "WTI",
-            "detail": "54,699 park-dates"
+            "detail": "54,700 park-dates"
         },
         "live_waits": {
             "status": "done",
@@ -94,17 +94,17 @@
         "services": [
             {
                 "name": "tpcr-discord-bot",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Discord bot"
             },
             {
                 "name": "chat-server",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Stream overlay"
             },
             {
                 "name": "twitch-chat",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Stream overlay"
             },
             {
@@ -118,7 +118,7 @@
         "db_entities": 1710,
         "db_forecasts": 29263674,
         "db_live_waits": 123206991,
-        "db_wti": 54699
+        "db_wti": 54700
     },
-    "last_updated": "2026-03-07T09:45:04.663855"
+    "last_updated": "2026-03-07T09:52:17.351763"
 }
