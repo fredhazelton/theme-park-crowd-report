@@ -121,17 +121,23 @@ def _write_to_live_duckdb(
     park_tz: ZoneInfo,
     output_base: Path,
     logger: logging.Logger,
+    max_retries: int = 5,
 ) -> bool:
     """
     Append new wait time rows to tpcr_live.duckdb live_waits table.
-    Called after CSV write. Fails gracefully if DuckDB/init not available.
+    Called after CSV write. Retries on lock conflicts (e.g. bot reading).
+    Fails gracefully if DuckDB/init not available.
     """
+    import time as _time
+
     if duckdb is None or df.empty:
         return False
     db_path = output_base / "tpcr_live.duckdb"
     if not db_path.exists():
         logger.debug("Skipping DuckDB write: tpcr_live.duckdb not found (run init_live_duckdb.py)")
         return False
+
+    # Prepare data once, outside retry loop
     try:
         df = df.copy()
         df["park_date"] = derive_park_date(df["observed_at"], park_tz)
@@ -141,27 +147,42 @@ def _write_to_live_duckdb(
         df = df[df["wait_time_minutes"] > 0]
         if df.empty:
             return False
-        con = duckdb.connect(str(db_path))
-        try:
-            con.register("_live_df", df)
-            con.execute("""
-                INSERT OR IGNORE INTO live_waits 
-                    (entity_code, observed_at, wait_time_type, wait_time_minutes, park_date)
-                SELECT entity_code, observed_at::TIMESTAMPTZ, wait_time_type, 
-                       wait_time_minutes::INTEGER, park_date::DATE
-                FROM _live_df
-            """)
-            con.execute("""
-                INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
-                VALUES ('scraper', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM live_waits), 'queue-times')
-            """)
-        finally:
-            con.close()  # Always close — minimize write lock duration
-        logger.debug(f"Wrote {len(df)} rows to live_waits")
-        return True
     except Exception as e:
-        logger.warning(f"DuckDB write failed: {e}")
+        logger.warning(f"DuckDB data prep failed: {e}")
         return False
+
+    for attempt in range(max_retries):
+        try:
+            con = duckdb.connect(str(db_path))
+            try:
+                con.register("_live_df", df)
+                con.execute("""
+                    INSERT OR IGNORE INTO live_waits 
+                        (entity_code, observed_at, wait_time_type, wait_time_minutes, park_date)
+                    SELECT entity_code, observed_at::TIMESTAMPTZ, wait_time_type, 
+                           wait_time_minutes::INTEGER, park_date::DATE
+                    FROM _live_df
+                """)
+                con.execute("""
+                    INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
+                    VALUES ('scraper', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM live_waits), 'queue-times')
+                """)
+            finally:
+                con.close()
+            logger.debug(f"Wrote {len(df)} rows to live_waits")
+            return True
+        except Exception as e:
+            error_str = str(e).lower()
+            is_lock = any(kw in error_str for kw in ("lock", "busy", "io error", "could not set", "blocked"))
+            if is_lock and attempt < max_retries - 1:
+                wait_s = 1.0 * (attempt + 1)  # 1s, 2s, 3s, 4s
+                logger.debug(f"DuckDB write lock (attempt {attempt + 1}/{max_retries}), retrying in {wait_s}s...")
+                _time.sleep(wait_s)
+                continue
+            logger.warning(f"DuckDB write failed after {attempt + 1} attempts: {e}")
+            return False
+
+    return False
 
 
 # =============================================================================
