@@ -1,16 +1,14 @@
-"""Step 8: Forecast Generation — Memory-safe by design.
+"""Step 8: Forecast Generation — Memory-safe and FAST.
 
-The v2 forecast OOM'd at 49GB because it:
-- Loaded all models at once
-- Pickled agg_lookup to 8 workers (8 copies in RAM)
-- Generated 730 days of time grids for all entities simultaneously
+v3.0 was correct but slow (42 min) due to df.apply() row-by-row loops.
+v3.1 vectorizes aggregate lookups with merge/map — target: <5 min.
 
-v3 approach:
+Architecture:
 - Process ONE PARK at a time
-- Sequential (no multiprocessing) — each park takes ~45s, total ~10 min
-- Load only that park's models, generate only that park's grid
+- Sequential (no multiprocessing)
+- Vectorized aggregate lookups (no df.apply)
 - Flush to parquet between parks, release memory
-- Peak memory: ~2-3GB (one park's worth)
+- Peak memory: ~2-3GB
 """
 
 from __future__ import annotations
@@ -55,7 +53,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         raise ValidationError("XGBoost is required for forecasting. pip install xgboost")
 
     log.info("=" * 60)
-    log.info("STEP 8: FORECAST GENERATION (v3 — memory-safe)")
+    log.info("STEP 8: FORECAST GENERATION (v3.1 — vectorized)")
     log.info("=" * 60)
 
     start_date = date.today() + timedelta(days=1)
@@ -66,7 +64,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     with log.timed("load shared data"):
         date_features = _load_date_features(cfg, log)
         park_hours = _load_park_hours(cfg, log)
-        agg_lookup = _load_aggregates(cfg, log)
+        agg_df = _load_aggregates_df(cfg, log)
         entity_list = _load_entity_list(cfg, log)
         operating_calendar = _load_operating_calendar(cfg, log)
         fallback_ratios = _load_fallback_ratios(cfg, log)
@@ -107,11 +105,20 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 log.warning(f"  {park_code}: no time grid generated, skipping")
                 continue
 
+            # Pre-compute park hours lookup for mins_since_open (vectorized)
+            park_open_mins = {}
+            for d in pd.date_range(start_date, end_date).date:
+                hours_tuple = park_hours.get((park_code, d))
+                if hours_tuple and hours_tuple[0] is not None:
+                    park_open_mins[d] = hours_tuple[0]
+                else:
+                    park_open_mins[d] = 6 * 60  # default
+
             for entity_code in entities:
                 try:
-                    result = _forecast_entity(
+                    result = _forecast_entity_vectorized(
                         entity_code, park_code, time_grid,
-                        cfg.models_dir, agg_lookup, park_hours,
+                        cfg.models_dir, agg_df, park_open_mins,
                         fallback_ratios, operating_calendar,
                     )
                     if result is not None and len(result) > 0:
@@ -169,20 +176,20 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
 
 # =========================================================================
-# Entity-level forecasting
+# Entity-level forecasting — VECTORIZED (v3.1)
 # =========================================================================
 
-def _forecast_entity(
+def _forecast_entity_vectorized(
     entity_code: str,
     park_code: str,
     time_grid: pd.DataFrame,
     models_dir: Path,
-    agg_lookup: dict,
-    park_hours: dict,
+    agg_df: pd.DataFrame,
+    park_open_mins: dict,
     fallback_ratios: dict,
     operating_calendar: set | None,
 ) -> pd.DataFrame | None:
-    """Generate forecast for a single entity. Returns DataFrame or None."""
+    """Generate forecast for a single entity using vectorized operations."""
 
     df = time_grid.copy()
     df["entity_code"] = entity_code
@@ -194,44 +201,40 @@ def _forecast_entity(
         if operating_dates:
             df = df[df["park_date"].isin(operating_dates)]
         elif any(e == ec_upper for e, _ in operating_calendar):
-            return None  # Entity in calendar but zero operating dates = extinct
+            return None
 
     if len(df) == 0:
         return None
 
-    # Get posted_time estimates from aggregates
-    def get_posted(row):
-        key = (entity_code, row["date_group_id"], row["time_slot_15min"])
-        return agg_lookup.get(key, 5.0)
-    df["posted_time"] = df.apply(get_posted, axis=1)
+    # VECTORIZED: posted_time via merge instead of apply
+    entity_agg = agg_df[agg_df["entity_code"] == entity_code]
+    if len(entity_agg) > 0:
+        df = df.merge(
+            entity_agg[["date_group_id", "time_slot_15min", "wait_median"]],
+            on=["date_group_id", "time_slot_15min"],
+            how="left",
+        )
+        df["posted_time"] = df["wait_median"].fillna(5.0)
+        df.drop(columns=["wait_median"], inplace=True)
+    else:
+        df["posted_time"] = 5.0
 
-    # Get mins_since_open
-    def get_mins_open(row):
-        key = (park_code, row["park_date"])
-        hours_tuple = park_hours.get(key)
-        if hours_tuple:
-            opening = hours_tuple[0]
-            if opening is not None:
-                current = row["hour_of_day"] * 60 + (row["time_slot"].minute if hasattr(row["time_slot"], "minute") else 0)
-                return max(0, current - opening)
-        return row["mins_since_6am"]
-    df["mins_since_open"] = df.apply(get_mins_open, axis=1)
+    # VECTORIZED: mins_since_open via map instead of apply
+    df["_open_mins"] = df["park_date"].map(park_open_mins).fillna(6 * 60)
+    df["mins_since_open"] = (df["mins_since_6am"] + 6 * 60 - df["_open_mins"]).clip(lower=0)
+    df.drop(columns=["_open_mins"], inplace=True)
 
-    # Model selection: actuals model > v2 model > aggregate > fallback_ratio
+    # Model selection
     entity_dir = models_dir / entity_code
+    v3_path = entity_dir / "model_v3.json"
     actuals_path = entity_dir / "model_julia_actuals.json"
     v2_path = entity_dir / "model_julia_v2.json"
-
-    # Also check for v3 models (when training step is implemented)
-    v3_path = entity_dir / "model_v3.json"
 
     fallback_ratio = fallback_ratios.get(entity_code, fallback_ratios.get("__global__", 0.678))
 
     if v3_path.exists():
-        # v3 model (future)
         model = xgb.XGBRegressor()
         model.load_model(str(v3_path))
-        meta = _read_metadata(entity_dir, "metadata_v3.json")
         features = FEATURES_ACTUALS
         method = "model_v3"
 
@@ -252,18 +255,12 @@ def _forecast_entity(
         method = "model_v2"
 
     else:
-        # No model — use aggregate * fallback_ratio
-        def get_fallback(row):
-            key = (entity_code, row["date_group_id"], row["time_slot_15min"])
-            if key in agg_lookup:
-                return int(round(agg_lookup[key] * fallback_ratio))
-            return int(round(row["posted_time"] * fallback_ratio))
-
-        df["predicted_actual"] = df.apply(get_fallback, axis=1)
+        # No model — VECTORIZED fallback
+        df["predicted_actual"] = (df["posted_time"] * fallback_ratio).round().astype(int)
         df["prediction_method"] = "fallback_ratio"
         return df[["entity_code", "park_date", "time_slot", "predicted_actual", "prediction_method"]]
 
-    # Run model prediction
+    # Run model prediction (already vectorized via numpy)
     X = df[features].values.astype(np.float32)
     predictions = model.predict(X)
     predictions = np.clip(predictions, 0, 300)
@@ -274,7 +271,7 @@ def _forecast_entity(
 
 
 # =========================================================================
-# Data loading helpers (called once at start)
+# Data loading helpers
 # =========================================================================
 
 def _load_date_features(cfg: PipelineConfig, log: PipelineLogger) -> dict:
@@ -284,7 +281,6 @@ def _load_date_features(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     pairs_str = str(pairs_path).replace("\\", "/")
 
     with read_connection() as con:
-        # Load encodings from matched pairs
         dgid_enc = dict(con.execute(f"""
             SELECT DISTINCT date_group_id, date_group_id_encoded
             FROM read_parquet('{pairs_str}')
@@ -300,7 +296,6 @@ def _load_date_features(cfg: PipelineConfig, log: PipelineLogger) -> dict:
             FROM read_parquet('{pairs_str}')
         """).fetchdf().values)
 
-        # Load date features
         df = con.execute(f"""
             SELECT CAST(d.park_date AS DATE) as park_date,
                    d.date_group_id, s.season, s.season_year
@@ -377,26 +372,27 @@ def _load_park_hours(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     return lookup
 
 
-def _load_aggregates(cfg: PipelineConfig, log: PipelineLogger) -> dict:
-    """Load model aggregates for posted_time estimates."""
+def _load_aggregates_df(cfg: PipelineConfig, log: PipelineLogger) -> pd.DataFrame:
+    """Load model aggregates as a DataFrame for vectorized merge.
+    
+    Returns DataFrame with columns: entity_code, date_group_id, time_slot_15min, wait_median
+    """
     agg_path = cfg.output_base / "aggregates" / "model_aggregates.parquet"
     if not agg_path.exists():
         log.warning(f"No aggregates file at {agg_path}")
-        return {}
+        return pd.DataFrame(columns=["entity_code", "date_group_id", "time_slot_15min", "wait_median"])
 
     with read_connection() as con:
         df = con.execute(f"""
-            SELECT entity_code, date_group_id, time_slot, wait_median
+            SELECT entity_code, date_group_id,
+                   CAST(time_slot AS INTEGER) as time_slot_15min,
+                   wait_median
             FROM read_parquet('{str(agg_path).replace(chr(92), "/")}')
             WHERE wait_median IS NOT NULL
         """).fetchdf()
 
-    lookup = {}
-    for _, row in df.iterrows():
-        lookup[(row["entity_code"], row["date_group_id"], row["time_slot"])] = row["wait_median"]
-
-    log.info(f"Aggregates loaded: {len(lookup):,} entries")
-    return lookup
+    log.info(f"Aggregates loaded: {len(df):,} entries as DataFrame")
+    return df
 
 
 def _load_entity_list(cfg: PipelineConfig, log: PipelineLogger) -> list[str]:
@@ -414,7 +410,6 @@ def _load_entity_list(cfg: PipelineConfig, log: PipelineLogger) -> list[str]:
               AND d.fastpass_booth = FALSE
         """).fetchdf()["entity_code"].tolist()
 
-        # Add EU entities with scope_and_scale (may not have POSTED data yet)
         eu_entities = con.execute(f"""
             SELECT code as entity_code FROM read_csv_auto('{dim_str}')
             WHERE code LIKE 'EU%' AND fastpass_booth = FALSE AND scope_and_scale IS NOT NULL

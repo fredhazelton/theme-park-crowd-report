@@ -12,6 +12,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import time
 from datetime import date, datetime, timezone
@@ -48,6 +49,13 @@ def main():
         overrides["forecast_days"] = args.days
     cfg = load_config(**overrides)
 
+    # Issue #6: Shadow mode runs at reduced priority to avoid starving production
+    if cfg.shadow:
+        try:
+            os.nice(10)
+        except OSError:
+            pass  # nice() may fail in some environments
+
     run_date = date.today().isoformat()
     log = PipelineLogger("pipeline", cfg.logs_dir)
     metrics = PipelineMetrics(
@@ -57,7 +65,7 @@ def main():
     )
 
     log.info("=" * 60)
-    log.info(f"HAZEYDATA PIPELINE v3 {'(SHADOW MODE)' if cfg.shadow else ''}")
+    log.info(f"HAZEYDATA PIPELINE v3.1 {'(SHADOW MODE — nice +10)' if cfg.shadow else ''}")
     log.info(f"Run date: {run_date}")
     log.info(f"Output: {cfg.output_base}")
     if cfg.shadow:

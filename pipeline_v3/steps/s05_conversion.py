@@ -11,6 +11,9 @@ v3 improvement: VALIDATION GATE
 - Keep previous model as automatic rollback
 
 Runs weekly (Monday) or if model is missing.
+
+v3.1 fix: removed time_slot from GROUP BY — raw parquet doesn't have
+a time_slot column. Match on entity_code + park_date + hour bucket instead.
 """
 
 from __future__ import annotations
@@ -38,7 +41,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     """Train conversion model with validation gate."""
 
     log.info("=" * 60)
-    log.info("STEP 5: CONVERSION MODEL (v3 — with validation gate)")
+    log.info("STEP 5: CONVERSION MODEL (v3.1 — with validation gate)")
     log.info("=" * 60)
 
     model_path = conversion_model_path(cfg)
@@ -49,34 +52,43 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         log.info(f"Model exists and not retrain day ({today.strftime('%A')}). Skipping.")
         return {"rows": 0, "action": "skipped"}
 
+    if cfg.shadow:
+        log.info("Shadow mode: skipping conversion model training (uses production model)")
+        return {"rows": 0, "action": "skipped_shadow"}
+
     if xgb is None:
         raise ValidationError("XGBoost required for conversion model")
 
     # Load matched pairs where we have both POSTED and ACTUAL
+    # v3.1: match on entity_code + park_date + hour (no time_slot column in raw parquet)
     with log.timed("load training data"):
         parquet_str = str(cfg.parquet_dir).replace("\\", "/")
         with read_connection() as con:
             df = con.execute(f"""
                 WITH posted AS (
-                    SELECT entity_code, park_date, time_slot,
+                    SELECT entity_code, park_date,
+                           EXTRACT(HOUR FROM time_slot_start) as hour_bucket,
                            AVG(wait_time_minutes) as posted_wait
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
-                    GROUP BY entity_code, park_date, time_slot
+                      AND time_slot_start IS NOT NULL
+                    GROUP BY entity_code, park_date, hour_bucket
                 ),
                 actual AS (
-                    SELECT entity_code, park_date, time_slot,
+                    SELECT entity_code, park_date,
+                           EXTRACT(HOUR FROM time_slot_start) as hour_bucket,
                            AVG(wait_time_minutes) as actual_wait
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_type = 'ACTUAL' AND wait_time_minutes > 0
-                    GROUP BY entity_code, park_date, time_slot
+                      AND time_slot_start IS NOT NULL
+                    GROUP BY entity_code, park_date, hour_bucket
                 )
                 SELECT p.posted_wait, a.actual_wait
                 FROM posted p
                 INNER JOIN actual a
                     ON p.entity_code = a.entity_code
                     AND p.park_date = a.park_date
-                    AND p.time_slot = a.time_slot
+                    AND p.hour_bucket = a.hour_bucket
             """).fetchdf()
 
     if len(df) < 1000:
@@ -140,7 +152,6 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
             return {"rows": 0, "action": "gate_rejected", "candidate_mae": candidate_mae, "current_mae": current_mae}
 
         log.info(f"Candidate is {-mae_regression:.3f} min better. Deploying.")
-        # Backup current model
         backup = conversion_model_backup_path(cfg)
         backup.parent.mkdir(parents=True, exist_ok=True)
         model_path.rename(backup)
@@ -157,7 +168,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         "n_train": len(train_df),
         "n_holdout": len(holdout_df),
         "mae_holdout": round(candidate_mae, 3),
-        "version": "v3",
+        "version": "v3.1",
     }
     meta_path = model_path.parent / "metadata_v3.json"
     with open(meta_path, "w") as f:

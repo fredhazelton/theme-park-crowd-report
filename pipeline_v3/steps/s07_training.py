@@ -4,13 +4,7 @@ Replaces the Julia training pipeline with pure Python.
 Same XGBoost algorithm (libxgboost), same hyperparameters,
 but with explicit memory management and validation.
 
-Approach:
-- Load training data one park at a time (from per-park parquet files)
-- Train each entity sequentially
-- 85/15 train/val split with geo-decay weighting
-- Early stopping on validation set
-- Save model + metadata per entity
-- Report per-entity MAE
+v3.1 fix: added .fillna() guards for NAType errors on UH entities.
 """
 
 from __future__ import annotations
@@ -48,7 +42,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         raise ValidationError("XGBoost is required. pip install xgboost")
 
     log.info("=" * 60)
-    log.info("STEP 7: MODEL TRAINING (v3 — Python XGBoost, per-park)")
+    log.info("STEP 7: MODEL TRAINING (v3.1 — Python XGBoost, per-park)")
     log.info("=" * 60)
 
     # Look for per-park training data (preferred) or single file
@@ -149,9 +143,15 @@ def _train_entity(
 ) -> dict | None:
     """Train XGBoost model for a single entity. Returns {mae, n_samples} or None."""
 
-    entity_df = park_df[park_df["entity_code"] == entity_code]
+    entity_df = park_df[park_df["entity_code"] == entity_code].copy()
     if len(entity_df) < min_samples:
         return None
+
+    # v3.1: Fill NaN/NAType in feature columns and target BEFORE converting to numpy
+    for col in feature_cols:
+        if col in entity_df.columns:
+            entity_df[col] = pd.to_numeric(entity_df[col], errors="coerce").fillna(0)
+    entity_df["actual_time"] = pd.to_numeric(entity_df["actual_time"], errors="coerce")
 
     # Build feature matrix
     X = entity_df[feature_cols].values.astype(np.float32)
@@ -165,13 +165,15 @@ def _train_entity(
 
     # Inverse frequency weighting for synthetic data
     if "is_synthetic" in entity_df.columns:
-        is_synth = entity_df["is_synthetic"].values
+        is_synth = entity_df["is_synthetic"].values.astype(bool)
         n_real = int(np.sum(~is_synth))
         synth_mult = np.float32(1.0 / np.log2(n_real + 1)) if n_real > 0 else np.float32(1.0)
         weights = weights * np.where(is_synth, synth_mult, np.float32(1.0))
 
-    # Filter valid
+    # Filter valid rows (no NaN in target or weights, target > 0)
     valid = ~np.isnan(y) & (y > 0) & ~np.isnan(weights)
+    # Also filter NaN in features
+    valid = valid & ~np.any(np.isnan(X), axis=1)
     X, y, weights = X[valid], y[valid], weights[valid]
 
     if len(y) < min_samples:
@@ -229,7 +231,7 @@ def _train_entity(
         "geo_decay_halflife_days": cfg.geo_decay_halflife_days,
         "hyperparameters": params,
         "backend": "Python xgboost",
-        "version": "v3",
+        "version": "v3.1",
     }
     meta_path = model_dir / "metadata_v3.json"
     with open(meta_path, "w") as f:
