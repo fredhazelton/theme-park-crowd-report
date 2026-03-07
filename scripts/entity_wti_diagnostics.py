@@ -26,6 +26,8 @@ from zoneinfo import ZoneInfo
 if str(Path(__file__).parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+from utils.park_code import entity_code_to_park_code
+
 import duckdb
 import pandas as pd
 
@@ -45,14 +47,6 @@ PARK_NAMES = {
     "UF": "Universal Florida",
     "UH": "Universal Hollywood",
 }
-
-
-def entity_code_to_park(code: str) -> str:
-    """Extract park code from entity code (e.g., MK01 -> MK, TDS12 -> TDS)."""
-    for prefix in ["TDL", "TDS"]:
-        if code.startswith(prefix):
-            return prefix
-    return ''.join(c for c in code if c.isalpha())
 
 
 def get_entity_names(pipeline_dir: Path) -> dict:
@@ -143,7 +137,7 @@ def get_entity_diagnostics(eval_date: str, pipeline_dir: Path, park_filter: str 
     
     # 4. Merge forecasts with actuals
     merged = forecasts.merge(actuals, on="entity_code", how="inner")
-    merged["park"] = merged["entity_code"].apply(entity_code_to_park)
+    merged["park"] = merged["entity_code"].apply(entity_code_to_park_code)
     merged["error"] = merged["forecast_avg"] - merged["actual_avg"]
     merged["abs_error"] = merged["error"].abs()
     
