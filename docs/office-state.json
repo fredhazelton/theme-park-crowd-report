@@ -1,55 +1,46 @@
 {
-  "updated": "2026-03-06T14:59:05.037551+00:00",
+  "updated": "2026-03-07T13:48:45.710225+00:00",
   "agents": [
     {
       "id": "fred",
       "name": "Fred",
-      "icon": "\ud83e\uddd4",
+      "icon": "🧔",
       "state": "working",
       "zone": "desk-2",
-      "task": "Reviewing bugs & Office page",
+      "task": "Morning check-in, reviewing overnight issues",
       "color": "#facc15"
     },
     {
       "id": "wilma",
       "name": "Wilma",
-      "icon": "\ud83e\uddb4",
+      "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "Fixing Office activity tracking",
+      "task": "Running missed morning checks, fixing forecast pipeline bug, heartbeat config fix",
       "color": "#4a90a4"
     },
     {
       "id": "barney",
       "name": "Barney",
-      "icon": "\ud83e\udea8",
-      "state": "idle",
-      "zone": "tarpit-2",
-      "task": "Available on claude.ai",
+      "icon": "🪨",
+      "state": "offline",
+      "zone": "offsite",
+      "task": "",
       "color": "#4ade80"
     },
     {
       "id": "bambam",
       "name": "Bam-Bam",
-      "icon": "\ud83d\udd28",
+      "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
       "task": "Pushed 3 commits recently",
       "color": "#c084fc"
     },
     {
-      "id": "mr-slate",
-      "name": "Mr. Slate",
-      "icon": "\ud83d\udcbc",
-      "state": "idle",
-      "zone": "corner-office",
-      "task": "Reviewing the quarterly numbers",
-      "color": "#fb923c"
-    },
-    {
       "id": "dino",
       "name": "Dino",
-      "icon": "\ud83e\udd95",
+      "icon": "🦕",
       "state": "idle",
       "zone": "pen-1",
       "task": "Waiting for a task",
@@ -58,7 +49,7 @@
     {
       "id": "pebbles",
       "name": "Pebbles",
-      "icon": "\ud83c\udf80",
+      "icon": "🎀",
       "state": "idle",
       "zone": "pen-2",
       "task": "Waiting for a task",
@@ -67,7 +58,7 @@
     {
       "id": "betty",
       "name": "Betty",
-      "icon": "\u270d\ufe0f",
+      "icon": "✍️",
       "state": "idle",
       "zone": "pen-3",
       "task": "Waiting for a task",
@@ -76,10 +67,10 @@
     {
       "id": "gazoo",
       "name": "Gazoo",
-      "icon": "\ud83d\udc7d",
+      "icon": "👽",
       "state": "idle",
       "zone": "float-1",
-      "task": "Observing the dum-dums\u2026",
+      "task": "Observing the dum-dums…",
       "color": "#34d399"
     }
   ],
@@ -102,7 +93,27 @@
     {
       "time": "08:34",
       "agent": "fred",
-      "text": "Morning check-in \u2014 reviewing The Office page"
+      "text": "Morning check-in — reviewing The Office page"
+    },
+    {
+      "time": "09:57",
+      "agent": "fred",
+      "text": "Reported Office status bug in #bugs-feedback"
+    },
+    {
+      "time": "09:57",
+      "agent": "wilma",
+      "text": "Building activity-based status tracking"
+    },
+    {
+      "time": "09:54",
+      "agent": "wilma",
+      "text": "Fixed Fred's status to 'working'"
+    },
+    {
+      "time": "08:34",
+      "agent": "fred",
+      "text": "Morning check-in — reviewing The Office page"
     },
     {
       "time": "23:58",

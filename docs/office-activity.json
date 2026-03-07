@@ -1,11 +1,11 @@
 {
   "fred": {
-    "last_active": "2026-03-06T14:57:00+00:00",
-    "task": "Reviewing bugs & Office page"
+    "last_active": "2026-03-07T13:48:45.609464+00:00",
+    "task": "Morning check-in, reviewing overnight issues"
   },
   "wilma": {
-    "last_active": "2026-03-06T14:57:00+00:00",
-    "task": "Fixing Office activity tracking"
+    "last_active": "2026-03-07T13:48:45.657935+00:00",
+    "task": "Running missed morning checks, fixing forecast pipeline bug, heartbeat config fix"
   },
   "barney": {},
   "bambam": {},
@@ -14,9 +14,25 @@
   "betty": {},
   "gazoo": {},
   "_recent_activity": [
-    {"time": "09:57", "agent": "fred", "text": "Reported Office status bug in #bugs-feedback"},
-    {"time": "09:57", "agent": "wilma", "text": "Building activity-based status tracking"},
-    {"time": "09:54", "agent": "wilma", "text": "Fixed Fred's status to 'working'"},
-    {"time": "08:34", "agent": "fred", "text": "Morning check-in — reviewing The Office page"}
+    {
+      "time": "09:57",
+      "agent": "fred",
+      "text": "Reported Office status bug in #bugs-feedback"
+    },
+    {
+      "time": "09:57",
+      "agent": "wilma",
+      "text": "Building activity-based status tracking"
+    },
+    {
+      "time": "09:54",
+      "agent": "wilma",
+      "text": "Fixed Fred's status to 'working'"
+    },
+    {
+      "time": "08:34",
+      "agent": "fred",
+      "text": "Morning check-in — reviewing The Office page"
+    }
   ]
 }
