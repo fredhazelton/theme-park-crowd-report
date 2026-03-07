@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T13:30:01Z",
+  "generated_at": "2026-03-07T13:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T13:27:28.300000+00:00"
+          "last_active": "2026-03-07T13:44:42.273000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "- No Gazoo afternoon review posted, no daily digest, no morning accuracy report today\n\nWant me to dig into why the heartbeats stopped firing and kick off the morning reports now?",
-      "timestamp": "2026-03-07T13:27:28.300000+00:00",
-      "message_id": "1479832862143418481",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479832862143418481"
+      "message": "Flipped. **`30m (anthropic)`** \u2014 heartbeat is now running on the right agent, targeting #fred-wilma.\n\n**Root cause summary:**\n- Heartbeat was configured in `agents.defaults` but the Clawdbot docs s...",
+      "timestamp": "2026-03-07T13:44:42.273000+00:00",
+      "message_id": "1479837198940504135",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479837198940504135"
     },
     {
       "channel": "fred-wilma",
@@ -175,21 +175,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Now I see the picture clearly. The morning cron jobs (5am improvement sprint, 6:30am park intel, 7:30am accuracy reports, 8am competitor watch) all \"fired\" with ~11ms duration but never actually ex...",
-      "timestamp": "2026-03-07T13:27:27.906000+00:00",
-      "message_id": "1479832860490727550",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479832860490727550"
+      "message": "There it is. Found it.\n\n```\nHeartbeat: 2h (main), disabled (anthropic)\n```\n\n**Heartbeat is DISABLED for the `anthropic` agent** \u2014 which is the agent bound to all our Discord and Telegram channels. ...",
+      "timestamp": "2026-03-07T13:44:05.653000+00:00",
+      "message_id": "1479837045344964690",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479837045344964690"
     },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "OK \u2014 so the last Discord activity from me was around 3:53 AM (Gazoo review). Nothing since then. The gateway crashed at 5:43 AM and restarted, but looking at the cron jobs, they all show `lastDurat...",
-      "timestamp": "2026-03-07T13:27:11.533000+00:00",
-      "message_id": "1479832791817523222",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479832791817523222"
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Yes - find out",
+      "timestamp": "2026-03-07T13:42:06.897000+00:00",
+      "message_id": "1479836547246194780",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479836547246194780"
     },
     {
       "channel": "mission-control",
