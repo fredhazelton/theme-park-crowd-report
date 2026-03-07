@@ -301,6 +301,8 @@ def forecast_entity(args) -> tuple:
             scope_mapping_path = scope_dir / "entity_code_mapping.json"
             
             if scope_model_path.exists() and scope_mapping_path.exists():
+                if xgb is None:
+                    raise ImportError("XGBoost is required for scope-scale models but not available")
                 scope_model = xgb.XGBRegressor()
                 scope_model.load_model(str(scope_model_path))
                 with open(scope_mapping_path) as _mf:
@@ -350,6 +352,8 @@ def forecast_entity(args) -> tuple:
                 lineage['training_data_type'] = 'none'
         elif actuals_model_path.exists():
             # Per-entity actuals-only model: 5 features, NO posted_time
+            if xgb is None:
+                raise ImportError("XGBoost is required for actuals models but not available")
             model = xgb.XGBRegressor()
             model.load_model(str(actuals_model_path))
             import json as _json
@@ -381,6 +385,8 @@ def forecast_entity(args) -> tuple:
             lineage['training_data_type'] = 'actuals_first'
         elif v2_model_path.exists():
             # Per-entity V2 model: uses posted_time
+            if xgb is None:
+                raise ImportError("XGBoost is required for V2 models but not available")
             model = xgb.XGBRegressor()
             model.load_model(str(v2_model_path))
             import json as _json
