@@ -547,6 +547,22 @@ else
     fi
 fi
 
+# Phase 2: Data completeness validation
+log_info "=== Data completeness check ==="
+COMPLETENESS_JSON=$($PYTHON scripts/pipeline_data_completeness.py --json 2>&1) || true
+COMPLETENESS_STATUS=$(echo "$COMPLETENESS_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','ok'))" 2>/dev/null || echo "ok")
+if [ "$COMPLETENESS_STATUS" = "warning" ] || [ "$COMPLETENESS_STATUS" = "critical" ]; then
+    log_info "Data completeness: $COMPLETENESS_STATUS"
+    echo "$COMPLETENESS_JSON" | python3 -c "
+import sys, json
+r = json.load(sys.stdin)
+for i in r.get('issues', []):
+    print(f\"  [{i['severity'].upper()}] {i['message']}\")
+" 2>/dev/null || true
+else
+    log_info "Data completeness: OK"
+fi
+
 # Restart dashboard API to pick up new data (WTI, fact tables, etc.)
 API_PID=$(pgrep -f "dashboard/api.py" 2>/dev/null | head -1)
 if [[ -n "$API_PID" ]]; then

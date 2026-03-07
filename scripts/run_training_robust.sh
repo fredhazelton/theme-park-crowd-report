@@ -25,6 +25,17 @@ while [ $RETRY -lt $MAX_RETRIES ]; do
         echo "$(date) — Running WTI calculation..." | tee -a "$LOG"
         .venv/bin/python3 scripts/calculate_wti_simple.py >> "$LOG" 2>&1
         
+        # Phase 2: Data completeness validation
+        echo "$(date) — Running data completeness check..." | tee -a "$LOG"
+        COMPLETENESS_JSON=$(.venv/bin/python3 scripts/pipeline_data_completeness.py --json 2>&1)
+        COMPLETENESS_STATUS=$(echo "$COMPLETENESS_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','ok'))" 2>/dev/null || echo "ok")
+        echo "$COMPLETENESS_JSON" >> "$LOG"
+        if [ "$COMPLETENESS_STATUS" = "warning" ] || [ "$COMPLETENESS_STATUS" = "critical" ]; then
+            echo "$(date) — Completeness check: $COMPLETENESS_STATUS — see log for details" | tee -a "$LOG"
+        else
+            echo "$(date) — Completeness check: OK" | tee -a "$LOG"
+        fi
+        
         echo "$(date) — Full pipeline recovery complete!" | tee -a "$LOG"
         exit 0
     fi
