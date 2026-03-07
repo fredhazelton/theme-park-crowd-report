@@ -24,10 +24,10 @@ from pipeline_v3.config import load_config
 
 
 def compare(output_base: Path | None = None) -> dict:
-    cfg = load_config(**(dict(output_base=output_base) if output_base else {}))
+    cfg = load_config(**(dict(output_base=output_base, shadow=True) if output_base else dict(shadow=True)))
 
     v3_path = cfg.wti_dir / "wti_v3.parquet"
-    prod_path = cfg.wti_dir / "wti.parquet"
+    prod_path = cfg.prod_output_base / "wti" / "wti.parquet"
 
     if not v3_path.exists() or not prod_path.exists():
         return {"error": "Missing WTI files", "v3_exists": v3_path.exists(), "prod_exists": prod_path.exists()}

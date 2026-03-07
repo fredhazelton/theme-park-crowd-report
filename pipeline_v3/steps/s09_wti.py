@@ -78,7 +78,7 @@ def _compute_historical_wti(
     cfg: PipelineConfig, log: PipelineLogger, pc_sql: str
 ) -> pd.DataFrame | None:
     """Compute historical WTI from synthetic actuals + real actuals."""
-    synth_dir = cfg.output_base / "synthetic_actuals"
+    synth_dir = cfg.prod_output_base / "synthetic_actuals"
     if not synth_dir.exists() or not any(synth_dir.glob("*.parquet")):
         log.warning("No synthetic actuals found — historical WTI unavailable")
         return None
@@ -151,7 +151,7 @@ def _compute_forecast_wti(
 ) -> pd.DataFrame | None:
     """Compute forecast WTI from predictions."""
     forecast_str = str(forecast_file).replace("\\", "/")
-    oc_path = cfg.output_base / "operating_calendar" / "operating_calendar.parquet"
+    oc_path = cfg.prod_output_base / "operating_calendar" / "operating_calendar.parquet"
     dimentity_path = cfg.dimension_dir / "dimentity.csv"
 
     excluded_methods = "('fallback_ratio')" if cfg.exclude_fallback_ratio else "('')"

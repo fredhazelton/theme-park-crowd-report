@@ -32,6 +32,7 @@ class PipelineConfig:
     # === Shadow mode ===
     shadow: bool = False
     shadow_output_base: Path = field(default=None)
+    prod_output_base: Path = field(default=None)  # Preserved for shadow reads
 
     # === Forecast ===
     forecast_days: int = 365
@@ -77,23 +78,35 @@ class PipelineConfig:
     ignore_parks: list[str] = field(default_factory=lambda: ["BB"])  # Blizzard Beach
 
     def __post_init__(self):
-        """Derive paths from output_base."""
-        base = self.output_base
-        if self.shadow:
-            base = self.shadow_output_base or (base.parent / "pipeline_v3_shadow")
-            self.shadow_output_base = base
+        """Derive paths from output_base.
 
+        Shadow mode: read from production, write to shadow dir.
+        """
+        prod_base = self.output_base
+        self.prod_output_base = prod_base
+
+        if self.shadow:
+            shadow_base = self.shadow_output_base or (prod_base.parent / "pipeline_v3_shadow")
+            self.shadow_output_base = shadow_base
+        else:
+            shadow_base = None
+
+        # Read paths always use production
+        base = prod_base
         self.raw_data_dir = self.raw_data_dir or base / "raw"
         self.fact_tables_dir = self.fact_tables_dir or base / "fact_tables"
         self.parquet_dir = self.parquet_dir or base / "fact_tables" / "parquet"
         self.dimension_dir = self.dimension_dir or base / "dimension_tables"
         self.models_dir = self.models_dir or base / "models"
         self.forecast_dir = self.forecast_dir or base / "curves" / "forecast_parquet"
-        self.wti_dir = self.wti_dir or base / "wti"
-        self.accuracy_dir = self.accuracy_dir or base / "accuracy"
-        self.logs_dir = self.logs_dir or base / "logs"
-        self.state_dir = self.state_dir or base / "state"
-        self.duckdb_path = self.duckdb_path or base / "tpcr_live.duckdb"
+
+        # Write paths use shadow in shadow mode
+        write_base = shadow_base if self.shadow else base
+        self.wti_dir = self.wti_dir or write_base / "wti"
+        self.accuracy_dir = self.accuracy_dir or write_base / "accuracy"
+        self.logs_dir = self.logs_dir or write_base / "logs"
+        self.state_dir = self.state_dir or write_base / "state"
+        self.duckdb_path = self.duckdb_path or write_base / "tpcr_live.duckdb"
 
 
 def load_config(**overrides) -> PipelineConfig:
