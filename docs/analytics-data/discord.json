@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T05:15:01Z",
+  "generated_at": "2026-03-07T05:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-07T04:00:01.338000+00:00"
+          "last_active": "2026-03-07T05:30:01.646000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T04:47:20.316000+00:00"
+          "last_active": "2026-03-07T05:29:46.043000+00:00"
         }
       ]
     },
@@ -159,15 +159,26 @@
   ],
   "recent_activity": [
     {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-07T05:30:01.646000+00:00",
+      "message_id": "1479712709368086561",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479712709368086561"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "All three validation scripts are built, tested, and deployed:\n\n- **Data Completeness** \u2014 runs after each pipeline run (already showing a warning, which means it's catching things \u2705)\n- **Freshness C...",
-      "timestamp": "2026-03-07T04:47:20.316000+00:00",
-      "message_id": "1479701966371291217",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479701966371291217"
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Yes! I love this. We already have gazoo\u2019s report which will tell us where we might need to improve something and then you just need to improve it.\n\nThat functionality sounds familiar though don\u2019t w...",
+      "timestamp": "2026-03-07T05:29:46.043000+00:00",
+      "message_id": "1479712643924099126",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479712643924099126"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Sub-agent is building all three phases now. It'll read the existing pipeline scripts to understand the data model, build the three validation scripts, set up crons, and integrate them into the work...",
-      "timestamp": "2026-03-07T04:37:08.804000+00:00",
-      "message_id": "1479699401504063608",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479699401504063608"
+      "message": "The 2am Gazoo review would feed directly into this \u2014 he finds the weakness, I fix it the same night. That's a pretty tight loop.",
+      "timestamp": "2026-03-07T05:27:33.689000+00:00",
+      "message_id": "1479712088791453769",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479712088791453769"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +197,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "On it. Spawning a sub-agent to build the full pipeline validation system.",
-      "timestamp": "2026-03-07T04:36:40.525000+00:00",
-      "message_id": "1479699282893209671",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479699282893209671"
+      "message": "We have pieces but not exactly this. Here's what exists:\n\n**Close but not quite:**\n- **Gazoo (2am cron)** \u2014 Reviews and *critiques* the pipeline nightly, but doesn't *fix or build* anything. He's t...",
+      "timestamp": "2026-03-07T05:27:33.565000+00:00",
+      "message_id": "1479712088271355944",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479712088271355944"
     },
     {
       "channel": "mission-control",
@@ -212,17 +223,6 @@
       "timestamp": "2026-03-06T23:30:01.573000+00:00",
       "message_id": "1479622112095244348",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479622112095244348"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-06T23:00:01.586000+00:00",
-      "message_id": "1479614562402828462",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479614562402828462"
     },
     {
       "channel": "gazoo",
@@ -382,6 +382,6 @@
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 2,
-    "messages_today": 4
+    "messages_today": 5
   }
 }
