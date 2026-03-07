@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T02:00:01Z",
+  "generated_at": "2026-03-07T02:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T01:07:45.495000+00:00"
+          "last_active": "2026-03-07T02:03:04.741000+00:00"
         }
       ]
     },
@@ -164,32 +164,32 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "Great question from Annette! That's actually a really smart data angle.\n\n**What we track now:** Standby posted wait times across WDW, Universal, and other parks.\n\n**What she's asking about:** Premi...",
+      "timestamp": "2026-03-07T02:03:04.741000+00:00",
+      "message_id": "1479660629093515504",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479660629093515504"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Question from Annette",
+      "timestamp": "2026-03-07T02:02:45.708000+00:00",
+      "message_id": "1479660549263589459",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479660549263589459"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "Betty dropped 5 tweet drafts in #content-review for you \ud83d\udc26 \u2014 covers accuracy wins, the pipeline fix, bot monitoring, and Gazoo. Take a look and \u2705 the ones you like!",
       "timestamp": "2026-03-07T01:07:45.495000+00:00",
       "message_id": "1479646707166871848",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479646707166871848"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Betty's on it! \ud83d\udc26 She's drafting 4-5 tweet options based on today's work and will post them to #content-review for you to approve. Lots of good material \u2014 the accuracy improvements and pipeline fixe...",
-      "timestamp": "2026-03-07T01:07:23.479000+00:00",
-      "message_id": "1479646614825209937",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479646614825209937"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "No dedicated Betty agent \u2014 I'll spawn a sub-agent to draft the tweets. Today was packed with meaningful improvements, perfect for content.",
-      "timestamp": "2026-03-07T01:07:06.279000+00:00",
-      "message_id": "1479646542683177010",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479646542683177010"
     },
     {
       "channel": "mission-control",
