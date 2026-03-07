@@ -6,24 +6,24 @@
             "task": "Pipeline accuracy audit follow-up"
         },
         {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "\ud83d\udd34 Confirm accuracy eval is working"
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Promote WTI blog article"
         },
         {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "\ud83d\udd34 Deploy inverse_freq weighting"
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Synthetic vs real actuals weighting review"
         },
         {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "\ud83d\udd34 Centralize park_code mappings"
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Build Social Pulse automated feed"
         },
         {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "\ud83d\udfe2 Per-entity synthetic quality scoring"
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Build Competitor Watch automated feed"
         }
     ],
     "key_dates": [
@@ -94,17 +94,17 @@
         "services": [
             {
                 "name": "tpcr-discord-bot",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Discord bot"
             },
             {
                 "name": "chat-server",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Stream overlay"
             },
             {
                 "name": "twitch-chat",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Stream overlay"
             },
             {
@@ -120,5 +120,5 @@
         "db_live_waits": 123206991,
         "db_wti": 54699
     },
-    "last_updated": "2026-03-07T08:50:38.115626"
+    "last_updated": "2026-03-07T09:00:11.752818"
 }
