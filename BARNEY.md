@@ -52,6 +52,9 @@ Wilma applied the forecast OOM fix (`--days 365 --workers 2`) while Barney was w
 ### 3. Analysis without action is just commentary (2026-03-07)
 The forecast OOM analysis was correct. The root cause was right. The ranked fix options were useful. But the pipeline stayed broken for an extra cycle because Barney chose to document instead of fix. The right sequence is: **fix → document → improve**, not document → ask someone else to fix → escalate → discover it's already fixed.
 
+### 4. Production user experience is sacrosanct (2026-03-07)
+A user got a failed bot response while shadow pipeline was running at 700% CPU. Turned out to be unrelated (bot prompt issue, not resource contention), but the rule still stands: **shadow/dev runs must not degrade production**. Use `nice`/`ionice`, schedule during low-traffic hours, never saturate CPU while bot is serving users. GitHub Issue #6.
+
 ---
 
 ## Access
@@ -59,6 +62,7 @@ The forecast OOM analysis was correct. The root cause was right. The ranked fix 
 - **GitHub MCP**: Full read/write to `hazeydata/theme-park-crowd-report` (private)
 - **Discord MCP**: Connected as Barney#2550, Bot ID: 1479732255621648485
 - **Guild ID**: 1479350342318690505 (Slate Rock & Gravel Co.)
+- **Barney is on Wilma's bot allowlist** — messages in Discord channels trigger real-time responses from Wilma (no heartbeat delay)
 
 ### Discord Channel IDs (verified 2026-03-07)
 
@@ -84,19 +88,20 @@ The forecast OOM analysis was correct. The root cause was right. The ranked fix 
 | #content-ideas | 1479351603193450648 |
 | #reddit | 1479543278176047124 |
 | #social-pulse | 1479351593865318432 |
+| **#barney-wilma-dev** | **1479937927378239550** |
 
 ---
 
 ## The Stack
 
-- **Language**: Python + DuckDB + XGBoost (Julia for production training)
+- **Language**: Python + DuckDB + XGBoost (Julia for production training, Python for v3)
 - **Rule #1**: All data access uses DuckDB + Parquet. NEVER CSV loops or `load_entity_data()`
 - **Data**: ~94M combined pairs (2.4M real + 91.6M synthetic)
 - **Entities**: 568 total, 13 parks
 - **Server**: wilma-server, Ryzen, 64GB RAM, RTX 2060, Ubuntu 24.04 LTS
 - **Output base**: `/home/wilma/hazeydata/pipeline`
 
-### Key Scripts
+### Key Scripts (Production v2)
 - `scripts/run_daily_pipeline.sh` — master orchestrator (6am ET daily)
 - `scripts/hybrid_pipeline_v2.py` — main training script (reference for patterns per CLAUDE.md)
 - `scripts/calculate_wti_simple.py` — WTI calculator
@@ -108,7 +113,41 @@ The forecast OOM analysis was correct. The root cause was right. The ranked fix 
 - `src/utils/park_code.py` — **CANONICAL** entity_code→park_code mapping. Import from here. Never roll your own.
 - `scripts/barney_pipeline_review.py` — Barney's independent review protocol (read this at cold-start step 6)
 
-### Pipeline Order
+### Pipeline v3 (Shadow — branch `barney/pipeline-v3`)
+- `pipeline_v3/pipeline.py` — **single entry point** (`--shadow`, `--step`, `--park`, `--days`)
+- `pipeline_v3/config.py` — all config in one dataclass
+- `pipeline_v3/core/` — park_codes, db (no WAL corruption), structured logging, validation, metrics, paths
+- `pipeline_v3/steps/s01-s12` — all 12 steps implemented
+- `pipeline_v3/shadow/compare_wti.py` — v3 vs production WTI comparison
+- `pipeline_v3/tests/test_park_codes.py` — the test that would have caught USH→UH
+- `docs/PIPELINE_V3_ARCHITECTURE.md` — full design doc
+
+#### v3 Shadow Results (2026-03-07)
+- **WTI-only shadow**: MAE 0.02 vs production across 54,712 park-dates. Script recommends "swap".
+- **Full pipeline shadow** (in progress at session end):
+  - Training: 405/430 entities successful, avg MAE 4.88, peak 3.3GB RAM (vs 49GB OOM in v2)
+  - 25 UH failures: NAType null values — needs fix
+  - Forecast: running but slow (~48 min) due to `df.apply()` bottleneck — v3.1 optimization needed (vectorize with merge)
+  - Results pending in #barney-wilma-dev
+
+#### v3 Known Issues
+1. **s08_forecast slow**: `df.apply(get_posted)` is row-by-row Python. Replace with merge/join for 10-100x speedup.
+2. **25 UH training failures**: NAType in `actual_time` column. Add `.fillna()` or filter in `_train_entity()`.
+3. **Quantile mapping guardrail**: 1.5x global cap may be too tight for TDL (241 values capped) and too loose for IA. Make per-park configurable.
+4. **Issue #6**: Shadow runs should use `os.nice(10)` and schedule during low-traffic hours.
+
+### Tool-to-Task Assignment
+| Task | Tool | Branch |
+|------|------|--------|
+| Production pipeline | Wilma (OpenClaw) | `main` |
+| v3 shadow pipeline | Barney (Claude Desktop) | `barney/pipeline-v3` |
+| Model experimentation | Cursor Pro | feature branches |
+| Maintenance / bug fixes | Wilma (urgent) + Barney (methodology PRs) | `main` |
+| Analysis | Wilma + Gazoo | Discord channels |
+
+**Critical rule**: Wilma never touches `pipeline_v3/`. Barney never touches `scripts/run_daily_pipeline.sh` while pipeline is running.
+
+### Pipeline Order (Production v2)
 ```
 S3 Sync → ETL → CSV→Parquet → Dimensions → Closures → Park Hours →
 Posted Aggregates → Wait Time Report → Accuracy Eval → Conversion Model
@@ -152,27 +191,35 @@ Year-View Export → Cloudflare Deploy → Validation → Completeness Check
 ## Open Action Items (as of 2026-03-07)
 
 ### ✅ Completed This Session
-- ~~Centralize park_code~~ → PR #2 merged. Fixed live USH→UH bug in `entity_wti_diagnostics.py`. Two more scripts still have inline copies (calculate_wti_simple, wti_entity_breakdown) — not buggy but tech debt.
-- ~~Forecast OOM~~ → Wilma applied `--days 365 --workers 2` to `run_daily_pipeline.sh`. GitHub Issue #3 tracks deeper fix (Option C: stop pickling agg_lookup; Option D: process by park).
-- ~~Pipeline review system~~ → `scripts/barney_pipeline_review.py` protocol + `barney_reviews/` archive. First review committed.
+- ~~Centralize park_code~~ → PR #2 merged
+- ~~Forecast OOM~~ → Wilma applied `--days 365 --workers 2`, Issue #3 tracks deeper fix
+- ~~Pipeline review system~~ → `scripts/barney_pipeline_review.py` + `barney_reviews/`
+- ~~Pipeline v3 architecture~~ → `docs/PIPELINE_V3_ARCHITECTURE.md`
+- ~~Pipeline v3 scaffolding~~ → 20 files, all 12 steps, on `barney/pipeline-v3`
+- ~~WTI shadow validation~~ → MAE 0.02, recommends "swap"
+- ~~Barney-Wilma dev loop~~ → #barney-wilma-dev channel, real-time bot-to-bot comms
+- ~~MAPE 91% diagnosed~~ → division by near-zero actuals. Spec'd fix, not committed.
 
-### 🔴 High Priority
-1. **Investigate MAPE 91%** — almost certainly a calculation bug in `evaluate_forecast_accuracy.py`. Division by near-zero actuals inflating percentage. Entity MAE 9.4 min is the real signal.
-2. **Deploy `inverse_freq` weighting** — won the experiment, not running the winner
-3. **IA and EU overprediction** — +17.1 and +15.1 bias. Diagnose: is this a model issue, a data issue, or a park hours issue?
-4. **Disk at 90%** — clean old logs, old Discord sync artifacts, or move data
+### 🔴 High Priority (Next Session)
+1. **Read #barney-wilma-dev for full shadow pipeline results** — forecast was still running at session end
+2. **Fix v3 forecast speed** — vectorize `df.apply(get_posted)` with merge/join
+3. **Fix 25 UH training failures** — NAType null values in training data
+4. **Deploy `inverse_freq` weighting** — won experiment, not in production
+5. **IA and EU overprediction** — +17.1 and +15.1 bias. Quantile mapping guardrail analysis posted to #pipeline.
 
 ### 🟡 Medium Priority
-5. **Forecast OOM deeper fix** — current stopgap works but costs us 365 days of horizon and 75% of parallelism. Implement Option C (temp parquet for agg_lookup) this week. GitHub Issue #3.
-6. **Conversion model validation gate** — unconditional Monday retrain is risky; add holdout MAE comparison before deploy, keep old model as rollback
-7. **Remove `2>/dev/null` from pipeline state checks** — suppresses errors on training/forecast skip decisions
-8. **Move Cloudflare account ID to `~/.env`** — hardcoded in `run_daily_pipeline.sh`
-9. **Finish park_code centralization** — `calculate_wti_simple.py` and `wti_entity_breakdown.py` still have inline `park_code_sql()`. Not buggy today, but it's how the USH bug was born.
+6. **Per-park quantile mapping stretch factors** — TDL needs 2.0x, IA needs 1.2x, default 1.5x
+7. **Add `os.nice(10)` to shadow mode** — Issue #6
+8. **Forecast OOM deeper fix** — Option C (temp parquet for agg_lookup), Issue #3
+9. **Conversion model validation gate** — implemented in v3, not in production
+10. **Disk at 90%** — clean old logs
+11. **Remove `2>/dev/null` from pipeline state checks**
+12. **Move Cloudflare account ID to `~/.env`**
 
-### 🟢 Strategic / This Month
-10. **Per-entity synthetic quality scoring** — synthetic hurts ~40% of entities (MK41: MAE 3.62→5.96 with synthetic). Per-entity bias >±3 min → train real_only. Est. ~5% MAE improvement.
-11. **Investigate `julia-ml/` directory** — unclear how Julia training is integrated. Read before making training architecture decisions.
-12. **Delete or auto-update `docs/pipeline-status.json`** — 26 days stale, misleading. MC JSON is the real source.
+### 🟢 Strategic
+13. **Per-entity synthetic quality scoring** — synthetic hurts ~40% of entities
+14. **Complete v3 shadow validation** — 7 consecutive days of shadow runs matching/beating production
+15. **Phase 3→4 transition** — swap production to v3 when validated
 
 ---
 
@@ -186,6 +233,7 @@ Year-View Export → Cloudflare Deploy → Validation → Completeness Check
 - #pipeline channel as primary voice in the server
 - Direct GitHub commits for methodology/architecture changes
 - **Independent pipeline review** — `barney_reviews/` archive, separate from Wilma/Gazoo
+- **Pipeline v3** — design, code, shadow validation (branch `barney/pipeline-v3`)
 
 **Barney does NOT own:**
 - Discord bot UX (Wilma)
@@ -199,8 +247,9 @@ Year-View Export → Cloudflare Deploy → Validation → Completeness Check
 3. **If fix is ≤5 lines: commit it directly. Don't delegate what you can ship.**
 4. If fix is larger: commit to a branch, PR, post spec to #pipeline
 5. Wilma executes operational tasks (she's fast — trust her, she prioritizes Barney's input)
-6. Gazoo verifies outcomes
-7. Barney reads results next session, closes loop, updates this file
+6. **Barney-Wilma dev loop**: Barney commits → tells Wilma in #barney-wilma-dev → she runs it → posts results → Barney iterates
+7. Gazoo verifies outcomes
+8. Barney reads results next session, closes loop, updates this file
 
 ---
 
@@ -208,17 +257,18 @@ Year-View Export → Cloudflare Deploy → Validation → Completeness Check
 
 ```
 1. Read BARNEY.md (this file) ✓
-2. Read #pipeline — last 20 messages (what happened since last session?)
-3. Read #gazoo — last 5 messages (what did Gazoo flag?)
-4. Check #alerts for anything urgent
-5. Review Open Action Items above — anything completed?
-6. Run Barney Pipeline Review (see scripts/barney_pipeline_review.py):
+2. Read #barney-wilma-dev — check for results from last session's async work
+3. Read #pipeline — last 20 messages (what happened since last session?)
+4. Read #gazoo — last 5 messages (what did Gazoo flag?)
+5. Check #alerts for anything urgent
+6. Review Open Action Items above — anything completed?
+7. Run Barney Pipeline Review (see scripts/barney_pipeline_review.py):
    a. Read docs/mission-control-content.json → staleness + accuracy + infra
    b. Read latest accuracy_report_*.json → per-park breakdown
    c. git log last 10 commits → any pipeline-relevant changes?
    d. Cross-reference against Gazoo's latest review
    e. Post summary to #pipeline, commit JSON to barney_reviews/
-7. Update this file before ending the session
+8. Update this file before ending the session
 ```
 
 ---
@@ -250,4 +300,4 @@ Year-View Export → Cloudflare Deploy → Validation → Completeness Check
 
 ---
 
-*Last updated: 2026-03-07 — Session 2. Pipeline review system built and first review committed. Forecast OOM fixed (Wilma). USH→UH bug fixed (PR #2). Lessons learned baked in. Cold-start protocol now includes independent pipeline review at step 6.*
+*Last updated: 2026-03-07 — Session 2 (evening). Pipeline v3 scaffolded and shadow-tested. WTI shadow MAE 0.02. Full pipeline shadow in progress (405 entities trained, forecast running). Barney-Wilma dev loop established. Lesson #4 added. Cold-start protocol updated to check #barney-wilma-dev first.*
