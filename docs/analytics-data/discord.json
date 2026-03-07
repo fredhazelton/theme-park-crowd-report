@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T15:38:59Z",
+  "generated_at": "2026-03-07T15:45:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -55,7 +55,7 @@
           "emoji": "\ud83d\udd27",
           "purpose": "Pipeline monitoring \u2014 ETL status, forecast runs, data quality checks",
           "url": "https://discord.com/channels/1479350342318690505/1479351574177513576",
-          "last_active": "2026-03-07T15:38:03.675000+00:00"
+          "last_active": "2026-03-07T15:40:55.613000+00:00"
         },
         {
           "name": "modeling",
@@ -164,6 +164,17 @@
       "channel_id": "1479351574177513576",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "Done! The service status manager now runs every 3 minutes via cron and updates the Discord announcement autonomously \u2014 posts when something goes down, edits to \"restored\" when it recovers. No more ...",
+      "timestamp": "2026-03-07T15:40:55.613000+00:00",
+      "message_id": "1479866447248359464",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479866447248359464"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "Building it now \u2014 sub-agent is on it. Every 3 minutes, the script will check health and post/edit the Discord announcement on its own, no heartbeat needed. I'll report back when it's done. \ud83e\uddb4",
       "timestamp": "2026-03-07T15:38:03.675000+00:00",
       "message_id": "1479865726088122511",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-07T15:37:45.189000+00:00",
       "message_id": "1479865648552087725",
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479865648552087725"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Yes, go ahead and build that and I might even suggest more often than five minutes maybe three minutes",
-      "timestamp": "2026-03-07T15:37:40.874000+00:00",
-      "message_id": "1479865630453793024",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479865630453793024"
     },
     {
       "channel": "mission-control",
