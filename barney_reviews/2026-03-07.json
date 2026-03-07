@@ -1,0 +1,96 @@
+{
+  "review_date": "2026-03-07",
+  "review_session": 2,
+  "overall_grade": "🟡",
+  "staleness": {
+    "mission_control_age_hours": 5.1,
+    "mission_control_last_updated": "2026-03-07T09:52:17",
+    "last_pipeline_commit": "2026-03-07T14:46:31Z",
+    "last_pipeline_commit_desc": "Fix forecast OOM: --days 365 --workers 2",
+    "pipeline_status_json_age_days": 26,
+    "pipeline_status_json_note": "docs/pipeline-status.json last updated 2026-02-09 — appears abandoned, MC JSON is the real source",
+    "forecast_row_count": 29263674,
+    "forecast_row_count_note": "29.3M rows — pre-OOM-fix number. Next pipeline run with --days 365 will produce ~14-15M rows. Watch for this.",
+    "accuracy_days_evaluated": 24,
+    "grade": "🟢",
+    "notes": "MC JSON is 5h old (updated 09:52 ET). Wilma committed OOM fix at 14:46 UTC. Pipeline should run fresh tomorrow 6am."
+  },
+  "accuracy": {
+    "wti_mae": 6.8,
+    "wti_bias": 1.4,
+    "entity_mae": 9.4,
+    "entity_bias": 2.6,
+    "mape": 91.0,
+    "mape_suspicious": true,
+    "mape_note": "91% MAPE is almost certainly a calculation bug, not real accuracy. Investigate: likely dividing by near-zero actuals inflating the percentage. Entity MAE of 9.4 min is the real signal.",
+    "worst_parks": [
+      {"park": "IA", "bias": "+17.1", "note": "Persistent overprediction — has been bad since at least Feb 27 (accuracy_report shows +17.8)"},
+      {"park": "EU", "bias": "+15.1", "note": "Epic Universe overpredicting. Per-entity models deployed 2026-03-05, may need more training data."},
+      {"park": "MK", "bias": "+11.9", "note": "From Feb 27 accuracy report. May have improved since — need fresher per-park data."}
+    ],
+    "best_parks": [
+      {"park": "DL", "bias": "+1.5"},
+      {"park": "TDL", "bias": "+0.1"},
+      {"park": "UH", "bias": "+0.9"}
+    ],
+    "grade": "🟡",
+    "notes": "WTI MAE 6.8 is acceptable (green threshold <7). But IA +17.1 and EU +15.1 are red flags dragging the average. MAPE 91% needs investigation — likely a division-by-near-zero bug."
+  },
+  "infrastructure": {
+    "disk_main_pct": 90,
+    "disk_data_pct": 4,
+    "services_down": [],
+    "services_all_active": true,
+    "db_entities": 1710,
+    "db_forecasts": 29263674,
+    "db_live_waits": 123206991,
+    "db_wti": 54700,
+    "grade": "🔴",
+    "notes": "Disk at 90% on main is critical. Need to clean old logs, old Discord sync commits, or move data. Data disk at 4% is fine."
+  },
+  "config_drift": {
+    "forecast_workers": 2,
+    "forecast_days": 365,
+    "issues_found": [
+      "Cloudflare account ID still hardcoded in run_daily_pipeline.sh (0ec71dc83a3e7f8559be115fa548902e)",
+      "docs/pipeline-status.json is 26 days stale — abandoned artifact, should either be updated by pipeline or deleted",
+      "72 Discord sync commits in 24h (per Gazoo) — git history is noise. Needs change detection or data branch."
+    ],
+    "grade": "🟡",
+    "notes": "Forecast params are correct post-fix. Three housekeeping items flagged."
+  },
+  "gazoo_cross_ref": {
+    "gazoo_review_date": "2026-03-07",
+    "gazoo_agrees_on_accuracy": true,
+    "gazoo_wti_mae": 6.8,
+    "barney_wti_mae": 6.8,
+    "discrepancies": [
+      "Gazoo said training OOM'd — it was actually the forecast step that OOM'd. Wilma corrected this in #fred-wilma.",
+      "Gazoo rated Barney 7/10 and said 'prove follow-through' — fair, first review delivered today."
+    ],
+    "gazoo_findings_not_in_data": [
+      "DuckDB WAL corruption recurring — not visible in MC JSON, only in logs",
+      "72 Discord sync commits — git noise not captured in any health metric"
+    ]
+  },
+  "action_items": [
+    "🔴 Investigate IA overprediction (+17.1 bias) — persistent since at least Feb 27. Is this a model issue, park hours issue, or data coverage issue?",
+    "🔴 Investigate MAPE 91% — almost certainly a calculation bug in evaluate_forecast_accuracy.py. Division by near-zero actuals?",
+    "🔴 Disk at 90% — clean old logs or move data before it fills",
+    "🟡 EU overprediction (+15.1) — per-entity models deployed Mar 5, may need more training cycles",
+    "🟡 Delete or auto-update docs/pipeline-status.json — 26 days stale, misleading",
+    "🟢 Deploy inverse_freq weighting — won experiment, not in production"
+  ],
+  "meta": {
+    "review_by": "Barney (Chief of Pipeline)",
+    "data_sources": [
+      "docs/mission-control-content.json (2026-03-07T09:52:17)",
+      "accuracy_report_2026-02-27.json",
+      "Discord #gazoo (2026-03-07 nightly review)",
+      "Discord #fred-wilma (last 20 messages)",
+      "Git commit history (last 10 commits on main)"
+    ],
+    "protocol_version": "1.0",
+    "notes": "First Barney pipeline review. Establishing baseline. Future reviews will compare against this."
+  }
+}
