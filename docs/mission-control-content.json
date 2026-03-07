@@ -51,7 +51,7 @@
         "forecasts": {
             "status": "done",
             "label": "Forecasts",
-            "detail": "29,263,674 rows, 10 MB"
+            "detail": "23,671,123 rows, 9 MB"
         },
         "wti": {
             "status": "done",
@@ -94,17 +94,17 @@
         "services": [
             {
                 "name": "tpcr-discord-bot",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Discord bot"
             },
             {
                 "name": "chat-server",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Stream overlay"
             },
             {
                 "name": "twitch-chat",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Stream overlay"
             },
             {
@@ -116,9 +116,9 @@
         "disk_main_pct": 90,
         "disk_data_pct": 4,
         "db_entities": 1710,
-        "db_forecasts": 29263674,
+        "db_forecasts": 23671123,
         "db_live_waits": 123206991,
         "db_wti": 54700
     },
-    "last_updated": "2026-03-07T09:52:17.351763"
+    "last_updated": "2026-03-07T10:00:04.801343"
 }

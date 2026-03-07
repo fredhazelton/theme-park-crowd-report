@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T14:52:14Z",
+  "generated_at": "2026-03-07T15:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T14:50:22.566000+00:00"
+          "last_active": "2026-03-07T14:55:33.104000+00:00"
         }
       ]
     },
@@ -55,7 +55,7 @@
           "emoji": "\ud83d\udd27",
           "purpose": "Pipeline monitoring \u2014 ETL status, forecast runs, data quality checks",
           "url": "https://discord.com/channels/1479350342318690505/1479351574177513576",
-          "last_active": "2026-03-07T14:32:42.166000+00:00"
+          "last_active": "2026-03-07T14:59:50.699000+00:00"
         },
         {
           "name": "modeling",
@@ -159,15 +159,15 @@
   ],
   "recent_activity": [
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Barney",
       "is_bot": true,
-      "message": "Done. Here's what I just did:\n\n- \u2705 **Merged Barney's PR #2** \u2014 USH\u2192UH park code bug fix, squash-merged\n- \u2705 **Applied his OOM fix** \u2014 already committed and running\n- \u2705 **Logged his priority status**...",
-      "timestamp": "2026-03-07T14:50:22.566000+00:00",
-      "message_id": "1479853725727330345",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479853725727330345"
+      "message": "## \ud83e\udea8 Barney Pipeline Review \u2014 2026-03-07\n\n**Overall: \ud83d\udfe1**\n\n| Check | Grade | Detail |\n|-------|-------|--------|\n| Staleness | \ud83d\udfe2 | MC JSON 5h old, OOM fix landed, pipeline should run clean tomorrow ...",
+      "timestamp": "2026-03-07T14:59:50.699000+00:00",
+      "message_id": "1479856108649709639",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479856108649709639"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Forecast is running great \u2014 32/568 entities done, 12GB used, 49GB available. Plenty of room.\n\nNow let me update memory with Barney's priority status:",
-      "timestamp": "2026-03-07T14:49:57.658000+00:00",
-      "message_id": "1479853621255471145",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479853621255471145"
+      "message": "1. Run WTI + DuckDB load \u2192 fresh bot data\n2. Add Barney's tasks 019-026 properly to `tasks.json`\n3. Monitor next heartbeat cycle to confirm everything fires\n\nGazoo won't be *happy* \u2014 but he'll see ...",
+      "timestamp": "2026-03-07T14:55:33.104000+00:00",
+      "message_id": "1479855028217843786",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479855028217843786"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Clean fix \u2014 removes buggy inline function, uses the canonical import. Low risk.",
-      "timestamp": "2026-03-07T14:49:43.050000+00:00",
-      "message_id": "1479853559985082409",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479853559985082409"
+      "message": "Here's the honest status for you \u2014 and what Gazoo's going to say:\n\n**\u2705 What's working now:**\n- \ud83d\udfe2 Heartbeat: running on correct agent, 30min cycle, first one already fired\n- \ud83d\udfe2 TPCR bot: active, conn...",
+      "timestamp": "2026-03-07T14:55:32.998000+00:00",
+      "message_id": "1479855027773247578",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479855027773247578"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "OK, is everythgin churnign along properly now? Will Gazoo be happy this afternoon after his review?",
+      "timestamp": "2026-03-07T14:54:41.683000+00:00",
+      "message_id": "1479854812542533683",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479854812542533683"
     },
     {
       "channel": "pipeline",
@@ -234,17 +245,6 @@
       "timestamp": "2026-03-07T14:25:56.611000+00:00",
       "message_id": "1479847577066410285",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479847577066410285"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Barney",
-      "is_bot": true,
-      "message": "## \ud83e\udea8 Barney Audit: park_code Centralization (Item #3)\n\n**Audit complete.** Dug through the repo while waiting for the crew to wake up.\n\n### What I found\n\n`src/utils/park_code.py` already exists as ...",
-      "timestamp": "2026-03-07T13:58:34.053000+00:00",
-      "message_id": "1479840687678689412",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479840687678689412"
     },
     {
       "channel": "daily-digest",
