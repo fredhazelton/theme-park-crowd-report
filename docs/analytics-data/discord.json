@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T14:24:31Z",
+  "generated_at": "2026-03-07T14:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-06T18:31:55.716000+00:00"
+          "last_active": "2026-03-07T14:25:56.611000+00:00"
         }
       ]
     },
@@ -158,6 +158,17 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udd27 **Pipeline Issue Fixed**\n\n**Problem:** forecast_vectorized.py was failing with `'NoneType' object has no attribute 'XGBRegressor'`\n\n**Root Cause:** Script imports XGBoost and sets `xgb = None` if...",
+      "timestamp": "2026-03-07T14:25:56.611000+00:00",
+      "message_id": "1479847577066410285",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479847577066410285"
+    },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
@@ -335,17 +346,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479545754979926026"
     },
     {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\u2705 **Pipeline Recovery Complete \u2014 2026-03-06**\n\nThe 22-day pipeline failure streak is **OVER**. Here's what was fixed and where we stand:\n\n**What broke:** Pandas OOM trying to load 94M rows (2.4M re...",
-      "timestamp": "2026-03-06T18:26:36.457000+00:00",
-      "message_id": "1479545754304647342",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479545754304647342"
-    },
-    {
       "channel": "modeling",
       "channel_emoji": "\ud83e\uddea",
       "channel_id": "1479351576232591491",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 5,
-    "messages_today": 14
+    "active_channels_today": 6,
+    "messages_today": 15
   }
 }
