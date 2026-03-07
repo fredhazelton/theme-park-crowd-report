@@ -46,32 +46,32 @@
         "etl": {
             "status": "pending",
             "label": "S3 ETL",
-            "detail": "Awaiting 6 AM run"
+            "detail": "1,710 entities tracked"
         },
         "forecasts": {
             "status": "pending",
             "label": "Forecasts",
-            "detail": "Awaiting 6 AM run"
+            "detail": "29,263,674 rows"
         },
         "wti": {
             "status": "pending",
             "label": "WTI",
-            "detail": "Awaiting 6 AM run"
+            "detail": "54,699 park-dates"
         },
         "live_waits": {
-            "status": "pending",
+            "status": "done",
             "label": "Live Waits",
-            "detail": "Awaiting 6 AM run"
+            "detail": ""
         },
         "discord_bot": {
-            "status": "pending",
+            "status": "done",
             "label": "Discord Bot",
-            "detail": "Awaiting 6 AM run"
+            "detail": ""
         },
         "daily_report": {
             "status": "pending",
             "label": "Daily Report",
-            "detail": "Awaiting 6 AM run"
+            "detail": "Not started yet"
         }
     },
     "accuracy": {
@@ -120,5 +120,5 @@
         "db_live_waits": 123103185,
         "db_wti": 54699
     },
-    "last_updated": "2026-03-07T05:45:03.644640"
+    "last_updated": "2026-03-07T06:00:04.682146"
 }
