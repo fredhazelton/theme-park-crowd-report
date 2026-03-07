@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-07T14:24:28.353178+00:00",
+  "updated": "2026-03-07T14:52:07.442580+00:00",
   "agents": [
     {
       "id": "fred",
@@ -7,7 +7,7 @@
       "icon": "🧔",
       "state": "idle",
       "zone": "tarpit-1",
-      "task": "Stepped away briefly",
+      "task": "Away",
       "color": "#facc15"
     },
     {
@@ -16,7 +16,7 @@
       "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "Running heartbeat checks, monitoring pipeline recovery",
+      "task": "Posted service interruption notice - DuckDB WAL corruption detected",
       "color": "#4a90a4"
     },
     {
@@ -34,7 +34,7 @@
       "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
-      "task": "Pushed 2 commits recently",
+      "task": "Pushed 6 commits recently",
       "color": "#c084fc"
     },
     {
@@ -156,24 +156,24 @@
       "text": "Morning check-in — reviewing The Office page"
     },
     {
-      "time": "23:58",
-      "agent": "wilma",
-      "text": "Started building the Office page"
+      "time": "09:57",
+      "agent": "fred",
+      "text": "Reported Office status bug in #bugs-feedback"
     },
     {
-      "time": "23:51",
+      "time": "09:57",
       "agent": "wilma",
-      "text": "Built the Team org chart page"
+      "text": "Building activity-based status tracking"
     },
     {
-      "time": "23:47",
+      "time": "09:54",
       "agent": "wilma",
-      "text": "Built the Docs Hub with search & filters"
+      "text": "Fixed Fred's status to 'working'"
     },
     {
-      "time": "23:00",
-      "agent": "wilma",
-      "text": "Updated Mission Control v3 tabs"
+      "time": "08:34",
+      "agent": "fred",
+      "text": "Morning check-in — reviewing The Office page"
     }
   ]
 }
