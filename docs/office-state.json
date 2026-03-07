@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-07T15:00:03.714721+00:00",
+  "updated": "2026-03-07T15:39:08.763590+00:00",
   "agents": [
     {
       "id": "fred",
@@ -16,7 +16,7 @@
       "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "Heartbeat check - service status restored, systems operational",
+      "task": "heartbeat check",
       "color": "#4a90a4"
     },
     {
@@ -34,7 +34,7 @@
       "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
-      "task": "Pushed 7 commits recently",
+      "task": "Pushed 3 commits recently",
       "color": "#c084fc"
     },
     {
