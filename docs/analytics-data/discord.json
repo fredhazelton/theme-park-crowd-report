@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T13:15:01Z",
+  "generated_at": "2026-03-08T13:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T13:00:08.783000+00:00"
+          "last_active": "2026-03-08T13:30:01.519000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 171879 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-08T13:30:01.519000+00:00",
+      "message_id": "1480195892656214192",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480195892656214192"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 171978 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-08T13:00:08.783000+00:00",
       "message_id": "1480188373376438494",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-08T12:30:39.546000+00:00",
       "message_id": "1480180952658608259",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480180952658608259"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\u2705 **Daily Competitor Watch Report Completed** **Posted to #competitor-watch:** Brief summary noting quiet Sunday activity across all monitored channels, with recommendation for manual spot-checks o...",
-      "timestamp": "2026-03-08T12:00:28.938000+00:00",
-      "message_id": "1480173358417969314",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480173358417969314"
     },
     {
       "channel": "alerts",
