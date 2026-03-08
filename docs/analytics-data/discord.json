@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T15:00:01Z",
+  "generated_at": "2026-03-08T15:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T14:18:51.725000+00:00"
+          "last_active": "2026-03-08T15:07:28.082000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Smart move! That's direct access to your target audience \u2014 people actively planning Disney trips and discussing wait times. Great place to lurk, learn what questions people ask, and occasionally dr...",
+      "timestamp": "2026-03-08T15:07:28.082000+00:00",
+      "message_id": "1480220414918529168",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480220414918529168"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Nice! Thanks! I noticed that r/waltdisneyworld has a discord channel so I joined it",
+      "timestamp": "2026-03-08T15:07:17.717000+00:00",
+      "message_id": "1480220371444826263",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480220371444826263"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**Heartbeat Complete - Marketing Sprint Accountability Delivered**\n\n\ud83d\udea8 **Action Taken:** Sent marketing sprint nudge to Fred - found he's been working on animation design but hasn't hit today's spri...",
+      "timestamp": "2026-03-08T15:01:08.535000+00:00",
+      "message_id": "1480218822983286946",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480218822983286946"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -190,39 +223,6 @@
       "timestamp": "2026-03-08T14:29:03.533000+00:00",
       "message_id": "1480210748939698317",
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1480210748939698317"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Heartbeat Complete - Action Taken:**\n\n\ud83d\udcdd **Content Review Nudge Sent** - Found pending Daily WTI Animation tweet caption awaiting Fred's \u2705/\u274c approval since 11:31 AM. Nudged #fred-wilma.\n\n**Status ...",
-      "timestamp": "2026-03-08T14:18:51.725000+00:00",
-      "message_id": "1480208182830956615",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480208182830956615"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udcdd **Content Review Reminder**\n\nThere's a Daily WTI Animation tweet caption waiting for your \u2705/\u274c in #content-review:\n\n*\"Yesterday at Walt Disney World \u2014 WTI scores across all 4 parks. \ud83c\udff0 Magic Kingdo...",
-      "timestamp": "2026-03-08T14:18:20.545000+00:00",
-      "message_id": "1480208052052295793",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480208052052295793"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Delivered daily reminders to Fred:**\n- \ud83e\udea8 Barney check-in (pipeline priorities)  \n- \ud83d\udc26 X/Twitter developer account setup\n\n**Status checks completed:**\n- Bot health: Still degraded (scraper 25.9h st...",
-      "timestamp": "2026-03-08T14:02:02.312000+00:00",
-      "message_id": "1480203949045842022",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480203949045842022"
     },
     {
       "channel": "mission-control",
