@@ -44,17 +44,17 @@
     ],
     "pipeline_status": {
         "etl": {
-            "status": "pending",
+            "status": "done",
             "label": "S3 ETL",
             "detail": "1,710 entities tracked"
         },
         "forecasts": {
-            "status": "pending",
+            "status": "done",
             "label": "Forecasts",
-            "detail": "23,607,373 rows"
+            "detail": "23,607,373 rows, 9 MB"
         },
         "wti": {
-            "status": "pending",
+            "status": "done",
             "label": "WTI",
             "detail": "54,700 park-dates"
         },
@@ -69,18 +69,18 @@
             "detail": ""
         },
         "daily_report": {
-            "status": "pending",
+            "status": "done",
             "label": "Daily Report",
-            "detail": "Not started yet"
+            "detail": "Completed today"
         }
     },
     "accuracy": {
         "entity_mae": "9.4 min",
         "entity_bias": "+2.6 min",
         "overall_rmse": "10.7",
-        "wti_mae": "6.8",
-        "wti_bias": "1.4",
-        "days_evaluated": 24
+        "wti_mae": "6.7",
+        "wti_bias": "1.5",
+        "days_evaluated": 25
     },
     "ask_analytics": {
         "total_questions": 61,
@@ -117,8 +117,8 @@
         "disk_data_pct": 4,
         "db_entities": 1710,
         "db_forecasts": 23607373,
-        "db_live_waits": 123206991,
+        "db_live_waits": 123265857,
         "db_wti": 54700
     },
-    "last_updated": "2026-03-08T06:00:05.754976"
+    "last_updated": "2026-03-08T06:15:06.053915"
 }
