@@ -1,4 +1,3 @@
-import sys
 """Step 2: ETL + CSV\u2192Parquet conversion.
 
 During shadow phase: reads from production parquet files (no separate ETL).
@@ -8,6 +7,7 @@ Post-swap: runs ETL and converts CSVs to Parquet.
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 from pipeline_v3.config import PipelineConfig
