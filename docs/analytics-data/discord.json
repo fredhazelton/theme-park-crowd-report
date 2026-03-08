@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T04:45:01Z",
+  "generated_at": "2026-03-08T05:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-08T00:00:01.502000+00:00"
+          "last_active": "2026-03-08T05:00:01.630000+00:00"
         },
         {
           "name": "daily-digest",
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-08T04:26:29.634000+00:00"
+          "last_active": "2026-03-08T04:48:52.782000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-08T05:00:01.630000+00:00",
+      "message_id": "1480067547419250822",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480067547419250822"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Added. Every review now includes a full link audit \u2014 every href on every page gets checked. Broken links, 404s, dead anchors, all flagged with the exact page and URL.\n\n*\"Broken links on a live webs...",
+      "timestamp": "2026-03-08T04:48:52.782000+00:00",
+      "message_id": "1480064742067535912",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480064742067535912"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Also, when you do your reviews of the website, check every link to see if it works properly",
+      "timestamp": "2026-03-08T04:48:39.686000+00:00",
+      "message_id": "1480064687138930759",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480064687138930759"
+    },
+    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -168,28 +201,6 @@
       "timestamp": "2026-03-08T04:26:29.634000+00:00",
       "message_id": "1480059108496244898",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480059108496244898"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now add a blog section to the review format template:",
-      "timestamp": "2026-03-08T04:26:15.612000+00:00",
-      "message_id": "1480059049683980309",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480059049683980309"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good call \u2014 Betty's been writing and nobody's been fact-checking. I'll add blog review as a standing section in every Gazoo review.",
-      "timestamp": "2026-03-08T04:25:59.312000+00:00",
-      "message_id": "1480058981316563059",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480058981316563059"
     },
     {
       "channel": "bam-bam",
@@ -346,17 +357,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479863703569436844"
     },
     {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-07T15:00:01.937000+00:00",
-      "message_id": "1479856155785429068",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479856155785429068"
-    },
-    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -382,6 +382,6 @@
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 4,
-    "messages_today": 9
+    "messages_today": 10
   }
 }
