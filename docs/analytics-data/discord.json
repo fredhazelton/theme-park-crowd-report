@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T03:45:01Z",
+  "generated_at": "2026-03-08T04:00:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-07T23:59:22.039000+00:00"
+          "last_active": "2026-03-08T03:52:17.370000+00:00"
         }
       ]
     },
@@ -96,7 +96,7 @@
           "emoji": "\ud83c\udfcf",
           "purpose": "Bam-Bam's workspace \u2014 coding tasks, Discord bot development",
           "url": "https://discord.com/channels/1479350342318690505/1479351580347072675",
-          "last_active": "2026-03-06T15:15:52.603000+00:00"
+          "last_active": "2026-03-08T03:56:46.821000+00:00"
         },
         {
           "name": "barney",
@@ -159,6 +159,61 @@
   ],
   "recent_activity": [
     {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Preview still (frame 90/150):",
+      "timestamp": "2026-03-08T03:56:46.821000+00:00",
+      "message_id": "1480051630836682762",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480051630836682762"
+    },
+    {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Run it: `bash scripts/render_daily_wti.sh`",
+      "timestamp": "2026-03-08T03:56:42.115000+00:00",
+      "message_id": "1480051611098284145",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480051611098284145"
+    },
+    {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "- Shows: emoji, park name, WTI score, label, and lowest-wait ride\n- Footer with date + themeparkcrowdreport.com\n- Navy background with subtle grid + wave animations\n\n\ud83d\udcc1 **`scripts/render_daily_wti.s...",
+      "timestamp": "2026-03-08T03:56:41.627000+00:00",
+      "message_id": "1480051609051332729",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480051609051332729"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udcdd **Content Review Alert Sent**\n\n**Extended heartbeat completed with action:**\n- \u2705 Bot health: healthy  \n- \u2705 Pipeline freshness: ok (caught up after being 2.5h overdue)\n- \u2705 Stale tasks: none found\n...",
+      "timestamp": "2026-03-08T03:52:17.370000+00:00",
+      "message_id": "1480050500677406853",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480050500677406853"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udcdd **Content Review Pending**\n\nThere's a blog post in #content-review awaiting your approval:\n\n**\"Spring Break 2026 at Disney World: Which Week Should You Avoid?\"**  \n- ~950 words, ready for publish...",
+      "timestamp": "2026-03-08T03:51:58.586000+00:00",
+      "message_id": "1480050421891600416",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480050421891600416"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -179,28 +234,6 @@
       "timestamp": "2026-03-07T23:59:22.039000+00:00",
       "message_id": "1479991883890430035",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479991883890430035"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "- `~/theme-park-crowd-report/docs/PIPELINE_DATA_FLOW.md`\n\nThis is a significant new modeling initiative Fred has assigned to Barney.",
-      "timestamp": "2026-03-07T23:59:03.134000+00:00",
-      "message_id": "1479991804597374976",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479991804597374976"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udc3b **New from Barney Channel:**\n\n**Major Assignment:** Model Competition Framework\n\nBarney has been assigned to build a complete Model Competition Framework with:\n\n1. **Prediction Ledger** - permane...",
-      "timestamp": "2026-03-07T23:59:02.955000+00:00",
-      "message_id": "1479991803846463488",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479991803846463488"
     },
     {
       "channel": "alerts",
@@ -344,44 +377,11 @@
       "timestamp": "2026-03-07T13:49:06.348000+00:00",
       "message_id": "1479838306551464098",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1479838306551464098"
-    },
-    {
-      "channel": "modeling",
-      "channel_emoji": "\ud83e\uddea",
-      "channel_id": "1479351576232591491",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udfe2 **Synthetic really helps high-error entities** \u2014 EP155: 11.36 \u2192 9.86, MK23: 9.81 \u2192 7.97. When real data is noisy, synthetic provides useful regularization.\n\n\ud83d\udfe1 **Adaptive sigmoid was a bust** \u2014 it...",
-      "timestamp": "2026-03-06T17:44:04.894000+00:00",
-      "message_id": "1479535052273484040",
-      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535052273484040"
-    },
-    {
-      "channel": "modeling",
-      "channel_emoji": "\ud83e\uddea",
-      "channel_id": "1479351576232591491",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "## \ud83e\uddea Weighting Experiment Complete \u2014 Synthetic vs Real Data\n\nJust finished running all 105 model combinations (15 entities \u00d7 7 weighting schemes). Full results: `research/weighting-experiment-resul...",
-      "timestamp": "2026-03-06T17:44:04.705000+00:00",
-      "message_id": "1479535051480760360",
-      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535051480760360"
-    },
-    {
-      "channel": "bam-bam",
-      "channel_emoji": "\ud83c\udfcf",
-      "channel_id": "1479351580347072675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "At 0.3 entities/sec with 568 entities \u2014 about 30 minutes total. Let me continue monitoring:",
-      "timestamp": "2026-03-06T15:15:52.603000+00:00",
-      "message_id": "1479497755301773322",
-      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1479497755301773322"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 1,
-    "messages_today": 1
+    "active_channels_today": 3,
+    "messages_today": 6
   }
 }
