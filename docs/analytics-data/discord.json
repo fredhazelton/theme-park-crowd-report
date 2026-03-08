@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T14:00:01Z",
+  "generated_at": "2026-03-08T14:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-08T11:00:01.730000+00:00"
+          "last_active": "2026-03-08T14:00:01.847000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T13:49:38.357000+00:00"
+          "last_active": "2026-03-08T14:02:02.312000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "**Next Steps:**\n- Pipeline may need entity model rebuild\n- Consider spawning Bam-Bam for competition framework\n- Investigate scraper staleness",
-      "timestamp": "2026-03-08T13:49:38.357000+00:00",
-      "message_id": "1480200828672282877",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480200828672282877"
+      "message": "**Delivered daily reminders to Fred:**\n- \ud83e\udea8 Barney check-in (pipeline priorities)  \n- \ud83d\udc26 X/Twitter developer account setup\n\n**Status checks completed:**\n- Bot health: Still degraded (scraper 25.9h st...",
+      "timestamp": "2026-03-08T14:02:02.312000+00:00",
+      "message_id": "1480203949045842022",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480203949045842022"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "**Critical Issues Requiring Attention:**\n\n\ud83d\udea8 **Pipeline Validation CRITICAL** \n- 827 entities missing models (entity coverage failure)\n- WTI anomalies in Animal Kingdom 2009 data  \n- Scraper data 25...",
-      "timestamp": "2026-03-08T13:49:38.244000+00:00",
-      "message_id": "1480200828198457437",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480200828198457437"
+      "message": "\ud83d\udc26 **REMINDER: X/Twitter Developer Account**\n\nHey \u2014 today's the day to wire up auto-tweeting. Takes ~10 min:\n\n1. Go to developer.x.com \u2192 sign in as @DisneyStatsWhiz\n2. Create a free project + app\n3....",
+      "timestamp": "2026-03-08T14:01:27.496000+00:00",
+      "message_id": "1480203803016826902",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480203803016826902"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\ud83d\udea8 **From Barney Channel - New Assignment for Bam-Bam**\n\nBarney has assigned a **Model Competition Framework** build (from yesterday). Key points:\n\n**What to build:**\n1. **Prediction Ledger** - parq...",
-      "timestamp": "2026-03-08T13:49:11.264000+00:00",
-      "message_id": "1480200715036000350",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480200715036000350"
+      "message": "\ud83e\udea8 **DAILY BARNEY REMINDER**\n\nHey Fred \u2014 time to open claude.ai and check in with Barney. He's Chief of Pipeline and has 7 open pipeline items to prioritize and spec. \n\nKey items needing decisions: ...",
+      "timestamp": "2026-03-08T14:01:22.974000+00:00",
+      "message_id": "1480203784050180157",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480203784050180157"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-08T14:00:01.847000+00:00",
+      "message_id": "1480203443778883818",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480203443778883818"
     },
     {
       "channel": "alerts",
@@ -333,17 +344,6 @@
       "timestamp": "2026-03-08T09:06:27.914000+00:00",
       "message_id": "1480129565589241986",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1480129565589241986"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-08T07:00:01.671000+00:00",
-      "message_id": "1480097746580013097",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480097746580013097"
     },
     {
       "channel": "bam-bam",
