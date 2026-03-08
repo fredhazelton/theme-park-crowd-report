@@ -69,6 +69,21 @@ def check_log_for_issues(log_path: Path) -> dict:
     issues = []
     
     if not log_path.exists():
+        # Pipeline runs at 6 AM ET — don't alert before the scheduled run time
+        from zoneinfo import ZoneInfo
+        now_et = datetime.now(ZoneInfo("America/Toronto"))
+        pipeline_hour = 6  # scheduled run hour (ET)
+        if now_et.strftime("%Y-%m-%d") == log_path.stem.replace("daily_pipeline_", "") and now_et.hour < pipeline_hour:
+            return {
+                "log_exists": False,
+                "issues": [{
+                    "type": "NO_LOG_PRE_SCHEDULE",
+                    "severity": "info",
+                    "message": f"No pipeline log yet — scheduled run is at {pipeline_hour}:00 AM ET",
+                    "detail": f"Current time: {now_et.strftime('%I:%M %p ET')}. Pipeline has not run yet today.",
+                    "suggestion": "No action needed. Check again after 6:30 AM ET."
+                }]
+            }
         return {
             "log_exists": False,
             "issues": [{
