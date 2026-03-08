@@ -7,6 +7,10 @@ Methodology (v3.1):
 - Fallback_ratio entities: EXCLUDED (no signal)
 - Quantile mapping: with PER-PARK guardrails (configurable stretch factor)
 - MAPE: NOT reported (broken for near-zero actuals)
+
+v3.2 fix: removed legacy fallback to all_forecasts.parquet (v2 file).
+Only reads all_forecasts_v3.parquet now. The v2 file was stale and caused
+today's date to be missing from WTI output.
 """
 
 from __future__ import annotations
@@ -25,7 +29,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     """Calculate WTI from forecasts and historical actuals."""
 
     log.info("="*60)
-    log.info("STEP 9: WTI CALCULATION (v3.1 — per-park stretch)")
+    log.info("STEP 9: WTI CALCULATION (v3.2)")
     log.info("="*60)
 
     results = []
@@ -36,15 +40,13 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         results.append(_compute_historical_wti(cfg, log, pc_sql))
 
     # ── Forecast WTI ──
+    # v3.2: ONLY read v3 forecast file. No fallback to stale v2 file.
     forecast_file = cfg.forecast_dir / "all_forecasts_v3.parquet"
-    if not forecast_file.exists():
-        # Legacy fallback — should not be needed after v3 deployment
-        forecast_file = cfg.forecast_dir / "all_forecasts.parquet"
     if forecast_file.exists():
         with log.timed("forecast WTI"):
             results.append(_compute_forecast_wti(cfg, log, pc_sql, forecast_file))
     else:
-        log.warning(f"No forecast file found — forecast WTI skipped")
+        log.warning(f"No v3 forecast file at {forecast_file} — forecast WTI skipped")
 
     # ── Quantile mapping ──
     if cfg.quantile_mapping and len(results) >= 2:
@@ -75,7 +77,7 @@ def _compute_historical_wti(
     cfg: PipelineConfig, log: PipelineLogger, pc_sql: str
 ) -> pd.DataFrame | None:
     """Compute historical WTI from synthetic actuals + real actuals."""
-    synth_dir = cfg.prod_output_base / "synthetic_actuals"
+    synth_dir = cfg.output_base / "synthetic_actuals"
     if not synth_dir.exists() or not any(synth_dir.glob("*.parquet")):
         log.warning("No synthetic actuals found — historical WTI unavailable")
         return None
@@ -147,7 +149,7 @@ def _compute_forecast_wti(
 ) -> pd.DataFrame | None:
     """Compute forecast WTI from predictions."""
     forecast_str = str(forecast_file).replace("\\", "/")
-    oc_path = cfg.prod_output_base / "operating_calendar" / "operating_calendar.parquet"
+    oc_path = cfg.output_base / "operating_calendar" / "operating_calendar.parquet"
     dimentity_path = cfg.dimension_dir / "dimentity.csv"
 
     excluded_methods = "('fallback_ratio')" if cfg.exclude_fallback_ratio else "('')"
