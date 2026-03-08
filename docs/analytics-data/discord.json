@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T10:30:02Z",
+  "generated_at": "2026-03-08T10:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-08T07:00:01.671000+00:00"
+          "last_active": "2026-03-08T10:30:02.608000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T09:09:09.377000+00:00"
+          "last_active": "2026-03-08T10:30:57.114000+00:00"
         }
       ]
     },
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-08T10:29:57.919000+00:00"
+          "last_active": "2026-03-08T10:33:42.867000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -164,10 +164,10 @@
       "channel_id": "1479351587129262232",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Now let me spawn Gazoo to get the review done right now.",
-      "timestamp": "2026-03-08T10:29:57.919000+00:00",
-      "message_id": "1480150579073388585",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480150579073388585"
+      "message": "Done. Two fixes applied to the Gazoo scheduler:\n\n1. **Switched to `isolated` session + `agentTurn`** \u2014 no more depending on my heartbeat to pick up the work. It'll run in its own session and actual...",
+      "timestamp": "2026-03-08T10:33:42.867000+00:00",
+      "message_id": "1480151522573680671",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480151522573680671"
     },
     {
       "channel": "gazoo",
@@ -175,10 +175,10 @@
       "channel_id": "1479351587129262232",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "The scheduler cron fired at 12:05 AM today but `durationMs: 1` \u2014 it just delivered the wake event but I never actually processed it (the instructions to create the one-shot cron jobs never ran). Sa...",
-      "timestamp": "2026-03-08T10:29:55.750000+00:00",
-      "message_id": "1480150569975939104",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480150569975939104"
+      "message": "Gazoo's review just dropped \u2014 **4/10**, ouch. Biggest issue: the pipeline's been stuck for 4+ hours on Julia training with 94M rows, so users are getting stale data. He also flagged IA and EU as di...",
+      "timestamp": "2026-03-08T10:33:42.702000+00:00",
+      "message_id": "1480151521881751572",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480151521881751572"
     },
     {
       "channel": "gazoo",
@@ -186,10 +186,32 @@
       "channel_id": "1479351587129262232",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "No `2026-03-08.md` \u2014 the nightly review didn't happen. The scheduler ran at 12:05 AM today and should have created a `gazoo-nightly-random` one-shot cron, but I don't see it in the cron list (it ei...",
-      "timestamp": "2026-03-08T10:29:49.585000+00:00",
-      "message_id": "1480150544118190167",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480150544118190167"
+      "message": "That's a sharp catch. DST is definitely part of this.\n\nTwo things compounded:\n\n1. **The scheduler itself barely ran** \u2014 `gazoo-scheduler` fired at 12:05 AM but `durationMs: 1ms` means the `next-hea...",
+      "timestamp": "2026-03-08T10:33:14.541000+00:00",
+      "message_id": "1480151403765829663",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480151403765829663"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2705 **Daily Park Intel Report Posted**\n\nSuccessfully generated and posted the daily Park Intel report to Discord #park-intel channel. The report includes:\n\n\u2022 **Tomorrow's forecast** (Mon 3/9): Avg WT...",
+      "timestamp": "2026-03-08T10:30:57.114000+00:00",
+      "message_id": "1480150827355344906",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480150827355344906"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-08T10:30:02.608000+00:00",
+      "message_id": "1480150598740344944",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480150598740344944"
     },
     {
       "channel": "fred-wilma",
@@ -212,17 +234,6 @@
       "timestamp": "2026-03-08T09:09:09.163000+00:00",
       "message_id": "1480130241916571721",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480130241916571721"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "## \ud83c\udf05 DAILY IMPROVEMENT SPRINT \u2014 COMPLETED! \u2705\n\n### \ud83c\udfaf MAJOR SUCCESS: Systematic Bias Correction Framework Deployed\n\n**FINAL RESULTS:**\n- **26,160 bias corrections applied** to today's and tomorrow's ...",
-      "timestamp": "2026-03-08T09:09:09.011000+00:00",
-      "message_id": "1480130241279164499",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480130241279164499"
     },
     {
       "channel": "daily-digest",
@@ -300,17 +311,6 @@
       "timestamp": "2026-03-08T06:30:01.406000+00:00",
       "message_id": "1480090195721326622",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480090195721326622"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-08T05:30:02.057000+00:00",
-      "message_id": "1480075098957418536",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480075098957418536"
     },
     {
       "channel": "bam-bam",

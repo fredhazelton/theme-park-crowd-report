@@ -51,12 +51,12 @@
         "forecasts": {
             "status": "done",
             "label": "Forecasts",
-            "detail": "23,607,373 rows, 9 MB"
+            "detail": "23,596,357 rows, 9 MB"
         },
         "wti": {
             "status": "done",
             "label": "WTI",
-            "detail": "54,700 park-dates"
+            "detail": "54,720 park-dates"
         },
         "live_waits": {
             "status": "done",
@@ -116,9 +116,9 @@
         "disk_main_pct": 90,
         "disk_data_pct": 4,
         "db_entities": 1710,
-        "db_forecasts": 23607373,
+        "db_forecasts": 23596357,
         "db_live_waits": 123265857,
-        "db_wti": 54700
+        "db_wti": 54720
     },
-    "last_updated": "2026-03-08T06:30:06.327689"
+    "last_updated": "2026-03-08T06:45:03.860112"
 }
