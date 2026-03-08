@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T19:45:01Z",
+  "generated_at": "2026-03-08T20:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-08T10:33:42.867000+00:00"
+          "last_active": "2026-03-08T19:58:54.337000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "On it \u2014 Gazoo's running his afternoon check now. Should post here in a few minutes. \ud83d\udc7d\n\nAnd yeah, the irony isn't lost on me that the review system designed to catch reliability problems... had a re...",
+      "timestamp": "2026-03-08T19:58:54.337000+00:00",
+      "message_id": "1480293757588082903",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480293757588082903"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Right \u2014 since the scheduler failed at midnight, neither today's AM nor PM one-shot jobs were created. The fix I made kicks in tomorrow at 12:05 AM. Today's a gap day.\n\nLet me spawn him now.",
+      "timestamp": "2026-03-08T19:58:41.233000+00:00",
+      "message_id": "1480293702625923123",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480293702625923123"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "So no afternoon review today?",
+      "timestamp": "2026-03-08T19:58:33.306000+00:00",
+      "message_id": "1480293669377544322",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480293669377544322"
+    },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
@@ -300,39 +333,6 @@
       "timestamp": "2026-03-08T13:45:05.801000+00:00",
       "message_id": "1480199685489688733",
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1480199685489688733"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Done. Two fixes applied to the Gazoo scheduler:\n\n1. **Switched to `isolated` session + `agentTurn`** \u2014 no more depending on my heartbeat to pick up the work. It'll run in its own session and actual...",
-      "timestamp": "2026-03-08T10:33:42.867000+00:00",
-      "message_id": "1480151522573680671",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480151522573680671"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Gazoo's review just dropped \u2014 **4/10**, ouch. Biggest issue: the pipeline's been stuck for 4+ hours on Julia training with 94M rows, so users are getting stale data. He also flagged IA and EU as di...",
-      "timestamp": "2026-03-08T10:33:42.702000+00:00",
-      "message_id": "1480151521881751572",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480151521881751572"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "That's a sharp catch. DST is definitely part of this.\n\nTwo things compounded:\n\n1. **The scheduler itself barely ran** \u2014 `gazoo-scheduler` fired at 12:05 AM but `durationMs: 1ms` means the `next-hea...",
-      "timestamp": "2026-03-08T10:33:14.541000+00:00",
-      "message_id": "1480151403765829663",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480151403765829663"
     },
     {
       "channel": "daily-digest",
