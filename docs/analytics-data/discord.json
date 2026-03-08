@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T12:00:01Z",
+  "generated_at": "2026-03-08T12:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T11:32:08.071000+00:00"
+          "last_active": "2026-03-08T12:00:28.938000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "\u2705 **Daily Competitor Watch Report Completed** **Posted to #competitor-watch:** Brief summary noting quiet Sunday activity across all monitored channels, with recommendation for manual spot-checks o...",
+      "timestamp": "2026-03-08T12:00:28.938000+00:00",
+      "message_id": "1480173358417969314",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480173358417969314"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "\u2705 **Daily System Tasks Completed** **Accuracy Reports:** Sent to Fred on Telegram - Entity MAE: 9.4 min, WTI MAE: 6.7 min - Bias corrections applied (26,160 corrections from early AM) - Notable iss...",
       "timestamp": "2026-03-08T11:32:08.071000+00:00",
       "message_id": "1480166224464707697",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-08T11:31:37.490000+00:00",
       "message_id": "1480166096198832138",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480166096198832138"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udd34 **Pipeline Validation Alert Raised**\n\nCompleted heartbeat checks and found **critical pipeline validation failures**:\n\n**Issues Detected:**\n- **WTI Anomalies:** 20 data anomalies in Animal Kingdo...",
-      "timestamp": "2026-03-08T11:01:35.041000+00:00",
-      "message_id": "1480158536179908681",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480158536179908681"
     },
     {
       "channel": "alerts",
