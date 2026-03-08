@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T07:30:01Z",
+  "generated_at": "2026-03-08T07:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T07:07:55.692000+00:00"
+          "last_active": "2026-03-08T07:37:56.075000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170994 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-08T07:37:56.075000+00:00",
+      "message_id": "1480107286121938954",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480107286121938954"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170951 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-08T07:07:55.692000+00:00",
       "message_id": "1480099734768193648",
@@ -190,17 +201,6 @@
       "timestamp": "2026-03-08T07:00:01.671000+00:00",
       "message_id": "1480097746580013097",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480097746580013097"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Everything's running fine:\n\n- **Bot:** \u2705 9h uptime\n- **Scraper:** \u2705 7h uptime (the one we fixed earlier)\n- **Gateway:** \u2705 7h uptime\n- **V3 shadow pipeline:** \u2705 Finished \u2014 all 430 models trained\n\nI ...",
-      "timestamp": "2026-03-08T06:54:16.212000+00:00",
-      "message_id": "1480096297620082802",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480096297620082802"
     },
     {
       "channel": "alerts",
