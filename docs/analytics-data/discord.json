@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T05:00:01Z",
+  "generated_at": "2026-03-08T05:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T03:52:17.370000+00:00"
+          "last_active": "2026-03-08T05:06:05.124000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-07T23:06:18.846000+00:00"
+          "last_active": "2026-03-08T05:07:24.794000+00:00"
         }
       ]
     },
@@ -96,7 +96,7 @@
           "emoji": "\ud83c\udfcf",
           "purpose": "Bam-Bam's workspace \u2014 coding tasks, Discord bot development",
           "url": "https://discord.com/channels/1479350342318690505/1479351580347072675",
-          "last_active": "2026-03-08T03:56:46.821000+00:00"
+          "last_active": "2026-03-08T05:05:27.753000+00:00"
         },
         {
           "name": "barney",
@@ -158,6 +158,61 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Yeah, my bad \u2014 the alert script had no concept of the pipeline schedule. Fixed it. Now it returns a quiet `info` instead of screaming `critical` when there's no log before 6 AM. Won't happen again. \ud83e\uddb4",
+      "timestamp": "2026-03-08T05:07:24.794000+00:00",
+      "message_id": "1480069406183784491",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480069406183784491"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "No more false `critical` for missing log before 6 AM. The `warning` is from yesterday's recovered forecast issue \u2014 that'll clear after tomorrow's clean run.",
+      "timestamp": "2026-03-08T05:07:17.289000+00:00",
+      "message_id": "1480069374705664090",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480069374705664090"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Good \u2014 `info` severity won't trigger `critical` or `warning` status, so the overall result will be `ok`. Let me verify it works:",
+      "timestamp": "2026-03-08T05:07:13.537000+00:00",
+      "message_id": "1480069358968635524",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480069358968635524"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udea8 **CRITICAL PIPELINE ISSUE FOUND**\n\n**Problem:** Pipeline has NOT run today (2026-03-08) - no log file exists\n**Impact:** Data stale (WTI & forecasts 6+ hours old)\n**Action taken:** \n- \u2705 Alerted #...",
+      "timestamp": "2026-03-08T05:06:05.124000+00:00",
+      "message_id": "1480069072023720081",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480069072023720081"
+    },
+    {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83c\udfa8 **Rendering request from Fred:** Apple Weather-style crowd report images\n\nCheck the new post in <#1479351603193450648> for full details. TL;DR \u2014 generate mockup images that look like iOS Weather ...",
+      "timestamp": "2026-03-08T05:05:27.753000+00:00",
+      "message_id": "1480068915278123152",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480068915278123152"
+    },
     {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
@@ -225,17 +280,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480051611098284145"
     },
     {
-      "channel": "bam-bam",
-      "channel_emoji": "\ud83c\udfcf",
-      "channel_id": "1479351580347072675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "- Shows: emoji, park name, WTI score, label, and lowest-wait ride\n- Footer with date + themeparkcrowdreport.com\n- Navy background with subtle grid + wave animations\n\n\ud83d\udcc1 **`scripts/render_daily_wti.s...",
-      "timestamp": "2026-03-08T03:56:41.627000+00:00",
-      "message_id": "1480051609051332729",
-      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480051609051332729"
-    },
-    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -267,50 +311,6 @@
       "timestamp": "2026-03-08T00:00:01.502000+00:00",
       "message_id": "1479992049410380028",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479992049410380028"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udc3b **New Barney Message Found!** \n\nForwarded major assignment to #fred-wilma: **Model Competition Framework** - Barney's been tasked with building a comprehensive challenger system for model competi...",
-      "timestamp": "2026-03-07T23:59:22.039000+00:00",
-      "message_id": "1479991883890430035",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1479991883890430035"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The OOM kills on March 5-6 were the bigger problem \u2014 Julia tried loading 94M rows (~33-50GB) into memory on a 62GB server. That was fixed with DuckDB streaming + pre-split per-park chunks. The OOM ...",
-      "timestamp": "2026-03-07T23:06:18.846000+00:00",
-      "message_id": "1479978532611428583",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479978532611428583"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Today's issues were a chain reaction from one root cause:\n\n**\ud83d\udd34 Root cause: Forecast crash from missing `import os`**\nThe training step completed fine at 6:52 AM, but `forecast_vectorized.py` crashe...",
-      "timestamp": "2026-03-07T23:06:18.658000+00:00",
-      "message_id": "1479978531823030605",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479978531823030605"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now I have the full picture. Let me give Fred a clear answer:",
-      "timestamp": "2026-03-07T23:06:05.328000+00:00",
-      "message_id": "1479978475912822811",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1479978475912822811"
     },
     {
       "channel": "pipeline",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 4,
-    "messages_today": 10
+    "active_channels_today": 5,
+    "messages_today": 14
   }
 }

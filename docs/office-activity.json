@@ -4,8 +4,8 @@
     "task": "Morning check-in, reviewing overnight issues"
   },
   "wilma": {
-    "last_active": "2026-03-08T04:43:49.498402+00:00",
-    "task": "heartbeat check"
+    "last_active": "2026-03-08T05:13:42.669508+00:00",
+    "task": "monitoring pipeline restart"
   },
   "barney": {},
   "bambam": {},
