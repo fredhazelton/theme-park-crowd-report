@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T20:45:01Z",
+  "generated_at": "2026-03-08T21:00:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-08T20:02:34.873000+00:00"
+          "last_active": "2026-03-08T20:50:48.593000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -164,32 +164,32 @@
       "channel_id": "1479351587129262232",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "**Agent Grades:**\n- \ud83e\uddb4 Wilma: **7/10** \u2014 Good v3 orchestration, but didn't kill v2 cron before swap\n- \ud83c\udf80 Pebbles: **N/A** \u2014 No visual work today\n- \u270d\ufe0f Betty: **7/10** \u2014 Blog posts live, could write mo...",
+      "timestamp": "2026-03-08T20:50:48.593000+00:00",
+      "message_id": "1480306819724345455",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480306819724345455"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udc7d **Gazoo's Afternoon Review \u2014 March 8, 2026**\n\n**Verdict: \ud83d\udd27 Morning Dumpster Fire \u2192 Afternoon Salvage Operation (6/10, up from 4)**\n\n**Progress vs AM Issues:**\n- \u2705 Pipeline \"stuck 4+ hours\" \u2014 RESO...",
+      "timestamp": "2026-03-08T20:50:48.417000+00:00",
+      "message_id": "1480306818986021077",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480306818986021077"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "Gazoo's afternoon review just dropped \u2014 **6.5/10**. He corrected himself on the AM \"stuck pipeline\" call (it was mid-run, not stuck), gave props for the v3 deploy, but is nagging about bias correct...",
       "timestamp": "2026-03-08T20:02:34.873000+00:00",
       "message_id": "1480294682582843482",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480294682582843482"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "1. **Run Barney's v4-accuracy shadow test.** It's been sitting there 24 hours.\n2. **No pipeline watchdog** \u2014 if it actually gets stuck, nobody knows\n3. **Model Competition Framework** starts tomorr...",
-      "timestamp": "2026-03-08T20:02:19.185000+00:00",
-      "message_id": "1480294616782737498",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480294616782737498"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "### What Went Right Since AM\n\n\ud83d\ude80 **Pipeline v3 DEPLOYED** (10:16 AM) \u2014 970s total, forecast 74s (was 2,540s \u2014 34x faster). All 12 steps passed. This is the day's crown jewel.\n\n\ud83d\udc1b **\"Today\" Bug Fixed*...",
-      "timestamp": "2026-03-08T20:02:18.914000+00:00",
-      "message_id": "1480294615646212188",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480294615646212188"
     },
     {
       "channel": "fred-wilma",
