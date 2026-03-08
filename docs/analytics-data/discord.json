@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T00:00:01Z",
+  "generated_at": "2026-03-08T00:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-07T15:30:01.469000+00:00"
+          "last_active": "2026-03-08T00:00:01.502000+00:00"
         },
         {
           "name": "daily-digest",
@@ -158,6 +158,17 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-08T00:00:01.502000+00:00",
+      "message_id": "1479992049410380028",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479992049410380028"
+    },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
@@ -313,17 +324,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479856155785429068"
     },
     {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-07T14:30:01.985000+00:00",
-      "message_id": "1479848606239424678",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479848606239424678"
-    },
-    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 0,
-    "messages_today": 0
+    "active_channels_today": 1,
+    "messages_today": 1
   }
 }
