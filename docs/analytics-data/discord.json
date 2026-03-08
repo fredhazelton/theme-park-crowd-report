@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T11:00:01Z",
+  "generated_at": "2026-03-08T11:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T10:30:57.114000+00:00"
+          "last_active": "2026-03-08T11:01:35.041000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-08T06:45:48.117000+00:00"
+          "last_active": "2026-03-08T11:01:04.377000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udd34 **Pipeline Validation Alert Raised**\n\nCompleted heartbeat checks and found **critical pipeline validation failures**:\n\n**Issues Detected:**\n- **WTI Anomalies:** 20 data anomalies in Animal Kingdo...",
+      "timestamp": "2026-03-08T11:01:35.041000+00:00",
+      "message_id": "1480158536179908681",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480158536179908681"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Report: `/mnt/data/pipeline/pipeline_validation/validation_report.json`",
+      "timestamp": "2026-03-08T11:01:04.377000+00:00",
+      "message_id": "1480158407565508733",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480158407565508733"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udd34 **Pipeline Validation Alert**\n\nPipeline completed successfully but **validation failed** with 2 issues:\n\n**1. WTI Anomaly Detection (FAIL)**\n- 20 anomalies detected in Animal Kingdom (AK) histori...",
+      "timestamp": "2026-03-08T11:01:04.303000+00:00",
+      "message_id": "1480158407255261194",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480158407255261194"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -236,17 +269,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480130242814152788"
     },
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "### \ud83d\udcbb Technical Deliverables:\n1. **Comprehensive framework:** `bias_correction_framework.py` (16KB)\n2. **Production system:** `quick_bias_analysis.py` (7.6KB) \n3. **Analysis files:** Full bias anal...",
-      "timestamp": "2026-03-08T09:09:09.163000+00:00",
-      "message_id": "1480130241916571721",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480130241916571721"
-    },
-    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -289,28 +311,6 @@
       "timestamp": "2026-03-08T06:45:48.117000+00:00",
       "message_id": "1480094166514925720",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480094166514925720"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good. Now the real fix \u2014 the script was already working, but **I** was the problem. I generated that false alert from my own reasoning during a heartbeat without actually checking the script. Let m...",
-      "timestamp": "2026-03-08T06:45:42.956000+00:00",
-      "message_id": "1480094144868253869",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480094144868253869"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now go back to v3 branch:",
-      "timestamp": "2026-03-08T06:45:38.858000+00:00",
-      "message_id": "1480094127679864995",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480094127679864995"
     },
     {
       "channel": "bam-bam",
