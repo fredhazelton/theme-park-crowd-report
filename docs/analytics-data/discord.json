@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T21:45:01Z",
+  "generated_at": "2026-03-08T22:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T18:38:55.922000+00:00"
+          "last_active": "2026-03-08T21:52:10.465000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Everything's solid. Here's your priority stack right now:\n\n**\ud83d\udd34 #1 \u2014 Marketing sprint (30 min)**\nDay 1 of 14. You joined the r/waltdisneyworld Discord today \u2014 great move. Now convert that into actio...",
+      "timestamp": "2026-03-08T21:52:10.465000+00:00",
+      "message_id": "1480322262614933504",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480322262614933504"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Everything's healthy \u2014 bot up 24h, scraper up 22h, data fresh, Gazoo did both reviews today. \u2705\n\nNow for what you should be working on \u2014 let me check the sprint:",
+      "timestamp": "2026-03-08T21:51:55.347000+00:00",
+      "message_id": "1480322199205449738",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480322199205449738"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Everything good? Anything I should be working on right now",
+      "timestamp": "2026-03-08T21:51:39.705000+00:00",
+      "message_id": "1480322133598142667",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480322133598142667"
+    },
+    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -190,39 +223,6 @@
       "timestamp": "2026-03-08T20:02:34.873000+00:00",
       "message_id": "1480294682582843482",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480294682582843482"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Today's PM review is already queued. Tomorrow the full system kicks in. \ud83e\uddb4\ud83d\udc7d",
-      "timestamp": "2026-03-08T18:38:55.922000+00:00",
-      "message_id": "1480273631576588478",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480273631576588478"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "All set. Here's the system:\n\n**Daily Gazoo Reviews \u2014 Redesigned:**\n\n```\n| Component              | What                                                        | When                       |\n| -----...",
-      "timestamp": "2026-03-08T18:38:55.726000+00:00",
-      "message_id": "1480273630754767071",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480273630754767071"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me verify the today's afternoon job is still in place:",
-      "timestamp": "2026-03-08T18:38:44.244000+00:00",
-      "message_id": "1480273582595641568",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480273582595641568"
     },
     {
       "channel": "daily-digest",
