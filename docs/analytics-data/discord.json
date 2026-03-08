@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T05:15:01Z",
+  "generated_at": "2026-03-08T05:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-08T05:00:01.630000+00:00"
+          "last_active": "2026-03-08T05:30:02.057000+00:00"
         },
         {
           "name": "daily-digest",
@@ -158,6 +158,17 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-08T05:30:02.057000+00:00",
+      "message_id": "1480075098957418536",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480075098957418536"
+    },
     {
       "channel": "alerts",
       "channel_emoji": "\ud83d\udea8",
@@ -346,17 +357,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479947995603796141"
     },
     {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-07T15:30:01.469000+00:00",
-      "message_id": "1479863703569436844",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1479863703569436844"
-    },
-    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -382,6 +382,6 @@
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 5,
-    "messages_today": 14
+    "messages_today": 15
   }
 }
