@@ -61,7 +61,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     log.info("STEP 8: FORECAST GENERATION (v3.2 — pre-indexed)")
     log.info("=" * 60)
 
-    start_date = date.today() + timedelta(days=1)
+    start_date = date.today()  # Include today — users ask about "today" and need predicted values
     end_date = start_date + timedelta(days=cfg.forecast_days)
     log.info(f"Forecast range: {start_date} to {end_date} ({cfg.forecast_days} days)")
 
