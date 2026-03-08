@@ -1,10 +1,9 @@
-"""Step 7: Model Training — v4 with smart synthetic weighting + model selection.
+"""Step 7: Model Training — v4 with school calendar features + model selection.
 
 v3: One model per entity (actuals-first, 5 features).
-v4: Three candidates per entity, best MAE wins. Synthetic quality scoring
-    filters out entities where synthetic data hurts accuracy.
-
-Pillars 1 + 2 of v4 accuracy improvements.
+v4: Four candidates per entity including calendar_aware. Best MAE wins.
+    Synthetic quality scoring filters bad synthetic data.
+    School calendar pct_on_break enriches training data.
 """
 
 from __future__ import annotations
@@ -28,6 +27,10 @@ from pipeline_v3.core.park_codes import entity_to_park
 from pipeline_v3.core.validation import ValidationError
 from pipeline_v3.models.model_selector import train_best_model
 from pipeline_v3.models.synthetic_scorer import score_synthetic_quality
+from pipeline_v3.models.school_calendar_feature import (
+    enrich_with_school_calendar,
+    get_calendar_coverage_stats,
+)
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
@@ -37,8 +40,18 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         raise ValidationError("XGBoost is required. pip install xgboost")
 
     log.info("=" * 60)
-    log.info("STEP 7: MODEL TRAINING (v4 — multi-candidate + synthetic scoring)")
+    log.info("STEP 7: MODEL TRAINING (v4 — calendar-aware + model selection)")
     log.info("=" * 60)
+
+    # === Check school calendar data availability ===
+    cal_stats = get_calendar_coverage_stats(cfg)
+    if cal_stats["available"]:
+        log.info(f"School calendar data: {cal_stats['days']} days loaded from {cal_stats['path']}")
+        log.info(f"  Break days (>15%): {cal_stats['break_days']}")
+        log.info(f"  calendar_aware candidate: ENABLED")
+    else:
+        log.warning("School calendar data: NOT FOUND — calendar_aware candidate disabled")
+        log.warning("  Place daily_aggregate_v3.csv in data/school_schedules/ or state/ dir")
 
     # === Pillar 1: Score synthetic quality ===
     with log.timed("synthetic quality scoring"):
@@ -46,7 +59,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     n_real_only = sum(1 for s in synth_scores.values() if not s["use_synthetic"])
     log.info(f"Synthetic scoring: {n_real_only} entities flagged for real-only training")
 
-    # Look for per-park training data (preferred) or single file
+    # Look for per-park training data
     actuals_dir = cfg.output_base / "matched_pairs" / "actuals_training_v2"
     actuals_single = cfg.output_base / "matched_pairs" / "actuals_training_v2.parquet"
 
@@ -78,6 +91,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     failed = 0
     total_mae = 0.0
     method_counts: dict[str, int] = {}
+    calendar_wins = 0  # How many entities picked calendar_aware
 
     for park_code in sorted(park_entity_map.keys()):
         park_entities = park_entity_map[park_code]
@@ -93,6 +107,10 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 park_df = pd.read_parquet(actuals_single)
                 park_df = park_df[park_df["entity_code"].isin(park_entities)]
 
+            # === Enrich park data with school calendar features ===
+            if cal_stats["available"]:
+                park_df = enrich_with_school_calendar(park_df, cfg)
+
             for entity_code in park_entities:
                 try:
                     entity_df = park_df[park_df["entity_code"] == entity_code].copy()
@@ -106,10 +124,10 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                             if before != after:
                                 log.info(f"  {entity_code}: dropped {before - after} synthetic rows (bias={synth_scores[entity_code]['bias']:.1f})")
 
-                    # === Pillar 2: Multi-candidate model selection ===
-                    min_obs = cfg.training_min_obs_lite
+                    # === Pillar 2: Multi-candidate model selection (now with calendar_aware) ===
                     result = train_best_model(
-                        entity_code, entity_df, cfg.models_dir, cfg, min_samples=min_obs
+                        entity_code, entity_df, cfg.models_dir, cfg,
+                        min_samples=cfg.training_min_obs_lite
                     )
 
                     if result is not None:
@@ -117,6 +135,8 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                         total_mae += result["mae"]
                         method = result.get("method", "unknown")
                         method_counts[method] = method_counts.get(method, 0) + 1
+                        if method == "calendar_aware":
+                            calendar_wins += 1
                     else:
                         failed += 1
 
@@ -134,10 +154,14 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     log.info(f"Average MAE: {avg_mae:.2f} min")
     log.info(f"Model selection breakdown:")
     for method, count in sorted(method_counts.items()):
-        log.info(f"  {method}: {count} entities")
+        pct = count / successful * 100 if successful else 0
+        log.info(f"  {method}: {count} entities ({pct:.1f}%)")
+    if calendar_wins > 0:
+        log.info(f"\n  🎯 School calendar feature won for {calendar_wins} entities!")
     log.metric("training_successful", successful)
     log.metric("training_failed", failed)
     log.metric("training_avg_mae", round(avg_mae, 2))
+    log.metric("calendar_aware_wins", calendar_wins)
     log.info("=" * 60)
 
     return {
@@ -146,7 +170,9 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         "failed": failed,
         "avg_mae": round(avg_mae, 2),
         "method_counts": method_counts,
+        "calendar_aware_wins": calendar_wins,
         "real_only_entities": n_real_only,
+        "school_calendar_available": cal_stats["available"],
     }
 
 

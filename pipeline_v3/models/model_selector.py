@@ -3,14 +3,17 @@
 Pillar 2 of v4 accuracy improvements.
 
 For each entity, trains multiple model candidates with different feature sets
-and picks the one with lowest holdout MAE. This fixes the UH regression where
-v3's actuals-first model was 3-7x worse than Julia's v2-style model.
+and picks the one with lowest holdout MAE.
 
 Candidates:
-1. actuals_first: 5 features (mins_since_6am, mins_since_open, date_group_id_encoded,
-   season_encoded, season_year_encoded) — current v3 default
-2. full_feature: 7 features (adds posted_time, hour_of_day) — v2 style
-3. lite: 2 features (mins_since_6am, mins_since_open) — low-data fallback
+1. actuals_first: 5 features (current v3 default)
+2. full_feature: 7 features (adds posted_time, hour_of_day)
+3. calendar_aware: 8 features (actuals_first + pct_on_break, is_break_season, break_intensity)
+4. lite: 2 features (mins_since_6am, mins_since_open) — low-data fallback
+
+The calendar_aware candidate is v4's key innovation: school calendar data as a
+training feature. If knowing what % of students are on break improves predictions
+for an entity, the model selector will pick it automatically.
 """
 
 from __future__ import annotations
@@ -40,6 +43,11 @@ CANDIDATES = {
         "hour_of_day", "date_group_id_encoded", "season_encoded",
         "season_year_encoded",
     ],
+    "calendar_aware": [
+        "mins_since_6am", "mins_since_open",
+        "date_group_id_encoded", "season_encoded", "season_year_encoded",
+        "pct_on_break", "is_break_season", "break_intensity",
+    ],
     "lite": [
         "mins_since_6am", "mins_since_open",
     ],
@@ -63,8 +71,12 @@ def train_best_model(
 
     # Clean data once
     entity_df = entity_df.copy()
-    for col in ["mins_since_6am", "mins_since_open", "date_group_id_encoded",
-                "season_encoded", "season_year_encoded", "posted_time", "hour_of_day"]:
+    all_possible_features = [
+        "mins_since_6am", "mins_since_open", "date_group_id_encoded",
+        "season_encoded", "season_year_encoded", "posted_time", "hour_of_day",
+        "pct_on_break", "is_break_season", "break_intensity",
+    ]
+    for col in all_possible_features:
         if col in entity_df.columns:
             entity_df[col] = pd.to_numeric(entity_df[col], errors="coerce").fillna(0)
     entity_df["actual_time"] = pd.to_numeric(entity_df["actual_time"], errors="coerce")
@@ -188,6 +200,7 @@ def train_best_model(
         "mae": round(best_mae, 3),
         "features": best_features,
         "model_selection_method": best_method,
+        "uses_school_calendar": "pct_on_break" in (best_features or []),
         "candidates_evaluated": list(CANDIDATES.keys()),
         "uses_geo_decay_weights": True,
         "geo_decay_halflife_days": cfg.geo_decay_halflife_days,
