@@ -36,10 +36,10 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         results.append(_compute_historical_wti(cfg, log, pc_sql))
 
     # ── Forecast WTI ──
-    forecast_file = cfg.forecast_dir / "all_forecasts.parquet"
+    forecast_file = cfg.forecast_dir / "all_forecasts_v3.parquet"
     if not forecast_file.exists():
-        # Also check for v3 forecast
-        forecast_file = cfg.forecast_dir / "all_forecasts_v3.parquet"
+        # Legacy fallback — should not be needed after v3 deployment
+        forecast_file = cfg.forecast_dir / "all_forecasts.parquet"
     if forecast_file.exists():
         with log.timed("forecast WTI"):
             results.append(_compute_forecast_wti(cfg, log, pc_sql, forecast_file))
