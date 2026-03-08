@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T09:00:01Z",
+  "generated_at": "2026-03-08T09:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -30,7 +30,7 @@
           "emoji": "\ud83d\udcf0",
           "purpose": "Automated daily summary \u2014 pipeline health, accuracy metrics, task progress",
           "url": "https://discord.com/channels/1479350342318690505/1479351571656474756",
-          "last_active": "2026-03-07T13:49:06.634000+00:00"
+          "last_active": "2026-03-08T09:06:28.087000+00:00"
         },
         {
           "name": "fred-wilma",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T07:37:56.075000+00:00"
+          "last_active": "2026-03-08T09:09:09.377000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170994 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-08T07:37:56.075000+00:00",
-      "message_id": "1480107286121938954",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480107286121938954"
+      "message": "The system is now serving significantly more accurate predictions to users! \ud83c\udfaf",
+      "timestamp": "2026-03-08T09:09:09.377000+00:00",
+      "message_id": "1480130242814152788",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480130242814152788"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170951 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-08T07:07:55.692000+00:00",
-      "message_id": "1480099734768193648",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480099734768193648"
+      "message": "### \ud83d\udcbb Technical Deliverables:\n1. **Comprehensive framework:** `bias_correction_framework.py` (16KB)\n2. **Production system:** `quick_bias_analysis.py` (7.6KB) \n3. **Analysis files:** Full bias anal...",
+      "timestamp": "2026-03-08T09:09:09.163000+00:00",
+      "message_id": "1480130241916571721",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480130241916571721"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,32 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170732 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-08T07:01:29.859000+00:00",
-      "message_id": "1480098116467294269",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480098116467294269"
+      "message": "## \ud83c\udf05 DAILY IMPROVEMENT SPRINT \u2014 COMPLETED! \u2705\n\n### \ud83c\udfaf MAJOR SUCCESS: Systematic Bias Correction Framework Deployed\n\n**FINAL RESULTS:**\n- **26,160 bias corrections applied** to today's and tomorrow's ...",
+      "timestamp": "2026-03-08T09:09:09.011000+00:00",
+      "message_id": "1480130241279164499",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480130241279164499"
+    },
+    {
+      "channel": "daily-digest",
+      "channel_emoji": "\ud83d\udcf0",
+      "channel_id": "1479351571656474756",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2022 Created comprehensive framework + fast production system\n\n**Inspired By:** Accuracy drift monitoring showing systematic bias + Gazoo's pipeline review\n\n**Tomorrow's Candidate:** Park-specific bia...",
+      "timestamp": "2026-03-08T09:06:28.087000+00:00",
+      "message_id": "1480129566315122758",
+      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1480129566315122758"
+    },
+    {
+      "channel": "daily-digest",
+      "channel_emoji": "\ud83d\udcf0",
+      "channel_id": "1479351571656474756",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83c\udf05 **Daily Improvement Report \u2014 March 8, 2026**\n\n**What I Built:** Systematic Bias Correction Framework \u2014 analyzed 365K accuracy records and applied corrections to fix persistent over/under-predicti...",
+      "timestamp": "2026-03-08T09:06:27.914000+00:00",
+      "message_id": "1480129565589241986",
+      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1480129565589241986"
     },
     {
       "channel": "mission-control",
@@ -355,33 +377,11 @@
       "timestamp": "2026-03-07T21:04:58.256000+00:00",
       "message_id": "1479947995603796141",
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1479947995603796141"
-    },
-    {
-      "channel": "daily-digest",
-      "channel_emoji": "\ud83d\udcf0",
-      "channel_id": "1479351571656474756",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**\ud83d\udccb No new Barney messages since 4am session**\n\nForecast + WTI refresh in progress \u2014 will update when complete.",
-      "timestamp": "2026-03-07T13:49:06.634000+00:00",
-      "message_id": "1479838307751035052",
-      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1479838307751035052"
-    },
-    {
-      "channel": "daily-digest",
-      "channel_emoji": "\ud83d\udcf0",
-      "channel_id": "1479351571656474756",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83c\udf05 **Morning Catchup \u2014 March 7, 2026**\n\n*Delayed due to heartbeat misconfiguration (fixed!)*\n\n**\ud83d\udcca Accuracy (yesterday, Mar 6)**\nOverall: MAE 6.4 | Bias +5.2 (overpredicting)\n\ud83d\udd34 IA: +17.1 | EU: +15.1 ...",
-      "timestamp": "2026-03-07T13:49:06.348000+00:00",
-      "message_id": "1479838306551464098",
-      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1479838306551464098"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 5,
-    "messages_today": 15
+    "active_channels_today": 6,
+    "messages_today": 17
   }
 }
