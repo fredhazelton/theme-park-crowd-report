@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T06:30:01Z",
+  "generated_at": "2026-03-08T07:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-08T06:30:01.406000+00:00"
+          "last_active": "2026-03-08T07:00:01.671000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T05:06:05.124000+00:00"
+          "last_active": "2026-03-08T06:54:16.212000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-08T05:07:24.794000+00:00"
+          "last_active": "2026-03-08T06:45:48.117000+00:00"
         }
       ]
     },
@@ -165,6 +165,83 @@
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
       "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-08T07:00:01.671000+00:00",
+      "message_id": "1480097746580013097",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480097746580013097"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Everything's running fine:\n\n- **Bot:** \u2705 9h uptime\n- **Scraper:** \u2705 7h uptime (the one we fixed earlier)\n- **Gateway:** \u2705 7h uptime\n- **V3 shadow pipeline:** \u2705 Finished \u2014 all 430 models trained\n\nI ...",
+      "timestamp": "2026-03-08T06:54:16.212000+00:00",
+      "message_id": "1480096297620082802",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480096297620082802"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Yeah, sorry about that \u2014 those stray messages at the bottom were context from a heartbeat check that leaked into my reply instead of being handled separately. Sloppy on my part, not a compaction is...",
+      "timestamp": "2026-03-08T06:53:56.396000+00:00",
+      "message_id": "1480096214505623705",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480096214505623705"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "You ok? Not sure what the above messages mean you might need to adjust your compaction schedule.",
+      "timestamp": "2026-03-08T06:53:46.823000+00:00",
+      "message_id": "1480096174353551373",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480096174353551373"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Sorry about that. The script fix was actually working \u2014 the false alert came from **me**, not the script. I generated that \"CRITICAL: Pipeline Missing\" message from my own heartbeat reasoning witho...",
+      "timestamp": "2026-03-08T06:45:48.117000+00:00",
+      "message_id": "1480094166514925720",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480094166514925720"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Good. Now the real fix \u2014 the script was already working, but **I** was the problem. I generated that false alert from my own reasoning during a heartbeat without actually checking the script. Let m...",
+      "timestamp": "2026-03-08T06:45:42.956000+00:00",
+      "message_id": "1480094144868253869",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480094144868253869"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now go back to v3 branch:",
+      "timestamp": "2026-03-08T06:45:38.858000+00:00",
+      "message_id": "1480094127679864995",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480094127679864995"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
       "timestamp": "2026-03-08T06:30:01.406000+00:00",
       "message_id": "1480090195721326622",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480090195721326622"
@@ -181,50 +258,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480075098957418536"
     },
     {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Yeah, my bad \u2014 the alert script had no concept of the pipeline schedule. Fixed it. Now it returns a quiet `info` instead of screaming `critical` when there's no log before 6 AM. Won't happen again. \ud83e\uddb4",
-      "timestamp": "2026-03-08T05:07:24.794000+00:00",
-      "message_id": "1480069406183784491",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480069406183784491"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "No more false `critical` for missing log before 6 AM. The `warning` is from yesterday's recovered forecast issue \u2014 that'll clear after tomorrow's clean run.",
-      "timestamp": "2026-03-08T05:07:17.289000+00:00",
-      "message_id": "1480069374705664090",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480069374705664090"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good \u2014 `info` severity won't trigger `critical` or `warning` status, so the overall result will be `ok`. Let me verify it works:",
-      "timestamp": "2026-03-08T05:07:13.537000+00:00",
-      "message_id": "1480069358968635524",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480069358968635524"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **CRITICAL PIPELINE ISSUE FOUND**\n\n**Problem:** Pipeline has NOT run today (2026-03-08) - no log file exists\n**Impact:** Data stale (WTI & forecasts 6+ hours old)\n**Action taken:** \n- \u2705 Alerted #...",
-      "timestamp": "2026-03-08T05:06:05.124000+00:00",
-      "message_id": "1480069072023720081",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480069072023720081"
-    },
-    {
       "channel": "bam-bam",
       "channel_emoji": "\ud83c\udfcf",
       "channel_id": "1479351580347072675",
@@ -234,17 +267,6 @@
       "timestamp": "2026-03-08T05:05:27.753000+00:00",
       "message_id": "1480068915278123152",
       "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480068915278123152"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-08T05:00:01.630000+00:00",
-      "message_id": "1480067547419250822",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480067547419250822"
     },
     {
       "channel": "gazoo",
@@ -300,28 +322,6 @@
       "timestamp": "2026-03-08T03:56:42.115000+00:00",
       "message_id": "1480051611098284145",
       "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480051611098284145"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udcdd **Content Review Alert Sent**\n\n**Extended heartbeat completed with action:**\n- \u2705 Bot health: healthy  \n- \u2705 Pipeline freshness: ok (caught up after being 2.5h overdue)\n- \u2705 Stale tasks: none found\n...",
-      "timestamp": "2026-03-08T03:52:17.370000+00:00",
-      "message_id": "1480050500677406853",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480050500677406853"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udcdd **Content Review Pending**\n\nThere's a blog post in #content-review awaiting your approval:\n\n**\"Spring Break 2026 at Disney World: Which Week Should You Avoid?\"**  \n- ~950 words, ready for publish...",
-      "timestamp": "2026-03-08T03:51:58.586000+00:00",
-      "message_id": "1480050421891600416",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480050421891600416"
     },
     {
       "channel": "pipeline",
