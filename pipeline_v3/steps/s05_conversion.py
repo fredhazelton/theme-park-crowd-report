@@ -67,20 +67,20 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
             df = con.execute(f"""
                 WITH posted AS (
                     SELECT entity_code, park_date,
-                           EXTRACT(HOUR FROM time_slot_start) as hour_bucket,
+                           EXTRACT(HOUR FROM observed_at_ts) as hour_bucket,
                            AVG(wait_time_minutes) as posted_wait
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
-                      AND time_slot_start IS NOT NULL
+                      AND observed_at_ts IS NOT NULL
                     GROUP BY entity_code, park_date, hour_bucket
                 ),
                 actual AS (
                     SELECT entity_code, park_date,
-                           EXTRACT(HOUR FROM time_slot_start) as hour_bucket,
+                           EXTRACT(HOUR FROM observed_at_ts) as hour_bucket,
                            AVG(wait_time_minutes) as actual_wait
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_type = 'ACTUAL' AND wait_time_minutes > 0
-                      AND time_slot_start IS NOT NULL
+                      AND observed_at_ts IS NOT NULL
                     GROUP BY entity_code, park_date, hour_bucket
                 )
                 SELECT p.posted_wait, a.actual_wait
