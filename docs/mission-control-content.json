@@ -94,17 +94,17 @@
         "services": [
             {
                 "name": "tpcr-discord-bot",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Discord bot"
             },
             {
                 "name": "chat-server",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Stream overlay"
             },
             {
                 "name": "twitch-chat",
-                "status": "active",
+                "status": "unknown",
                 "detail": "Stream overlay"
             },
             {
@@ -120,5 +120,5 @@
         "db_live_waits": 123206991,
         "db_wti": 54712
     },
-    "last_updated": "2026-03-07T20:20:35.820987"
+    "last_updated": "2026-03-07T20:30:05.113714"
 }
