@@ -1,13 +1,13 @@
 {
-  "updated": "2026-03-07T15:39:08.763590+00:00",
+  "updated": "2026-03-08T08:08:53.542614+00:00",
   "agents": [
     {
       "id": "fred",
       "name": "Fred",
       "icon": "🧔",
-      "state": "idle",
-      "zone": "tarpit-1",
-      "task": "Away",
+      "state": "resting",
+      "zone": "rest",
+      "task": "Sleeping 😴",
       "color": "#facc15"
     },
     {
@@ -23,9 +23,9 @@
       "id": "barney",
       "name": "Barney",
       "icon": "🪨",
-      "state": "idle",
-      "zone": "tarpit-2",
-      "task": "Available on claude.ai",
+      "state": "offline",
+      "zone": "offsite",
+      "task": "",
       "color": "#4ade80"
     },
     {
