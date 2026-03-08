@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T11:30:01Z",
+  "generated_at": "2026-03-08T11:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T11:01:35.041000+00:00"
+          "last_active": "2026-03-08T11:32:08.071000+00:00"
         }
       ]
     },
@@ -164,6 +164,28 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "\u2705 **Daily System Tasks Completed** **Accuracy Reports:** Sent to Fred on Telegram - Entity MAE: 9.4 min, WTI MAE: 6.7 min - Bias corrections applied (26,160 corrections from early AM) - Notable iss...",
+      "timestamp": "2026-03-08T11:32:08.071000+00:00",
+      "message_id": "1480166224464707697",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480166224464707697"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2615 Morning! Fresh WTI animation ready to tweet \u2014 grab it from #content-review\n\n**Yesterday's data:** Magic Kingdom had the lowest crowds (12.8 \ud83d\udc8e), while Animal Kingdom was the busiest (26.9 \ud83d\udd34). \n\nMP...",
+      "timestamp": "2026-03-08T11:31:37.490000+00:00",
+      "message_id": "1480166096198832138",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480166096198832138"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "\ud83d\udd34 **Pipeline Validation Alert Raised**\n\nCompleted heartbeat checks and found **critical pipeline validation failures**:\n\n**Issues Detected:**\n- **WTI Anomalies:** 20 data anomalies in Animal Kingdo...",
       "timestamp": "2026-03-08T11:01:35.041000+00:00",
       "message_id": "1480158536179908681",
@@ -236,17 +258,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480151403765829663"
     },
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\u2705 **Daily Park Intel Report Posted**\n\nSuccessfully generated and posted the daily Park Intel report to Discord #park-intel channel. The report includes:\n\n\u2022 **Tomorrow's forecast** (Mon 3/9): Avg WT...",
-      "timestamp": "2026-03-08T10:30:57.114000+00:00",
-      "message_id": "1480150827355344906",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480150827355344906"
-    },
-    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -256,17 +267,6 @@
       "timestamp": "2026-03-08T10:30:02.608000+00:00",
       "message_id": "1480150598740344944",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480150598740344944"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The system is now serving significantly more accurate predictions to users! \ud83c\udfaf",
-      "timestamp": "2026-03-08T09:09:09.377000+00:00",
-      "message_id": "1480130242814152788",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480130242814152788"
     },
     {
       "channel": "daily-digest",
