@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T10:15:01Z",
+  "generated_at": "2026-03-08T10:30:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-08T04:48:52.782000+00:00"
+          "last_active": "2026-03-08T10:29:57.919000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me spawn Gazoo to get the review done right now.",
+      "timestamp": "2026-03-08T10:29:57.919000+00:00",
+      "message_id": "1480150579073388585",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480150579073388585"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "The scheduler cron fired at 12:05 AM today but `durationMs: 1` \u2014 it just delivered the wake event but I never actually processed it (the instructions to create the one-shot cron jobs never ran). Sa...",
+      "timestamp": "2026-03-08T10:29:55.750000+00:00",
+      "message_id": "1480150569975939104",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480150569975939104"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "No `2026-03-08.md` \u2014 the nightly review didn't happen. The scheduler ran at 12:05 AM today and should have created a `gazoo-nightly-random` one-shot cron, but I don't see it in the cron list (it ei...",
+      "timestamp": "2026-03-08T10:29:49.585000+00:00",
+      "message_id": "1480150544118190167",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480150544118190167"
+    },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
@@ -289,39 +322,6 @@
       "timestamp": "2026-03-08T05:05:27.753000+00:00",
       "message_id": "1480068915278123152",
       "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480068915278123152"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Added. Every review now includes a full link audit \u2014 every href on every page gets checked. Broken links, 404s, dead anchors, all flagged with the exact page and URL.\n\n*\"Broken links on a live webs...",
-      "timestamp": "2026-03-08T04:48:52.782000+00:00",
-      "message_id": "1480064742067535912",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480064742067535912"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Also, when you do your reviews of the website, check every link to see if it works properly",
-      "timestamp": "2026-03-08T04:48:39.686000+00:00",
-      "message_id": "1480064687138930759",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480064687138930759"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Done. Updated `GAZOO.md` with:\n\n1. **New review step (#17)** \u2014 full blog audit checklist: factual accuracy, rule compliance (never trash crowd calendars, never reveal day job), unsupported claims, ...",
-      "timestamp": "2026-03-08T04:26:29.634000+00:00",
-      "message_id": "1480059108496244898",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480059108496244898"
     },
     {
       "channel": "bam-bam",
