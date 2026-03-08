@@ -1,12 +1,17 @@
 """Step 8: Forecast Generation — Memory-safe and FAST.
 
-v3.0 was correct but slow (42 min) due to df.apply() row-by-row loops.
-v3.1 vectorizes aggregate lookups with merge/map — target: <5 min.
+v3.0: correct but slow (42 min) — df.apply() row-by-row loops.
+v3.1: vectorized aggregates (30 min) — merge instead of apply.
+v3.2: pre-indexed OC + aggregates (target: <8 min) — O(1) lookups.
+
+The v3.1 benchmark showed OC filter = 84% of per-entity time (2.77s/3.3s).
+Root cause: scanning 9.3M set elements per entity instead of O(1) dict lookup.
 
 Architecture:
 - Process ONE PARK at a time
 - Sequential (no multiprocessing)
-- Vectorized aggregate lookups (no df.apply)
+- Pre-indexed operating calendar: dict[entity] → set(dates)
+- Pre-indexed aggregates: dict[entity] → DataFrame
 - Flush to parquet between parks, release memory
 - Peak memory: ~2-3GB
 """
@@ -53,7 +58,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         raise ValidationError("XGBoost is required for forecasting. pip install xgboost")
 
     log.info("=" * 60)
-    log.info("STEP 8: FORECAST GENERATION (v3.1 — vectorized)")
+    log.info("STEP 8: FORECAST GENERATION (v3.2 — pre-indexed)")
     log.info("=" * 60)
 
     start_date = date.today() + timedelta(days=1)
@@ -64,9 +69,9 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     with log.timed("load shared data"):
         date_features = _load_date_features(cfg, log)
         park_hours = _load_park_hours(cfg, log)
-        agg_df = _load_aggregates_df(cfg, log)
+        agg_by_entity = _load_aggregates_indexed(cfg, log)
         entity_list = _load_entity_list(cfg, log)
-        operating_calendar = _load_operating_calendar(cfg, log)
+        oc_by_entity = _load_operating_calendar_indexed(cfg, log)
         fallback_ratios = _load_fallback_ratios(cfg, log)
 
     # Group entities by park
@@ -116,10 +121,10 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
             for entity_code in entities:
                 try:
-                    result = _forecast_entity_vectorized(
+                    result = _forecast_entity_fast(
                         entity_code, park_code, time_grid,
-                        cfg.models_dir, agg_df, park_open_mins,
-                        fallback_ratios, operating_calendar,
+                        cfg.models_dir, agg_by_entity, park_open_mins,
+                        fallback_ratios, oc_by_entity,
                     )
                     if result is not None and len(result) > 0:
                         park_results.append(result)
@@ -176,39 +181,40 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
 
 # =========================================================================
-# Entity-level forecasting — VECTORIZED (v3.1)
+# Entity-level forecasting — FAST (v3.2)
 # =========================================================================
 
-def _forecast_entity_vectorized(
+def _forecast_entity_fast(
     entity_code: str,
     park_code: str,
     time_grid: pd.DataFrame,
     models_dir: Path,
-    agg_df: pd.DataFrame,
+    agg_by_entity: dict,
     park_open_mins: dict,
     fallback_ratios: dict,
-    operating_calendar: set | None,
+    oc_by_entity: dict | None,
 ) -> pd.DataFrame | None:
-    """Generate forecast for a single entity using vectorized operations."""
+    """Generate forecast for a single entity. O(1) lookups, no scanning."""
 
     df = time_grid.copy()
     df["entity_code"] = entity_code
 
-    # Filter by operating calendar
-    if operating_calendar is not None:
+    # O(1) operating calendar filter (was 84% of per-entity time in v3.1)
+    if oc_by_entity is not None:
         ec_upper = entity_code.upper()
-        operating_dates = {d for (e, d) in operating_calendar if e == ec_upper}
-        if operating_dates:
-            df = df[df["park_date"].isin(operating_dates)]
-        elif any(e == ec_upper for e, _ in operating_calendar):
-            return None
+        entity_dates = oc_by_entity.get(ec_upper)
+        if entity_dates is not None:
+            if len(entity_dates) == 0:
+                return None  # Entity in calendar but zero dates = extinct
+            df = df[df["park_date"].isin(entity_dates)]
+        # If entity not in OC at all, assume operating (new entity)
 
     if len(df) == 0:
         return None
 
-    # VECTORIZED: posted_time via merge instead of apply
-    entity_agg = agg_df[agg_df["entity_code"] == entity_code]
-    if len(entity_agg) > 0:
+    # O(1) aggregate lookup (pre-indexed by entity)
+    entity_agg = agg_by_entity.get(entity_code)
+    if entity_agg is not None and len(entity_agg) > 0:
         df = df.merge(
             entity_agg[["date_group_id", "time_slot_15min", "wait_median"]],
             on=["date_group_id", "time_slot_15min"],
@@ -219,7 +225,7 @@ def _forecast_entity_vectorized(
     else:
         df["posted_time"] = 5.0
 
-    # VECTORIZED: mins_since_open via map instead of apply
+    # Vectorized mins_since_open
     df["_open_mins"] = df["park_date"].map(park_open_mins).fillna(6 * 60)
     df["mins_since_open"] = (df["mins_since_6am"] + 6 * 60 - df["_open_mins"]).clip(lower=0)
     df.drop(columns=["_open_mins"], inplace=True)
@@ -255,7 +261,7 @@ def _forecast_entity_vectorized(
         method = "model_v2"
 
     else:
-        # No model — VECTORIZED fallback
+        # No model — vectorized fallback
         df["predicted_actual"] = (df["posted_time"] * fallback_ratio).round().astype(int)
         df["prediction_method"] = "fallback_ratio"
         return df[["entity_code", "park_date", "time_slot", "predicted_actual", "prediction_method"]]
@@ -271,7 +277,7 @@ def _forecast_entity_vectorized(
 
 
 # =========================================================================
-# Data loading helpers
+# Data loading helpers — PRE-INDEXED (v3.2)
 # =========================================================================
 
 def _load_date_features(cfg: PipelineConfig, log: PipelineLogger) -> dict:
@@ -372,15 +378,16 @@ def _load_park_hours(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     return lookup
 
 
-def _load_aggregates_df(cfg: PipelineConfig, log: PipelineLogger) -> pd.DataFrame:
-    """Load model aggregates as a DataFrame for vectorized merge.
+def _load_aggregates_indexed(cfg: PipelineConfig, log: PipelineLogger) -> dict:
+    """Load aggregates PRE-INDEXED by entity code.
     
-    Returns DataFrame with columns: entity_code, date_group_id, time_slot_15min, wait_median
+    Returns dict[entity_code] → DataFrame with date_group_id, time_slot_15min, wait_median.
+    O(1) lookup per entity instead of filtering a 6M-row DataFrame each time.
     """
     agg_path = cfg.output_base / "aggregates" / "model_aggregates.parquet"
     if not agg_path.exists():
         log.warning(f"No aggregates file at {agg_path}")
-        return pd.DataFrame(columns=["entity_code", "date_group_id", "time_slot_15min", "wait_median"])
+        return {}
 
     with read_connection() as con:
         df = con.execute(f"""
@@ -391,8 +398,11 @@ def _load_aggregates_df(cfg: PipelineConfig, log: PipelineLogger) -> pd.DataFram
             WHERE wait_median IS NOT NULL
         """).fetchdf()
 
-    log.info(f"Aggregates loaded: {len(df):,} entries as DataFrame")
-    return df
+    # Pre-index by entity
+    indexed = {entity: group for entity, group in df.groupby("entity_code")}
+
+    log.info(f"Aggregates loaded: {len(df):,} entries, {len(indexed)} entities indexed")
+    return indexed
 
 
 def _load_entity_list(cfg: PipelineConfig, log: PipelineLogger) -> list[str]:
@@ -424,8 +434,12 @@ def _load_entity_list(cfg: PipelineConfig, log: PipelineLogger) -> list[str]:
     return sorted(entities)
 
 
-def _load_operating_calendar(cfg: PipelineConfig, log: PipelineLogger) -> set | None:
-    """Load operating calendar as set of (entity_code, date) tuples."""
+def _load_operating_calendar_indexed(cfg: PipelineConfig, log: PipelineLogger) -> dict | None:
+    """Load operating calendar PRE-INDEXED by entity code.
+    
+    Returns dict[entity_code_upper] → set(dates) or None if no OC.
+    O(1) lookup per entity instead of scanning 9.3M tuples (was 84% of forecast time).
+    """
     oc_path = cfg.output_base / "operating_calendar" / "operating_calendar.parquet"
     if not oc_path.exists():
         log.info("No operating calendar — assuming all entities operating")
@@ -433,12 +447,16 @@ def _load_operating_calendar(cfg: PipelineConfig, log: PipelineLogger) -> set | 
 
     oc_df = pd.read_parquet(oc_path)
     oc_df = oc_df[oc_df["is_operating"] == True]
-    result = set(zip(
-        oc_df["entity_code"].astype(str).str.upper(),
-        pd.to_datetime(oc_df["park_date"]).dt.date,
-    ))
-    log.info(f"Operating calendar: {len(result):,} entity-dates")
-    return result
+    oc_df["entity_upper"] = oc_df["entity_code"].astype(str).str.upper()
+    oc_df["date_val"] = pd.to_datetime(oc_df["park_date"]).dt.date
+
+    # Pre-index: entity → set of operating dates
+    indexed = {}
+    for entity, group in oc_df.groupby("entity_upper"):
+        indexed[entity] = set(group["date_val"])
+
+    log.info(f"Operating calendar: {len(oc_df):,} entries, {len(indexed)} entities indexed")
+    return indexed
 
 
 def _load_fallback_ratios(cfg: PipelineConfig, log: PipelineLogger) -> dict:
