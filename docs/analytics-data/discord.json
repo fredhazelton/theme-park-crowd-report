@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T17:15:02Z",
+  "generated_at": "2026-03-08T17:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T15:07:28.082000+00:00"
+          "last_active": "2026-03-08T17:21:14.009000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-08T13:48:39.031000+00:00"
+          "last_active": "2026-03-08T17:21:06.335000+00:00"
         }
       ]
     },
@@ -159,6 +159,28 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**Excellent News - Bot Health Restored! \u2705**\n\n**Major Improvement:** TPCR bot is now HEALTHY after being degraded for hours\n- Scraper data: 4.0h fresh (was 28.9h stale) \n- All systems: \u2705 Active and ...",
+      "timestamp": "2026-03-08T17:21:14.009000+00:00",
+      "message_id": "1480254078096379945",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480254078096379945"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2705 **Bot Health RESTORED**\n\n**Good news:** Bot health is now HEALTHY!\n- \u2705 Scraper data: 4.0h fresh (was 28.9h stale)\n- \u2705 Service: Active and stable\n- \u2705 Discord: Connected  \n- \u2705 DuckDB: Accessible\n- ...",
+      "timestamp": "2026-03-08T17:21:06.335000+00:00",
+      "message_id": "1480254045909422181",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480254045909422181"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -190,17 +212,6 @@
       "timestamp": "2026-03-08T15:07:17.717000+00:00",
       "message_id": "1480220371444826263",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480220371444826263"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Heartbeat Complete - Marketing Sprint Accountability Delivered**\n\n\ud83d\udea8 **Action Taken:** Sent marketing sprint nudge to Fred - found he's been working on animation design but hasn't hit today's spri...",
-      "timestamp": "2026-03-08T15:01:08.535000+00:00",
-      "message_id": "1480218822983286946",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480218822983286946"
     },
     {
       "channel": "mission-control",
@@ -278,17 +289,6 @@
       "timestamp": "2026-03-08T13:45:05.801000+00:00",
       "message_id": "1480199685489688733",
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1480199685489688733"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Report: `/mnt/data/pipeline/pipeline_validation/validation_report.json`",
-      "timestamp": "2026-03-08T11:01:04.377000+00:00",
-      "message_id": "1480158407565508733",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480158407565508733"
     },
     {
       "channel": "gazoo",
