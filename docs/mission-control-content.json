@@ -51,7 +51,7 @@
         "forecasts": {
             "status": "done",
             "label": "Forecasts",
-            "detail": "23,596,357 rows, 9 MB"
+            "detail": "Completed today"
         },
         "wti": {
             "status": "done",
@@ -116,9 +116,9 @@
         "disk_main_pct": 90,
         "disk_data_pct": 4,
         "db_entities": 1710,
-        "db_forecasts": 23596357,
+        "db_forecasts": 0,
         "db_live_waits": 123265857,
         "db_wti": 54720
     },
-    "last_updated": "2026-03-08T10:45:04.000617"
+    "last_updated": "2026-03-08T11:00:04.261676"
 }
