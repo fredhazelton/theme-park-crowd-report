@@ -1,12 +1,7 @@
-"""Step 9: WTI Calculation
+"""Step 9: WTI Calculation — v4 with adaptive quantile mapping.
 
-WTI = average predicted actual wait time per park per day.
-
-Methodology (v3.1):
-- Sources: synthetic actuals (weight 1.0) + real ACTUAL (weight from config)
-- Fallback_ratio entities: EXCLUDED (no signal)
-- Quantile mapping: with PER-PARK guardrails (configurable stretch factor)
-- MAPE: NOT reported (broken for near-zero actuals)
+v3: Global 1.5x stretch cap for quantile mapping.
+v4: Per-park stretch factors optimized from historical accuracy (Pillar 3).
 """
 
 from __future__ import annotations
@@ -19,39 +14,44 @@ from pipeline_v3.core.db import read_connection
 from pipeline_v3.core.logging import PipelineLogger
 from pipeline_v3.core.park_codes import park_code_sql
 from pipeline_v3.core.validation import require_file, require_parquet_rows
+from pipeline_v3.models.adaptive_quantile import optimize_stretch_factors
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     """Calculate WTI from forecasts and historical actuals."""
 
-    log.info("="*60)
-    log.info("STEP 9: WTI CALCULATION (v3.1 — per-park stretch)")
-    log.info("="*60)
+    log.info("=" * 60)
+    log.info("STEP 9: WTI CALCULATION (v4 — adaptive quantile mapping)")
+    log.info("=" * 60)
 
     results = []
     pc_sql = park_code_sql("entity_code")
 
-    # ── Historical WTI (synthetic actuals + real actuals) ──
+    # === Pillar 3: Optimize per-park stretch factors ===
+    with log.timed("optimize quantile mapping stretch factors"):
+        stretch_factors = optimize_stretch_factors(cfg, log)
+    log.info(f"Per-park stretch factors: {stretch_factors}")
+
+    # Historical WTI
     with log.timed("historical WTI"):
         results.append(_compute_historical_wti(cfg, log, pc_sql))
 
-    # ── Forecast WTI ──
-    forecast_file = cfg.forecast_dir / "all_forecasts.parquet"
+    # Forecast WTI
+    forecast_file = cfg.forecast_dir / "all_forecasts_v3.parquet"
     if not forecast_file.exists():
-        # Also check for v3 forecast
-        forecast_file = cfg.forecast_dir / "all_forecasts_v3.parquet"
+        forecast_file = cfg.forecast_dir / "all_forecasts.parquet"
     if forecast_file.exists():
         with log.timed("forecast WTI"):
             results.append(_compute_forecast_wti(cfg, log, pc_sql, forecast_file))
     else:
         log.warning(f"No forecast file found — forecast WTI skipped")
 
-    # ── Quantile mapping ──
+    # Adaptive quantile mapping with per-park stretch factors
     if cfg.quantile_mapping and len(results) >= 2:
-        with log.timed("quantile mapping (per-park stretch)"):
-            results = _apply_quantile_mapping(cfg, log, results)
+        with log.timed("adaptive quantile mapping"):
+            results = _apply_adaptive_quantile_mapping(cfg, log, results, stretch_factors)
 
-    # ── Combine and save ──
+    # Combine and save
     if not results or all(r is None for r in results):
         log.error("No WTI data produced")
         return {"rows": 0}
@@ -75,9 +75,9 @@ def _compute_historical_wti(
     cfg: PipelineConfig, log: PipelineLogger, pc_sql: str
 ) -> pd.DataFrame | None:
     """Compute historical WTI from synthetic actuals + real actuals."""
-    synth_dir = cfg.prod_output_base / "synthetic_actuals"
+    synth_dir = cfg.output_base / "synthetic_actuals"
     if not synth_dir.exists() or not any(synth_dir.glob("*.parquet")):
-        log.warning("No synthetic actuals found — historical WTI unavailable")
+        log.warning("No synthetic actuals found")
         return None
 
     synth_str = str(synth_dir).replace("\\", "/")
@@ -147,7 +147,7 @@ def _compute_forecast_wti(
 ) -> pd.DataFrame | None:
     """Compute forecast WTI from predictions."""
     forecast_str = str(forecast_file).replace("\\", "/")
-    oc_path = cfg.prod_output_base / "operating_calendar" / "operating_calendar.parquet"
+    oc_path = cfg.output_base / "operating_calendar" / "operating_calendar.parquet"
     dimentity_path = cfg.dimension_dir / "dimentity.csv"
 
     excluded_methods = "('fallback_ratio')" if cfg.exclude_fallback_ratio else "('')"
@@ -205,25 +205,25 @@ def _compute_forecast_wti(
     return df
 
 
-def _apply_quantile_mapping(
-    cfg: PipelineConfig, log: PipelineLogger, results: list[pd.DataFrame]
+def _apply_adaptive_quantile_mapping(
+    cfg: PipelineConfig,
+    log: PipelineLogger,
+    results: list[pd.DataFrame],
+    stretch_factors: dict[str, float],
 ) -> list[pd.DataFrame]:
-    """Map forecast distribution to match historical variance shape.
-
-    v3.1: PER-PARK stretch factors from config.
-    TDL/TDS get 2.0x (real seasonal extremes), IA/CA/EU get tighter caps.
-    """
+    """Quantile mapping with per-park adaptive stretch factors (Pillar 3)."""
     from scipy import stats
 
     historical = [df for df in results if df is not None and (df["source"] == "historical").any()]
     forecast_idx = [i for i, df in enumerate(results) if df is not None and (df["source"] == "forecast").any()]
 
     if not historical or not forecast_idx:
-        log.info("Quantile mapping skipped — missing historical or forecast data")
+        log.info("Quantile mapping skipped — missing data")
         return results
 
     hist_combined = pd.concat(historical, ignore_index=True)
     hist_combined = hist_combined[hist_combined["source"] == "historical"]
+    default_stretch = cfg.quantile_mapping_max_stretch
     parks_mapped = 0
     total_capped = 0
 
@@ -241,15 +241,13 @@ def _apply_quantile_mapping(
             if len(forecast_vals) == 0:
                 continue
 
-            # PER-PARK stretch factor
-            max_stretch = cfg.get_park_stretch(park_code)
+            # Per-park stretch factor (v4 adaptive)
+            max_stretch = stretch_factors.get(park_code, default_stretch)
 
-            # Percentile rank within forecast distribution
             percentiles = stats.rankdata(forecast_vals, method="average") / len(forecast_vals)
             clamped = np.clip(percentiles * 100, 1.0, 99.0)
             mapped = np.percentile(park_hist, clamped)
 
-            # Guardrail: cap stretch factor
             original = forecast_vals
             stretch = np.where(original > 0, mapped / original, 1.0)
             capped = np.where(
@@ -260,13 +258,11 @@ def _apply_quantile_mapping(
 
             n_capped = int(np.sum(np.abs(stretch) > max_stretch))
             if n_capped > 0:
-                log.warning(
-                    f"Quantile mapping: {park_code} — {n_capped} values capped at {max_stretch}x stretch"
-                )
+                log.info(f"  {park_code}: {n_capped} values capped at {max_stretch}x")
                 total_capped += n_capped
 
             results[idx].loc[park_mask, "wti"] = np.round(capped, 1)
             parks_mapped += 1
 
-    log.info(f"Quantile mapping applied to {parks_mapped} parks ({total_capped} values capped)")
+    log.info(f"Adaptive quantile mapping: {parks_mapped} parks, {total_capped} values capped")
     return results
