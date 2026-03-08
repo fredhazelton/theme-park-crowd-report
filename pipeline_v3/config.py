@@ -53,7 +53,17 @@ class PipelineConfig:
     wti_min_wait: float = 5.0  # Floor for WTI values
     exclude_fallback_ratio: bool = True
     quantile_mapping: bool = True
-    quantile_mapping_max_stretch: float = 1.5  # Guardrail: max 50% stretch
+    quantile_mapping_max_stretch: float = 1.5  # Global default guardrail
+    quantile_mapping_per_park_stretch: dict = field(default_factory=lambda: {
+        # Parks with real high-variance seasonality need more stretch
+        "TDL": 2.0,   # Golden Week, New Year's — genuine extreme peaks
+        "TDS": 2.0,   # Same seasonal patterns as TDL
+        # Parks where overprediction is a known problem need tighter caps
+        "IA": 1.2,    # Persistent overprediction (+17.1 bias on 2026-03-07)
+        "CA": 1.3,    # Had +34.3 error on Feb 26 from uncapped mapping
+        "EU": 1.3,    # Persistent overprediction (+15.1 bias on 2026-03-07)
+        # Everything else uses the global default (1.5)
+    })
 
     # === Conversion model ===
     conversion_retrain_day: int = 0  # 0=Monday
@@ -76,6 +86,12 @@ class PipelineConfig:
         "TDL", "TDS",             # Tokyo
     ])
     ignore_parks: list[str] = field(default_factory=lambda: ["BB"])  # Blizzard Beach
+
+    def get_park_stretch(self, park_code: str) -> float:
+        """Get quantile mapping stretch factor for a park."""
+        return self.quantile_mapping_per_park_stretch.get(
+            park_code, self.quantile_mapping_max_stretch
+        )
 
     def __post_init__(self):
         """Derive paths from output_base.

@@ -2,16 +2,10 @@
 
 WTI = average predicted actual wait time per park per day.
 
-This is the first step I'm implementing fully because:
-1. It's the most important output (what users see)
-2. It's self-contained (reads forecasts + actuals, writes WTI)
-3. It's where the methodology improvements live
-4. It's easy to shadow-compare against production
-
-Methodology (v3):
+Methodology (v3.1):
 - Sources: synthetic actuals (weight 1.0) + real ACTUAL (weight from config)
 - Fallback_ratio entities: EXCLUDED (no signal)
-- Quantile mapping: with guardrails (max stretch factor)
+- Quantile mapping: with PER-PARK guardrails (configurable stretch factor)
 - MAPE: NOT reported (broken for near-zero actuals)
 """
 
@@ -31,7 +25,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     """Calculate WTI from forecasts and historical actuals."""
 
     log.info("="*60)
-    log.info("STEP 9: WTI CALCULATION (v3)")
+    log.info("STEP 9: WTI CALCULATION (v3.1 — per-park stretch)")
     log.info("="*60)
 
     results = []
@@ -43,15 +37,18 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
     # ── Forecast WTI ──
     forecast_file = cfg.forecast_dir / "all_forecasts.parquet"
+    if not forecast_file.exists():
+        # Also check for v3 forecast
+        forecast_file = cfg.forecast_dir / "all_forecasts_v3.parquet"
     if forecast_file.exists():
         with log.timed("forecast WTI"):
             results.append(_compute_forecast_wti(cfg, log, pc_sql, forecast_file))
     else:
-        log.warning(f"No forecast file at {forecast_file} — forecast WTI skipped")
+        log.warning(f"No forecast file found — forecast WTI skipped")
 
     # ── Quantile mapping ──
     if cfg.quantile_mapping and len(results) >= 2:
-        with log.timed("quantile mapping"):
+        with log.timed("quantile mapping (per-park stretch)"):
             results = _apply_quantile_mapping(cfg, log, results)
 
     # ── Combine and save ──
@@ -88,7 +85,6 @@ def _compute_historical_wti(
     dimentity_path = cfg.dimension_dir / "dimentity.csv"
 
     with read_connection() as con:
-        # Build posted entity filter
         posted_join = ""
         if dimentity_path.exists():
             dim_str = str(dimentity_path).replace("\\", "/")
@@ -158,7 +154,6 @@ def _compute_forecast_wti(
     pc_f = park_code_sql("f.entity_code")
 
     with read_connection() as con:
-        # Posted entity filter
         posted_join = ""
         if dimentity_path.exists():
             dim_str = str(dimentity_path).replace("\\", "/")
@@ -215,8 +210,8 @@ def _apply_quantile_mapping(
 ) -> list[pd.DataFrame]:
     """Map forecast distribution to match historical variance shape.
 
-    v3 improvement: max_stretch guardrail prevents amplification errors
-    (the IA overprediction hypothesis from 2026-03-07).
+    v3.1: PER-PARK stretch factors from config.
+    TDL/TDS get 2.0x (real seasonal extremes), IA/CA/EU get tighter caps.
     """
     from scipy import stats
 
@@ -229,8 +224,8 @@ def _apply_quantile_mapping(
 
     hist_combined = pd.concat(historical, ignore_index=True)
     hist_combined = hist_combined[hist_combined["source"] == "historical"]
-    max_stretch = cfg.quantile_mapping_max_stretch
     parks_mapped = 0
+    total_capped = 0
 
     for idx in forecast_idx:
         df = results[idx]
@@ -246,12 +241,15 @@ def _apply_quantile_mapping(
             if len(forecast_vals) == 0:
                 continue
 
+            # PER-PARK stretch factor
+            max_stretch = cfg.get_park_stretch(park_code)
+
             # Percentile rank within forecast distribution
             percentiles = stats.rankdata(forecast_vals, method="average") / len(forecast_vals)
             clamped = np.clip(percentiles * 100, 1.0, 99.0)
             mapped = np.percentile(park_hist, clamped)
 
-            # v3 GUARDRAIL: cap stretch factor
+            # Guardrail: cap stretch factor
             original = forecast_vals
             stretch = np.where(original > 0, mapped / original, 1.0)
             capped = np.where(
@@ -260,14 +258,15 @@ def _apply_quantile_mapping(
                 mapped,
             )
 
-            n_capped = np.sum(np.abs(stretch) > max_stretch)
+            n_capped = int(np.sum(np.abs(stretch) > max_stretch))
             if n_capped > 0:
                 log.warning(
                     f"Quantile mapping: {park_code} — {n_capped} values capped at {max_stretch}x stretch"
                 )
+                total_capped += n_capped
 
             results[idx].loc[park_mask, "wti"] = np.round(capped, 1)
             parks_mapped += 1
 
-    log.info(f"Quantile mapping applied to {parks_mapped} parks (max stretch: {max_stretch}x)")
+    log.info(f"Quantile mapping applied to {parks_mapped} parks ({total_capped} values capped)")
     return results
