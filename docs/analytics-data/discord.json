@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T18:30:01Z",
+  "generated_at": "2026-03-08T18:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T17:21:14.009000+00:00"
+          "last_active": "2026-03-08T18:38:55.922000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Today's PM review is already queued. Tomorrow the full system kicks in. \ud83e\uddb4\ud83d\udc7d",
+      "timestamp": "2026-03-08T18:38:55.922000+00:00",
+      "message_id": "1480273631576588478",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480273631576588478"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "All set. Here's the system:\n\n**Daily Gazoo Reviews \u2014 Redesigned:**\n\n```\n| Component              | What                                                        | When                       |\n| -----...",
+      "timestamp": "2026-03-08T18:38:55.726000+00:00",
+      "message_id": "1480273630754767071",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480273630754767071"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me verify the today's afternoon job is still in place:",
+      "timestamp": "2026-03-08T18:38:44.244000+00:00",
+      "message_id": "1480273582595641568",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480273582595641568"
+    },
+    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -168,17 +201,6 @@
       "timestamp": "2026-03-08T17:51:27.853000+00:00",
       "message_id": "1480261685909520609",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1480261685909520609"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Excellent News - Bot Health Restored! \u2705**\n\n**Major Improvement:** TPCR bot is now HEALTHY after being degraded for hours\n- Scraper data: 4.0h fresh (was 28.9h stale) \n- All systems: \u2705 Active and ...",
-      "timestamp": "2026-03-08T17:21:14.009000+00:00",
-      "message_id": "1480254078096379945",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480254078096379945"
     },
     {
       "channel": "alerts",
@@ -201,28 +223,6 @@
       "timestamp": "2026-03-08T15:30:01.328000+00:00",
       "message_id": "1480226090843635813",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480226090843635813"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Smart move! That's direct access to your target audience \u2014 people actively planning Disney trips and discussing wait times. Great place to lurk, learn what questions people ask, and occasionally dr...",
-      "timestamp": "2026-03-08T15:07:28.082000+00:00",
-      "message_id": "1480220414918529168",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480220414918529168"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Nice! Thanks! I noticed that r/waltdisneyworld has a discord channel so I joined it",
-      "timestamp": "2026-03-08T15:07:17.717000+00:00",
-      "message_id": "1480220371444826263",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480220371444826263"
     },
     {
       "channel": "mission-control",
