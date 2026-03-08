@@ -1,3 +1,4 @@
+import sys
 """Step 2: ETL + CSV\u2192Parquet conversion.
 
 During shadow phase: reads from production parquet files (no separate ETL).
@@ -48,7 +49,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     if convert_script.exists():
         with log.timed("CSV\u2192Parquet"):
             result = subprocess.run(
-                ["python", str(convert_script)],
+                [sys.executable, str(convert_script)],
                 capture_output=True, text=True, timeout=300,
             )
             if result.returncode != 0:
