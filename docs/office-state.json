@@ -1,13 +1,13 @@
 {
-  "updated": "2026-03-09T09:07:25.634012+00:00",
+  "updated": "2026-03-09T13:34:49.995927+00:00",
   "agents": [
     {
       "id": "fred",
       "name": "Fred",
       "icon": "🧔",
-      "state": "resting",
+      "state": "idle",
       "zone": "rest",
-      "task": "Sleeping 😴",
+      "task": "Away",
       "color": "#facc15"
     },
     {
@@ -23,9 +23,9 @@
       "id": "barney",
       "name": "Barney",
       "icon": "🪨",
-      "state": "offline",
-      "zone": "offsite",
-      "task": "",
+      "state": "idle",
+      "zone": "tarpit-2",
+      "task": "Available on claude.ai",
       "color": "#4ade80"
     },
     {
@@ -77,9 +77,9 @@
       "id": "mr-slate",
       "name": "Mr. Slate",
       "icon": "💼",
-      "state": "idle",
-      "zone": "offsite",
-      "task": "Off the clock",
+      "state": "working",
+      "zone": "corner-office",
+      "task": "Watching the bottom line",
       "color": "#a78bfa"
     }
   ],
