@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T20:15:01Z",
+  "generated_at": "2026-03-09T20:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-09T16:15:14.012000+00:00"
+          "last_active": "2026-03-09T20:23:43.582000+00:00"
         }
       ]
     },
@@ -158,6 +158,28 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "- Training/forecast 38h stale\n\n**Action needed:** System stability issues require immediate attention. Bot performance degrading and users getting poor experience.",
+      "timestamp": "2026-03-09T20:23:43.582000+00:00",
+      "message_id": "1480662391799812206",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480662391799812206"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udea8 **CRITICAL: System Health Degradation**\n\n**Bot Health:** DEGRADED\n- Memory spike: 195.7MB (was ~100MB)\n- Discord connection errors: \"Cannot write to closing transport\"\n- DuckDB lock conflicts per...",
+      "timestamp": "2026-03-09T20:23:43.368000+00:00",
+      "message_id": "1480662390902362256",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480662390902362256"
+    },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
@@ -256,28 +278,6 @@
       "timestamp": "2026-03-09T16:15:14.012000+00:00",
       "message_id": "1480599856530587659",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480599856530587659"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "YES! The three strikes rule is coming into affect!! That was a great addition",
-      "timestamp": "2026-03-09T16:15:04.860000+00:00",
-      "message_id": "1480599818144448632",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480599818144448632"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Three strikes \u2014 promoting to MEMORY.md:",
-      "timestamp": "2026-03-09T16:14:23.991000+00:00",
-      "message_id": "1480599646727573658",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480599646727573658"
     },
     {
       "channel": "mission-control",
