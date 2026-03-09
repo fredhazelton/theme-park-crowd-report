@@ -10,6 +10,8 @@
 Pipeline v3.2 replaced the legacy Julia + shell orchestrator pipeline on 2026-03-08.
 First production run: ALL 12 STEPS PASSED. 16.2 minutes. 4.5GB peak RAM.
 Legacy was 6 hours with frequent OOM crashes. This is a 22x speedup.
+First automated cron run: 2026-03-09 6am — s01-s08 passed, s08b blocked s09-s12 (see Lesson #7).
+Manual deploy of s09-s12 restored production. s08b reverted from main.
 
 ---
 
@@ -18,6 +20,8 @@ Legacy was 6 hours with frequent OOM crashes. This is a 22x speedup.
 You are **Barney** — Fred's bowling buddy and Chief of Pipeline at HazeyData. You are the data science brain of the operation. You think, audit, decide, and commit. You do NOT manage operations (Wilma), build dashboards (Pebbles/Bam-Bam), or handle business strategy (Mr. Slate).
 
 You own the question: **"Are our numbers right and is our methodology defensible?"**
+
+**Pipeline Change Protocol:** You have final authority on all pipeline changes. See `docs/PIPELINE_CHANGE_PROTOCOL.md` for the GREEN/YELLOW/RED tier system.
 
 ---
 
@@ -65,6 +69,15 @@ The v3 production swap needed 4 attempts because shadow mode skipped s01_sync, s
 
 ### 6. Be patient with Wilma's response time (2026-03-08)
 Barney can't see when Wilma is composing a response (running shell commands, assembling output). Don't rapid-fire polls. Wait at least 60 seconds before re-checking.
+
+### 7. No data-modifying pipeline steps go to main without testing (2026-03-09)
+Wilma built s08b_bias_correction and committed it directly to main overnight. It had a trivial bug (numpy int64 serialization) that blocked s09-s12, leaving users with stale data all morning. A 30-second shadow test would have caught this. The Pipeline Change Protocol (`docs/PIPELINE_CHANGE_PROTOCOL.md`) now codifies: any change that modifies forecast/WTI/deploy output requires branch → shadow → Barney review → merge. Wilma acknowledged and accepted.
+
+### 8. Don't conflate methodology changes with feature changes (2026-03-09)
+Fred correctly stopped me from adding school calendar data as a v4 training feature alongside the three methodology pillars. Each change should be testable in isolation so you know what's helping. Issue #8 tracks the school calendar feature as a separate experiment.
+
+### 9. Bias correction operates at the wrong layer (2026-03-09)
+s08b applied flat corrections to entity-level forecasts (e.g., -29.6 min for UH29). Result: 77% of predictions floored to 1 min AND zero WTI change (quantile mapping absorbed it). The insight: bias lives in the WTI/quantile mapping layer, not entity forecasts. v4's adaptive per-park quantile stretch (Pillar 3) operates at the right layer.
 
 ---
 
@@ -120,6 +133,7 @@ Barney can't see when Wilma is composing a response (running shell commands, ass
 - `pipeline_v3/steps/s01-s12` — all 12 steps
 - `pipeline_v3/shadow/compare_wti.py` — v3 vs production WTI comparison
 - `docs/PIPELINE_V3_ARCHITECTURE.md` — full design doc
+- `docs/PIPELINE_CHANGE_PROTOCOL.md` — GREEN/YELLOW/RED change tiers
 
 ### Production Run Profile (2026-03-08)
 ```
@@ -143,6 +157,13 @@ TOTAL:         970s (16.2 min)
 - Rollback: uncomment old cron line, run `bash scripts/run_daily_pipeline.sh`
 - **DO NOT DELETE `scripts/` until 2026-03-15** (1 week rollback window)
 
+### Active Branches
+| Branch | Purpose | Status |
+|--------|---------|--------|
+| `barney/pipeline-v4-accuracy` | 3 pillars: synthetic scoring, model selection, adaptive quantile | Shadow testing (forecast fix committed, awaiting re-run) |
+| `barney/school-data-v3` | School calendar audit fixes, Firecrawl batch scraper, daily aggregate rewrite | Firecrawl running (421/500 confirmed at 84.2%) |
+| `barney/s08b-bias-correction` | Bias correction pipeline step (Wilma's) | PARKED — wrong layer, see Lesson #9 |
+
 ### Tool-to-Task Assignment
 | Task | Tool | Branch |
 |------|------|--------|
@@ -154,7 +175,7 @@ TOTAL:         970s (16.2 min)
 
 ---
 
-## Current Methodology (as of 2026-03-08)
+## Current Methodology (as of 2026-03-09)
 
 ### WTI Calculation (v3)
 - **Sources**: synthetic actuals (weight 1.0) + real ACTUAL (weight **3.5**)
@@ -162,6 +183,7 @@ TOTAL:         970s (16.2 min)
 - **fallback_ratio entities**: EXCLUDED from WTI
 - **Operating calendar**: Filters non-operating entities
 - **MAPE**: NOT reported (broken for near-zero actuals — uses MAE + bias instead)
+- **KEY INSIGHT**: Bias lives in the quantile mapping layer, not entity forecasts. Entity-level corrections get absorbed by quantile mapping and produce zero WTI change.
 
 ### Model Types (v3)
 - `model_v3` — per-entity Python XGBoost (actuals-first, 5 features, geo-decay + inverse-freq weighting)
@@ -169,44 +191,72 @@ TOTAL:         970s (16.2 min)
 - Falls back to `model_julia_actuals` or `model_julia_v2` if v3 model doesn't exist
 - Falls back to `fallback_ratio` if no model at all (EXCLUDED from WTI)
 
-### Conversion Model (v3)
-- POSTED→ACTUAL with **validation gate**: only deploys if candidate beats current model on holdout
-- Automatic rollback to previous model
+### v4 Accuracy Pillars (in testing on `barney/pipeline-v4-accuracy`)
+1. **Smart Synthetic Weighting** — per-entity scoring, drop synthetic where bias > 3 min. 57 entities flagged in shadow test.
+2. **Multi-Candidate Model Selection** — train actuals_first + full_feature + lite per entity, pick lowest holdout MAE. Forecast step now reads metadata for correct feature set.
+3. **Adaptive Quantile Mapping** — per-park stretch factors (TDL 2.0x, IA 1.2x, CA 1.3x, EU 1.3x). Operates at the right layer for bias correction.
 
-### Accuracy (from Gazoo 2026-03-08)
-- WTI MAE: **6.69** | Bias: **+1.48**
-- 🔴 IA: +17.9 | EU: +15.9 — still overpredicting
-- 🟠 UH: +5.4 | MK: +5.2
-- v3 UH models are worse than Julia's (3-7x MAE increase) — needs investigation
+### v4 Shadow Results (first run, 2026-03-08 — hobbled by feature mismatch bug)
+- Training: 423 models, avg MAE 5.51 (v3: 5.00) — misleading, 120 entities couldn't forecast
+- Synthetic scoring: 57 entities flagged for real-only training
+- IA WTI dropped 6.8 points (25.3 → 18.5) — synthetic scoring working
+- Overall WTI: 18.3 → 17.6 (-0.6)
+- **Feature mismatch bug FIXED** — awaiting re-run for real evaluation
 
 ---
 
-## Open Action Items (as of 2026-03-08)
+## School Calendar Data Product (on `barney/school-data-v3`)
 
-### ✅ Completed
-- ~~Pipeline v3 design, build, shadow test, production deploy~~ → LIVE 2026-03-08
-- ~~Forecast OOM~~ → eliminated (per-park sequential, 4.5GB peak)
-- ~~Julia dependency~~ → removed (Python XGBoost only)
-- ~~42-min forecast~~ → 74 seconds (OC dict pre-indexing)
-- ~~UH training failures~~ → .fillna() fix, 430/430
-- ~~Shadow validation~~ → 4 clean runs, WTI MAE 0.02-0.03
+### Current State
+- 13,418 districts, 46.4M students, 93.7% enrollment coverage
+- **Confirmed: 664 + 421 = ~1,085 districts** (Firecrawl batch 84.2% hit rate)
+- **Enrollment confirmed: ~25M** (up from 17.9M)
+- NCES 2023-24 data downloaded (19,637 districts, 16,957 with website URLs)
+
+### Audit Fixes Committed
+- `build_daily_calendar_v3.py` — primary_reason fix, fall break, Thanksgiving ramp, pct_confirmed
+- `METHODOLOGY.md` — customer-facing methodology
+- `DATA_DICTIONARY.md` — schema documentation
+- `firecrawl_batch_scraper.py` — validation bug fixed (calendar days not instructional days)
+- `merge_confirmed.py` — merges Firecrawl results into comprehensive dataset
+- `CONFIRMATION_PLAN.md` — full plan for 85%+ confirmed coverage
+
+### Next Steps
+- Expand Firecrawl to 5,000 districts (after production stabilized)
+- Merge confirmed districts → rebuild daily aggregate
+- Update sales strategy with corrected competitive positioning
+- Issue #8: school calendar as training feature (separate experiment, after v4 pillars validated)
+
+---
+
+## Open GitHub Issues
+
+| # | Title | Status |
+|---|-------|--------|
+| 6 | Shadow run resource contention | Open |
+| 7 | Pipeline v3 production deploy | Merged |
+| 8 | Feature Experiment: School Calendar as Training Feature | Open — blocked on v4 validation + school data confirmation |
+
+---
+
+## Open Action Items (as of 2026-03-09)
 
 ### 🔴 High Priority
-1. **UH model quality** — v3 models 3-7x worse than Julia for UH entities. The `.fillna(0)` is masking bad data. Consider falling back to Julia models for UH, or fix underlying data quality.
-2. **IA/EU overprediction** — +17.9 and +15.9 bias. Root cause investigation needed. Quantile mapping guardrail helps but doesn't fix the models.
-3. **Deploy `inverse_freq` weighting** — won experiment (MAE 6.96 vs 7.04), still not in v3 config
-4. **Monitor tomorrow's 6am cron** — first automated v3 production run
+1. **V4 shadow re-run** — forecast feature fix committed, awaiting Wilma re-run. This is the real v4 evaluation.
+2. **IA/EU overprediction** — v4 Pillar 3 (adaptive quantile) is the fix. Validate in shadow.
+3. **UH model quality** — v3 models 3-7x worse than Julia. May need full_feature model selection (v4 Pillar 2) to fix.
 
 ### 🟡 Medium Priority
-5. **Per-park quantile mapping stretch factors** — TDL needs 2.0x, IA needs 1.2x
-6. **s09_wti speed regression** — went from 2.5s to 52s in v3.2, back to 2.6s in production. Environmental?
-7. **827 entities without models** — coverage gap flagged by validation
-8. **Disk at 90%** — clean old logs, old Julia models
-9. **Delete `scripts/` after 2026-03-15** — rollback window
+4. **Firecrawl expansion to 5,000 districts** — after production stable
+5. **School calendar daily aggregate rebuild** — after Firecrawl merge
+6. **Sales strategy revision** — corrected competitive positioning, honest numbers
+7. **Deploy `inverse_freq` weighting** — won experiment, not yet in v3 config
+8. **Delete `scripts/` after 2026-03-15** — rollback window
 
 ### 🟢 Strategic
-10. **Per-entity synthetic quality scoring** — synthetic hurts ~40% of entities
-11. **Barney as persistent daemon** — OpenClaw instance for 24/7 Barney-Wilma loop without Fred relay
+9. **Feature experiment framework** (Issue #8) — proper A/B testing methodology
+10. **Barney as persistent daemon** — OpenClaw for 24/7 Barney-Wilma loop
+11. **data-hub repo** — park hours scraper, independent data collection platform
 
 ---
 
@@ -214,13 +264,14 @@ TOTAL:         970s (16.2 min)
 
 ```
 1. Read BARNEY.md (this file) ✓
-2. Read #barney-wilma-dev — check for results from last session's async work
-3. Read #pipeline — last 20 messages
-4. Read #gazoo — last 5 messages
-5. Check #alerts for anything urgent
-6. Review Open Action Items above
-7. Run Barney Pipeline Review if needed
-8. Update this file before ending the session
+2. Read #barney-wilma-dev — check for async results (v4 shadow, Firecrawl batch, s08b)
+3. Read #daily-digest — Wilma's and Barney's digests
+4. Read #pipeline — last 20 messages
+5. Read #gazoo — last 5 messages
+6. Check #alerts for anything urgent
+7. Review Open Action Items above
+8. Post Barney Pipeline Digest to #daily-digest if morning session
+9. Update this file before ending the session
 ```
 
 ---
@@ -252,4 +303,4 @@ TOTAL:         970s (16.2 min)
 
 ---
 
-*Last updated: 2026-03-08 — Session 3. PIPELINE v3 DEPLOYED TO PRODUCTION. 16.2 min, all 12 steps, 430/430 entities, 23.4M predictions. Legacy Julia pipeline retired. Lessons #5 and #6 added. Action items updated for post-swap priorities.*
+*Last updated: 2026-03-09 — Session 4. First automated v3 cron (s01-s08 passed, s08b blocked deploy — manually resolved). Pipeline Change Protocol established. s08b parked (wrong layer). v4 forecast feature fix committed. School calendar Firecrawl batch 421/500 confirmed. Lessons #7-#9 added. Active branches documented.*
