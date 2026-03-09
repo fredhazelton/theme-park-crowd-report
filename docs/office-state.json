@@ -1,13 +1,13 @@
 {
-  "updated": "2026-03-08T14:01:48.130183+00:00",
+  "updated": "2026-03-09T04:20:43.583246+00:00",
   "agents": [
     {
       "id": "fred",
       "name": "Fred",
       "icon": "🧔",
-      "state": "idle",
+      "state": "resting",
       "zone": "rest",
-      "task": "Away",
+      "task": "Sleeping 😴",
       "color": "#facc15"
     },
     {
@@ -16,7 +16,7 @@
       "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "heartbeat check - delivered daily reminders",
+      "task": "heartbeat check",
       "color": "#4a90a4"
     },
     {
@@ -34,7 +34,7 @@
       "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
-      "task": "Pushed 9 commits recently",
+      "task": "Pushed 5 commits recently",
       "color": "#c084fc"
     },
     {
@@ -72,6 +72,15 @@
       "zone": "float-1",
       "task": "Observing the dum-dums…",
       "color": "#34d399"
+    },
+    {
+      "id": "mr-slate",
+      "name": "Mr. Slate",
+      "icon": "💼",
+      "state": "idle",
+      "zone": "offsite",
+      "task": "Off the clock",
+      "color": "#a78bfa"
     }
   ],
   "activity": [
