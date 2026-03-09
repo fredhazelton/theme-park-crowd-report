@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T05:00:01Z",
+  "generated_at": "2026-03-09T05:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-09T04:47:03.337000+00:00"
+          "last_active": "2026-03-09T05:13:54.687000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 176762 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-09T05:13:54.687000+00:00",
+      "message_id": "1480433429379022970",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480433429379022970"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "That's actually what just happened to me \u2014 my conversation got too long, hit the context limit, and Clawdbot had to compact/summarize the history to continue.\n\n**What it means:** When a session acc...",
       "timestamp": "2026-03-09T04:47:03.337000+00:00",
       "message_id": "1480426670887538849",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-09T04:46:55.311000+00:00",
       "message_id": "1480426637223919656",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480426637223919656"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Hmm, not finding it in the bot logs. This might be from me (Clawdbot) rather than the TPCR bot. Let me check.",
-      "timestamp": "2026-03-09T04:46:37.862000+00:00",
-      "message_id": "1480426564037640275",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480426564037640275"
     },
     {
       "channel": "mission-control",
