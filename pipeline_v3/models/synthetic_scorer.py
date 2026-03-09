@@ -45,11 +45,13 @@ def score_synthetic_quality(
     synth_str = str(synth_dir).replace("\\", "/")
     parquet_str = str(parquet_dir).replace("\\", "/")
 
+    # NOTE: Synthetic parquets use 'observed_at' (VARCHAR), not 'observed_at_ts' (TIMESTAMP).
+    # Fact table parquets use 'observed_at_ts'. Must CAST synthetic column for EXTRACT to work.
     with read_connection() as con:
         df = con.execute(f"""
             WITH synth AS (
                 SELECT entity_code, park_date,
-                       EXTRACT(HOUR FROM observed_at_ts) as hour_bucket,
+                       EXTRACT(HOUR FROM CAST(observed_at AS TIMESTAMP)) as hour_bucket,
                        AVG(synthetic_actual) as synth_wait
                 FROM read_parquet('{synth_str}/*.parquet')
                 WHERE synthetic_actual > 0
