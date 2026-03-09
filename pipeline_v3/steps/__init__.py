@@ -19,7 +19,6 @@ STEP_ORDER = [
     "s06_synthetic",
     "s07_training",
     "s08_forecast",
-    "s08b_bias_correction",
     "s09_wti",
     "s10_accuracy",
     "s11_deploy",
