@@ -3,9 +3,14 @@
 v3.0: correct but slow (42 min) — df.apply() row-by-row loops.
 v3.1: vectorized aggregates (30 min) — merge instead of apply.
 v3.2: pre-indexed OC + aggregates (target: <8 min) — O(1) lookups.
+v4:   reads model metadata to determine correct feature set per entity.
 
 The v3.1 benchmark showed OC filter = 84% of per-entity time (2.77s/3.3s).
 Root cause: scanning 9.3M set elements per entity instead of O(1) dict lookup.
+
+v4 fix: The model selector trains multiple candidates with different feature
+sets. The forecast step now reads metadata_v3.json to know which features
+each model was trained with, instead of assuming FEATURES_ACTUALS for all v3 models.
 
 Architecture:
 - Process ONE PARK at a time
@@ -38,7 +43,7 @@ from pipeline_v3.core.logging import PipelineLogger
 from pipeline_v3.core.park_codes import PARK_TIMEZONE, entity_to_park
 from pipeline_v3.core.validation import ValidationError, require_file
 
-# Feature columns for actuals-first model (v3 default)
+# Feature columns by model type
 FEATURES_ACTUALS = [
     "mins_since_6am", "mins_since_open",
     "date_group_id_encoded", "season_encoded", "season_year_encoded",
@@ -50,6 +55,14 @@ FEATURES_V2 = [
     "season_year_encoded",
 ]
 
+# All possible features that might be in a time grid row
+# (we generate all of these, then select the subset each model needs)
+ALL_POSSIBLE_FEATURES = [
+    "mins_since_6am", "mins_since_open",
+    "date_group_id_encoded", "season_encoded", "season_year_encoded",
+    "posted_time", "hour_of_day",
+]
+
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     """Generate forecasts for all parks, one park at a time."""
@@ -58,10 +71,10 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         raise ValidationError("XGBoost is required for forecasting. pip install xgboost")
 
     log.info("=" * 60)
-    log.info("STEP 8: FORECAST GENERATION (v3.2 — pre-indexed)")
+    log.info("STEP 8: FORECAST GENERATION (v4 — metadata-aware feature selection)")
     log.info("=" * 60)
 
-    start_date = date.today() + timedelta(days=1)
+    start_date = date.today()
     end_date = start_date + timedelta(days=cfg.forecast_days)
     log.info(f"Forecast range: {start_date} to {end_date} ({cfg.forecast_days} days)")
 
@@ -93,6 +106,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     total_predictions = 0
     total_entities = 0
     failed_entities = 0
+    method_feature_counts: dict[str, int] = {}  # Track which feature sets are used
     batch_files = []
 
     for park_code in sorted(park_entities.keys()):
@@ -121,7 +135,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
             for entity_code in entities:
                 try:
-                    result = _forecast_entity_fast(
+                    result, feat_key = _forecast_entity_fast(
                         entity_code, park_code, time_grid,
                         cfg.models_dir, agg_by_entity, park_open_mins,
                         fallback_ratios, oc_by_entity,
@@ -129,6 +143,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                     if result is not None and len(result) > 0:
                         park_results.append(result)
                         total_entities += 1
+                        method_feature_counts[feat_key] = method_feature_counts.get(feat_key, 0) + 1
                 except Exception as e:
                     log.warning(f"  {entity_code}: failed — {e}")
                     failed_entities += 1
@@ -168,6 +183,12 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         except OSError:
             pass
 
+    # Log feature set usage (v4 diagnostic)
+    if method_feature_counts:
+        log.info("Feature set usage:")
+        for feat_key, count in sorted(method_feature_counts.items()):
+            log.info(f"  {feat_key}: {count} entities")
+
     log.info("=" * 60)
     log.info("FORECAST COMPLETE")
     log.info(f"Entities: {total_entities} successful, {failed_entities} failed")
@@ -181,8 +202,23 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
 
 # =========================================================================
-# Entity-level forecasting — FAST (v3.2)
+# Entity-level forecasting — v4 (metadata-aware features)
 # =========================================================================
+
+def _get_model_features(entity_dir: Path) -> list[str] | None:
+    """Read model metadata to determine which features it was trained with.
+
+    v4 FIX: The model selector saves the feature list in metadata_v3.json.
+    We read that to know exactly what the model expects, instead of guessing
+    based on the model filename.
+
+    Returns the feature list, or None if no metadata found.
+    """
+    meta = _read_metadata(entity_dir, "metadata_v3.json")
+    if meta and "features" in meta:
+        return meta["features"]
+    return None
+
 
 def _forecast_entity_fast(
     entity_code: str,
@@ -193,8 +229,12 @@ def _forecast_entity_fast(
     park_open_mins: dict,
     fallback_ratios: dict,
     oc_by_entity: dict | None,
-) -> pd.DataFrame | None:
-    """Generate forecast for a single entity. O(1) lookups, no scanning."""
+) -> tuple[pd.DataFrame | None, str]:
+    """Generate forecast for a single entity. O(1) lookups, no scanning.
+
+    Returns (DataFrame, feature_key) where feature_key describes which
+    feature set was used (for diagnostic logging).
+    """
 
     df = time_grid.copy()
     df["entity_code"] = entity_code
@@ -205,12 +245,12 @@ def _forecast_entity_fast(
         entity_dates = oc_by_entity.get(ec_upper)
         if entity_dates is not None:
             if len(entity_dates) == 0:
-                return None  # Entity in calendar but zero dates = extinct
+                return None, "extinct"  # Entity in calendar but zero dates = extinct
             df = df[df["park_date"].isin(entity_dates)]
         # If entity not in OC at all, assume operating (new entity)
 
     if len(df) == 0:
-        return None
+        return None, "no_dates"
 
     # O(1) aggregate lookup (pre-indexed by entity)
     entity_agg = agg_by_entity.get(entity_code)
@@ -230,7 +270,7 @@ def _forecast_entity_fast(
     df["mins_since_open"] = (df["mins_since_6am"] + 6 * 60 - df["_open_mins"]).clip(lower=0)
     df.drop(columns=["_open_mins"], inplace=True)
 
-    # Model selection
+    # Model selection — v4: read metadata for feature list
     entity_dir = models_dir / entity_code
     v3_path = entity_dir / "model_v3.json"
     actuals_path = entity_dir / "model_julia_actuals.json"
@@ -241,7 +281,23 @@ def _forecast_entity_fast(
     if v3_path.exists():
         model = xgb.XGBRegressor()
         model.load_model(str(v3_path))
-        features = FEATURES_ACTUALS
+
+        # v4 FIX: Read features from metadata instead of assuming FEATURES_ACTUALS
+        meta_features = _get_model_features(entity_dir)
+        if meta_features is not None:
+            # Verify all required features exist in the DataFrame
+            missing = [f for f in meta_features if f not in df.columns]
+            if missing:
+                # Fall back to actuals features if metadata features aren't available
+                features = FEATURES_ACTUALS
+                feat_key = "v3_actuals_fallback"
+            else:
+                features = meta_features
+                feat_key = f"v3_meta_{len(features)}feat"
+        else:
+            # No metadata (old v3 model) — use default actuals features
+            features = FEATURES_ACTUALS
+            feat_key = "v3_actuals_default"
         method = "model_v3"
 
     elif actuals_path.exists():
@@ -251,6 +307,7 @@ def _forecast_entity_fast(
         is_lite = meta and (meta.get("model_label") == "XGBOOST_ACTUALS_LITE" or meta.get("version") == "actuals_lite")
         features = FEATURES_ACTUALS_LITE if is_lite else FEATURES_ACTUALS
         method = "model_actuals"
+        feat_key = "julia_actuals_lite" if is_lite else "julia_actuals"
 
     elif v2_path.exists():
         model = xgb.XGBRegressor()
@@ -259,12 +316,13 @@ def _forecast_entity_fast(
         is_lite = meta and (meta.get("model_label") == "XGBOOST_LITE_MODEL" or meta.get("version") == "lite")
         features = ["posted_time", "mins_since_6am", "mins_since_open", "hour_of_day"] if is_lite else FEATURES_V2
         method = "model_v2"
+        feat_key = "julia_v2_lite" if is_lite else "julia_v2"
 
     else:
         # No model — vectorized fallback
         df["predicted_actual"] = (df["posted_time"] * fallback_ratio).round().astype(int)
         df["prediction_method"] = "fallback_ratio"
-        return df[["entity_code", "park_date", "time_slot", "predicted_actual", "prediction_method"]]
+        return df[["entity_code", "park_date", "time_slot", "predicted_actual", "prediction_method"]], "fallback"
 
     # Run model prediction (already vectorized via numpy)
     X = df[features].values.astype(np.float32)
@@ -273,7 +331,7 @@ def _forecast_entity_fast(
     df["predicted_actual"] = np.round(predictions).astype(int)
     df["prediction_method"] = method
 
-    return df[["entity_code", "park_date", "time_slot", "predicted_actual", "prediction_method"]]
+    return df[["entity_code", "park_date", "time_slot", "predicted_actual", "prediction_method"]], feat_key
 
 
 # =========================================================================
