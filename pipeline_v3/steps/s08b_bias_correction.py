@@ -5,8 +5,8 @@ Step 8b: Bias Correction
 Applies systematic bias corrections to forecasts based on recent accuracy patterns.
 This corrects persistent over/under-prediction patterns that hurt user experience.
 
-Input: all_forecasts.parquet (from s08_forecast)
-Output: all_forecasts.parquet (corrected predictions)
+Input: all_forecasts_v3.parquet (from s08_forecast)
+Output: all_forecasts_v3.parquet (corrected predictions, backup saved first)
 """
 
 import json
@@ -33,7 +33,7 @@ def run(cfg, log) -> Dict[str, Any]:
     log.info("Starting bias correction...")
     
     # Paths
-    forecast_file = cfg.output_base / "curves" / "forecast_parquet" / "all_forecasts.parquet"
+    forecast_file = cfg.output_base / "curves" / "forecast_parquet" / "all_forecasts_v3.parquet"
     accuracy_file = cfg.output_base / "accuracy" / "slot_accuracy.parquet"
     corrections_dir = cfg.output_base / "bias_correction"
     corrections_dir.mkdir(exist_ok=True)
@@ -52,11 +52,10 @@ def run(cfg, log) -> Dict[str, Any]:
     original_rows = len(df)
     log.info(f"Loaded {original_rows:,} forecast rows")
     
-    # Create backup
+    # Create backup (always fresh — overwrite previous backup)
     backup_file = forecast_file.with_suffix('.parquet.pre_bias_correction')
-    if not backup_file.exists():
-        log.info(f"Creating backup at {backup_file}")
-        shutil.copy2(forecast_file, backup_file)
+    log.info(f"Creating backup at {backup_file}")
+    shutil.copy2(forecast_file, backup_file)
     
     # Analyze bias patterns
     log.info("Analyzing entity bias patterns...")
@@ -100,14 +99,14 @@ def run(cfg, log) -> Dict[str, Any]:
                         df.loc[model_mask, 'predicted_actual'] + correction
                     ).round().astype(int)
                     
-                    corrections_applied += corrected_rows
+                    corrections_applied += int(corrected_rows)
                     correction_log.append({
-                        'entity_code': entity_code,
-                        'bias_minutes': bias_minutes,
-                        'correction_applied': correction,
-                        'rows_corrected': corrected_rows,
-                        'sample_count': sample_count,
-                        'confidence': confidence
+                        'entity_code': str(entity_code),
+                        'bias_minutes': float(bias_minutes),
+                        'correction_applied': float(correction),
+                        'rows_corrected': int(corrected_rows),
+                        'sample_count': int(sample_count),
+                        'confidence': float(confidence)
                     })
                     
                     log.info(f"  {entity_code}: {correction:+.1f} min correction applied to {corrected_rows} rows (bias: {bias_minutes:+.1f})")
@@ -122,9 +121,9 @@ def run(cfg, log) -> Dict[str, Any]:
     
     correction_summary = {
         "timestamp": timestamp,
-        "total_corrections": corrections_applied,
+        "total_corrections": int(corrections_applied),
         "entities_corrected": len(correction_log),
-        "original_rows": original_rows,
+        "original_rows": int(original_rows),
         "corrections": correction_log
     }
     
