@@ -40,7 +40,7 @@ def optimize_stretch_factors(
     """
 
     if stretch_candidates is None:
-        stretch_candidates = [1.0, 1.1, 1.2, 1.3, 1.5, 1.8, 2.0, 2.5, 3.0]
+        stretch_candidates = [1.0, 1.1, 1.2, 1.3, 1.5]  # Capped at 1.5x (global guardrail)
 
     # Load recent accuracy data (forecast vs actual WTI)
     accuracy_dir = cfg.accuracy_dir / "archive"
