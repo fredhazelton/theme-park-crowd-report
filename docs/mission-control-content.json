@@ -37,41 +37,41 @@
         {
             "emoji": "\ud83d\udd04",
             "event": "Conversion model retrain",
-            "date": "Tomorrow",
-            "days_out": 1,
-            "urgency": "tomorrow"
+            "date": "Today",
+            "days_out": 0,
+            "urgency": "today"
         }
     ],
     "pipeline_status": {
         "etl": {
-            "status": "done",
+            "status": "pending",
             "label": "S3 ETL",
-            "detail": "1,710 entities tracked"
+            "detail": "Awaiting 6 AM run"
         },
         "forecasts": {
-            "status": "done",
+            "status": "pending",
             "label": "Forecasts",
-            "detail": "Completed today"
+            "detail": "Awaiting 6 AM run"
         },
         "wti": {
-            "status": "done",
+            "status": "pending",
             "label": "WTI",
-            "detail": "54,720 park-dates"
+            "detail": "Awaiting 6 AM run"
         },
         "live_waits": {
-            "status": "done",
+            "status": "pending",
             "label": "Live Waits",
-            "detail": ""
+            "detail": "Awaiting 6 AM run"
         },
         "discord_bot": {
-            "status": "done",
+            "status": "pending",
             "label": "Discord Bot",
-            "detail": ""
+            "detail": "Awaiting 6 AM run"
         },
         "daily_report": {
-            "status": "done",
+            "status": "pending",
             "label": "Daily Report",
-            "detail": "Completed today"
+            "detail": "Awaiting 6 AM run"
         }
     },
     "accuracy": {
@@ -120,5 +120,5 @@
         "db_live_waits": 123265857,
         "db_wti": 54720
     },
-    "last_updated": "2026-03-08T23:45:04.790223"
+    "last_updated": "2026-03-09T00:00:04.197950"
 }
