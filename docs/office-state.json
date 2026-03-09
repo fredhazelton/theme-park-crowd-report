@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-09T04:20:43.583246+00:00",
+  "updated": "2026-03-09T06:24:09.000427+00:00",
   "agents": [
     {
       "id": "fred",
@@ -23,9 +23,9 @@
       "id": "barney",
       "name": "Barney",
       "icon": "🪨",
-      "state": "idle",
-      "zone": "tarpit-2",
-      "task": "Available on claude.ai",
+      "state": "offline",
+      "zone": "offsite",
+      "task": "",
       "color": "#4ade80"
     },
     {
@@ -34,7 +34,7 @@
       "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
-      "task": "Pushed 5 commits recently",
+      "task": "Pushed 2 commits recently",
       "color": "#c084fc"
     },
     {
@@ -68,9 +68,9 @@
       "id": "gazoo",
       "name": "Gazoo",
       "icon": "👽",
-      "state": "idle",
+      "state": "working",
       "zone": "float-1",
-      "task": "Observing the dum-dums…",
+      "task": "Nightly review completed — 7.5/10",
       "color": "#34d399"
     },
     {
