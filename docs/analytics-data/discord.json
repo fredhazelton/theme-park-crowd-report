@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T14:00:01Z",
+  "generated_at": "2026-03-09T14:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-09T13:35:27.549000+00:00"
+          "last_active": "2026-03-09T14:06:29.786000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-09T13:44:26.014000+00:00"
+          "last_active": "2026-03-09T14:07:05.844000+00:00"
         }
       ]
     },
@@ -159,6 +159,28 @@
   ],
   "recent_activity": [
     {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udea8 **UPDATE: Manual Training Run Failed**\n\nThe `run_training_robust.sh` script I started to recover from pipeline failure has also failed (exit code 0 after ~30 min).\n\n**Status:**\n- WTI still 27.4h ...",
+      "timestamp": "2026-03-09T14:07:05.844000+00:00",
+      "message_id": "1480567610016796827",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480567610016796827"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Hey Fred \u2014 time to open claude.ai and check in with Barney. He's Chief of Pipeline and has 7 open pipeline items to prioritize and spec. Key items needing decisions: deploy inverse_freq weighting (...",
+      "timestamp": "2026-03-09T14:06:29.786000+00:00",
+      "message_id": "1480567458778714296",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480567458778714296"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -212,28 +234,6 @@
       "timestamp": "2026-03-09T13:32:29.029000+00:00",
       "message_id": "1480558899223597238",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480558899223597238"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "OK \u2014 now I have the full picture. Let me answer Fred's two questions.",
-      "timestamp": "2026-03-09T13:32:10.549000+00:00",
-      "message_id": "1480558821712724122",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480558821712724122"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **CRITICAL: Pipeline Freshness Issue**\n\n**70% drop in entity count today:**\n- Today: 57 entities  \n- 7-day average: 188.9 entities\n- Drop: 69.8%\n\n**Status:**\n- Scraper: \u2705 Running (PID 3765200, 48...",
-      "timestamp": "2026-03-09T09:38:38.044000+00:00",
-      "message_id": "1480500049007083591",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480500049007083591"
     },
     {
       "channel": "daily-digest",
