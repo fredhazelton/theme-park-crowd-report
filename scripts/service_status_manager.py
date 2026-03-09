@@ -20,6 +20,7 @@ Usage:
   python3 service_status_manager.py --fix     # Health check + auto-fixes → JSON output
   python3 service_status_manager.py --auto    # Health check + fixes + Discord post/edit (for cron)
   python3 service_status_manager.py --status  # Show current status from state file
+  python3 service_status_manager.py --cleanup # Delete old resolved announcements (6h delay)
 
 Output (--check/--fix):
   JSON with action field: "post", "edit", or "nothing"
@@ -57,6 +58,16 @@ PIPELINE_ALERT_SCRIPT = Path(__file__).parent / "pipeline_alert_check.py"
 PYTHON = Path(__file__).parent.parent / ".venv" / "bin" / "python3"
 
 SERVICE_NAME = "tpcr-discord-bot"
+
+# Auto-cleanup: delete resolved status announcements after this many hours
+CLEANUP_DELAY_HOURS = 6
+
+# Patterns that identify transient status messages (eligible for auto-cleanup)
+STATUS_MESSAGE_PREFIXES = (
+    "✅ **Service Restored",
+    "🔴 **Service Interruption",
+    "🛠️ **Service Notice",
+)
 
 logger = logging.getLogger("service-status")
 
@@ -138,6 +149,111 @@ def discord_edit_message(channel_id: str, message_id: str, content: str) -> dict
     except Exception as e:
         logger.error(f"Discord PATCH exception: {e}")
         return None
+
+
+def discord_delete_message(channel_id: str, message_id: str) -> bool:
+    """
+    Delete a Discord message via REST API.
+    Returns True on success, False on failure.
+    """
+    token = _get_discord_token()
+    if not token:
+        return False
+
+    url = f"{DISCORD_API_BASE}/channels/{channel_id}/messages/{message_id}"
+    headers = {
+        "Authorization": f"Bot {token}",
+    }
+
+    try:
+        resp = requests.delete(url, headers=headers, timeout=15)
+        if resp.status_code == 204:
+            logger.info(f"Discord: Deleted message {message_id} from channel {channel_id}")
+            return True
+        elif resp.status_code == 404:
+            logger.warning(f"Discord DELETE 404: Message {message_id} already gone")
+            return True  # Already deleted = success
+        else:
+            logger.error(
+                f"Discord DELETE failed: {resp.status_code} — {resp.text[:300]}"
+            )
+            return False
+    except Exception as e:
+        logger.error(f"Discord DELETE exception: {e}")
+        return False
+
+
+def cleanup_old_announcements() -> dict:
+    """
+    Delete resolved status announcements that are older than CLEANUP_DELAY_HOURS.
+
+    Checks state for pending_cleanup entries and deletes them if enough time
+    has passed since resolution. Only deletes messages matching transient
+    status patterns (Service Restored, Service Interruption, Service Notice).
+
+    Returns a dict with cleanup results.
+    """
+    state = load_state()
+    pending = state.get("pending_cleanup")
+
+    if not pending:
+        return {"action": "none", "reason": "no pending cleanup"}
+
+    message_id = pending.get("message_id")
+    resolved_at = pending.get("resolved_at")
+    channel_id = pending.get("channel_id", TPCR_ANNOUNCEMENTS_CHANNEL)
+
+    if not message_id or not resolved_at:
+        # Invalid pending entry — clear it
+        state.pop("pending_cleanup", None)
+        save_state(state)
+        return {"action": "cleared_invalid", "reason": "missing message_id or resolved_at"}
+
+    # Check if enough time has passed
+    try:
+        resolved_time = datetime.fromisoformat(resolved_at)
+        if resolved_time.tzinfo is None:
+            resolved_time = resolved_time.replace(tzinfo=timezone.utc)
+        now = datetime.now(timezone.utc)
+        hours_elapsed = (now - resolved_time).total_seconds() / 3600
+    except (ValueError, TypeError) as e:
+        logger.error(f"Cleanup: Bad resolved_at timestamp: {e}")
+        state.pop("pending_cleanup", None)
+        save_state(state)
+        return {"action": "cleared_invalid", "reason": f"bad timestamp: {e}"}
+
+    if hours_elapsed < CLEANUP_DELAY_HOURS:
+        remaining = CLEANUP_DELAY_HOURS - hours_elapsed
+        logger.info(
+            f"Cleanup: Message {message_id} resolved {hours_elapsed:.1f}h ago, "
+            f"waiting {remaining:.1f}h more before deleting"
+        )
+        return {
+            "action": "waiting",
+            "message_id": message_id,
+            "hours_elapsed": round(hours_elapsed, 1),
+            "hours_remaining": round(remaining, 1),
+        }
+
+    # Time's up — delete the message
+    logger.info(
+        f"Cleanup: Deleting message {message_id} "
+        f"(resolved {hours_elapsed:.1f}h ago, threshold={CLEANUP_DELAY_HOURS}h)"
+    )
+    success = discord_delete_message(channel_id, message_id)
+
+    # Clear pending regardless (if delete failed, message may already be gone)
+    state.pop("pending_cleanup", None)
+    # Also clear the announcement_message_id since we just deleted it
+    if state.get("announcement_message_id") == message_id:
+        state["announcement_message_id"] = None
+    save_state(state)
+
+    return {
+        "action": "deleted" if success else "delete_failed",
+        "message_id": message_id,
+        "hours_elapsed": round(hours_elapsed, 1),
+    }
 
 
 def execute_discord_action(result: dict) -> bool:
@@ -779,6 +895,11 @@ def run_check(do_fix: bool = False) -> dict:
     """
     now = datetime.now(timezone.utc).isoformat()
 
+    # Auto-cleanup old resolved announcements first
+    cleanup_result = cleanup_old_announcements()
+    if cleanup_result.get("action") not in ("none", "waiting"):
+        logger.info(f"Cleanup result: {cleanup_result}")
+
     # Run health checks
     logger.info("Running health checks...")
     pipeline = check_pipeline()
@@ -906,6 +1027,18 @@ def run_check(do_fix: bool = False) -> dict:
             # Clear outage context on recovery (already used for message)
             state.pop("outage_context", None)
 
+            # Schedule cleanup of the resolved announcement
+            if message_id:
+                state["pending_cleanup"] = {
+                    "message_id": message_id,
+                    "resolved_at": now,
+                    "channel_id": TPCR_ANNOUNCEMENTS_CHANNEL,
+                }
+                logger.info(
+                    f"Scheduled cleanup of message {message_id} "
+                    f"in {CLEANUP_DELAY_HOURS}h"
+                )
+
     # Accumulate fixes into outage context even on subsequent checks
     if fixes and new_status in ("degraded", "down"):
         ctx = state.get("outage_context", {})
@@ -995,6 +1128,11 @@ def main():
         action="store_true",
         help="Show current status from state file",
     )
+    group.add_argument(
+        "--cleanup",
+        action="store_true",
+        help="Run only the announcement cleanup step (delete old resolved messages)",
+    )
     # Hidden option: Wilma calls this after posting/editing to save the message ID
     parser.add_argument(
         "--set-message-id",
@@ -1012,7 +1150,11 @@ def main():
         print(json.dumps({"ok": True, "message_id": args.set_message_id}))
         return
 
-    if args.status:
+    if args.cleanup:
+        result = cleanup_old_announcements()
+        print(json.dumps(result, indent=2))
+        return
+    elif args.status:
         result = show_status()
     elif args.check:
         result = run_check(do_fix=False)

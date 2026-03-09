@@ -4,7 +4,7 @@
     "task": "Morning check-in, reviewing overnight issues"
   },
   "wilma": {
-    "last_active": "2026-03-09T16:12:02.924509+00:00",
+    "last_active": "2026-03-09T13:34:43.777068+00:00",
     "task": "heartbeat check"
   },
   "barney": {},
@@ -12,7 +12,10 @@
   "dino": {},
   "pebbles": {},
   "betty": {},
-  "gazoo": {},
+  "gazoo": {
+    "last_active": "2026-03-09T06:24:08.956062+00:00",
+    "task": "Nightly review completed — 7.5/10"
+  },
   "_recent_activity": [
     {
       "time": "09:57",

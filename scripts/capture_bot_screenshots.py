@@ -15,7 +15,7 @@ from datetime import datetime, date
 
 # Get the repo root
 REPO = Path(__file__).parent.parent
-ASSETS = REPO / "web" / "assets"
+ASSETS = Path("/home/wilma/hazeydata.ai/assets")
 
 DUCKDB_PATH = "/mnt/data/pipeline/tpcr_live.duckdb"
 
@@ -642,4 +642,18 @@ if __name__ == "__main__":
     print("Generating /ask screenshot...")
     capture_screenshot(create_ask_html(data), str(ASSETS / "screenshot-ask.png"), width=620, selector=".message")
 
-    print("\n🎉 Done! All 5 screenshots saved to web/assets/")
+    print(f"\n🎉 Done! All 5 screenshots saved to {ASSETS}")
+
+    # Auto-commit to hazeydata.ai repo
+    site_repo = ASSETS.parent
+    try:
+        subprocess.run(["git", "add", "assets/screenshot-*.png"], cwd=site_repo, check=True)
+        result = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=site_repo)
+        if result.returncode != 0:
+            subprocess.run(["git", "commit", "-m", "Update bot screenshots with live data"], cwd=site_repo, check=True)
+            subprocess.run(["git", "push"], cwd=site_repo, check=True)
+            print("📤 Pushed updated screenshots to hazeydata.ai")
+        else:
+            print("📌 No screenshot changes to push")
+    except Exception as e:
+        print(f"⚠️ Git push failed: {e}")

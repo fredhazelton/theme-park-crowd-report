@@ -1,0 +1,101 @@
+rank,district_name,state,enrollment,source
+1,New York City,New York,956634,top100_csv
+2,Los Angeles Unified,California,483234,top100_csv
+3,City of Chicago (SD 299),Illinois,347484,top100_csv
+4,Miami-Dade County,Florida,347307,top100_csv
+5,Clark County,Nevada,328991,top100_csv
+6,Broward County,Florida,269172,top100_csv
+7,Hillsborough County,Florida,223305,top100_csv
+8,Houston ISD,Texas,210061,top100_csv
+9,Orange County,Florida,208875,top100_csv
+10,Palm Beach,Florida,194675,top100_csv
+11,Fairfax County,Virginia,188887,top100_csv
+12,Hawaii Department of Education,Hawaii,181088,top100_csv
+13,Gwinnett County,Georgia,180589,top100_csv
+14,Montgomery County,Maryland,165267,top100_csv
+15,Wake County,North Carolina,163404,top100_csv
+16,Dallas ISD,Texas,153861,top100_csv
+17,Charlotte-Mecklenburg,North Carolina,149845,top100_csv
+18,Prince George's County,Maryland,135952,top100_csv
+19,Philadelphia City,Pennsylvania,130617,top100_csv
+20,Duval County,Florida,130279,top100_csv
+21,Cypress-Fairbanks ISD,Texas,117446,top100_csv
+22,Baltimore County,Maryland,115038,top100_csv
+23,Shelby County,Tennessee,113198,top100_csv
+24,Cobb County,Georgia,112097,top100_csv
+25,Northside ISD,Texas,107817,top100_csv
+26,Polk County,Florida,102952,top100_csv
+27,San Diego Unified,California,102270,top100_csv
+28,Jefferson County,Kentucky,100348,top100_csv
+29,Pinellas County,Florida,99772,top100_csv
+30,DeKalb County,Georgia,98800,top100_csv
+31,Lee County,Florida,95613,top100_csv
+32,Fulton County,Georgia,93897,top100_csv
+33,Prince William County,Virginia,92237,top100_csv
+34,Denver,Colorado,92143,top100_csv
+35,Albuquerque,New Mexico,88312,top100_csv
+36,Davidson County,Tennessee,85588,top100_csv
+37,Anne Arundel County,Maryland,84984,top100_csv
+38,Jefferson County No R1,Colorado,84078,top100_csv
+39,Loudoun County,Virginia,83606,top100_csv
+40,Alpine,Utah,83540,top100_csv
+41,Katy ISD,Texas,83423,top100_csv
+42,Fort Worth ISD,Texas,82891,top100_csv
+43,Austin ISD,Texas,80911,top100_csv
+44,Baltimore City,Maryland,79187,top100_csv
+45,Fort Bend ISD,Texas,77756,top100_csv
+46,Greenville County,South Carolina,77302,top100_csv
+47,Pasco County,Florida,76661,top100_csv
+48,Davis,Utah,74773,top100_csv
+49,Milwaukee,Wisconsin,74683,top100_csv
+50,Brevard County,Florida,73962,top100_csv
+51,Guilford County,North Carolina,72682,top100_csv
+52,Long Beach Unified,California,71712,top100_csv
+53,Fresno Unified,California,71265,top100_csv
+54,Osceola County,Florida,69925,top100_csv
+55,Virginia Beach City,Virginia,68706,top100_csv
+56,Seminole County,Florida,68096,top100_csv
+57,Douglas County No RE1,Colorado,67305,top100_csv
+58,Washoe County,Nevada,67301,top100_csv
+59,Aldine ISD,Texas,67259,top100_csv
+60,Granite,Utah,66276,top100_csv
+61,Conroe ISD,Texas,64799,top100_csv
+62,North East ISD,Texas,64539,top100_csv
+63,Elk Grove Unified,California,63660,top100_csv
+64,Volusia County,Florida,63009,top100_csv
+65,Frisco ISD,Texas,62705,top100_csv
+66,Mesa Unified,Arizona,62703,top100_csv
+67,Chesterfield County,Virginia,62614,top100_csv
+68,Knox County,Tennessee,61545,top100_csv
+69,Arlington ISD,Texas,59532,top100_csv
+70,Howard County,Maryland,58868,top100_csv
+71,Jordan,Utah,57771,top100_csv
+72,Cherry Creek No 5,Colorado,56228,top100_csv
+73,Seattle,Washington,55986,top100_csv
+74,Garland ISD,Texas,55701,top100_csv
+75,El Paso ISD,Texas,55253,top100_csv
+76,Winston-Salem/Forsyth County,North Carolina,54566,top100_csv
+77,Clayton County,Georgia,54424,top100_csv
+78,Klein ISD,Texas,54096,top100_csv
+79,Mobile County,Alabama,53941,top100_csv
+80,Omaha,Nebraska,53483,top100_csv
+81,Pasadena ISD,Texas,52878,top100_csv
+82,San Francisco Unified,California,52811,top100_csv
+83,Plano ISD,Texas,52629,top100_csv
+84,Corona-Norco Unified,California,52557,top100_csv
+85,Atlanta,Georgia,52416,top100_csv
+86,Lewisville ISD,Texas,52189,top100_csv
+87,Henrico County,Virginia,51786,top100_csv
+88,District of Columbia,District of Columbia,50971,top100_csv
+89,Round Rock ISD,Texas,50953,top100_csv
+90,Cumberland County,North Carolina,50750,top100_csv
+91,Detroit,Michigan,50644,top100_csv
+92,Forsyth County,Georgia,50544,top100_csv
+93,Boston,Massachusetts,50480,top100_csv
+94,Charleston 01,South Carolina,50299,top100_csv
+95,Manatee County,Florida,50088,top100_csv
+96,Jefferson Parish,Louisiana,49862,top100_csv
+97,Wichita,Kansas,49323,top100_csv
+98,Columbus City,Ohio,48759,top100_csv
+99,San Bernardino City Unified,California,48755,top100_csv
+100,Portland SD1J,Oregon,48601,top100_csv

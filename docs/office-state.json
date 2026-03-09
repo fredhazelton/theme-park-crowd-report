@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-08T14:01:48.130183+00:00",
+  "updated": "2026-03-09T13:34:49.995927+00:00",
   "agents": [
     {
       "id": "fred",
@@ -16,7 +16,7 @@
       "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "heartbeat check - delivered daily reminders",
+      "task": "heartbeat check",
       "color": "#4a90a4"
     },
     {
@@ -34,7 +34,7 @@
       "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
-      "task": "Pushed 9 commits recently",
+      "task": "Pushed 3 commits recently",
       "color": "#c084fc"
     },
     {
@@ -72,6 +72,15 @@
       "zone": "float-1",
       "task": "Observing the dum-dums…",
       "color": "#34d399"
+    },
+    {
+      "id": "mr-slate",
+      "name": "Mr. Slate",
+      "icon": "💼",
+      "state": "working",
+      "zone": "corner-office",
+      "task": "Watching the bottom line",
+      "color": "#a78bfa"
     }
   ],
   "activity": [

@@ -171,6 +171,36 @@ def determine_gazoo_state(activity_data):
     return "idle", "float-1", "Observing the dum-dums…"
 
 
+def determine_slate_state(activity_data):
+    """Mr. Slate — the CBO. Works business hours, weekends off."""
+    slate_data = activity_data.get("mr-slate", {})
+    last_seen = slate_data.get("last_active")
+    mins = minutes_since(last_seen)
+    n = now_et()
+    h = n.hour
+    weekday = n.weekday()  # 0=Mon, 6=Sun
+
+    # If recently active (breadcrumb), show working
+    if mins < 30:
+        task = slate_data.get("task", "Reviewing the numbers")
+        return "working", "corner-office", task
+
+    # Weekends off
+    if weekday >= 5:
+        return "idle", "offsite", "Weekend — even bosses rest"
+
+    # Business hours (8 AM - 6 PM ET)
+    if 8 <= h < 18:
+        return "working", "corner-office", "Watching the bottom line"
+
+    # Evening
+    if 18 <= h < 22:
+        return "idle", "corner-office", "Wrapping up for the day"
+
+    # Night / early morning
+    return "idle", "offsite", "Off the clock"
+
+
 def determine_subagent_state(name, agent_id, activity_data):
     """Sub-agents — check if recently spawned."""
     data = activity_data.get(agent_id, {})
@@ -248,6 +278,13 @@ def build_state():
     agents.append({
         "id": "gazoo", "name": "Gazoo", "icon": "👽",
         "state": state, "zone": zone, "task": task, "color": "#34d399"
+    })
+
+    # Mr. Slate
+    state, zone, task = determine_slate_state(activity_data)
+    agents.append({
+        "id": "mr-slate", "name": "Mr. Slate", "icon": "💼",
+        "state": state, "zone": zone, "task": task, "color": "#a78bfa"
     })
 
     # Preserve + append activity log

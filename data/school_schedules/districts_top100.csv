@@ -1,0 +1,101 @@
+rank,district_name,state,students_2019,calendar_url,spring_break_start,spring_break_end,winter_break_start,winter_break_end,summer_start,summer_end,last_updated
+1,New York City,New York,956634,https://www.schools.nyc.gov/about-us/news/2025-26-school-year-calendar,2026-04-02,2026-04-10,2025-12-24,2026-01-02,2026-06-26,2025-09-04,2026-03-08
+2,Los Angeles Unified,California,483234,https://www.lausd.org/calendars,2026-03-30,2026-04-03,2025-12-18,2026-01-02,2026-06-10,2025-08-14,2026-03-08
+3,City of Chicago (SD 299),Illinois,347484,https://schoolcalendarinfo.com/chicago-public-schools/,2026-03-23,2026-03-27,2025-12-22,2026-01-05,2026-06-04,2025-08-18,2026-03-08
+4,Miami-Dade County,Florida,347307,https://schoolcalendarinfo.com/miami-dade-county-public-schools/,2026-03-20,2026-03-27,2025-12-22,2026-01-02,2026-06-04,2025-08-14,2026-03-08
+5,Clark County,Nevada,328991,https://schoolcalendarinfo.com/clark-county-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-02,2026-05-22,2025-08-11,2026-03-08
+6,Broward County,Florida,269172,https://schoolcalendarinfo.com/broward-county-public-schools/,2026-03-13,2026-03-20,2025-12-22,2026-01-05,2026-06-03,2025-08-11,2026-03-08
+7,Hillsborough County,Florida,223305,https://schoolcalendarinfo.com/hillsborough-county-public-schools/,2026-03-16,2026-03-23,2025-12-22,2026-01-05,2026-05-29,2025-08-11,2026-03-08
+8,Houston ISD,Texas,210061,https://schoolcalendarinfo.com/houston-independent-school-district/,2026-03-09,2026-03-13,2025-12-22,2026-01-05,2026-06-04,2025-08-12,2026-03-08
+9,Orange County,Florida,208875,https://schoolcalendarinfo.com/orange-county-public-schools/,2026-03-13,2026-03-20,2025-12-22,2026-01-05,2026-05-27,2025-08-11,2026-03-08
+10,Palm Beach,Florida,194675,https://schoolcalendarinfo.com/palm-beach-county-school-district/,2026-03-16,2026-03-23,2025-12-22,2026-01-05,2026-05-29,2025-08-11,2026-03-08
+11,Fairfax County,Virginia,188887,https://schoolcalendarinfo.com/fairfax-county-public-schools/,2026-03-30,2026-04-06,2025-12-22,2026-01-02,2026-06-17,2025-08-18,2026-03-08
+12,Hawaii Department of Education,Hawaii,181088,https://hawaiipublicschools.org/,2026-03-16,2026-03-20,2025-12-22,2026-01-02,2026-05-28,2025-07-28,2026-03-08
+13,Gwinnett County,Georgia,180589,https://schoolcalendarinfo.com/gwinnett-county-public-schools/,2026-04-06,2026-04-10,2025-12-22,2026-01-02,2026-05-20,2025-08-04,2026-03-08
+14,Montgomery County,Maryland,165267,https://schoolcalendarinfo.com/montgomery-county-public-schools/,2026-03-30,2026-04-03,2025-12-24,2026-01-02,2026-06-15,2025-08-25,2026-03-08
+15,Wake County,North Carolina,163404,https://schoolcalendarinfo.com/wake-county-public-schools/,2026-03-30,2026-04-06,2025-12-22,2026-01-02,2026-06-11,2025-08-25,2026-03-08
+16,Dallas ISD,Texas,153861,https://schoolcalendarinfo.com/dallas-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-05,2026-05-22,2025-08-12,2026-03-08
+17,Charlotte-Mecklenburg,North Carolina,149845,https://schoolcalendarinfo.com/charlotte-mecklenburg-schools/,2026-04-03,2026-04-10,2025-12-22,2026-01-02,2026-06-10,2025-08-25,2026-03-08
+18,Prince George's County,Maryland,135952,https://schoolcalendarinfo.com/prince-georges-county-public-schools/,2026-03-30,2026-04-06,2025-12-22,2026-01-02,2026-06-12,2025-08-26,2026-03-08
+19,Philadelphia City,Pennsylvania,130617,https://www.philasd.org/calendar/,2026-03-30,2026-04-03,2025-12-24,2026-01-02,2026-06-11,2025-08-25,2026-03-08
+20,Duval County,Florida,130279,https://schoolcalendarinfo.com/duval-county-public-schools/,2026-03-16,2026-03-23,2025-12-22,2026-01-06,2026-05-28,2025-08-11,2026-03-08
+21,Cypress-Fairbanks ISD,Texas,117446,https://schoolcalendarinfo.com/cypress-fairbanks-independent-school-district/,2026-03-09,2026-03-13,2025-12-19,2026-01-05,2026-05-28,2025-08-13,2026-03-08
+22,Baltimore County,Maryland,115038,https://schoolcalendarinfo.com/baltimore-county-public-schools/,2026-04-02,2026-04-10,2025-12-24,2026-01-02,2026-06-16,2025-08-25,2026-03-08
+23,Shelby County,Tennessee,113198,https://www.scsk12.org/calendar,2026-03-16,2026-03-20,2025-12-22,2026-01-02,2026-05-22,2025-08-04,2026-03-08
+24,Cobb County,Georgia,112097,https://schoolcalendarinfo.com/cobb-county-school-district/,2026-04-06,2026-04-10,2025-12-22,2026-01-05,2026-05-20,2025-08-04,2026-03-08
+25,Northside ISD,Texas,107817,https://schoolcalendarinfo.com/northside-independent-school-district/,2026-03-09,2026-03-13,2025-12-22,2026-01-05,2026-05-21,2025-08-11,2026-03-08
+26,Polk County,Florida,102952,https://schoolcalendarinfo.com/polk-county-public-schools/,2026-03-16,2026-03-20,2025-12-22,2026-01-06,2026-05-28,2025-08-11,2026-03-08
+27,San Diego Unified,California,102270,https://schoolcalendarinfo.com/san-diego-unified-school-district/,2026-03-30,2026-04-03,2025-12-22,2026-01-02,2026-05-28,2025-08-11,2026-03-08
+28,Jefferson County,Kentucky,100348,https://schoolcalendarinfo.com/jefferson-county-public-schools/,2026-04-03,2026-04-10,2025-12-22,2026-01-02,2026-05-22,2025-08-07,2026-03-08
+29,Pinellas County,Florida,99772,https://schoolcalendarinfo.com/pinellas-county-schools/,2026-03-16,2026-03-20,2025-12-22,2026-01-02,2026-05-28,2025-08-11,2026-03-08
+30,DeKalb County,Georgia,98800,https://schoolcalendarinfo.com/dekalb-county-school-district/,2026-04-06,2026-04-10,2025-12-22,2026-01-05,2026-05-28,2025-08-04,2026-03-08
+31,Lee County,Florida,95613,https://www.leeschools.net/our_district/calendars,2026-03-16,2026-03-20,2025-12-22,2026-01-02,2026-05-29,2025-08-11,2026-03-08
+32,Fulton County,Georgia,93897,https://schoolcalendarinfo.com/fulton-county-schools/,2026-04-06,2026-04-10,2025-12-22,2026-01-05,2026-05-21,2025-08-04,2026-03-08
+33,Prince William County,Virginia,92237,https://schoolcalendarinfo.com/prince-william-county-public-schools/,2026-03-30,2026-04-06,2025-12-22,2026-01-02,2026-06-12,2025-08-18,2026-03-08
+34,Denver,Colorado,92143,https://schoolcalendarinfo.com/denver-public-schools/,2026-03-30,2026-04-03,2025-12-22,2026-01-05,2026-05-29,2025-08-18,2026-03-08
+35,Albuquerque,New Mexico,88312,https://schoolcalendarinfo.com/albuquerque-public-schools/,2026-03-30,2026-04-03,2025-12-22,2026-01-05,2026-05-28,2025-08-07,2026-03-08
+36,Davidson County,Tennessee,85588,https://schoolcalendarinfo.com/metro-nashville-public-schools/,2026-03-09,2026-03-13,2025-12-22,2026-01-06,2026-05-21,2025-08-05,2026-03-08
+37,Anne Arundel County,Maryland,84984,https://schoolcalendarinfo.com/anne-arundel-county-public-schools/,2026-03-30,2026-04-06,2025-12-22,2026-01-02,2026-06-17,2025-08-26,2026-03-08
+38,Jefferson County No R1,Colorado,84078,https://schoolcalendarinfo.com/jeffco-public-schools/,2026-03-23,2026-03-30,2025-12-22,2026-01-06,2026-05-28,2025-08-19,2026-03-08
+39,Loudoun County,Virginia,83606,https://schoolcalendarinfo.com/loudoun-county-public-schools/,2026-03-30,2026-04-03,2025-12-22,2026-01-02,2026-06-15,2025-08-21,2026-03-08
+40,Alpine,Utah,83540,https://schoolcalendarinfo.com/alpine-school-district/,2026-04-06,2026-04-10,2025-12-22,2026-01-05,2026-05-22,2025-08-13,2026-03-08
+41,Katy ISD,Texas,83423,https://schoolcalendarinfo.com/katy-independent-school-district/,2026-03-09,2026-03-13,2025-12-22,2026-01-05,2026-05-21,2025-08-13,2026-03-08
+42,Fort Worth ISD,Texas,82891,https://schoolcalendarinfo.com/fort-worth-independent-school-district/,2026-03-16,2026-03-23,2025-12-19,2026-01-05,2026-05-21,2025-08-12,2026-03-08
+43,Austin ISD,Texas,80911,https://schoolcalendarinfo.com/austin-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-05,2026-05-28,2025-08-19,2026-03-08
+44,Baltimore City,Maryland,79187,https://schoolcalendarinfo.com/baltimore-city-public-schools/,2026-03-30,2026-04-06,2025-12-24,2026-01-02,2026-06-11,2025-08-25,2026-03-08
+45,Fort Bend ISD,Texas,77756,https://schoolcalendarinfo.com/fort-bend-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-07,2026-05-28,2025-08-12,2026-03-08
+46,Greenville County,South Carolina,77302,https://schoolcalendarinfo.com/greenville-county-schools/,2026-03-13,2026-03-20,2025-12-22,2026-01-05,2026-05-22,2025-08-11,2026-03-08
+47,Pasco County,Florida,76661,https://schoolcalendarinfo.com/pasco-county-schools/,2026-03-30,2026-04-03,2025-12-22,2026-01-06,2026-05-29,2025-08-11,2026-03-08
+48,Davis,Utah,74773,https://schoolcalendarinfo.com/davis-school-district/,2026-03-30,2026-04-03,2025-12-22,2026-01-05,2026-05-22,2025-08-18,2026-03-08
+49,Milwaukee,Wisconsin,74683,https://schoolcalendarinfo.com/milwaukee-public-schools/,2026-03-30,2026-04-03,2025-12-22,2026-01-02,2026-06-15,2025-09-02,2026-03-08
+50,Brevard County,Florida,73962,https://schoolcalendarinfo.com/brevard-public-schools/,2026-03-23,2026-03-27,2025-12-22,2026-01-02,2026-05-27,2025-08-11,2026-03-08
+51,Guilford County,North Carolina,72682,https://schoolcalendarinfo.com/guilford-county-schools/,2026-03-30,2026-04-06,2025-12-22,2026-01-02,2026-06-10,2025-08-25,2026-03-08
+52,Long Beach Unified,California,71712,https://schoolcalendarinfo.com/long-beach-unified-school-district/,2026-04-06,2026-04-10,2025-12-22,2026-01-02,2026-06-11,2025-08-26,2026-03-08
+53,Fresno Unified,California,71265,https://schoolcalendarinfo.com/fresno-unified-school-district/,2026-03-30,2026-04-06,2025-12-22,2026-01-09,2026-06-11,2025-08-18,2026-03-08
+54,Osceola County,Florida,69925,https://schoolcalendarinfo.com/osceola-county-school-district/,2026-03-13,2026-03-20,2025-12-22,2026-01-02,2026-05-28,2025-08-11,2026-03-08
+55,Virginia Beach City,Virginia,68706,https://schoolcalendarinfo.com/virginia-beach-city-public-schools/,2026-04-03,2026-04-10,2025-12-22,2026-01-02,2026-06-12,2025-08-25,2026-03-08
+56,Seminole County,Florida,68096,https://schoolcalendarinfo.com/seminole-county-public-schools/,2026-03-13,2026-03-20,2025-12-19,2026-01-05,2026-05-27,2025-08-11,2026-03-08
+57,Douglas County No RE1,Colorado,67305,https://schoolcalendarinfo.com/douglas-county-schools/,2026-04-06,2026-04-10,2025-12-22,2026-01-02,2026-05-22,2025-08-11,2026-03-08
+58,Washoe County,Nevada,67301,https://schoolcalendarinfo.com/washoe-county-school-district/,2026-03-23,2026-04-03,2025-12-19,2026-01-05,2026-06-05,2025-08-11,2026-03-08
+59,Aldine ISD,Texas,67259,https://schoolcalendarinfo.com/aldine-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-06,2026-05-28,2025-08-11,2026-03-08
+60,Granite,Utah,66276,https://schoolcalendarinfo.com/granite-school-district/,2026-04-06,2026-04-10,2025-12-22,2026-01-06,2026-05-29,2025-08-13,2026-03-08
+61,Conroe ISD,Texas,64799,https://schoolcalendarinfo.com/conroe-independent-school-district/,2026-03-09,2026-03-13,2025-12-22,2026-01-05,2026-05-22,2025-08-13,2026-03-08
+62,North East ISD,Texas,64539,https://schoolcalendarinfo.com/north-east-independent-school-district/,2026-03-09,2026-03-13,2025-12-22,2026-01-02,2026-06-04,2025-08-11,2026-03-08
+63,Elk Grove Unified,California,63660,https://schoolcalendarinfo.com/elk-grove-unified-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-05,2026-05-29,2025-08-14,2026-03-08
+64,Volusia County,Florida,63009,https://www.vcsedu.org/schools/school-calendar,2026-03-16,2026-03-20,2025-12-22,2026-01-02,2026-05-27,2025-08-11,2026-03-08
+65,Frisco ISD,Texas,62705,https://schoolcalendarinfo.com/frisco-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-05,2026-05-22,2025-08-13,2026-03-08
+66,Mesa Unified,Arizona,62703,https://schoolcalendarinfo.com/mesa-public-schools/,2026-03-16,2026-03-20,2025-12-19,2026-01-05,2026-05-21,2025-07-31,2026-03-08
+67,Chesterfield County,Virginia,62614,https://schoolcalendarinfo.com/chesterfield-county-public-schools/,2026-03-30,2026-04-03,2025-12-22,2026-01-02,2026-05-29,2025-08-18,2026-03-08
+68,Knox County,Tennessee,61545,https://schoolcalendarinfo.com/knox-county-schools/,2026-03-09,2026-03-13,2025-12-22,2026-01-02,2026-05-21,2025-08-07,2026-03-08
+69,Arlington ISD,Texas,59532,https://www.aisd.net/district/calendars/,2026-03-16,2026-03-20,2025-12-22,2026-01-02,2026-06-04,2025-08-11,2026-03-08
+70,Howard County,Maryland,58868,https://schoolcalendarinfo.com/howard-county-public-schools/,2026-03-30,2026-04-03,2025-12-24,2026-01-02,2026-06-12,2025-08-25,2026-03-08
+71,Jordan,Utah,57771,https://schoolcalendarinfo.com/jordan-school-district/,2026-03-30,2026-04-03,2025-12-22,2026-01-02,2026-06-04,2025-08-07,2026-03-08
+72,Cherry Creek No 5,Colorado,56228,https://schoolcalendarinfo.com/cherry-creek-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-05,2026-05-22,2025-08-11,2026-03-08
+73,Seattle,Washington,55986,https://schoolcalendarinfo.com/seattle-public-schools/,2026-04-13,2026-04-17,2025-12-22,2026-01-02,2026-06-17,2025-09-03,2026-03-08
+74,Garland ISD,Texas,55701,https://schoolcalendarinfo.com/garland-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-05,2026-05-22,2025-08-11,2026-03-08
+75,El Paso ISD,Texas,55253,https://schoolcalendarinfo.com/el-paso-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-06,2026-06-05,2025-08-04,2026-03-08
+76,Winston-Salem/Forsyth County,North Carolina,54566,https://www.wsfcs.k12.nc.us/calendars,2026-04-06,2026-04-10,2025-12-22,2026-01-02,2026-06-10,2025-08-25,2026-03-08
+77,Clayton County,Georgia,54424,https://schoolcalendarinfo.com/clayton-county-public-schools/,2026-04-06,2026-04-10,2025-12-22,2026-01-06,2026-05-22,2025-08-04,2026-03-08
+78,Klein ISD,Texas,54096,https://schoolcalendarinfo.com/klein-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-06,2026-05-28,2025-08-13,2026-03-08
+79,Mobile County,Alabama,53941,https://schoolcalendarinfo.com/mobile-county-public-schools/,2026-04-13,2026-04-17,2025-12-22,2026-01-05,2026-05-22,2025-08-11,2026-03-08
+80,Omaha,Nebraska,53483,https://schoolcalendarinfo.com/omaha-public-schools/,2026-03-16,2026-03-20,2025-12-22,2026-01-02,2026-05-20,2025-08-14,2026-03-08
+81,Pasadena ISD,Texas,52878,https://www1.pasadenaisd.org/calendar,2026-03-09,2026-03-13,2025-12-22,2026-01-02,2026-05-28,2025-08-11,2026-03-08
+82,San Francisco Unified,California,52811,https://schoolcalendarinfo.com/san-francisco-unified-school-district/,2026-03-27,2026-04-03,2025-12-22,2026-01-02,2026-06-03,2025-08-18,2026-03-08
+83,Plano ISD,Texas,52629,https://schoolcalendarinfo.com/plano-independent-school-district/,2026-03-16,2026-03-23,2025-12-22,2026-01-05,2026-05-22,2025-08-12,2026-03-08
+84,Corona-Norco Unified,California,52557,https://www.cnusd.k12.ca.us/departments/educational_services/school_calendar,2026-03-30,2026-04-03,2025-12-22,2026-01-05,2026-06-11,2025-08-11,2026-03-08
+85,Atlanta,Georgia,52416,https://schoolcalendarinfo.com/atlanta-public-schools/,2026-04-06,2026-04-10,2025-12-22,2026-01-05,2026-05-28,2025-08-01,2026-03-08
+86,Lewisville ISD,Texas,52189,https://schoolcalendarinfo.com/lewisville-independent-school-district/,2026-03-16,2026-03-20,2025-12-22,2026-01-05,2026-05-22,2025-08-12,2026-03-08
+87,Henrico County,Virginia,51786,https://schoolcalendarinfo.com/henrico-county-public-schools/,2026-03-30,2026-04-03,2025-12-22,2026-01-02,2026-05-29,2025-08-18,2026-03-08
+88,District of Columbia,District of Columbia,50971,https://dcps.dc.gov/calendar,2026-04-06,2026-04-10,2025-12-22,2026-01-02,2026-06-19,2025-08-25,2026-03-08
+89,Round Rock ISD,Texas,50953,https://schoolcalendarinfo.com/round-rock-independent-school-district/,2026-03-16,2026-03-20,2025-12-19,2026-01-05,2026-05-21,2025-08-13,2026-03-08
+90,Cumberland County,North Carolina,50750,https://schoolcalendarinfo.com/cumberland-county-schools/,2026-04-03,2026-04-10,2025-12-22,2026-01-05,2026-05-22,2025-08-25,2026-03-08
+91,Detroit,Michigan,50644,https://schoolcalendarinfo.com/detroit-public-schools/,2026-03-30,2026-04-03,2025-12-22,2026-01-02,2026-06-05,2025-08-25,2026-03-08
+92,Forsyth County,Georgia,50544,https://schoolcalendarinfo.com/forsyth-county-schools/,2026-04-06,2026-04-10,2025-12-22,2026-01-05,2026-05-22,2025-08-05,2026-03-08
+93,Boston,Massachusetts,50480,https://schoolcalendarinfo.com/boston-public-schools/,2026-04-20,2026-04-24,2025-12-22,2026-01-02,2026-06-22,2025-09-04,2026-03-08
+94,Charleston 01,South Carolina,50299,https://schoolcalendarinfo.com/charleston-county-school-district/,2026-04-06,2026-04-10,2025-12-22,2026-01-05,2026-05-28,2025-08-12,2026-03-08
+95,Manatee County,Florida,50088,https://schoolcalendarinfo.com/manatee-county-school-district/,2026-03-16,2026-03-23,2025-12-22,2026-01-05,2026-05-28,2025-08-11,2026-03-08
+96,Jefferson Parish,Louisiana,49862,https://www.jpschools.org/Page/2,2026-04-03,2026-04-10,2025-12-22,2026-01-02,2026-05-21,2025-08-06,2026-03-08
+97,Wichita,Kansas,49323,https://schoolcalendarinfo.com/wichita-public-schools/,2026-03-13,2026-03-20,2025-12-22,2026-01-02,2026-05-21,2025-08-14,2026-03-08
+98,Columbus City,Ohio,48759,https://schoolcalendarinfo.com/columbus-city-schools/,2026-04-03,2026-04-10,2025-12-22,2026-01-02,2026-05-28,2025-08-25,2026-03-08
+99,San Bernardino City Unified,California,48755,https://www.sbcusd.com/district/calendars,2026-03-30,2026-04-03,2025-12-22,2026-01-05,2026-06-04,2025-08-11,2026-03-08
+100,Portland SD1J,Oregon,48601,https://schoolcalendarinfo.com/portland-public-schools/,2026-03-23,2026-03-27,2025-12-22,2026-01-02,2026-06-09,2025-08-26,2026-03-08

@@ -1,7 +1,10 @@
 """Step 9: WTI Calculation — v4 with adaptive quantile mapping.
 
-v3: Global 1.5x stretch cap for quantile mapping.
+v3.2 fix: removed legacy fallback to all_forecasts.parquet (v2 file).
+Only reads all_forecasts_v3.parquet now.
+
 v4: Per-park stretch factors optimized from historical accuracy (Pillar 3).
+Stretch candidates capped at 1.5x.
 """
 
 from __future__ import annotations
@@ -36,15 +39,13 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     with log.timed("historical WTI"):
         results.append(_compute_historical_wti(cfg, log, pc_sql))
 
-    # Forecast WTI
+    # Forecast WTI (v3.2+: ONLY v3 file, no fallback to stale v2)
     forecast_file = cfg.forecast_dir / "all_forecasts_v3.parquet"
-    if not forecast_file.exists():
-        forecast_file = cfg.forecast_dir / "all_forecasts.parquet"
     if forecast_file.exists():
         with log.timed("forecast WTI"):
             results.append(_compute_forecast_wti(cfg, log, pc_sql, forecast_file))
     else:
-        log.warning(f"No forecast file found — forecast WTI skipped")
+        log.warning(f"No v3 forecast file at {forecast_file} — forecast WTI skipped")
 
     # Adaptive quantile mapping with per-park stretch factors
     if cfg.quantile_mapping and len(results) >= 2:
