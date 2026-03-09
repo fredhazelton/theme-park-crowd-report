@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T22:45:01Z",
+  "generated_at": "2026-03-09T23:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-09T19:22:39.259000+00:00"
+          "last_active": "2026-03-09T22:52:59.929000+00:00"
         }
       ]
     },
@@ -159,6 +159,17 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175805 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-09T22:52:59.929000+00:00",
+      "message_id": "1480699957441986621",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480699957441986621"
+    },
+    {
       "channel": "alerts",
       "channel_emoji": "\ud83d\udea8",
       "channel_id": "1479471928262529088",
@@ -201,17 +212,6 @@
       "timestamp": "2026-03-09T19:22:38.907000+00:00",
       "message_id": "1480647021038665843",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480647021038665843"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me tackle the action items Barney left for me. I need to:\n1. Fetch queue-times API data for all 12 parks\n2. Run the dimEntity query\n3. Check the scraper for name fields\n4. Answer Fred's que...",
-      "timestamp": "2026-03-09T19:22:38.724000+00:00",
-      "message_id": "1480647020271239272",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480647020271239272"
     },
     {
       "channel": "gazoo",
