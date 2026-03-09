@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T11:45:01Z",
+  "generated_at": "2026-03-09T12:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-09T11:30:06.772000+00:00"
+          "last_active": "2026-03-09T12:00:01.645000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 171124 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-09T12:00:01.645000+00:00",
+      "message_id": "1480535631808565329",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480535631808565329"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 171082 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-09T11:30:06.772000+00:00",
       "message_id": "1480528103565557871",
@@ -190,17 +201,6 @@
       "timestamp": "2026-03-09T09:38:38.044000+00:00",
       "message_id": "1480500049007083591",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480500049007083591"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "- **Islands of Adventure:** -10.7 min correction\n- **Animal Kingdom:** -9.3 min correction  \n- **Magic Kingdom:** -7.3 min correction\n- **171 total entities** with significant bias patterns\n\n### \u2705 ...",
-      "timestamp": "2026-03-09T09:06:36.835000+00:00",
-      "message_id": "1480491990872231936",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480491990872231936"
     },
     {
       "channel": "daily-digest",
