@@ -83,9 +83,9 @@
         "days_evaluated": 25
     },
     "ask_analytics": {
-        "total_questions": 74,
+        "total_questions": 75,
         "unique_users": 20,
-        "thumbs_up": 8,
+        "thumbs_up": 9,
         "thumbs_down": 0,
         "avg_response_ms": 0,
         "model": "Claude Sonnet 4"
@@ -120,5 +120,5 @@
         "db_live_waits": 123364583,
         "db_wti": 54720
     },
-    "last_updated": "2026-03-09T09:00:05.314881"
+    "last_updated": "2026-03-09T09:15:05.820246"
 }
