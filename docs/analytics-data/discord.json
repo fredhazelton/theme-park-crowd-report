@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T11:30:01Z",
+  "generated_at": "2026-03-09T11:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-09T11:00:40.876000+00:00"
+          "last_active": "2026-03-09T11:30:06.772000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 171082 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-09T11:30:06.772000+00:00",
+      "message_id": "1480528103565557871",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480528103565557871"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170638 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-09T11:00:40.876000+00:00",
       "message_id": "1480520696861032552",
@@ -190,17 +201,6 @@
       "timestamp": "2026-03-09T09:06:36.835000+00:00",
       "message_id": "1480491990872231936",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480491990872231936"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "## \u2705 **DAILY IMPROVEMENT SPRINT COMPLETED**\n\nSuccessfully built and integrated a **systematic bias correction system** that addresses the #1 user experience issue identified by Gazoo.\n\n### \ud83c\udfaf **High...",
-      "timestamp": "2026-03-09T09:06:36.489000+00:00",
-      "message_id": "1480491989420998737",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480491989420998737"
     },
     {
       "channel": "daily-digest",
