@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T04:30:01Z",
+  "generated_at": "2026-03-09T04:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-08T15:30:01.328000+00:00"
+          "last_active": "2026-03-09T04:30:01.646000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-09T04:28:20.103000+00:00"
+          "last_active": "2026-03-09T04:44:44.979000+00:00"
         }
       ]
     },
@@ -162,34 +162,45 @@
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Ah - there it is again!",
+      "timestamp": "2026-03-09T04:44:44.979000+00:00",
+      "message_id": "1480426090571759627",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480426090571759627"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 176719 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-09T04:43:54.962000+00:00",
+      "message_id": "1480425880785260585",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480425880785260585"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-09T04:30:01.646000+00:00",
+      "message_id": "1480422385604628550",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480422385604628550"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
       "message": "Pre-flight looks decent:\n\n- **Scraper:** \u2705 running, fresh data flowing\n- **Bot:** \u2705 31h uptime\n- **6 AM cron:** Set to run `pipeline_v3/pipeline.py` tomorrow \u2014 but today it looks like it fell back ...",
       "timestamp": "2026-03-09T04:28:20.103000+00:00",
       "message_id": "1480421959702675529",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480421959702675529"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Me too. Let me do a quick pre-flight check so we're set up for success:",
-      "timestamp": "2026-03-09T04:27:52.200000+00:00",
-      "message_id": "1480421842668752917",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480421842668752917"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Thanks! I'm really hoping for good news tomorrow - a clean run (mybe the first) and some good error results from the WTI and entity level predictions",
-      "timestamp": "2026-03-09T04:27:47.154000+00:00",
-      "message_id": "1480421821504557186",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480421821504557186"
     },
     {
       "channel": "alerts",
@@ -302,17 +313,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1480210748939698317"
     },
     {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-08T14:00:01.847000+00:00",
-      "message_id": "1480203443778883818",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480203443778883818"
-    },
-    {
       "channel": "alerts",
       "channel_emoji": "\ud83d\udea8",
       "channel_id": "1479471928262529088",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 2,
-    "messages_today": 4
+    "active_channels_today": 3,
+    "messages_today": 5
   }
 }
