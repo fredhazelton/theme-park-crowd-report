@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-09T06:24:09.000427+00:00",
+  "updated": "2026-03-09T08:14:36.550670+00:00",
   "agents": [
     {
       "id": "fred",
@@ -68,9 +68,9 @@
       "id": "gazoo",
       "name": "Gazoo",
       "icon": "👽",
-      "state": "working",
+      "state": "idle",
       "zone": "float-1",
-      "task": "Nightly review completed — 7.5/10",
+      "task": "Observing the dum-dums…",
       "color": "#34d399"
     },
     {
