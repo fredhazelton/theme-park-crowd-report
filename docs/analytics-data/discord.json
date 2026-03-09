@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T16:00:01Z",
+  "generated_at": "2026-03-09T16:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-09T14:30:01.808000+00:00"
+          "last_active": "2026-03-09T16:00:01.928000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-09T15:00:23.409000+00:00"
+          "last_active": "2026-03-09T16:11:10.860000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-09T14:07:05.844000+00:00"
+          "last_active": "2026-03-09T16:14:23.991000+00:00"
         }
       ]
     },
@@ -159,15 +159,81 @@
   ],
   "recent_activity": [
     {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Three strikes \u2014 promoting to MEMORY.md:",
+      "timestamp": "2026-03-09T16:14:23.991000+00:00",
+      "message_id": "1480599646727573658",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480599646727573658"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "You're right, sorry \u2014 it's 12:13 PM EDT, not 4 PM. The Gazoo afternoon review isn't even due until 2:40 PM. Another premature alert. \n\nThat's a pattern now \u2014 three false alarms where I alert about ...",
+      "timestamp": "2026-03-09T16:14:07.463000+00:00",
+      "message_id": "1480599577403854969",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480599577403854969"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "You're right \u2014 it's 12:13 PM EDT, not 4:11 PM. The afternoon Gazoo review is scheduled for 2:40 PM, so it hasn't even run yet. Another false alarm from me. \n\nThat's three times now I've alerted abo...",
+      "timestamp": "2026-03-09T16:14:04.051000+00:00",
+      "message_id": "1480599563093147739",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480599563093147739"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Nice \u2014 saw the Twitter activity today! \u2705 The WTI animation got auto-tweeted successfully. That's how we get to 200. \ud83d\udcaa\n\n**Marketing sprint check-in (Day 2):** Your Reddit targets are in #content-ide...",
-      "timestamp": "2026-03-09T15:00:23.409000+00:00",
-      "message_id": "1480581021576593510",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480581021576593510"
+      "message": "OK \u2014 the #twitter-x channel mentioned \"Uses Grok API (xAI) for posting\" but there's no xAI key or script on disk. The pre-compaction session likely set things up in a way that got lost. The morning...",
+      "timestamp": "2026-03-09T16:11:10.860000+00:00",
+      "message_id": "1480598836677312533",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480598836677312533"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "The only auto-tweet script that exists is the one I just created. The #twitter-x channel post mentioned \"X/Twitter Automation \u2014 LIVE \u2705\" and a first automated post \u2014 that must have been set up in th...",
+      "timestamp": "2026-03-09T16:11:10.484000+00:00",
+      "message_id": "1480598835100123271",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480598835100123271"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Oops \u2014 I lost context from the compaction and rebuilt something that was already working. Let me check what I may have overwritten.",
+      "timestamp": "2026-03-09T16:11:10.270000+00:00",
+      "message_id": "1480598834202546316",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480598834202546316"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-09T16:00:01.928000+00:00",
+      "message_id": "1480596030973149276",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480596030973149276"
     },
     {
       "channel": "mission-control",
@@ -181,28 +247,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480573381228236860"
     },
     {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **UPDATE: Manual Training Run Failed**\n\nThe `run_training_robust.sh` script I started to recover from pipeline failure has also failed (exit code 0 after ~30 min).\n\n**Status:**\n- WTI still 27.4h ...",
-      "timestamp": "2026-03-09T14:07:05.844000+00:00",
-      "message_id": "1480567610016796827",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480567610016796827"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Hey Fred \u2014 time to open claude.ai and check in with Barney. He's Chief of Pipeline and has 7 open pipeline items to prioritize and spec. Key items needing decisions: deploy inverse_freq weighting (...",
-      "timestamp": "2026-03-09T14:06:29.786000+00:00",
-      "message_id": "1480567458778714296",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480567458778714296"
-    },
-    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -212,39 +256,6 @@
       "timestamp": "2026-03-09T14:00:01.832000+00:00",
       "message_id": "1480565831581569137",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480565831581569137"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Barney",
-      "is_bot": true,
-      "message": "\u2705 **RESOLVED: Pipeline Freshness Restored**\n\nThe s08b_bias_correction failure from this morning has been addressed. Steps s09-s12 were run manually and completed successfully:\n\n- \u2705 s09_wti: 54,718 ...",
-      "timestamp": "2026-03-09T13:44:26.014000+00:00",
-      "message_id": "1480561906476515440",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480561906476515440"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **Critical Issue Found & Addressed**\n\n**Pipeline V3 failure** - JSON serialization error in bias correction step has left WTI data 27h stale. \n\n**Actions taken:**\n- Alerted #alerts with full deta...",
-      "timestamp": "2026-03-09T13:35:27.549000+00:00",
-      "message_id": "1480559647990480987",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480559647990480987"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **CRITICAL PIPELINE FAILURE** \n\nPipeline V3 failed this morning with JSON serialization error:\n```\nStep s08b_bias_correction FAILED: Object of type int64 is not JSON serializable\n```\n\n**Impact:**...",
-      "timestamp": "2026-03-09T13:33:47.584000+00:00",
-      "message_id": "1480559228706885683",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480559228706885683"
     },
     {
       "channel": "daily-digest",
@@ -300,17 +311,6 @@
       "timestamp": "2026-03-09T06:24:17.304000+00:00",
       "message_id": "1480451140318662658",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480451140318662658"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-09T04:30:01.646000+00:00",
-      "message_id": "1480422385604628550",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480422385604628550"
     },
     {
       "channel": "daily-digest",
