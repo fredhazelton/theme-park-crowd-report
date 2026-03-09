@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T01:15:01Z",
+  "generated_at": "2026-03-09T01:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-08T21:52:10.465000+00:00"
+          "last_active": "2026-03-09T01:19:55.597000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-08T17:21:06.335000+00:00"
+          "last_active": "2026-03-09T01:19:12.498000+00:00"
         }
       ]
     },
@@ -164,6 +164,28 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "**Excellent News - Bot Health Restored Again! \u2705** **Major Recovery:** TPCR bot status has returned to HEALTHY - \u2705 DuckDB: Now accessible (was locked earlier) - \u2705 Scraper data: 4.0h fresh (excellent...",
+      "timestamp": "2026-03-09T01:19:55.597000+00:00",
+      "message_id": "1480374545167941880",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480374545167941880"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2705 **Bot Health RESTORED (Again)**\n\n**Good news:** TPCR bot is back to HEALTHY status!\n\n**Recovery details:**\n- \u2705 DuckDB: Now accessible (was locked by scraper process)\n- \u2705 Scraper data: 4.0h fresh ...",
+      "timestamp": "2026-03-09T01:19:12.498000+00:00",
+      "message_id": "1480374364397371564",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480374364397371564"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "Everything's solid. Here's your priority stack right now:\n\n**\ud83d\udd34 #1 \u2014 Marketing sprint (30 min)**\nDay 1 of 14. You joined the r/waltdisneyworld Discord today \u2014 great move. Now convert that into actio...",
       "timestamp": "2026-03-08T21:52:10.465000+00:00",
       "message_id": "1480322262614933504",
@@ -179,17 +201,6 @@
       "timestamp": "2026-03-08T21:51:55.347000+00:00",
       "message_id": "1480322199205449738",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480322199205449738"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Everything good? Anything I should be working on right now",
-      "timestamp": "2026-03-08T21:51:39.705000+00:00",
-      "message_id": "1480322133598142667",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480322133598142667"
     },
     {
       "channel": "gazoo",
@@ -313,17 +324,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480200579841265765"
     },
     {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **CRITICAL: Pipeline Validation Failed**\n\n**Issues:**\n- Validation: FAIL with logged errors at 06:45:34\n- Scraper data 25.7h stale (>24h)  \n- Pipeline validation failed (4 occurrences)\n- No compl...",
-      "timestamp": "2026-03-08T13:48:38.755000+00:00",
-      "message_id": "1480200578683638002",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480200578683638002"
-    },
-    {
       "channel": "pipeline",
       "channel_emoji": "\ud83d\udd27",
       "channel_id": "1479351574177513576",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 0,
-    "messages_today": 0
+    "active_channels_today": 2,
+    "messages_today": 2
   }
 }
