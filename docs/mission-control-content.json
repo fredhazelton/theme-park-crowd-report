@@ -83,9 +83,9 @@
         "days_evaluated": 25
     },
     "ask_analytics": {
-        "total_questions": 73,
+        "total_questions": 75,
         "unique_users": 20,
-        "thumbs_up": 8,
+        "thumbs_up": 9,
         "thumbs_down": 0,
         "avg_response_ms": 0,
         "model": "Claude Sonnet 4"
@@ -116,9 +116,9 @@
         "disk_main_pct": 90,
         "disk_data_pct": 4,
         "db_entities": 1710,
-        "db_forecasts": 0,
-        "db_live_waits": 123265857,
+        "db_forecasts": 16729986,
+        "db_live_waits": 123364583,
         "db_wti": 54720
     },
-    "last_updated": "2026-03-09T05:00:05.265576"
+    "last_updated": "2026-03-09T09:45:04.536432"
 }
