@@ -55,7 +55,7 @@ FIRECRAWL_EXTRACT_URL = "https://api.firecrawl.dev/v1/extract"
 FIRECRAWL_SCRAPE_URL = "https://api.firecrawl.dev/v1/scrape"
 
 # Rate limiting
-REQUEST_DELAY = 1.0  # seconds between requests
+REQUEST_DELAY = 2.0  # seconds between requests (increased for concurrency limit)
 SAVE_INTERVAL = 25   # save results every N districts
 
 # Extraction schema for Firecrawl
@@ -229,6 +229,11 @@ def validate_dates(data: dict, state: str) -> dict | None:
     """Validate extracted dates against expected ranges.
 
     Returns cleaned dict with YYYY-MM-DD strings, or None if invalid.
+
+    BUGFIX (Barney 2026-03-08): The school year is ~295 CALENDAR days
+    (Aug-Jun), not 180 instructional days. Previous validation rejected
+    all valid results because it checked for 140-210 calendar days.
+    Fixed to 240-330 calendar days.
     """
     first_day = parse_date(data.get("first_day_of_school", ""))
     last_day = parse_date(data.get("last_day_of_school", ""))
@@ -245,13 +250,20 @@ def validate_dates(data: dict, state: str) -> dict | None:
     if not (date(2025, 7, 1) <= first_day <= date(2025, 9, 30)):
         return None
 
-    # Last day: May 2026 - Jun 2026
+    # Last day: May 2026 - Jul 2026 (some year-round schools end in July)
     if not (date(2026, 5, 1) <= last_day <= date(2026, 7, 15)):
         return None
 
-    # School year must be 140-210 days
-    school_days = (last_day - first_day).days
-    if not (140 <= school_days <= 210):
+    # School year: 240-330 CALENDAR days (not instructional days)
+    # A typical school year is ~295 calendar days (Aug 11 to Jun 5)
+    # Early-start states (AZ, HI: Jul 28) to late-end states (NY: Jun 26) = ~330
+    # Short year-round tracks might be as low as 240
+    calendar_days = (last_day - first_day).days
+    if not (240 <= calendar_days <= 330):
+        return None
+
+    # last_day must be after first_day
+    if last_day <= first_day:
         return None
 
     result = {
@@ -265,6 +277,7 @@ def validate_dates(data: dict, state: str) -> dict | None:
     if spring_start and spring_end:
         if (date(2026, 2, 1) <= spring_start <= date(2026, 5, 15) and
                 date(2026, 2, 1) <= spring_end <= date(2026, 5, 15) and
+                spring_end >= spring_start and
                 1 <= (spring_end - spring_start).days <= 21):
             result["spring_break_start"] = spring_start.isoformat()
             result["spring_break_end"] = spring_end.isoformat()
@@ -273,6 +286,7 @@ def validate_dates(data: dict, state: str) -> dict | None:
     if winter_start and winter_end:
         if (date(2025, 11, 15) <= winter_start <= date(2026, 1, 15) and
                 date(2025, 12, 1) <= winter_end <= date(2026, 1, 15) and
+                winter_end >= winter_start and
                 3 <= (winter_end - winter_start).days <= 28):
             result["winter_break_start"] = winter_start.isoformat()
             result["winter_break_end"] = winter_end.isoformat()
