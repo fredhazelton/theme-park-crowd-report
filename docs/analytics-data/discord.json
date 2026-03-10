@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T04:00:01Z",
+  "generated_at": "2026-03-10T04:02:35Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-10T03:55:46.461000+00:00"
+          "last_active": "2026-03-10T04:01:46.680000+00:00"
         }
       ]
     },
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-09T18:44:55.917000+00:00"
+          "last_active": "2026-03-10T04:00:38.657000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -164,10 +164,43 @@
       "channel_id": "1479471928262529088",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\ud83d\udea8 **CRITICAL PIPELINE ISSUE**\n\n**Status:** Pipeline hasn't run in 45+ hours\n**Root Cause:** Missing `daily-pipeline-wilma.timer` systemd unit\n\n**Issues found:**\n- No pipeline log for 2026-03-09\n- W...",
-      "timestamp": "2026-03-10T03:55:46.461000+00:00",
-      "message_id": "1480776153399558388",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480776153399558388"
+      "message": "\ud83d\udea8 **CRITICAL: Pipeline was stuck for 24+ hours**\n\n- WTI output 41h old (threshold: 26h)\n- Training/forecast/WTI last completed 45h ago (2026-03-08)\n- Found stuck `run_training_robust` process from ...",
+      "timestamp": "2026-03-10T04:01:46.680000+00:00",
+      "message_id": "1480777664267817010",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480777664267817010"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "You're right to question it. Here's what actually happened:\n\n**My alert was wrong about:**\n- \u274c \"Pipeline hasn't run in 45+ hours\" \u2014 **v3 pipeline DID run at 6 AM today** (Mar 9), it just failed at ...",
+      "timestamp": "2026-03-10T04:00:44.484000+00:00",
+      "message_id": "1480777403398885446",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480777403398885446"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udc7d Scheduled today's reviews.",
+      "timestamp": "2026-03-10T04:00:38.657000+00:00",
+      "message_id": "1480777378958671872",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480777378958671872"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "OK, here's the actual picture:",
+      "timestamp": "2026-03-10T04:00:34.307000+00:00",
+      "message_id": "1480777360713449532",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480777360713449532"
     },
     {
       "channel": "fred-wilma",
@@ -203,28 +236,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480775747210707135"
     },
     {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "- Training/forecast 38h stale\n\n**Action needed:** System stability issues require immediate attention. Bot performance degrading and users getting poor experience.",
-      "timestamp": "2026-03-09T20:23:43.582000+00:00",
-      "message_id": "1480662391799812206",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480662391799812206"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **CRITICAL: System Health Degradation**\n\n**Bot Health:** DEGRADED\n- Memory spike: 195.7MB (was ~100MB)\n- Discord connection errors: \"Cannot write to closing transport\"\n- DuckDB lock conflicts per...",
-      "timestamp": "2026-03-09T20:23:43.368000+00:00",
-      "message_id": "1480662390902362256",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480662390902362256"
-    },
-    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -245,17 +256,6 @@
       "timestamp": "2026-03-09T18:44:54.075000+00:00",
       "message_id": "1480637521644749034",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480637521644749034"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now I have a comprehensive picture. Let me write the afternoon review.",
-      "timestamp": "2026-03-09T18:44:53.813000+00:00",
-      "message_id": "1480637520545972259",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480637520545972259"
     },
     {
       "channel": "pipeline",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 2,
-    "messages_today": 4
+    "active_channels_today": 3,
+    "messages_today": 7
   }
 }
