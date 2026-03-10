@@ -53,6 +53,12 @@ try:
 except ImportError:
     HAS_BS4 = False
 
+try:
+    import feedparser
+    HAS_FEEDPARSER = True
+except ImportError:
+    HAS_FEEDPARSER = False
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
@@ -139,53 +145,109 @@ def extract_links(html_text: str, base_url: str) -> list[dict]:
 # Source scrapers
 # ---------------------------------------------------------------------------
 
-def check_touringplans() -> list[dict]:
-    """Check TouringPlans blog for recent posts."""
-    items = []
-    blog_url = "https://touringplans.com/blog/"
-
-    text = fetch_page(blog_url, max_chars=15000)
-    if not text:
-        return items
-
-    # Known article URL patterns from TouringPlans
-    # Extract URLs from the blog page
+def _clean_url(url: str) -> str:
+    """Remove tracking parameters from URLs."""
+    from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
     try:
-        resp = SESSION.get(blog_url, timeout=15)
-        if HAS_BS4 and resp.status_code == 200:
-            soup = BeautifulSoup(resp.text, "html.parser")
-            seen_urls = set()
-            for a in soup.find_all("a", href=True):
-                href = a["href"]
-                title = a.get_text(strip=True)
-                if "/blog/" in href and href != blog_url and title and len(title) > 15:
-                    if href.startswith("/"):
-                        href = f"https://touringplans.com{href}"
-                    skip_patterns = ["category", "tag/", "page/", "#", "dashboard", "forum", "author/", "touringplans.com/blog/$",
-                                     "/blog/disney-world-vacation", "/blog/universal-orlando-trip",
-                                     "/blog/disneyland-trip-planning", "/blog/disney-cruise-line-vacation"]
-                    if href not in seen_urls and not any(p in href for p in skip_patterns):
-                        seen_urls.add(href)
-                        # Check if it looks like a recent article
-                        items.append({
-                            "title": title[:120],
-                            "url": href,
-                            "source": "TouringPlans"
-                        })
-            # Keep only first ~8 (most recent on page)
-            items = items[:8]
-        else:
-            # Regex fallback for article URLs
-            urls = re.findall(
-                r'https://touringplans\.com/blog/[a-z0-9\-]+/',
-                text
-            )
-            for url in list(dict.fromkeys(urls))[:8]:
-                slug = url.rstrip("/").split("/")[-1]
-                title = slug.replace("-", " ").title()
-                items.append({"title": title, "url": url, "source": "TouringPlans"})
+        parsed = urlparse(url)
+        params = parse_qs(parsed.query)
+        # Remove common tracking params
+        tracking_keys = {"utm_source", "utm_medium", "utm_campaign", "utm_content",
+                         "utm_term", "adt_ei", "fbclid", "gclid", "ref", "mc_eid",
+                         "mc_cid", "mkt_tok"}
+        cleaned = {k: v for k, v in params.items() if k.lower() not in tracking_keys}
+        new_query = urlencode(cleaned, doseq=True)
+        return urlunparse(parsed._replace(query=new_query))
+    except Exception:
+        return url
+
+
+def _parse_rss_feed(feed_url: str, source_name: str, max_items: int = 10,
+                    max_age_days: int = 7) -> list[dict]:
+    """Generic RSS feed parser. Returns list of items from a feed."""
+    if not HAS_FEEDPARSER:
+        return []
+    items = []
+    try:
+        feed = feedparser.parse(feed_url, agent="HazeyData-CompWatch/1.0")
+        cutoff = datetime.now() - timedelta(days=max_age_days)
+        
+        for entry in feed.entries[:max_items]:
+            title = entry.get("title", "").strip()
+            link = _clean_url(entry.get("link", ""))
+            if not title or not link:
+                continue
+            
+            # Check publication date if available
+            published = None
+            for date_field in ("published_parsed", "updated_parsed"):
+                parsed = entry.get(date_field)
+                if parsed:
+                    try:
+                        from time import mktime
+                        published = datetime.fromtimestamp(mktime(parsed))
+                        break
+                    except (ValueError, OverflowError):
+                        pass
+            
+            # Skip old items
+            if published and published < cutoff:
+                continue
+            
+            # Get summary snippet
+            summary = ""
+            if entry.get("summary"):
+                if HAS_BS4:
+                    summary = BeautifulSoup(entry["summary"], "html.parser").get_text(strip=True)[:200]
+                else:
+                    summary = re.sub(r"<[^>]+>", " ", entry["summary"])[:200]
+            
+            items.append({
+                "title": title[:120],
+                "url": link,
+                "source": source_name,
+                "snippet": summary,
+                "published": published.strftime("%Y-%m-%d") if published else None,
+            })
     except Exception:
         pass
+    return items
+
+
+def check_touringplans() -> list[dict]:
+    """Check TouringPlans blog for recent posts via RSS feed."""
+    # RSS bypasses Cloudflare — much more reliable than HTML scraping
+    items = _parse_rss_feed(
+        "https://touringplans.com/blog/feed/",
+        "TouringPlans",
+        max_items=10,
+        max_age_days=7,
+    )
+    
+    # Fallback to HTML scraping if RSS fails
+    if not items:
+        blog_url = "https://touringplans.com/blog/"
+        text = fetch_page(blog_url, max_chars=15000)
+        if text and HAS_BS4:
+            try:
+                resp = SESSION.get(blog_url, timeout=15)
+                if resp.status_code == 200:
+                    soup = BeautifulSoup(resp.text, "html.parser")
+                    seen_urls = set()
+                    for a in soup.find_all("a", href=True):
+                        href = a["href"]
+                        title = a.get_text(strip=True)
+                        if "/blog/" in href and href != blog_url and title and len(title) > 15:
+                            if href.startswith("/"):
+                                href = f"https://touringplans.com{href}"
+                            skip_patterns = ["category", "tag/", "page/", "#", "dashboard",
+                                             "forum", "author/"]
+                            if href not in seen_urls and not any(p in href for p in skip_patterns):
+                                seen_urls.add(href)
+                                items.append({"title": title[:120], "url": href, "source": "TouringPlans"})
+                    items = items[:8]
+            except Exception:
+                pass
 
     # Filter for crowd/data relevant articles
     crowd_keywords = [
@@ -204,7 +266,9 @@ def check_touringplans() -> list[dict]:
     relevant = []
     for item in items:
         title_lower = item["title"].lower()
-        if any(kw in title_lower for kw in crowd_keywords):
+        snippet_lower = item.get("snippet", "").lower()
+        combined = title_lower + " " + snippet_lower
+        if any(kw in combined for kw in crowd_keywords):
             item["relevant"] = True
             relevant.append(item)
         else:
@@ -250,16 +314,15 @@ def check_undercover_tourist() -> list[dict]:
 
 
 def check_theme_park_news() -> list[dict]:
-    """Check major theme park news sites."""
+    """Check major theme park news sites via RSS feeds (bypasses Cloudflare)."""
     items = []
-    sources = [
-        ("https://wdwnt.com", "WDWNT"),
-        ("https://blogmickey.com", "BlogMickey"),
-        ("https://www.laughingplace.com/w/news/", "Laughing Place"),
+    
+    # RSS feeds — much more reliable than HTML scraping
+    rss_sources = [
+        ("https://wdwnt.com/feed/", "WDWNT"),
+        ("https://blogmickey.com/feed/", "BlogMickey"),
+        ("https://www.laughingplace.com/w/feed/", "Laughing Place"),
     ]
-
-    # Year/month patterns to identify actual articles (not category pages)
-    article_pattern = re.compile(r"/202[4-9]/\d{2}/")
 
     crowd_keywords = [
         "epic universe", "crowd", "price", "ticket", "close",
@@ -268,105 +331,181 @@ def check_theme_park_news() -> list[dict]:
         "spring break", "capacity", "hour", "sell",
         "after hours", "event", "castle", "festival",
         "closure", "construction", "merchandise",
+        "attendance", "delay", "soft open", "preview",
     ]
 
-    for url, name in sources:
-        try:
-            resp = SESSION.get(url, timeout=15)
-            if resp.status_code == 200 and HAS_BS4:
-                soup = BeautifulSoup(resp.text, "html.parser")
-                seen = set()
-                for a in soup.find_all("a", href=True):
-                    href = a["href"]
-                    title = a.get_text(strip=True)
-                    if not title or len(title) < 20 or not href.startswith("http"):
-                        continue
-                    # Must be an actual article URL (has date pattern)
-                    if not article_pattern.search(href):
-                        continue
-                    if href in seen:
-                        continue
-                    # Check relevance
-                    title_lower = title.lower()
-                    if any(kw in title_lower for kw in crowd_keywords):
-                        seen.add(href)
-                        items.append({
-                            "title": title[:120],
-                            "url": href,
-                            "source": name
-                        })
-                    if len(items) >= 8:
-                        break
-        except Exception:
-            pass
+    for feed_url, name in rss_sources:
+        feed_items = _parse_rss_feed(feed_url, name, max_items=15, max_age_days=3)
+        for item in feed_items:
+            title_lower = item["title"].lower()
+            snippet_lower = item.get("snippet", "").lower()
+            combined = title_lower + " " + snippet_lower
+            if any(kw in combined for kw in crowd_keywords):
+                item["relevant"] = True
+                items.append(item)
 
-    return items
+    # Fallback to HTML scraping if RSS returned nothing
+    if not items:
+        html_sources = [
+            ("https://wdwnt.com", "WDWNT"),
+            ("https://blogmickey.com", "BlogMickey"),
+            ("https://www.laughingplace.com/w/news/", "Laughing Place"),
+        ]
+        article_pattern = re.compile(r"/202[4-9]/\d{2}/")
+        for url, name in html_sources:
+            try:
+                resp = SESSION.get(url, timeout=15)
+                if resp.status_code == 200 and HAS_BS4:
+                    soup = BeautifulSoup(resp.text, "html.parser")
+                    seen = set()
+                    for a in soup.find_all("a", href=True):
+                        href = a["href"]
+                        title = a.get_text(strip=True)
+                        if not title or len(title) < 20 or not href.startswith("http"):
+                            continue
+                        if not article_pattern.search(href):
+                            continue
+                        if href in seen:
+                            continue
+                        title_lower = title.lower()
+                        if any(kw in title_lower for kw in crowd_keywords):
+                            seen.add(href)
+                            items.append({"title": title[:120], "url": href, "source": name})
+                        if len(items) >= 8:
+                            break
+            except Exception:
+                pass
+
+    return items[:12]
 
 
 def check_reddit() -> list[dict]:
     """Check Reddit for crowd calendar / wait times discussions.
     
-    Uses Reddit's JSON API (append .json to search URLs) for cleaner results.
-    Falls back to HTML scraping if JSON fails.
+    Two-pronged approach:
+    1. Browse hot/new posts from key theme park subreddits directly
+    2. Search for specific terms (crowd calendar, wait times, hazeydata)
+    
+    Uses Reddit's JSON API (append .json to URLs) for structured data.
     """
     items = []
-    queries = [
-        ("crowd calendar", "crowd+calendar+disney+OR+universal", "DisneyPlanning+disneyparks+WaltDisneyWorld+UniversalOrlando"),
-        ("wait times", "wait+times+disney+OR+universal", "DisneyPlanning+disneyparks+WaltDisneyWorld+UniversalOrlando"),
-        ("best time to visit", "best+time+to+visit+disney+OR+universal", "DisneyPlanning+disneyparks+WaltDisneyWorld"),
-        ("hazeydata", "hazeydata+OR+%22hazey+data%22", None),
+    seen_urls: set[str] = set()
+
+    # --- Approach 1: Browse key subreddits for hot/new posts ---
+    subreddits = [
+        "WaltDisneyWorld", "UniversalOrlando", "DisneyPlanning",
+        "disneyparks", "Disneyland", "UniversalStudios",
+    ]
+    
+    crowd_keywords = [
+        "crowd", "wait time", "busy", "spring break", "summer",
+        "epic universe", "hazey", "touring plan", "prediction",
+        "annual pass", "lightning lane", "genie", "express pass",
+        "best time", "worst time", "how busy", "capacity",
+        "ticket price", "sell out", "closure", "refurb",
+        "crowd calendar", "wait", "line", "packed", "empty",
+        "slow day", "dead", "mobbed", "insane",
     ]
 
-    for label, query, restrict in queries:
+    for sub in subreddits:
         try:
-            # Try Reddit JSON API
-            url = f"https://www.reddit.com/search.json?q={query}&t=week&sort=new&limit=3"
-            if restrict:
-                url += f"&restrict_sr=false"
+            url = f"https://www.reddit.com/r/{sub}/hot.json?limit=10"
             resp = SESSION.get(url, timeout=15, headers={
                 "User-Agent": "HazeyData-CompWatch/1.0 (competitive intelligence)"
             })
             if resp.status_code == 200:
-                try:
-                    data = resp.json()
-                    posts = data.get("data", {}).get("children", [])
-                    for post in posts[:2]:
-                        pd_ = post.get("data", {})
-                        title = pd_.get("title", "")
-                        permalink = pd_.get("permalink", "")
-                        subreddit = pd_.get("subreddit", "")
-                        
-                        if not title or not permalink:
-                            continue
-                        
-                        # Relevance filter — must mention theme park stuff
-                        title_lower = title.lower()
-                        park_terms = [
-                            "disney", "universal", "epcot", "magic kingdom",
-                            "crowd", "wait time", "busy", "spring break",
-                            "epic universe", "theme park", "hazey", "touring",
-                            "annual pass", "lightning lane", "genie",
-                        ]
-                        if label == "hazeydata" or any(t in title_lower for t in park_terms):
-                            items.append({
-                                "title": title[:120],
-                                "url": f"https://www.reddit.com{permalink}",
-                                "source": f"Reddit r/{subreddit}",
-                                "query": label,
-                            })
-                except (json.JSONDecodeError, KeyError):
-                    pass
+                data = resp.json()
+                posts = data.get("data", {}).get("children", [])
+                for post in posts:
+                    pd_ = post.get("data", {})
+                    title = pd_.get("title", "")
+                    permalink = pd_.get("permalink", "")
+                    score = pd_.get("score", 0)
+                    num_comments = pd_.get("num_comments", 0)
+                    
+                    if not title or not permalink:
+                        continue
+                    
+                    full_url = f"https://www.reddit.com{permalink}"
+                    if full_url in seen_urls:
+                        continue
+                    
+                    # Filter for crowd/wait-time relevance OR high engagement
+                    title_lower = title.lower()
+                    selftext_lower = pd_.get("selftext", "")[:500].lower()
+                    combined = title_lower + " " + selftext_lower
+                    
+                    is_relevant = any(kw in combined for kw in crowd_keywords)
+                    is_popular = score >= 50 or num_comments >= 20
+                    
+                    if is_relevant or is_popular:
+                        seen_urls.add(full_url)
+                        items.append({
+                            "title": title[:120],
+                            "url": full_url,
+                            "source": f"Reddit r/{sub}",
+                            "query": "subreddit_browse",
+                            "score": score,
+                            "comments": num_comments,
+                            "relevant": is_relevant,
+                        })
         except Exception:
             pass
 
-    # Deduplicate by URL
-    seen = set()
-    deduped = []
-    for item in items:
-        if item["url"] not in seen:
-            seen.add(item["url"])
-            deduped.append(item)
-    return deduped
+    # --- Approach 2: Search for specific terms ---
+    queries = [
+        ("crowd calendar", "crowd+calendar+disney+OR+universal"),
+        ("wait times", "wait+times+disney+OR+universal"),
+        ("hazeydata", "hazeydata+OR+%22hazey+data%22+OR+%22crowd+report%22"),
+    ]
+
+    for label, query in queries:
+        try:
+            url = f"https://www.reddit.com/search.json?q={query}&t=week&sort=relevance&limit=5"
+            resp = SESSION.get(url, timeout=15, headers={
+                "User-Agent": "HazeyData-CompWatch/1.0 (competitive intelligence)"
+            })
+            if resp.status_code == 200:
+                data = resp.json()
+                posts = data.get("data", {}).get("children", [])
+                for post in posts[:3]:
+                    pd_ = post.get("data", {})
+                    title = pd_.get("title", "")
+                    permalink = pd_.get("permalink", "")
+                    subreddit = pd_.get("subreddit", "")
+                    
+                    if not title or not permalink:
+                        continue
+                    
+                    full_url = f"https://www.reddit.com{permalink}"
+                    if full_url in seen_urls:
+                        continue
+                    
+                    # For search results, apply relevance filter
+                    title_lower = title.lower()
+                    park_terms = [
+                        "disney", "universal", "epcot", "magic kingdom",
+                        "crowd", "wait time", "busy", "spring break",
+                        "epic universe", "theme park", "hazey", "touring",
+                        "annual pass", "lightning lane", "genie",
+                        "disneyland", "hollywood studios", "animal kingdom",
+                    ]
+                    if label == "hazeydata" or any(t in title_lower for t in park_terms):
+                        seen_urls.add(full_url)
+                        items.append({
+                            "title": title[:120],
+                            "url": full_url,
+                            "source": f"Reddit r/{subreddit}",
+                            "query": label,
+                            "score": pd_.get("score", 0),
+                            "comments": pd_.get("num_comments", 0),
+                        })
+        except (json.JSONDecodeError, KeyError, Exception):
+            pass
+
+    # Sort by relevance first, then score
+    items.sort(key=lambda x: (not x.get("relevant", False), -x.get("score", 0)))
+    return items[:15]
 
 
 def check_hazeydata_mentions() -> list[dict]:

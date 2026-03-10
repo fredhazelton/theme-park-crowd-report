@@ -1,0 +1,52 @@
+{
+  "eval_date": "2026-03-09",
+  "parks": [
+    {
+      "park_code": "CA",
+      "wti_forecast": 18.2,
+      "wti_actual": 14.0,
+      "error": 4.199999999999999,
+      "abs_error": 4.199999999999999,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-08"
+    },
+    {
+      "park_code": "DL",
+      "wti_forecast": 13.1,
+      "wti_actual": 14.5,
+      "error": -1.4000000000000004,
+      "abs_error": 1.4000000000000004,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-08"
+    },
+    {
+      "park_code": "EU",
+      "wti_forecast": 29.6,
+      "wti_actual": 1.0,
+      "error": 28.6,
+      "abs_error": 28.6,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-08"
+    },
+    {
+      "park_code": "HS",
+      "wti_forecast": 19.4,
+      "wti_actual": 21.5,
+      "error": -2.1000000000000014,
+      "abs_error": 2.1000000000000014,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-08"
+    },
+    {
+      "park_code": "MK",
+      "wti_forecast": 20.3,
+      "wti_actual": 3.0,
+      "error": 17.3,
+      "abs_error": 17.3,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-08"
+    }
+  ],
+  "yesterday_mae": 10.720000000000002,
+  "yesterday_bias": 9.319999999999999
+}

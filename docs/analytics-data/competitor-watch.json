@@ -1,10 +1,91 @@
 {
-  "generated_at": "2026-03-10T00:26:32.476771-04:00",
+  "generated_at": "2026-03-10T17:05:29.352199-04:00",
   "date": "2026-03-10",
   "categories": {
     "touringplans": {
-      "count": 0,
-      "items": []
+      "count": 10,
+      "items": [
+        {
+          "title": "Mears Connect Standard- Morning Arrival",
+          "url": "https://touringplans.com/blog/mears-connect-standard-morning-arrival/",
+          "source": "TouringPlans",
+          "snippet": "We tested Mears Connect Standard transportation from MCO, Orlando International Airport, to Disney&#8217;s Pop Century Resort. We used this same...",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "The Best $50 You Can Spend at EPCOT\u2019s Flower & Garden",
+          "url": "https://touringplans.com/blog/the-best-50-you-can-spend-at-epcots-flower-garden/",
+          "source": "TouringPlans",
+          "snippet": "We ate everything at EPCOT&#8217;s Flower &#38; Garden Festival and have narrowed down the best $50 you can spend if...",
+          "published": "2026-03-09",
+          "relevant": true
+        },
+        {
+          "title": "Photo Tour of Magic Kingdom Construction",
+          "url": "https://touringplans.com/blog/photo-tour-of-magic-kingdom-construction/",
+          "source": "TouringPlans",
+          "snippet": "The Magic Kingdom is busy getting ready for a big summer if the the construction walls and scrims are any...",
+          "published": "2026-03-08",
+          "relevant": true
+        },
+        {
+          "title": "A Kid\u2019s Perspective on Nomad Lounge",
+          "url": "https://touringplans.com/blog/a-kids-perspective-on-nomad-lounge/",
+          "source": "TouringPlans",
+          "snippet": "When we talk about Walt Disney World planning here at Touring Plans, we usually do it through the lens of...",
+          "published": "2026-03-08",
+          "relevant": true
+        },
+        {
+          "title": "10 Things that Surprise First-Time Disney Cruisers",
+          "url": "https://touringplans.com/blog/10-things-that-surprise-first-time-disney-cruisers/",
+          "source": "TouringPlans",
+          "snippet": "My first Disney cruise was way back in 2005, but even as a long-time Disney World and Disneyland fan, I...",
+          "published": "2026-03-08",
+          "relevant": true
+        },
+        {
+          "title": "Super Mario Galaxy Movie Experiences in Super Nintendo World",
+          "url": "https://touringplans.com/blog/super_mari_galaxy_movie_snw/",
+          "source": "TouringPlans",
+          "snippet": "To celebrate the upcoming release of the Super Mario Galaxy Movie and Mario Day, Universal is offering limited-time snacks, merchandise,...",
+          "published": "2026-03-07",
+          "relevant": true
+        },
+        {
+          "title": "The SATURDAY SIX Plays 18 Holes at HOLLYWOOD DRIVE-IN Golf at Universal Citywalk",
+          "url": "https://touringplans.com/blog/the-saturday-six-plays-18-holes-at-hollywood-drive-in-golf-at-universal-citywalk/",
+          "source": "TouringPlans",
+          "snippet": "This week&#8217;s SATURDAY SIX heads over to Universal Orlando for HOLLYWOOD DRIVE-IN GOLF. We here at SAT SIX HQ consider...",
+          "published": "2026-03-07",
+          "relevant": true
+        },
+        {
+          "title": "2026 Garden Graze Review",
+          "url": "https://touringplans.com/blog/2026-garden-graze-review/",
+          "source": "TouringPlans",
+          "snippet": "EPCOT&#8217;s Flower and Garden Festival is underway and one of the highlights is always the Garden Graze. Spoiler &#8211; the...",
+          "published": "2026-03-07",
+          "relevant": true
+        },
+        {
+          "title": "2026 Guide to Volcano Bay Nights",
+          "url": "https://touringplans.com/blog/2025-volcano-bay-nights-tickets-now-on-sale/",
+          "source": "TouringPlans",
+          "snippet": "Enjoy exclusive Volcano Bay time under the stars with DJs and characters at Volcano Bay Nights! Find out all the...",
+          "published": "2026-03-10",
+          "relevant": false
+        },
+        {
+          "title": "10 Reasons Castaway Cay and Lookout Cay May Become Your Favorite Ports",
+          "url": "https://touringplans.com/blog/10-reasons-castaway-cay-and-lookout-cay-may-become-your-favorite-ports/",
+          "source": "TouringPlans",
+          "snippet": "I\u2019ve been asked before what\u2019s so special about a private island destination stop when you\u2019re on a cruise. These days,...",
+          "published": "2026-03-09",
+          "relevant": false
+        }
+      ]
     },
     "thrilldata": {
       "count": 0,
@@ -15,17 +96,249 @@
       "items": []
     },
     "theme_park_news": {
-      "count": 0,
-      "items": []
+      "count": 12,
+      "items": [
+        {
+          "title": "Space Mountain Evacuated and Section of Tomorrowland Closed at Disneyland Resort",
+          "url": "https://wdwnt.com/2026/03/space-mountain-evacuated-and-section-of-tomorrowland-closed-at-disneyland-resort/",
+          "source": "WDWNT",
+          "snippet": " We are receiving word from our reporter at Disneyland Resort that areas of Tomorrowland at Disneyland are being closed and evacuated. Areas Evacuated As you can see from the photo above, Cast Members",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Universal Orlando\u2019s Volcano Bay Nights Returns This May",
+          "url": "https://wdwnt.com/2026/03/universal-orlandos-volcano-bay-nights-returns-this-may/",
+          "source": "WDWNT",
+          "snippet": " The after-hours separately ticketed Volcano Bay Nights event will return to Universal Orlando Resort on select dates this spring and summer. Volcano Bay Nights Volcano Bay Nights will be on the follo",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Disney Teases Winnie the Pooh 100th Anniversary Merchandise With a Look at the Past",
+          "url": "https://wdwnt.com/2026/03/disney-teases-winnie-the-pooh-100th-anniversary-merchandise-with-a-look-at-the-past/",
+          "source": "WDWNT",
+          "snippet": " This year marks 100 years since the publication of the original Winnie-the-Pooh book by A.A. Milne in October 1926. Disney is honoring the milestone with a look at how the Walt Disney Archives and Di",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Full Guide for Disney California Adventure Food and Wine Festival 2026",
+          "url": "https://wdwnt.com/2026/03/full-guide-for-disney-california-adventure-food-and-wine-festival-2026/",
+          "source": "WDWNT",
+          "snippet": " The 2026 Disney California Adventure Food &#38; Wine Festival runs from March 6 through April 27, 2026. This full guide includes everything you need to know to make the most of your visit. Festival G",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Inside Out Emotional Whirlwind Still Closed at Disney California Adventure",
+          "url": "https://wdwnt.com/2026/03/inside-out-emotional-whirlwind-still-closed-disney-california-adventure/",
+          "source": "WDWNT",
+          "snippet": " At Disney California Adventure, Inside Out Emotional Whirlwind closed on February 27 for a two-day refurbishment. It was set to reopen on March 1; however, it is still closed as of today, March 10. T",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Full Live Music Schedule for Disney California Adventure Food and Wine Festival 2026",
+          "url": "https://wdwnt.com/2026/03/full-live-music-schedule-disney-california-adventure-food-and-wine-festival-2026/",
+          "source": "WDWNT",
+          "snippet": " The full schedule of all of the live music for the 2026 Disney California Food &#38; Wine Festival has been released. The 2026 Disney California Food &#38; Wine Festival takes place from March 8 to A",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Mary Poppins Fountain Under Refurbishment in The Villas at Disney\u2019s Grand Floridian Resort",
+          "url": "https://wdwnt.com/2026/03/mary-poppins-fountain-refurbishment-the-villas-at-disneys-grand-floridian-resort/",
+          "source": "WDWNT",
+          "snippet": " The Mary Poppins fountain in the lobby of The Villas at Disney&#8217;s Grand Floridian Resort &#38; Spa is blocked off for refurbishment. Grand Floridian Resort Fountain Refurbishment Tall ferns in w",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Imagineering Targets Quick Turnaround for Muppets Retheme of Rock \u2018n\u2019 Roller Coaster",
+          "url": "https://blogmickey.com/2026/03/imagineering-targets-quick-turnaround-for-muppets-rock-n-roller-coaster/",
+          "source": "BlogMickey",
+          "snippet": "Good afternoon from Disney&#8217;s Hollywood Studios, where work continues at an impressive pace since Rock &#8216;n&#8217; Roller Coaster Starring Aerosmith closed earlier this month. Scaffolding cov",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Smellephants Shortened: Aromatic Activity Adjusted at Storybook Circus",
+          "url": "https://blogmickey.com/2026/03/smellephants-shortened-construction-storybook-circus/",
+          "source": "BlogMickey",
+          "snippet": "The Smellephants on Parade activity in Storybook Circus has been adjusted due to ongoing construction in the area. Typically, guests can find 8 scent-sational elephants during a scavenger hunt that as",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "Report: Thomas Mazloum to Take Over Disney Experiences Following D\u2019Amaro CEO Promotion",
+          "url": "https://blogmickey.com/2026/03/report-thomas-mazloum-to-take-over-disney-experiences-following-damaro-ceo-promotion/",
+          "source": "BlogMickey",
+          "snippet": "A new report from Bloomberg says that The Walt Disney Company is close to naming Thomas Mazloum as the Chairman of the Disney Experiences division. The promotion would follow the ascension of current ",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "New Themed Pavement Revealed at Big Thunder Mountain Railroad",
+          "url": "https://blogmickey.com/2026/03/new-themed-pavement-revealed-at-big-thunder-mountain-railroad/",
+          "source": "BlogMickey",
+          "snippet": "As part of the ongoing refurbishment of Big Thunder Mountain Railroad, new pavement is now visible in front of the attraction. The construction walls have been pushed back, showcasing the new themed p",
+          "published": "2026-03-09",
+          "relevant": true
+        },
+        {
+          "title": "Merchant of Venus Signage Removed at Magic Kingdom, Are Changes on the Way?",
+          "url": "https://blogmickey.com/2026/03/merchant-of-venus-signage-removed-magic-kingdom/",
+          "source": "BlogMickey",
+          "snippet": "A sign outside the former Merchant of Venus gift shop has been changed recently to remove the outdated branding. The gift shop hasn&#8217;t been in use as a gift shop since before the COVID-19 closure",
+          "published": "2026-03-09",
+          "relevant": true
+        }
+      ]
     },
     "reddit": {
-      "count": 0,
-      "items": []
+      "count": 15,
+      "items": [
+        {
+          "title": "Scenes from Epic Universe",
+          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rp1aak/scenes_from_epic_universe/",
+          "source": "Reddit r/UniversalOrlando",
+          "query": "subreddit_browse",
+          "score": 453,
+          "comments": 34,
+          "relevant": true
+        },
+        {
+          "title": "Super Nintendo World is insane.",
+          "url": "https://www.reddit.com/r/universalstudios/comments/1rns524/super_nintendo_world_is_insane/",
+          "source": "Reddit r/UniversalStudios",
+          "query": "subreddit_browse",
+          "score": 215,
+          "comments": 21,
+          "relevant": true
+        },
+        {
+          "title": "Longest wait the the parks. By a lot!",
+          "url": "https://www.reddit.com/r/Disneyland/comments/1rpkx8f/longest_wait_the_the_parks_by_a_lot/",
+          "source": "Reddit r/Disneyland",
+          "query": "subreddit_browse",
+          "score": 158,
+          "comments": 50,
+          "relevant": true
+        },
+        {
+          "title": "Yoshi meet and greet info",
+          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rpxyhm/yoshi_meet_and_greet_info/",
+          "source": "Reddit r/UniversalOrlando",
+          "query": "subreddit_browse",
+          "score": 14,
+          "comments": 2,
+          "relevant": true
+        },
+        {
+          "title": "Disneyland with low wait times for the first time in years.",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rq0hjm/disneyland_with_low_wait_times_for_the_first_time/",
+          "source": "Reddit r/DisneyPlanning",
+          "query": "subreddit_browse",
+          "score": 5,
+          "comments": 21,
+          "relevant": true
+        },
+        {
+          "title": "Universal Hollywood: Express Pass Needed with AAP?",
+          "url": "https://www.reddit.com/r/universalstudios/comments/1roqjun/universal_hollywood_express_pass_needed_with_aap/",
+          "source": "Reddit r/UniversalStudios",
+          "query": "subreddit_browse",
+          "score": 3,
+          "comments": 2,
+          "relevant": true
+        },
+        {
+          "title": "help finding autographs",
+          "url": "https://www.reddit.com/r/disneyparks/comments/1rq6ebo/help_finding_autographs/",
+          "source": "Reddit r/disneyparks",
+          "query": "subreddit_browse",
+          "score": 1,
+          "comments": 0,
+          "relevant": true
+        },
+        {
+          "title": "Universal Orlando",
+          "url": "https://www.reddit.com/r/universalstudios/comments/1rpb47d/universal_orlando/",
+          "source": "Reddit r/UniversalStudios",
+          "query": "subreddit_browse",
+          "score": 1,
+          "comments": 2,
+          "relevant": true
+        },
+        {
+          "title": "4th of July DLR - Are we crazy?",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rq6arl/4th_of_july_dlr_are_we_crazy/",
+          "source": "Reddit r/DisneyPlanning",
+          "query": "subreddit_browse",
+          "score": 0,
+          "comments": 2,
+          "relevant": true
+        },
+        {
+          "title": "Tuesday vs Thursday",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rq67c2/tuesday_vs_thursday/",
+          "source": "Reddit r/DisneyPlanning",
+          "query": "subreddit_browse",
+          "score": 0,
+          "comments": 2,
+          "relevant": true
+        },
+        {
+          "title": "Massively underrated",
+          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rpj5gm/massively_underrated/",
+          "source": "Reddit r/WaltDisneyWorld",
+          "query": "subreddit_browse",
+          "score": 2328,
+          "comments": 256,
+          "relevant": false
+        },
+        {
+          "title": "Two Men Throw Incendiary Devices Into NYC Crowd, Reportedly Shout \u2018Allahu Akbar\u2019",
+          "url": "https://www.reddit.com/r/Conservative/comments/1ro4c85/two_men_throw_incendiary_devices_into_nyc_crowd/",
+          "source": "Reddit r/Conservative",
+          "query": "hazeydata",
+          "score": 1569,
+          "comments": 218
+        },
+        {
+          "title": "I found free slushies for everyone!",
+          "url": "https://www.reddit.com/r/Disneyland/comments/1rpgldv/i_found_free_slushies_for_everyone/",
+          "source": "Reddit r/Disneyland",
+          "query": "subreddit_browse",
+          "score": 1545,
+          "comments": 133,
+          "relevant": false
+        },
+        {
+          "title": "Business Insider highlights the price increases across Disney World",
+          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rpg6iz/business_insider_highlights_the_price_increases/",
+          "source": "Reddit r/WaltDisneyWorld",
+          "query": "subreddit_browse",
+          "score": 829,
+          "comments": 243,
+          "relevant": false
+        },
+        {
+          "title": "Former Disney Safari Driver Reveals Grim Reason Staff Are Trained To Drive Off If Someone Falls Into Crocodile Pit",
+          "url": "https://www.reddit.com/r/disneyparks/comments/1rpcfiq/former_disney_safari_driver_reveals_grim_reason/",
+          "source": "Reddit r/disneyparks",
+          "query": "subreddit_browse",
+          "score": 416,
+          "comments": 102,
+          "relevant": false
+        }
+      ]
     },
     "hazeydata_mentions": {
       "count": 0,
       "items": []
     }
   },
-  "total_items": 0
+  "total_items": 37
 }
