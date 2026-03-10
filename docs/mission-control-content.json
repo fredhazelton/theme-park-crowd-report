@@ -1,29 +1,29 @@
 {
     "todays_focus": [
         {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
-            "task": "AK model underprediction during Spring Break"
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Content: Thanksgiving 2026 Crowd Predictions"
         },
         {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
-            "task": "Fix /crowd command (only /ask works)"
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Fix Firecrawl async API bug"
         },
         {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
-            "task": "Promote WTI blog article"
+            "status_class": "high",
+            "status_text": "\ud83d\udeab Blocked",
+            "task": "Afternoon prediction tweets (ON HOLD)"
         },
         {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
-            "task": "Build Social Pulse automated feed"
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Model Competition Framework"
         },
         {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
-            "task": "Build Competitor Watch automated feed"
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Pipeline Twins / Blue-Green Deploy for bot"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123364583,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-10T05:00:05.467841"
+    "last_updated": "2026-03-10T05:15:06.209175"
 }
