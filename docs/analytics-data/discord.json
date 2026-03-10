@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T23:45:01Z",
+  "generated_at": "2026-03-10T00:00:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-09T23:22:39.979000+00:00"
+          "last_active": "2026-03-09T23:52:40.080000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175569 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-09T23:52:40.080000+00:00",
+      "message_id": "1480714973683650611",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480714973683650611"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175526 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-09T23:22:39.979000+00:00",
       "message_id": "1480707423512825948",
@@ -201,17 +212,6 @@
       "timestamp": "2026-03-09T20:23:43.368000+00:00",
       "message_id": "1480662390902362256",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480662390902362256"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now respond to Fred's attraction change types question:",
-      "timestamp": "2026-03-09T19:22:39.259000+00:00",
-      "message_id": "1480647022515327130",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480647022515327130"
     },
     {
       "channel": "gazoo",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 6,
-    "messages_today": 16
+    "active_channels_today": 0,
+    "messages_today": 0
   }
 }
