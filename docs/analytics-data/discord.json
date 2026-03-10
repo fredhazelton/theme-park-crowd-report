@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-03-10T19:15:01Z",
+  "generated_at": "2026-03-10T19:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
     "icon_status": "configured",
-    "total_channels": 29,
+    "total_channels": 30,
     "total_categories": 6,
     "url": "https://discord.com/channels/1479350342318690505"
   },
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T18:57:28.083000+00:00"
+          "last_active": "2026-03-10T19:27:28.096000+00:00"
         }
       ]
     },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-10T19:12:41.822000+00:00"
+          "last_active": "2026-03-10T19:25:08.763000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,15 +159,26 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 173220 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T19:27:28.096000+00:00",
+      "message_id": "1481010621851107440",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481010621851107440"
+    },
+    {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "You say that now \u2014 wait until Gazoo gives you a 4/10 for spending three hours on Discord branding at 1 AM instead of sleeping \ud83d\ude02\n\nFirst reviews with the full crew response loop start tomorrow. Your ...",
-      "timestamp": "2026-03-10T19:12:41.822000+00:00",
-      "message_id": "1481006904548393061",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481006904548393061"
+      "message": "Yep! The **Daily Improvement Sprint** runs every day at 5:00 AM. Here's the gist:\n\n1. I read Gazoo's latest review + check accuracy drift + scan the task backlog\n2. Pick **one high-impact thing** t...",
+      "timestamp": "2026-03-10T19:25:08.763000+00:00",
+      "message_id": "1481010037445890159",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481010037445890159"
     },
     {
       "channel": "wilma",
@@ -175,21 +186,21 @@
       "channel_id": "1479351579185250436",
       "agent": "Fred Hazelton",
       "is_bot": false,
-      "message": "Awesome!!!",
-      "timestamp": "2026-03-10T19:12:33.741000+00:00",
-      "message_id": "1481006870654226513",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481006870654226513"
+      "message": "OK now the <#1479351571656474756>  - I noticed that you have a dialy task to automnomously imporoive something. Correct?",
+      "timestamp": "2026-03-10T19:24:58.987000+00:00",
+      "message_id": "1481009996442501254",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481009996442501254"
     },
     {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Done! Starting tomorrow, Gazoo will grade you alongside everyone else. Given his personality, I expect something like:\n\n> **\ud83e\udea8 Fred (The Boss)**\n> **Grade: 6/10** \u2014 *\"The Big Dum-Dum spent 45 minute...",
-      "timestamp": "2026-03-10T19:12:02.574000+00:00",
-      "message_id": "1481006739930222603",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481006739930222603"
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Awesome!",
+      "timestamp": "2026-03-10T19:24:27.350000+00:00",
+      "message_id": "1481009863747305534",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481009863747305534"
     },
     {
       "channel": "gazoo",
@@ -245,17 +256,6 @@
       "timestamp": "2026-03-10T18:56:09.362000+00:00",
       "message_id": "1481002741869318348",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481002741869318348"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172892 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T18:40:55.703000+00:00",
-      "message_id": "1480998909705982092",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480998909705982092"
     },
     {
       "channel": "pipeline",
