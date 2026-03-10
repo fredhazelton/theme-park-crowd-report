@@ -1,13 +1,17 @@
-"""Step 6: Synthetic Actuals Generation.
+"""Step 6: Synthetic Actuals Generation — lean version.
 
-Applies the POSTED→ACTUAL conversion model to ALL historical POSTED
-observations to produce synthetic actual wait times.
+Applies the lean 3-feature conversion model (posted_wait, log_posted_wait,
+months_since_epoch) to ALL historical POSTED observations.
 
-v1: Not implemented (TODO). Synthetic actuals were stale on disk.
-v2: Full implementation. Applies the v2 conversion model with all features.
+Because the conversion model is entity-agnostic, s06 is dramatically simpler:
+- No dimEntity join needed
+- No encoding map lookups for entity/park/scope
+- No handling of unseen entities
+- Just: load posted waits, compute 3 features, predict, write parquets
 
-Shadow mode: NOW RUNS FULLY — loads conversion model from shadow dir
-(written by s05), generates synthetics to shadow dir. Previously skipped.
+This also means much lower memory usage — no categorical encoding columns.
+
+Shadow mode: runs fully — loads model from shadow dir, writes to shadow dir.
 """
 
 from __future__ import annotations
@@ -34,14 +38,14 @@ TIME_EPOCH = date(2015, 1, 1)
 
 
 def _get_model_dir(cfg: PipelineConfig) -> Path:
-    """Get the correct conversion model directory (shadow or production)."""
+    """Get the correct conversion model directory."""
     if cfg.shadow and cfg.shadow_output_base:
         return cfg.shadow_output_base / "conversion_model"
     return cfg.output_base / "conversion_model"
 
 
 def _get_synth_dir(cfg: PipelineConfig) -> Path:
-    """Get the correct synthetic output directory (shadow or production)."""
+    """Get the correct synthetic output directory."""
     if cfg.shadow and cfg.shadow_output_base:
         synth_dir = cfg.shadow_output_base / "synthetic_actuals"
     else:
@@ -51,22 +55,19 @@ def _get_synth_dir(cfg: PipelineConfig) -> Path:
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
-    """Generate synthetic actuals using the conversion model."""
+    """Generate synthetic actuals using the lean conversion model."""
 
     log.info("=" * 60)
-    log.info(f"STEP 6: SYNTHETIC ACTUALS v2 {'(SHADOW)' if cfg.shadow else ''}")
+    log.info(f"STEP 6: SYNTHETIC ACTUALS v2_lean {'(SHADOW)' if cfg.shadow else ''}")
     log.info("=" * 60)
 
     if xgb is None:
         raise ValidationError("XGBoost required for synthetic generation")
 
-    # Load conversion model from the correct directory
-    # In shadow mode: use the model s05 just trained to shadow dir
-    # In production: use the production model
+    # Load conversion model
     model_dir = _get_model_dir(cfg)
     model_path = model_dir / "conversion_model.json"
 
-    # Fallback: if shadow model doesn't exist yet, try production model path
     if not model_path.exists():
         prod_model_path = conversion_model_path(cfg)
         if prod_model_path.exists():
@@ -74,12 +75,12 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
             model_path = prod_model_path
             model_dir = prod_model_path.parent
         else:
-            log.warning("No conversion model found — cannot generate synthetics")
+            log.warning("No conversion model found")
             return {"rows": 0, "action": "no_model"}
 
     encoding_path = model_dir / "conversion_encodings.json"
     if not encoding_path.exists():
-        log.warning("No encoding maps found — conversion model may be v1")
+        log.warning("No encoding maps found")
         return {"rows": 0, "action": "no_encodings"}
 
     model = xgb.Booster()
@@ -91,32 +92,24 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
     feature_cols = encodings.get("feature_cols")
     if not feature_cols:
-        log.warning("Encoding maps missing feature_cols — cannot apply v2 model")
+        log.warning("Encoding maps missing feature_cols")
         return {"rows": 0, "action": "incompatible_encodings"}
 
-    park_map = encodings["park_map"]
-    entity_map = encodings["entity_map"]
-    scope_map = encodings.get("scope_map", {})
-    log.info(f"Encodings: {len(entity_map)} entities, {len(park_map)} parks, {len(scope_map)} scopes")
+    log.info(f"Features: {feature_cols}")
 
-    # Load ALL posted observations
+    # Load ALL posted observations — simple query, no dimEntity join needed
     with log.timed("load posted observations"):
         parquet_str = str(cfg.parquet_dir).replace("\\", "/")
-        dim_str = str(cfg.dimension_dir / "dimentity.csv").replace("\\", "/")
         with read_connection() as con:
             df = con.execute(f"""
-                SELECT f.entity_code,
-                       f.park_date,
-                       EXTRACT(HOUR FROM f.observed_at_ts) as hour_bucket,
-                       f.observed_at_ts as observed_at,
-                       f.wait_time_minutes as posted_wait,
-                       d.scope_and_scale
-                FROM read_parquet('{parquet_str}/*.parquet') f
-                LEFT JOIN read_csv_auto('{dim_str}') d
-                    ON f.entity_code = d.code
-                WHERE f.wait_time_type = 'POSTED'
-                  AND f.wait_time_minutes > 0
-                  AND f.observed_at_ts IS NOT NULL
+                SELECT entity_code,
+                       park_date,
+                       observed_at_ts as observed_at,
+                       wait_time_minutes as posted_wait
+                FROM read_parquet('{parquet_str}/*.parquet')
+                WHERE wait_time_type = 'POSTED'
+                  AND wait_time_minutes > 0
+                  AND observed_at_ts IS NOT NULL
             """).fetchdf()
 
     if len(df) == 0:
@@ -125,70 +118,71 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
     log.info(f"Posted observations: {len(df):,} rows, {df['entity_code'].nunique()} entities")
 
-    # Build features (must match s05 exactly)
+    # Build features — just 3, no encoding lookups
     with log.timed("feature engineering"):
         df["park_date_dt"] = pd.to_datetime(df["park_date"])
-
+        df["posted_wait"] = df["posted_wait"].astype(np.float32)
         df["log_posted_wait"] = np.log1p(df["posted_wait"]).astype(np.float32)
-        df["hour_of_day"] = df["hour_bucket"].astype(np.float32)
-        df["day_of_week"] = df["park_date_dt"].dt.dayofweek.astype(np.float32)
-        df["month_of_year"] = df["park_date_dt"].dt.month.astype(np.float32)
-
         df["months_since_epoch"] = (
             (df["park_date_dt"].dt.year - TIME_EPOCH.year) * 12
             + (df["park_date_dt"].dt.month - TIME_EPOCH.month)
         ).astype(np.float32)
 
-        df["park_code"] = df["entity_code"].str.extract(r'^([A-Z]{2,3})')[0]
-        df["park_encoded"] = df["park_code"].map(park_map).fillna(-1).astype(np.float32)
-
-        unknown_entity = len(entity_map)
-        df["entity_encoded"] = df["entity_code"].map(entity_map).fillna(unknown_entity).astype(np.float32)
-
-        df["scope_encoded"] = df["scope_and_scale"].map(scope_map).fillna(-1).astype(np.float32)
-
     missing = [c for c in feature_cols if c not in df.columns]
     if missing:
         raise ValidationError(f"Feature mismatch: s06 missing {missing}")
 
-    # Apply conversion model
-    with log.timed("generate synthetic actuals"):
-        X = df[feature_cols].values.astype(np.float32)
-        dmatrix = xgb.DMatrix(X, feature_names=feature_cols)
-        df["synthetic_actual"] = model.predict(dmatrix)
-        df["synthetic_actual"] = df["synthetic_actual"].clip(lower=1.0)
-
-    log.info(f"Synthetic actuals generated: {len(df):,} rows")
-    log.info(f"Mean synthetic: {df['synthetic_actual'].mean():.1f} min")
-    log.info(f"Mean posted: {df['posted_wait'].mean():.1f} min")
-    log.info(f"Mean ratio (synthetic/posted): {(df['synthetic_actual'] / df['posted_wait']).mean():.3f}")
-
-    # Write per-park parquet files to correct directory
+    # Apply conversion model — process per-park to control memory
     synth_dir = _get_synth_dir(cfg)
-    with log.timed("write parquet files"):
-        output_cols = ["entity_code", "park_date", "observed_at", "synthetic_actual"]
+    df["park_code"] = df["entity_code"].str.extract(r'^([A-Z]{2,3})')[0]
 
-        parks_written = 0
-        total_rows = 0
-        for park_code in sorted(df["park_code"].unique()):
-            park_df = df[df["park_code"] == park_code][output_cols].copy()
+    parks = sorted(df["park_code"].unique())
+    parks_written = 0
+    total_rows = 0
+
+    with log.timed("generate + write synthetic actuals"):
+        for park_code in parks:
+            park_df = df[df["park_code"] == park_code].copy()
             if len(park_df) == 0:
                 continue
 
-            park_df["observed_at"] = park_df["observed_at"].astype(str)
+            # Predict for this park
+            X = park_df[feature_cols].values.astype(np.float32)
+            dmatrix = xgb.DMatrix(X, feature_names=feature_cols)
+            park_df["synthetic_actual"] = model.predict(dmatrix)
+            park_df["synthetic_actual"] = park_df["synthetic_actual"].clip(lower=1.0)
+
+            # Write
+            output_cols = ["entity_code", "park_date", "observed_at", "synthetic_actual"]
+            out_df = park_df[output_cols].copy()
+            out_df["observed_at"] = out_df["observed_at"].astype(str)
 
             out_path = synth_dir / f"{park_code}.parquet"
-            park_df.to_parquet(out_path, index=False)
+            out_df.to_parquet(out_path, index=False)
             parks_written += 1
-            total_rows += len(park_df)
+            total_rows += len(out_df)
 
-        log.info(f"Written {parks_written} park files to {synth_dir}")
-        log.info(f"Total rows: {total_rows:,}")
+            del park_df, out_df, X, dmatrix  # Release memory between parks
+
+    log.info(f"Written {parks_written} park files to {synth_dir}")
+    log.info(f"Total rows: {total_rows:,}")
+
+    # Summary stats
+    sample = df.head(100000)
+    X_sample = sample[feature_cols].values.astype(np.float32)
+    d_sample = xgb.DMatrix(X_sample, feature_names=feature_cols)
+    sample_pred = model.predict(d_sample)
+    mean_synth = float(np.mean(sample_pred))
+    mean_posted = float(sample["posted_wait"].mean())
+
+    log.info(f"Mean synthetic (sample): {mean_synth:.1f} min")
+    log.info(f"Mean posted (sample): {mean_posted:.1f} min")
+    log.info(f"Mean ratio: {mean_synth / mean_posted:.3f}")
 
     return {
         "rows": total_rows,
         "action": "generated",
         "parks": parks_written,
-        "mean_synthetic": round(float(df["synthetic_actual"].mean()), 1),
-        "mean_posted": round(float(df["posted_wait"].mean()), 1),
+        "mean_synthetic": round(mean_synth, 1),
+        "mean_posted": round(mean_posted, 1),
     }
