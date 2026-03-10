@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T06:45:01Z",
+  "generated_at": "2026-03-10T07:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-10T04:00:38.657000+00:00"
+          "last_active": "2026-03-10T06:57:38.591000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Review posted. Now let me update today's memory with the Gazoo review and handle any task creation from the findings:",
+      "timestamp": "2026-03-10T06:57:38.591000+00:00",
+      "message_id": "1480821922190196788",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480821922190196788"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now post the summary to Discord #gazoo:",
+      "timestamp": "2026-03-10T06:57:38.411000+00:00",
+      "message_id": "1480821921435222169",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480821921435222169"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now I have everything. Let me write the review:",
+      "timestamp": "2026-03-10T06:57:36.805000+00:00",
+      "message_id": "1480821914699173965",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480821914699173965"
+    },
     {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
@@ -234,39 +267,6 @@
       "timestamp": "2026-03-10T04:00:44.484000+00:00",
       "message_id": "1480777403398885446",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480777403398885446"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udc7d Scheduled today's reviews.",
-      "timestamp": "2026-03-10T04:00:38.657000+00:00",
-      "message_id": "1480777378958671872",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480777378958671872"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me remove the one-shot cron job since it fired.",
-      "timestamp": "2026-03-09T18:44:55.917000+00:00",
-      "message_id": "1480637529370919115",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480637529370919115"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now post the summary to Discord #gazoo.",
-      "timestamp": "2026-03-09T18:44:54.075000+00:00",
-      "message_id": "1480637521644749034",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480637521644749034"
     },
     {
       "channel": "pipeline",
@@ -382,6 +382,6 @@
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 4,
-    "messages_today": 8
+    "messages_today": 10
   }
 }
