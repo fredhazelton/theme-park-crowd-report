@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T04:45:02Z",
+  "generated_at": "2026-03-10T05:00:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-09T16:00:01.928000+00:00"
+          "last_active": "2026-03-10T05:00:02.242000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T04:39:30.663000+00:00"
+          "last_active": "2026-03-10T04:55:19.993000+00:00"
         }
       ]
     },
@@ -159,15 +159,15 @@
   ],
   "recent_activity": [
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "The sub-agent already posted the full summary to #fred-wilma, so Fred should see it. Let me just make sure it landed cleanly.",
-      "timestamp": "2026-03-10T04:39:30.663000+00:00",
-      "message_id": "1480787160100638801",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480787160100638801"
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-10T05:00:02.242000+00:00",
+      "message_id": "1480792325717495922",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480792325717495922"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "**\ud83d\udfe1 Medium (10 new):**\nFirecrawl async bug, afternoon tweets on hold, Model Competition Framework, Pipeline Twins, Apple Weather cards, Unhosted Twitch Stream, School Schedules, Mobile site fix, pe...",
-      "timestamp": "2026-03-10T04:39:07.702000+00:00",
-      "message_id": "1480787063795093607",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480787063795093607"
+      "message": "\u2705 All 19 new tasks posted as forum threads in #dino with proper tags (status + priority + owner). tasks.json updated with threadIds. analytics tasks.json regenerated.",
+      "timestamp": "2026-03-10T04:55:19.993000+00:00",
+      "message_id": "1480791141879255115",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480791141879255115"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\u2705 **Discord Channel Review + Dino Task Audit COMPLETE**\n\nSwept 20 channels, all forum threads, and cross-referenced with tasks.json.\n\n**Results:**\n- **20 new tasks added** (task-029 \u2192 task-048)\n- *...",
-      "timestamp": "2026-03-10T04:39:07.569000+00:00",
-      "message_id": "1480787063237509286",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480787063237509286"
+      "message": "Good catch \u2014 the tasks were added to `tasks.json` but not posted as forum threads in #dino yet. Spawning a sub-agent now to create all 20 threads with proper tags (status, priority, owner). Should ...",
+      "timestamp": "2026-03-10T04:50:09.197000+00:00",
+      "message_id": "1480789838306345081",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480789838306345081"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "I can see the #dino forum already has 7 threads from the earlier setup (task-006 through task-010, plus task-027 and task-028), but the 20 new tasks from this audit weren't posted as forum threads....",
+      "timestamp": "2026-03-10T04:49:50.876000+00:00",
+      "message_id": "1480789761462505503",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480789761462505503"
     },
     {
       "channel": "alerts",
@@ -302,17 +313,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480573381228236860"
     },
     {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-09T14:00:01.832000+00:00",
-      "message_id": "1480565831581569137",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1480565831581569137"
-    },
-    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 3,
-    "messages_today": 7
+    "active_channels_today": 4,
+    "messages_today": 8
   }
 }
