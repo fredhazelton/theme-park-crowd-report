@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-10T04:02:45.888374+00:00",
+  "updated": "2026-03-10T08:26:31.570101+00:00",
   "agents": [
     {
       "id": "fred",
@@ -23,9 +23,9 @@
       "id": "barney",
       "name": "Barney",
       "icon": "🪨",
-      "state": "idle",
-      "zone": "tarpit-2",
-      "task": "Available on claude.ai",
+      "state": "offline",
+      "zone": "offsite",
+      "task": "",
       "color": "#4ade80"
     },
     {
@@ -34,7 +34,7 @@
       "icon": "🔨",
       "state": "working",
       "zone": "desk-3",
-      "task": "Pushed 3 commits recently",
+      "task": "Pushed 2 commits recently",
       "color": "#c084fc"
     },
     {
