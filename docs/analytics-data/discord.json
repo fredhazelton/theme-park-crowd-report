@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T19:30:01Z",
+  "generated_at": "2026-03-10T19:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T19:27:28.096000+00:00"
+          "last_active": "2026-03-10T19:31:42.861000+00:00"
         }
       ]
     },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-10T19:25:08.763000+00:00"
+          "last_active": "2026-03-10T19:38:41.310000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,50 @@
   ],
   "recent_activity": [
     {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**Every task any agent discovers \u2192 goes to Dino's board.** No orphaned work.\n\nBy the time you wake up each morning, every agent has already fixed yesterday's bugs AND shipped an improvement. Then G...",
+      "timestamp": "2026-03-10T19:38:41.310000+00:00",
+      "message_id": "1481013445515149413",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481013445515149413"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "```\n| Time | What                                              |\n| ---- | ------------------------------------------------- |\n| 6:00 | \ud83e\udd95 Dino sprint \u2192 task management improvements     |\n| 6:30 | \ud83d\udcf0 ...",
+      "timestamp": "2026-03-10T19:38:41.125000+00:00",
+      "message_id": "1481013444739203279",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481013444739203279"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "All built! Here's the complete daily machine:\n\n**\ud83c\udf19 Overnight \u2014 Gazoo Review + Bug Fixes**\n\n```\n| Time   | What                                                |\n| ------ | --------------------------...",
+      "timestamp": "2026-03-10T19:38:41.028000+00:00",
+      "message_id": "1481013444332359771",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481013444332359771"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 173263 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T19:31:42.861000+00:00",
+      "message_id": "1481011690412970044",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481011690412970044"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -168,39 +212,6 @@
       "timestamp": "2026-03-10T19:27:28.096000+00:00",
       "message_id": "1481010621851107440",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481010621851107440"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Yep! The **Daily Improvement Sprint** runs every day at 5:00 AM. Here's the gist:\n\n1. I read Gazoo's latest review + check accuracy drift + scan the task backlog\n2. Pick **one high-impact thing** t...",
-      "timestamp": "2026-03-10T19:25:08.763000+00:00",
-      "message_id": "1481010037445890159",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481010037445890159"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "OK now the <#1479351571656474756>  - I noticed that you have a dialy task to automnomously imporoive something. Correct?",
-      "timestamp": "2026-03-10T19:24:58.987000+00:00",
-      "message_id": "1481009996442501254",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481009996442501254"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Awesome!",
-      "timestamp": "2026-03-10T19:24:27.350000+00:00",
-      "message_id": "1481009863747305534",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481009863747305534"
     },
     {
       "channel": "gazoo",
@@ -245,17 +256,6 @@
       "timestamp": "2026-03-10T18:57:28.083000+00:00",
       "message_id": "1481003072049254593",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481003072049254593"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172935 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T18:56:09.362000+00:00",
-      "message_id": "1481002741869318348",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481002741869318348"
     },
     {
       "channel": "pipeline",
