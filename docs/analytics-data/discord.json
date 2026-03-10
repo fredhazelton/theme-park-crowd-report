@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T01:30:01Z",
+  "generated_at": "2026-03-10T01:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T00:55:17.623000+00:00"
+          "last_active": "2026-03-10T01:30:16.763000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175698 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T01:30:16.763000+00:00",
+      "message_id": "1480739538392584243",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480739538392584243"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "Context overflow: prompt too large for the model. Try again with less input or a larger-context model.",
       "timestamp": "2026-03-10T00:55:17.623000+00:00",
       "message_id": "1480730733961285804",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-10T00:55:17.468000+00:00",
       "message_id": "1480730733311037451",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480730733311037451"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Context overflow: prompt too large for the model. Try again with less input or a larger-context model.",
-      "timestamp": "2026-03-10T00:55:10.665000+00:00",
-      "message_id": "1480730704777314375",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480730704777314375"
     },
     {
       "channel": "alerts",
