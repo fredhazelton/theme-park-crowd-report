@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T16:30:01Z",
+  "generated_at": "2026-03-10T16:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T16:14:56.140000+00:00"
+          "last_active": "2026-03-10T16:37:54.882000+00:00"
         }
       ]
     },
@@ -159,6 +159,17 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172379 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T16:37:54.882000+00:00",
+      "message_id": "1480967952298803241",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480967952298803241"
+    },
+    {
       "channel": "pipeline",
       "channel_emoji": "\ud83d\udd27",
       "channel_id": "1479351574177513576",
@@ -201,17 +212,6 @@
       "timestamp": "2026-03-10T15:42:32.381000+00:00",
       "message_id": "1480954016719568980",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480954016719568980"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172250 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T15:40:11.907000+00:00",
-      "message_id": "1480953427528908920",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480953427528908920"
     },
     {
       "channel": "alerts",
