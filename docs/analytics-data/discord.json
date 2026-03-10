@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T11:15:01Z",
+  "generated_at": "2026-03-10T11:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T11:00:14.727000+00:00"
+          "last_active": "2026-03-10T11:30:01.563000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170881 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T11:30:01.563000+00:00",
+      "message_id": "1480890469583028234",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480890469583028234"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170659 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-10T11:00:14.727000+00:00",
       "message_id": "1480882975049515141",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-10T10:31:09.476000+00:00",
       "message_id": "1480875654936264768",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480875654936264768"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good morning! \u2600\ufe0f\n\n**Right now:** v4 pipeline is running \u2014 kicked off at 6:00 AM, currently training models (AK \u2705, CA \u2705, DL in progress). This is the first v4 production run with synthetic scoring +...",
-      "timestamp": "2026-03-10T10:05:31.233000+00:00",
-      "message_id": "1480869203077763173",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480869203077763173"
     },
     {
       "channel": "mission-control",
