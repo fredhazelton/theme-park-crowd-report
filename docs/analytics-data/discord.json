@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T15:15:02Z",
+  "generated_at": "2026-03-10T15:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T15:08:51.425000+00:00"
+          "last_active": "2026-03-10T15:28:43.377000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172078 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T15:08:51.425000+00:00",
-      "message_id": "1480945540215607429",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480945540215607429"
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172121 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T15:28:43.377000+00:00",
+      "message_id": "1480950539624910868",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480950539624910868"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 171734 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T14:54:37.146000+00:00",
-      "message_id": "1480941957109911785",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480941957109911785"
+      "message": "Pillar 1 done \u2014 57 entities flagged for real-only training (matching previous shadow results). Now training park-by-park starting with AK. This is the longest step. I'll let you know when it wraps up!",
+      "timestamp": "2026-03-10T15:25:09.128000+00:00",
+      "message_id": "1480949640999211082",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480949640999211082"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 171691 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T14:43:40.811000+00:00",
-      "message_id": "1480939204241264680",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480939204241264680"
+      "message": "Training is chugging away. I'll ping you when s07 finishes or if something breaks! \u23f3",
+      "timestamp": "2026-03-10T15:25:05.329000+00:00",
+      "message_id": "1480949625065308313",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480949625065308313"
     },
     {
       "channel": "alerts",
