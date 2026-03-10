@@ -66,7 +66,8 @@ class PipelineConfig:
     })
 
     # === Conversion model ===
-    conversion_retrain_day: int = 0  # 0=Monday
+    # v2: daily refresh (v1 was weekly Monday-only via conversion_retrain_day)
+    conversion_retrain_daily: bool = True  # Retrain conversion model every run
     conversion_holdout_fraction: float = 0.15
     conversion_max_mae_regression: float = 1.0  # Only deploy if MAE doesn't worsen by >1 min
 
