@@ -1,33 +1,15 @@
 """Step 5: POSTED→ACTUAL Conversion Model v2 — multi-feature with validation gate.
 
 v1 (original): Single feature (posted_wait). Global model. Weekly refresh.
-    Problem: One model for all entities, all parks, all time periods.
-    A 60-min posted wait at Space Mountain 9am treated identically to
-    a 60-min posted wait at It's a Small World 3pm.
-
 v2 (this version): Multi-feature, entity-aware, continuous time trend.
-    Features:
-    - posted_wait: the core signal
-    - log_posted_wait: captures nonlinear inflation at high posted waits
-    - hour_of_day: mornings more accurate, afternoons inflate
-    - day_of_week: weekend vs weekday posting behavior
-    - month_of_year: seasonal patterns in posting accuracy
-    - months_since_epoch: continuous time trend (concept drift in how parks
-      post wait times over the years — gradual, no artificial year boundaries)
-    - entity_encoded: frequency-based, lets model learn entity-specific behavior
-    - park_encoded: park-level posting culture
-    - scope_encoded: scope_and_scale from dimEntity — Super Headliner vs Minor
-      attractions have very different posting inflation patterns
 
-    The model learns that posted-to-actual ratios differ by entity, time of day,
-    time period, season, and ride importance. One global model that borrows
-    strength across entities while learning entity-specific behavior.
+Features: posted_wait, log_posted_wait, hour_of_day, day_of_week,
+month_of_year, months_since_epoch, entity_encoded, park_encoded,
+scope_encoded.
 
-Still uses validation gate: only deploys if candidate beats current model.
-Refreshes daily (was weekly) — fast enough with v3/v4 pipeline speed.
-
-This model generates 94% of all training data (synthetic actuals).
-Every minute of accuracy gained here propagates to all 423 entity models.
+Shadow mode: NOW RUNS FULLY — trains model and writes to shadow output dir.
+Previously skipped in shadow mode, which meant conversion model changes
+could never be shadow-tested (Lesson #5 recurring).
 """
 
 from __future__ import annotations
@@ -51,11 +33,8 @@ from pipeline_v3.core.logging import PipelineLogger
 from pipeline_v3.core.paths import conversion_model_path, conversion_model_backup_path
 from pipeline_v3.core.validation import ValidationError
 
-# Epoch for continuous time feature
-# 2015-01-01 ≈ start of modern wait time data era
 TIME_EPOCH = date(2015, 1, 1)
 
-# Feature columns in training order — must match exactly at inference time (s06)
 FEATURE_COLS = [
     "posted_wait",
     "log_posted_wait",
@@ -69,21 +48,33 @@ FEATURE_COLS = [
 ]
 
 
+def _get_model_dir(cfg: PipelineConfig) -> Path:
+    """Get the correct model output directory (shadow or production)."""
+    if cfg.shadow and cfg.shadow_output_base:
+        model_dir = cfg.shadow_output_base / "conversion_model"
+    else:
+        model_dir = cfg.output_base / "conversion_model"
+    model_dir.mkdir(parents=True, exist_ok=True)
+    return model_dir
+
+
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     """Train conversion model v2 with multi-feature + validation gate."""
 
     log.info("=" * 60)
-    log.info("STEP 5: CONVERSION MODEL v2 (multi-feature, daily refresh)")
+    log.info(f"STEP 5: CONVERSION MODEL v2 {'(SHADOW)' if cfg.shadow else ''}")
     log.info("=" * 60)
-
-    model_path = conversion_model_path(cfg)
-
-    if cfg.shadow:
-        log.info("Shadow mode: skipping conversion model training (uses production model)")
-        return {"rows": 0, "action": "skipped_shadow"}
 
     if xgb is None:
         raise ValidationError("XGBoost required for conversion model")
+
+    # In shadow mode: train to shadow dir. In production: train to production dir.
+    # NEVER skip — shadow mode must test conversion model changes (Lesson #5).
+    model_dir = _get_model_dir(cfg)
+    model_path = model_dir / "conversion_model.json"
+
+    # For validation gate comparison: always compare against PRODUCTION model
+    prod_model_path = conversion_model_path(cfg)
 
     # Load matched pairs with ALL context columns
     with log.timed("load training data"):
@@ -132,18 +123,17 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     log.info(f"Entities: {df['entity_code'].nunique()}")
     log.info(f"Date range: {df['park_date'].min()} to {df['park_date'].max()}")
 
-    # === Feature engineering ===
+    # Feature engineering
     with log.timed("feature engineering"):
         df, encoding_maps = _build_features(df, log)
 
-    # Verify all features exist
     missing = [c for c in FEATURE_COLS if c not in df.columns]
     if missing:
         raise ValidationError(f"Feature engineering failed — missing: {missing}")
 
     log.info(f"Features ({len(FEATURE_COLS)}): {FEATURE_COLS}")
 
-    # Split: train / holdout (TIME-BASED — holdout is most recent data)
+    # Split: train / holdout (time-based)
     df = df.sort_values("park_date")
     n = len(df)
     holdout_n = int(n * cfg.conversion_holdout_fraction)
@@ -181,7 +171,6 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
             verbose_eval=False,
         )
 
-    # Evaluate candidate
     candidate_pred = bst.predict(dhold)
     candidate_mae = float(np.mean(np.abs(y_hold - candidate_pred)))
     candidate_bias = float(np.mean(candidate_pred - y_hold))
@@ -193,21 +182,20 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     for feat, score in sorted(importance.items(), key=lambda x: -x[1]):
         log.info(f"  {feat}: {score:.1f}")
 
-    # === Validation gate ===
+    # Validation gate: compare against PRODUCTION model (even in shadow mode)
     current_mae = None
     mae_improvement = 0.0
 
-    if model_path.exists():
-        with log.timed("evaluate current model"):
+    if prod_model_path.exists():
+        with log.timed("evaluate production model"):
             current_model = xgb.Booster()
-            current_model.load_model(str(model_path))
+            current_model.load_model(str(prod_model_path))
 
             try:
                 current_pred = current_model.predict(dhold)
                 current_mae = float(np.mean(np.abs(y_hold - current_pred)))
             except Exception:
-                # v1 model has different feature shape — build v1 input
-                log.info("Current model is v1 (single feature) — building v1 holdout")
+                log.info("Production model is v1 (single feature) — building v1 holdout")
                 dhold_v1 = xgb.DMatrix(
                     holdout_df[["posted_wait"]].values.astype(np.float32),
                     label=y_hold,
@@ -215,7 +203,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 current_pred = current_model.predict(dhold_v1)
                 current_mae = float(np.mean(np.abs(y_hold - current_pred)))
 
-            log.info(f"Current model MAE: {current_mae:.3f} min")
+            log.info(f"Production model MAE: {current_mae:.3f} min")
 
         mae_improvement = current_mae - candidate_mae
         mae_regression = candidate_mae - current_mae
@@ -230,20 +218,23 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 "candidate_mae": candidate_mae, "current_mae": current_mae,
             }
 
-        log.info(f"Candidate is {mae_improvement:.3f} min BETTER. Deploying.")
-        backup = conversion_model_backup_path(cfg)
-        backup.parent.mkdir(parents=True, exist_ok=True)
-        model_path.rename(backup)
-        log.info(f"Previous model backed up to {backup}")
+        log.info(f"Candidate is {mae_improvement:.3f} min BETTER than production.")
+
+        # Backup only in production mode
+        if not cfg.shadow:
+            backup = conversion_model_backup_path(cfg)
+            backup.parent.mkdir(parents=True, exist_ok=True)
+            prod_model_path.rename(backup)
+            log.info(f"Previous model backed up to {backup}")
     else:
-        log.info("No existing model — deploying directly")
+        log.info("No existing production model — deploying directly")
 
-    # Deploy
-    model_path.parent.mkdir(parents=True, exist_ok=True)
+    # Save model to appropriate directory
     bst.save_model(str(model_path))
+    log.info(f"Model saved to {model_path}")
 
-    # Save encoding maps (needed by s06_synthetic to apply the model)
-    encoding_path = model_path.parent / "conversion_encodings.json"
+    # Save encoding maps
+    encoding_path = model_dir / "conversion_encodings.json"
     with open(encoding_path, "w") as f:
         json.dump(encoding_maps, f, indent=2)
     log.info(f"Encoding maps saved ({len(encoding_maps['entity_map'])} entities, "
@@ -264,16 +255,17 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         "feature_importance": {k: round(v, 1) for k, v in importance.items()},
         "params": params,
         "best_iteration": bst.best_iteration,
+        "shadow_mode": cfg.shadow,
         "version": "v2",
     }
-    meta_path = model_path.parent / "metadata_v3.json"
+    meta_path = model_dir / "metadata_v3.json"
     with open(meta_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
     log.info(f"Conversion model v2 deployed: MAE {candidate_mae:.3f} min")
     if current_mae:
         pct = mae_improvement / current_mae * 100
-        log.info(f"Improvement over previous: {mae_improvement:.3f} min ({pct:.1f}%)")
+        log.info(f"Improvement over production: {mae_improvement:.3f} min ({pct:.1f}%)")
 
     return {
         "rows": len(train_df), "action": "deployed",
@@ -287,37 +279,29 @@ def _build_features(df: pd.DataFrame, log: PipelineLogger) -> tuple[pd.DataFrame
 
     df["park_date_dt"] = pd.to_datetime(df["park_date"])
 
-    # --- Numeric features ---
     df["log_posted_wait"] = np.log1p(df["posted_wait"]).astype(np.float32)
     df["hour_of_day"] = df["hour_bucket"].astype(np.float32)
     df["day_of_week"] = df["park_date_dt"].dt.dayofweek.astype(np.float32)
     df["month_of_year"] = df["park_date_dt"].dt.month.astype(np.float32)
 
-    # Continuous time trend: MONTHS since epoch (not days — days overfits)
     df["months_since_epoch"] = (
         (df["park_date_dt"].dt.year - TIME_EPOCH.year) * 12
         + (df["park_date_dt"].dt.month - TIME_EPOCH.month)
     ).astype(np.float32)
 
-    # --- Encoded categoricals ---
-
-    # Park
     df["park_code"] = df["entity_code"].str.extract(r'^([A-Z]{2,3})')[0]
     park_codes = sorted(df["park_code"].dropna().unique())
     park_map = {p: i for i, p in enumerate(park_codes)}
     df["park_encoded"] = df["park_code"].map(park_map).fillna(-1).astype(np.float32)
     log.info(f"Parks: {len(park_map)}")
 
-    # Entity (frequency-based: common entities get lower IDs)
     entity_freq = df["entity_code"].value_counts()
     entity_map = {e: i for i, e in enumerate(entity_freq.index)}
     df["entity_encoded"] = df["entity_code"].map(entity_map).astype(np.float32)
     log.info(f"Entities: {len(entity_map)}")
 
-    # Scope and scale (from dimEntity join)
     scope_values = sorted(df["scope_and_scale"].dropna().unique())
     scope_map = {s: i for i, s in enumerate(scope_values)}
-    # -1 for entities not in dimEntity or with null scope
     df["scope_encoded"] = df["scope_and_scale"].map(scope_map).fillna(-1).astype(np.float32)
     log.info(f"Scope categories: {scope_map}")
 
