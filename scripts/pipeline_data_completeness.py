@@ -397,13 +397,8 @@ def run_completeness_check(check_date: str = None, do_fix: bool = False) -> dict
             "stats": {},
         }
 
-    # Determine a good date to check (first future date in forecasts)
-    try:
-        max_date = con.execute("SELECT MAX(park_date)::VARCHAR FROM forecasts").fetchone()[0]
-        if max_date:
-            check_date = max_date
-    except Exception:
-        pass
+    # Don't override check_date with MAX(park_date) - it's too far in future
+    # The check_date was already set to tomorrow above, which is what we want
 
     all_issues = []
     all_stats = {}
