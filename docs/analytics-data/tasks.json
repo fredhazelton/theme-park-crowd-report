@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-03-07T08:51:29",
+  "generated_at": "2026-03-10T05:04:30",
   "summary": {
-    "total": 26,
-    "this_week": 26,
-    "in_progress": 6,
+    "total": 48,
+    "this_week": 48,
+    "in_progress": 13,
     "completed_this_week": 0,
     "pct_complete": 0
   },
@@ -11,21 +11,21 @@
     {
       "id": "task-001",
       "title": "Pipeline accuracy audit follow-up",
-      "description": "Monitor accuracy after conversion model retrain. First signal expected Mar 7.",
-      "status": "in_progress",
-      "column": "in_progress",
+      "description": "",
+      "status": "done",
+      "column": "done",
       "priority": "high",
       "owner": "Wilma",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-04T10:00:00",
-      "updated": "2026-03-05T08:00:00",
-      "notes": "Conversion model retrained Mar 4 with geo-decay. Three-day feedback loop."
+      "updated": "2026-03-07T14:00:00",
+      "notes": "COMPLETED: MAE=9.36 min, bias=2.57 min, MAPE=91.0% across 24 evaluated dates."
     },
     {
       "id": "task-002",
       "title": "Mission Control v3 \u2014 remaining tabs",
-      "description": "Build out Discord, Social, Ideas, Finance, Model Use tabs",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "high",
@@ -34,12 +34,12 @@
       "is_recurring": false,
       "created": "2026-03-05T06:00:00",
       "updated": "2026-03-06T08:00:00",
-      "notes": "All 10 tabs live: Pipeline, Analytics, Tasks, Calendar, Projects, Memory, Social, Ideas, Finance, Discord. Plus Office + Team as sidebar links."
+      "notes": "All 10 tabs live."
     },
     {
       "id": "task-003",
       "title": "Prediction lineage tracking \u2014 verify in production",
-      "description": "Confirm 14 lineage columns populate correctly in tomorrow's pipeline run",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "medium",
@@ -48,12 +48,12 @@
       "is_recurring": false,
       "created": "2026-03-05T08:00:00",
       "updated": "2026-03-06T15:30:00",
-      "notes": "Verified 2026-03-06. All 14 columns present in all_forecasts.parquet (29.3M rows, 426 entities). 11 active columns fully populated for model-based predictions. 3 placeholders (quantile_mapping, hyperparameter_hash, notes) structurally in place. ~19.2% nulls on model-specific cols are correct (fallback_ratio + aggregate methods). Report: research/lineage-verification-2026-03-06.md"
+      "notes": "Verified 2026-03-06. All 14 columns present."
     },
     {
       "id": "task-004",
       "title": "Replace X branding across codebase",
-      "description": "Updated all Twitter references to X across website, overlays, scripts, docs, and stream assets",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "low",
@@ -62,12 +62,12 @@
       "is_recurring": false,
       "created": "2026-02-02T13:14:00",
       "updated": "2026-03-06T09:00:00",
-      "notes": "Full rebrand: 46+ files across both repos. Completed by sub-agent."
+      "notes": "Full rebrand: 46+ files."
     },
     {
       "id": "task-005",
       "title": "Renew GitHub PAT token",
-      "description": "Token hazeydata-fred expires Jun 3, 2026. Reminder set for May 27.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "high",
@@ -76,7 +76,7 @@
       "is_recurring": false,
       "created": "2026-03-05T19:00:00",
       "updated": "2026-03-05T19:24:00",
-      "notes": "Renewed Mar 5. New token active. Reminder cron set."
+      "notes": "Renewed Mar 5."
     },
     {
       "id": "task-006",
@@ -89,27 +89,27 @@
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-05T13:00:00",
-      "updated": "2026-03-05T13:29:00",
-      "notes": "Twitter post done Mar 5 ~1:30 PM. Reddit and others still pending."
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Twitter post done Mar 5. Reddit account set up (disneystatswhiz, Reddit Premium). Reddit targets posted in #content-ideas. Still needs direct WTI article promo on Reddit."
     },
     {
       "id": "task-007",
       "title": "Synthetic vs real actuals weighting review",
       "description": "After conversion model fix settles, revisit how synthetic and real actuals are weighted in training",
-      "status": "in_progress",
-      "column": "in_progress",
+      "status": "done",
+      "column": "done",
       "priority": "medium",
       "owner": "Wilma",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-04T10:00:00",
-      "updated": "2026-03-06T12:34:00",
-      "notes": "Experiment framework built. Full run with 7 weighting schemes now executing."
+      "updated": "2026-03-10T04:40:00",
+      "notes": "COMPLETED via v4 pipeline. Pillar 1 (synthetic scoring) dropped bad synthetic data for 57 entities. inverse_freq weighting deployed. v4 merged to main."
     },
     {
       "id": "task-008",
       "title": "Build Social Pulse automated feed",
-      "description": "Automated feed for #social-pulse \u2014 trending theme park tweets/posts, viral content, Discord community activity, new subscriber signups. Runs every 4 hours.",
+      "description": "Automated feed for #social-pulse",
       "status": "in_progress",
       "column": "in_progress",
       "priority": "medium",
@@ -118,12 +118,12 @@
       "is_recurring": false,
       "created": "2026-03-06T08:19:00",
       "updated": "2026-03-06T12:34:00",
-      "notes": "From Discord workflow report. Needs: web scraping for trending content, Discord bot activity tracking, subscriber webhook integration. Posts to #social-pulse channel."
+      "notes": "Needs: web scraping, Discord bot activity tracking, subscriber webhook."
     },
     {
       "id": "task-009",
       "title": "Build Competitor Watch automated feed",
-      "description": "Daily automated feed for #competitor-watch \u2014 monitor TouringPlans, Thrill Data, Undercover Tourist, theme park news, HazeyData mentions, new crowd tools, Reddit discussions. Runs daily at 8am.",
+      "description": "Daily automated feed for #competitor-watch",
       "status": "in_progress",
       "column": "recurring",
       "priority": "medium",
@@ -132,12 +132,12 @@
       "is_recurring": true,
       "created": "2026-03-06T08:19:00",
       "updated": "2026-03-06T12:34:00",
-      "notes": "From Discord workflow report. Needs: RSS/web scraping for competitor blogs, Reddit API for r/WaltDisneyWorld + r/UniversalOrlando, web search for HazeyData mentions. Posts to #competitor-watch channel."
+      "notes": "Needs: RSS/web scraping, Reddit API, HazeyData mention monitoring."
     },
     {
       "id": "task-010",
       "title": "Build Park Intel automated feed",
-      "description": "Daily automated feed for #park-intel \u2014 today's operating hours across all 12 parks, last-minute closures/schedule changes, special events, yesterday's actuals vs predictions. Runs daily at 6:30am.",
+      "description": "Daily automated feed for #park-intel",
       "status": "in_progress",
       "column": "recurring",
       "priority": "medium",
@@ -146,26 +146,26 @@
       "is_recurring": true,
       "created": "2026-03-06T08:19:00",
       "updated": "2026-03-06T12:34:00",
-      "notes": "From Discord workflow report. Needs: park hours API/scraping, event calendar integration, accuracy comparison from pipeline outputs. Posts to #park-intel channel."
+      "notes": "Needs: park hours API/scraping, accuracy comparison."
     },
     {
       "id": "task-011",
       "title": "Content: Thanksgiving 2026 Crowd Predictions",
-      "description": "Blog/article analyzing predicted Thanksgiving 2026 crowds. Angle: might be the best year to visit in late November. Include year-over-year comparison (5 years), park-specific callouts, and day-by-day breakdown of Thanksgiving week.",
-      "status": "done",
-      "column": "done",
+      "description": "Blog/article analyzing predicted Thanksgiving 2026 crowds.",
+      "status": "todo",
+      "column": "backlog",
       "priority": "medium",
       "owner": "Fred",
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-06T08:22:00",
       "updated": "2026-03-06T08:22:00",
-      "notes": "From #content-ideas. Publish by mid-October to catch planners. Suggested angles: Thanksgiving 2026 vs last 5 years, which parks benefit most, best/worst days of the week. Needs forecast data closer to publish date."
+      "notes": "Publish by mid-October. Needs forecast data closer to publish date."
     },
     {
       "id": "task-012",
       "title": "Install Claude Desktop app + MCP Discord integration for Barney",
-      "description": "Install the Claude Desktop app on Fred's Mac Mini. Configure a Discord MCP server so Barney can read and send messages in the Slate Rock & Gravel Co. Discord, particularly the #barney channel.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "medium",
@@ -173,13 +173,13 @@
       "project": "Discord HQ",
       "is_recurring": false,
       "created": "2026-03-06T08:28:00",
-      "updated": "2026-03-06T08:28:00",
-      "notes": "Goal: Let Barney (Claude on claude.ai/desktop) participate in Discord directly via MCP. Download from claude.ai/download. Then set up Discord MCP server in Claude Desktop settings."
+      "updated": "2026-03-08T13:44:00",
+      "notes": "COMPLETED: Barney is live on Discord with MCP, posting in #barney and #pipeline."
     },
     {
       "id": "task-013",
       "title": "Discord: Add forum tags to #ideas and #bugs-feedback",
-      "description": "Add tags to the new forum channels. Ideas: pipeline, streaming, discord, website, content, modeling, business, agent-idea. Bugs: bug, enhancement, visual, data, pipeline, urgent.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "medium",
@@ -188,12 +188,12 @@
       "is_recurring": false,
       "created": "2026-03-06T08:36:00",
       "updated": "2026-03-06T08:36:00",
-      "notes": "Server Settings \u2192 Channels \u2192 select forum \u2192 Tags. API can't set available_tags via our current tooling."
+      "notes": "Done."
     },
     {
       "id": "task-014",
       "title": "Discord: Convert #alerts to Announcement channel",
-      "description": "Change #alerts channel type to Announcement in Discord Server Settings. API doesn't support channel type conversion.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "medium",
@@ -202,26 +202,26 @@
       "is_recurring": false,
       "created": "2026-03-06T08:36:00",
       "updated": "2026-03-06T08:36:00",
-      "notes": "Server Settings \u2192 Channels \u2192 #alerts \u2192 change type to Announcement. Channel ID: 1479471928262529088."
+      "notes": "Done."
     },
     {
       "id": "task-015",
       "title": "Discord: Create scheduled events",
-      "description": "Create recurring scheduled events: Daily Pipeline Run (6:00 AM EST daily), Morning Briefing (7:30 AM EST daily), Weekly Review (Friday 10:00 AM EST).",
+      "description": "",
       "status": "done",
-      "column": "recurring",
+      "column": "done",
       "priority": "low",
       "owner": "Fred",
       "project": "Discord HQ",
-      "is_recurring": true,
+      "is_recurring": false,
       "created": "2026-03-06T08:36:00",
       "updated": "2026-03-06T08:36:00",
-      "notes": "Server Settings \u2192 Scheduled Events \u2192 Create Event. API event-create had issues."
+      "notes": "Done."
     },
     {
       "id": "task-016",
       "title": "Discord: Create roles (Human, Agent, Pipeline-Bot, Admin)",
-      "description": "Create Discord roles for team organization. Human = Fred, Agent = all AI agents, Pipeline-Bot = automated pipeline posts, Admin = full access.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "medium",
@@ -230,12 +230,12 @@
       "is_recurring": false,
       "created": "2026-03-06T08:36:00",
       "updated": "2026-03-06T08:36:00",
-      "notes": "Server Settings \u2192 Roles \u2192 Create Role. Assign appropriate permissions and colors."
+      "notes": "Done."
     },
     {
       "id": "task-017",
       "title": "Discord: Restrict #fred-wilma to Fred + bot only",
-      "description": "Set channel permissions so only Fred and the bot can see/send in #fred-wilma. Private command center.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "medium",
@@ -244,12 +244,12 @@
       "is_recurring": false,
       "created": "2026-03-06T08:36:00",
       "updated": "2026-03-06T08:36:00",
-      "notes": "Channel Settings \u2192 Permissions \u2192 deny @everyone view, allow Fred + bot. Channel ID: 1479351572386414675."
+      "notes": "Done."
     },
     {
       "id": "task-018",
       "title": "Discord: Set up auto-moderation rules",
-      "description": "Configure auto-mod: spam filter, link filter for non-admin, rate limiting on public channels.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "low",
@@ -258,12 +258,12 @@
       "is_recurring": false,
       "created": "2026-03-06T08:36:00",
       "updated": "2026-03-06T08:36:00",
-      "notes": "Server Settings \u2192 Safety Setup \u2192 AutoMod. Not available via API, needs manual setup."
+      "notes": "Done."
     },
     {
       "id": "task-019",
       "title": "\ud83d\udd34 Confirm accuracy eval is working",
-      "description": "Verify that src/evaluate_forecast_accuracy.py runs correctly and produces valid output. Was flagged as half-fixed by Gazoo on Mar 6.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "high",
@@ -272,12 +272,12 @@
       "is_recurring": false,
       "created": "2026-03-07T03:53:00",
       "updated": "2026-03-07T13:51:00",
-      "notes": "VERIFIED WORKING: Script ran successfully producing MAE=9.4 min, bias=2.6, MAPE=91.0% for 24 dates evaluated. WTI summary shows MAE=6.8, bias=1.4, 233 park-dates. Both slot-level and WTI evaluation working correctly."
+      "notes": "VERIFIED WORKING."
     },
     {
       "id": "task-020",
       "title": "\ud83d\udd34 Deploy inverse_freq weighting",
-      "description": "Switch real actuals weighting from 3.5x to inverse_freq. Experiment showed MAE 6.96 (inverse_freq) vs 7.04 (current 3.5x). Tested and won \u2014 needs deployment.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "high",
@@ -285,13 +285,13 @@
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-07T03:53:00",
-      "updated": "2026-03-07T03:53:00",
-      "notes": "Barney pipeline item #2. Related to task-007 (weighting review). This is the specific winner \u2014 deploy it. Source: Barney pipeline audit 2026-03-07."
+      "updated": "2026-03-09T17:00:00",
+      "notes": "Deployed as part of v4 pipeline. Merged to main Mar 9."
     },
     {
       "id": "task-021",
       "title": "\ud83d\udd34 Centralize park_code mappings",
-      "description": "Create src/park_codes.py as single canonical park_code mapping. Scattered CASE statements across scripts caused the EU/Europa Park bug. One source, imported everywhere.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "high",
@@ -300,54 +300,54 @@
       "is_recurring": false,
       "created": "2026-03-07T03:53:00",
       "updated": "2026-03-07T03:53:00",
-      "notes": "Barney pipeline item #3. Root cause of silent plausibility errors. Source: Barney pipeline audit 2026-03-07."
+      "notes": "Done. src/park_codes.py created."
     },
     {
       "id": "task-022",
       "title": "\ud83d\udfe1 Add conversion model validation gate",
-      "description": "Weekly Monday retrain is unconditional. Bad data produces silently worse model. Add holdout MAE comparison before deploying new conversion model.",
+      "description": "",
       "status": "done",
-      "column": "recurring",
+      "column": "done",
       "priority": "medium",
       "owner": "Bam-Bam",
       "project": "Pipeline",
-      "is_recurring": true,
+      "is_recurring": false,
       "created": "2026-03-07T03:53:00",
       "updated": "2026-03-07T03:53:00",
-      "notes": "Barney pipeline item #4. Safety gate: compare new model MAE vs current before swapping. Source: Barney pipeline audit 2026-03-07."
+      "notes": "Done."
     },
     {
       "id": "task-023",
       "title": "\ud83d\udfe1 Remove 2>/dev/null from pipeline state checks",
-      "description": "Pipeline state checks swallow errors with 2>/dev/null. These control whether training runs \u2014 silencing errors here is dangerous.",
+      "description": "",
       "status": "done",
-      "column": "recurring",
+      "column": "done",
       "priority": "medium",
       "owner": "Bam-Bam",
       "project": "Pipeline",
-      "is_recurring": true,
+      "is_recurring": false,
       "created": "2026-03-07T03:53:00",
       "updated": "2026-03-07T03:53:00",
-      "notes": "Barney pipeline item #5. In run_daily_pipeline.sh. Source: Barney pipeline audit 2026-03-07."
+      "notes": "Done."
     },
     {
       "id": "task-024",
       "title": "\ud83d\udfe1 Move Cloudflare account ID to ~/.env",
-      "description": "Cloudflare account ID is hardcoded in run_daily_pipeline.sh. Move to ~/.env for security and maintainability.",
+      "description": "",
       "status": "done",
-      "column": "recurring",
+      "column": "done",
       "priority": "low",
       "owner": "Bam-Bam",
       "project": "Pipeline",
-      "is_recurring": true,
+      "is_recurring": false,
       "created": "2026-03-07T03:53:00",
       "updated": "2026-03-07T03:53:00",
-      "notes": "Barney pipeline item #6. Quick cleanup. Source: Barney pipeline audit 2026-03-07."
+      "notes": "Done."
     },
     {
       "id": "task-025",
       "title": "\ud83d\udfe2 Per-entity synthetic quality scoring",
-      "description": "Synthetic data hurts ~40% of entities. Build per-entity quality scoring and train real_only where bias exceeds \u00b13 min. Estimated ~5% MAE improvement \u2014 biggest modeling win available.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "high",
@@ -355,13 +355,13 @@
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-07T03:53:00",
-      "updated": "2026-03-07T03:53:00",
-      "notes": "Barney pipeline item #7. Biggest accuracy win on the table. Requires entity-level bias analysis, scoring framework, conditional training logic. Source: Barney pipeline audit 2026-03-07."
+      "updated": "2026-03-09T17:00:00",
+      "notes": "COMPLETED in v4 (Pillar 1). 57 entities cleaned of bad synthetic data."
     },
     {
       "id": "task-026",
       "title": "\ud83d\udfe2 Investigate julia-ml/ directory integration",
-      "description": "Unclear how Julia training is integrated into the pipeline. Barney needs to understand this before making training architecture decisions.",
+      "description": "",
       "status": "done",
       "column": "done",
       "priority": "medium",
@@ -369,8 +369,316 @@
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-07T03:59:00",
-      "updated": "2026-03-07T03:59:00",
-      "notes": "Barney pipeline item #8 (from BARNEY.md). Read before making training architecture decisions. Source: Barney's BARNEY.md cold-start file."
+      "updated": "2026-03-08T14:29:00",
+      "notes": "COMPLETED: Barney understood and replaced Julia training with Python v3 pipeline (16 min vs 4+ hours)."
+    },
+    {
+      "id": "task-027",
+      "title": "Feature: operational_streak_mins",
+      "description": "New model feature: minutes since ride last reopened after temp closure.",
+      "status": "backlog",
+      "column": "backlog",
+      "priority": "low",
+      "owner": "Barney",
+      "project": "Modeling",
+      "is_recurring": false,
+      "created": "2026-03-06T09:43:00",
+      "updated": "2026-03-07T18:57:00",
+      "notes": "Fred idea from Discord #ideas. Dependencies: temp closure data, feature engineering."
+    },
+    {
+      "id": "task-028",
+      "title": "Set up Instagram automation (Reels)",
+      "description": "Set up Meta Developer App + Instagram Graph API to post daily Reels to @DisneyStatsWhiz.",
+      "status": "in_progress",
+      "column": "recurring",
+      "priority": "medium",
+      "owner": "Fred",
+      "project": "Social Media",
+      "is_recurring": true,
+      "created": "2026-03-09T01:09:00",
+      "updated": "2026-03-10T01:46:00",
+      "notes": "Facebook Page created, IG linked. Developer app blocked by Meta portal issues (new device lockout). Fred will retry tomorrow. Nearly there."
+    },
+    {
+      "id": "task-029",
+      "title": "Entity Registry / Data Hub",
+      "description": "Build canonical entity registry with one hazeydata_id per physical attraction. Cross-reference TouringPlans dimEntity, queue-times IDs, and other sources. Fix 182+ unmapped queue-times entities polluting fact tables.",
+      "status": "in_progress",
+      "column": "in_progress",
+      "priority": "critical",
+      "owner": "Barney",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Barney created data-hub repo with Pydantic models and design doc. Wilma extracted QT entities (182 unmapped across 11 parks, 74 missing names in TDL/TDS). dimEntity.csv copied. Committed to hazeydata/data-hub on main. Source: #barney-wilma-dev, #entity-registry."
+    },
+    {
+      "id": "task-030",
+      "title": "Fix Firecrawl async API bug",
+      "description": "firecrawl_batch_scraper.py expects synchronous data but Extract API v1 is async. Needs polling loop: POST /v1/extract \u2192 get job ID \u2192 GET /v1/extract/{id} until completed.",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "medium",
+      "owner": "Barney",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Discovered by Wilma overnight while running entity-registry tasks. 0/8 districts succeeded. Source: #entity-registry."
+    },
+    {
+      "id": "task-031",
+      "title": "Monitor v4 first production run",
+      "description": "v4 pipeline merged to main (PR #9). First production run at 6 AM March 10. Monitor all 12 steps, verify AK improvement, confirm WTI numbers match shadow predictions.",
+      "status": "in_progress",
+      "column": "in_progress",
+      "priority": "critical",
+      "owner": "Wilma",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "v4 pillars: (1) synthetic scoring, (2) multi-candidate model selection, (3) adaptive per-park quantile mapping. Expected: AK 8.7\u219212.2, UH 11.6\u21927.0, EU 25.4\u219222.7. Alarm set for 6:30am. Source: #pipeline."
+    },
+    {
+      "id": "task-032",
+      "title": "AK model underprediction during Spring Break",
+      "description": "AK predicting 8.5-9.9 WTI (Ghost Town) during Spring Break week when actuals are 19-28. Root cause: pre-2015 half-day park data dragging predictions down. v4 should help but needs verification.",
+      "status": "in_progress",
+      "column": "in_progress",
+      "priority": "high",
+      "owner": "Barney",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Barney confirmed: pre-2015 AK mean WTI 12.1 vs post-2015 20.7. v4 shadow #3 moved AK from 8.7\u219213.3 (better but still under). Auto-tweets paused for AK until verified. Source: #twitter-x, #barney."
+    },
+    {
+      "id": "task-033",
+      "title": "Afternoon prediction tweets (ON HOLD)",
+      "description": "Auto-tweet afternoon predictions (3 PM cron) for tomorrow's WTI. Currently disabled due to AK model issues.",
+      "status": "blocked",
+      "column": "review",
+      "priority": "medium",
+      "owner": "Wilma",
+      "project": "Content",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Fred said 'put a hold on afternoon tweets until we get predictions better'. Afternoon cron disabled. Morning tweet (yesterday's observed WTI) still active. Re-enable after v4 is verified. Source: #twitter-x."
+    },
+    {
+      "id": "task-034",
+      "title": "Model Competition Framework",
+      "description": "Build prediction ledger, evaluation harness, challenger template, and blend analysis for comparing multiple models per entity. First real challenger by March 21.",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "medium",
+      "owner": "Barney",
+      "project": "Modeling",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Design doc at ~/clawd-anthropic/docs/MODEL_COMPETITION_DESIGN.md. Key: per-entity evaluation, raw predictions stored, tournament format. Assignment posted to #barney. Source: #barney."
+    },
+    {
+      "id": "task-035",
+      "title": "Pipeline Twins / Blue-Green Deploy for bot",
+      "description": "Implement read-only snapshots (Option C) so bot never fails during pipeline updates. Pipeline writes to staging, atomically swaps symlink when done.",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "medium",
+      "owner": "Barney",
+      "project": "Infrastructure",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Three options evaluated: A (symlink swap), B (dual DuckDB), C (read-only snapshots). Fred prefers C. Barney consulted. Source: #ideas 'Pipeline twins', #barney."
+    },
+    {
+      "id": "task-036",
+      "title": "Apple Weather-Style Crowd Report Images",
+      "description": "Generate shareable images that look like iOS Weather forecasts but for theme park crowds. WTI highs/lows, park names, actual weather data layered in.",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "medium",
+      "owner": "Bam-Bam",
+      "project": "Content",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Fred idea. Reference screenshots saved at ~/stream-overlay/design-inspiration/ios-weather-app/. Need mockup rendering (Python Pillow/Cairo). Source: #content-ideas, #bam-bam, #ideas 'Weather App Design'."
+    },
+    {
+      "id": "task-037",
+      "title": "Unhosted Twitch Stream (Data TV)",
+      "description": "Automated Twitch stream running during park hours \u2014 animated dashboard cycling through parks with live wait times, historical comparisons, crowd visualizations. No host required.",
+      "status": "todo",
+      "column": "recurring",
+      "priority": "medium",
+      "owner": "Wilma",
+      "project": "Streaming",
+      "is_recurring": true,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "POC: 3 parks (MK, EP, HS). 5 auto-rotating screens (overview, attraction spotlight, leaderboard, daily curve, forecast). Architecture: single HTML page polling API, OBS/ffmpeg capture, RTMP to Twitch. #twitch channel created. Source: #ideas 'Unhosted Twitch Stream', #twitch."
+    },
+    {
+      "id": "task-038",
+      "title": "School Schedules Feature",
+      "description": "Incorporate school schedule data (spring break, summer, holidays) as a feature for crowd prediction models.",
+      "status": "in_progress",
+      "column": "in_progress",
+      "priority": "medium",
+      "owner": "Wilma",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "87-message thread in #ideas. Active development. Firecrawl batch scraper being used to collect data. Source: #ideas 'Review school schedules project'."
+    },
+    {
+      "id": "task-039",
+      "title": "Mobile Site View Fix",
+      "description": "Fix mobile rendering issues on hazeydata.ai website. 41-message bug thread with screenshots.",
+      "status": "in_progress",
+      "column": "in_progress",
+      "priority": "medium",
+      "owner": "Wilma",
+      "project": "Website",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Multiple issues reported by Fred with screenshots. Active debugging. Source: #bugs-feedback 'Mobile site view'."
+    },
+    {
+      "id": "task-040",
+      "title": "Per-park quantile mapping configuration",
+      "description": "Make quantile mapping stretch factor per-park configurable instead of global 1.5x cap. Some parks need more stretch (TDL: 2.0), others less (IA: 1.2, CA: 1.3).",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "medium",
+      "owner": "Barney",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Barney recommended as v3.1 improvement (now v4.1). Global 1.5x cap better than uncapped but needs tuning. Feb 26 uncapped: CA +34.3, IA +16.1, MK +13.4 errors. Source: #pipeline."
+    },
+    {
+      "id": "task-041",
+      "title": "Disney Trip Planning Podcast",
+      "description": "Create an automated AI-generated podcast about Disney trip planning using crowd data and predictions.",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "low",
+      "owner": "Fred",
+      "project": "Content",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "22-message discussion thread in #ideas. Concept explored. Source: #ideas 'Disney Trip Planning Podcast'."
+    },
+    {
+      "id": "task-042",
+      "title": "Website auto-deploy via GitHub Actions",
+      "description": "Set up auto-deploy for hazeydata.ai website: push to master \u2192 Cloudflare Pages deploy in ~30s.",
+      "status": "done",
+      "column": "done",
+      "priority": "medium",
+      "owner": "Wilma",
+      "project": "Website",
+      "is_recurring": false,
+      "created": "2026-03-08T04:40:00",
+      "updated": "2026-03-08T04:47:00",
+      "notes": "COMPLETED: GitHub Actions workflow added. Stale web/ folder removed from main repo. DEPLOY.md created. Two successful test deploys confirmed. Source: #website."
+    },
+    {
+      "id": "task-043",
+      "title": "X (Twitter) auto-posting pipeline",
+      "description": "Automated daily tweets: morning (yesterday's observed WTI) and afternoon (tomorrow's predictions). Uses tweepy + X API free tier.",
+      "status": "done",
+      "column": "recurring",
+      "priority": "high",
+      "owner": "Wilma",
+      "project": "Content",
+      "is_recurring": true,
+      "created": "2026-03-08T04:44:00",
+      "updated": "2026-03-09T14:02:00",
+      "notes": "COMPLETED: post_daily_tweet.py built. Morning tweet auto-posts via cron. First auto-tweet live: https://x.com/DisneyStatsWhiz/status/2031007574175179036. Afternoon tweets paused (task-033). Source: #content-review, #business."
+    },
+    {
+      "id": "task-044",
+      "title": "Disboard listing + bump automation",
+      "description": "TPCR Discord listed on Disboard. Need regular /invite bumps every 2 hours to stay visible in search.",
+      "status": "in_progress",
+      "column": "in_progress",
+      "priority": "low",
+      "owner": "Fred",
+      "project": "Discord HQ",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Disboard bot added, first bump done, tags/description added. Fred needs to bump manually every 2h when active. Consider auto-reminder. Source: #discord-bot."
+    },
+    {
+      "id": "task-045",
+      "title": "/heatmap command for Discord bot",
+      "description": "Add a /heatmap slash command that generates an actual image showing WTI heat map for custom date ranges. Users already asking for this via /ask.",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "low",
+      "owner": "Bam-Bam",
+      "project": "Discord Bot",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Fred noticed users requesting heat maps via /ask. More shareable than text tables. Source: #discord-bot."
+    },
+    {
+      "id": "task-046",
+      "title": "Develop agent personalities",
+      "description": "Define distinct personalities, communication styles, and specialties for each AI agent (Wilma, Barney, Bam-Bam, Betty, Gazoo, Pebbles, Dino).",
+      "status": "in_progress",
+      "column": "in_progress",
+      "priority": "low",
+      "owner": "Fred",
+      "project": "Discord HQ",
+      "is_recurring": false,
+      "created": "2026-03-10T04:10:00",
+      "updated": "2026-03-10T04:10:00",
+      "notes": "14-message thread in #ideas. Fred initiated today. Source: #ideas 'Develop agent personalities'."
+    },
+    {
+      "id": "task-047",
+      "title": "Fix /crowd command (only /ask works)",
+      "description": "Discord bot /ask command works but /crowd returns errors or wrong data. 29-message bug thread investigating.",
+      "status": "in_progress",
+      "column": "in_progress",
+      "priority": "high",
+      "owner": "Wilma",
+      "project": "Discord Bot",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Fred reported: '/ask works but /crowd doesn't'. Active investigation thread. Source: #bugs-feedback 'Strange that /ask works but /crowd doesn't'."
+    },
+    {
+      "id": "task-048",
+      "title": "QT API park mapping fix (DL = Gardaland, not Disneyland)",
+      "description": "Queue-times park 12 returns Gardaland data, not Disneyland Anaheim. QT park 16 is the real DL. Need to update park mapping.",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "medium",
+      "owner": "Barney",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-10T04:40:00",
+      "updated": "2026-03-10T04:40:00",
+      "notes": "Discovered during QT API re-run for entity registry. TDL/TDS fixed (274/275). DL still wrong. Source: #entity-registry."
     }
   ],
   "live_activity": []
