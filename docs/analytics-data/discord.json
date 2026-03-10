@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T16:00:01Z",
+  "generated_at": "2026-03-10T13:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T15:42:32.381000+00:00"
+          "last_active": "2026-03-10T13:00:02.264000+00:00"
         }
       ]
     },
@@ -164,32 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172293 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T15:42:32.381000+00:00",
-      "message_id": "1480954016719568980",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480954016719568980"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172250 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T15:40:11.907000+00:00",
-      "message_id": "1480953427528908920",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480953427528908920"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172207 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T15:37:01.635000+00:00",
-      "message_id": "1480952629470167144",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480952629470167144"
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 171290 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T13:00:02.264000+00:00",
+      "message_id": "1480913121764708464",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480913121764708464"
     },
     {
       "channel": "alerts",
@@ -201,6 +179,28 @@
       "timestamp": "2026-03-10T12:36:35.678000+00:00",
       "message_id": "1480907222115553303",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480907222115553303"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170967 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T12:30:01.483000+00:00",
+      "message_id": "1480905568741884019",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480905568741884019"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 170924 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T12:00:01.596000+00:00",
+      "message_id": "1480898019468771399",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480898019468771399"
     },
     {
       "channel": "mission-control",
