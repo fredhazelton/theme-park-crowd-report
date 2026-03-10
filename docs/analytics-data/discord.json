@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T04:15:01Z",
+  "generated_at": "2026-03-10T04:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-10T04:01:46.680000+00:00"
+          "last_active": "2026-03-10T04:21:56.612000+00:00"
         }
       ]
     },
@@ -108,10 +108,10 @@
         },
         {
           "name": "dino",
-          "id": "1479351582872043580",
+          "id": "1480781998527348767",
           "emoji": "\ud83e\udd96",
           "purpose": "Dino's workspace \u2014 lightweight automation, fetch tasks, monitoring",
-          "url": "https://discord.com/channels/1479350342318690505/1479351582872043580",
+          "url": "https://discord.com/channels/1479350342318690505/1480781998527348767",
           "last_active": ""
         },
         {
@@ -164,6 +164,17 @@
       "channel_id": "1479471928262529088",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "\u2705 **PIPELINE RECOVERED SUCCESSFULLY**\n\nThe stuck pipeline has been fully restored after ~19 minutes:\n- **Training:** Completed 12:13 AM \u2705\n- **Forecasts:** Completed 12:21 AM \u2705  \n- **WTI:** Complete...",
+      "timestamp": "2026-03-10T04:21:56.612000+00:00",
+      "message_id": "1480782739090182217",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480782739090182217"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "\ud83d\udea8 **CRITICAL: Pipeline was stuck for 24+ hours**\n\n- WTI output 41h old (threshold: 26h)\n- Training/forecast/WTI last completed 45h ago (2026-03-08)\n- Found stuck `run_training_robust` process from ...",
       "timestamp": "2026-03-10T04:01:46.680000+00:00",
       "message_id": "1480777664267817010",
@@ -190,17 +201,6 @@
       "timestamp": "2026-03-10T04:00:38.657000+00:00",
       "message_id": "1480777378958671872",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480777378958671872"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "OK, here's the actual picture:",
-      "timestamp": "2026-03-10T04:00:34.307000+00:00",
-      "message_id": "1480777360713449532",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480777360713449532"
     },
     {
       "channel": "fred-wilma",
