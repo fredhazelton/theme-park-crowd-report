@@ -1,31 +1,25 @@
 #!/bin/bash
-# Robust training runner - retries on failure, runs detached from session
+# Robust pipeline runner - v4 integrated pipeline with retries
 set -o pipefail
 
 cd /home/wilma/theme-park-crowd-report
-LOG="/mnt/data/pipeline/logs/training_robust_$(date +%Y%m%d_%H%M%S).log"
+LOG="/mnt/data/pipeline/logs/pipeline_v4_$(date +%Y%m%d_%H%M%S).log"
 MAX_RETRIES=3
 RETRY=0
 
-echo "$(date) — Starting robust training (max $MAX_RETRIES retries)" | tee "$LOG"
+echo "$(date) — Starting Pipeline v4 (max $MAX_RETRIES retries)" | tee "$LOG"
 
 while [ $RETRY -lt $MAX_RETRIES ]; do
     echo "$(date) — Attempt $((RETRY+1))/$MAX_RETRIES" | tee -a "$LOG"
     
-    .venv/bin/python3 scripts/hybrid_pipeline_v2.py --use-synthetic >> "$LOG" 2>&1
+    # Run full v4 pipeline (includes training, forecasting, WTI, all 12 steps)
+    .venv/bin/python3 pipeline_v3/pipeline.py --output-base /mnt/data/pipeline >> "$LOG" 2>&1
     EXIT_CODE=$?
     
     if [ $EXIT_CODE -eq 0 ]; then
-        echo "$(date) — Training completed successfully!" | tee -a "$LOG"
+        echo "$(date) — Pipeline v4 completed successfully!" | tee -a "$LOG"
         
-        # Run forecasts + WTI
-        echo "$(date) — Running forecasts..." | tee -a "$LOG"
-        .venv/bin/python3 scripts/forecast_vectorized.py >> "$LOG" 2>&1
-        
-        echo "$(date) — Running WTI calculation..." | tee -a "$LOG"
-        .venv/bin/python3 scripts/calculate_wti_simple.py >> "$LOG" 2>&1
-        
-        # Phase 2: Data completeness validation
+        # Data completeness validation
         echo "$(date) — Running data completeness check..." | tee -a "$LOG"
         COMPLETENESS_JSON=$(.venv/bin/python3 scripts/pipeline_data_completeness.py --json 2>&1)
         COMPLETENESS_STATUS=$(echo "$COMPLETENESS_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','ok'))" 2>/dev/null || echo "ok")
@@ -36,7 +30,7 @@ while [ $RETRY -lt $MAX_RETRIES ]; do
             echo "$(date) — Completeness check: OK" | tee -a "$LOG"
         fi
         
-        echo "$(date) — Full pipeline recovery complete!" | tee -a "$LOG"
+        echo "$(date) — Full v4 pipeline complete!" | tee -a "$LOG"
         exit 0
     fi
     
