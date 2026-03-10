@@ -1,13 +1,13 @@
 {
-  "updated": "2026-03-09T13:34:49.995927+00:00",
+  "updated": "2026-03-10T04:02:45.888374+00:00",
   "agents": [
     {
       "id": "fred",
       "name": "Fred",
       "icon": "🧔",
-      "state": "idle",
+      "state": "resting",
       "zone": "rest",
-      "task": "Away",
+      "task": "Sleeping 😴",
       "color": "#facc15"
     },
     {
@@ -77,9 +77,9 @@
       "id": "mr-slate",
       "name": "Mr. Slate",
       "icon": "💼",
-      "state": "working",
-      "zone": "corner-office",
-      "task": "Watching the bottom line",
+      "state": "idle",
+      "zone": "offsite",
+      "task": "Off the clock",
       "color": "#a78bfa"
     }
   ],
