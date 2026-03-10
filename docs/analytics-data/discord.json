@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T18:45:01Z",
+  "generated_at": "2026-03-10T19:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T18:40:55.703000+00:00"
+          "last_active": "2026-03-10T18:57:28.083000+00:00"
         }
       ]
     },
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-10T17:07:11.055000+00:00"
+          "last_active": "2026-03-10T18:58:06.826000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -159,6 +159,61 @@
   ],
   "recent_activity": [
     {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Afternoon review posted. Quick summary:\n\n**Rating moved from 5/10 \u2192 7/10** since this morning. The big wins: v4 pipeline actually running in production, Conversion Model v2 deployed (1.6% accuracy ...",
+      "timestamp": "2026-03-10T18:58:06.826000+00:00",
+      "message_id": "1481003234549174334",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481003234549174334"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now post the summary to Discord #gazoo:",
+      "timestamp": "2026-03-10T18:58:06.681000+00:00",
+      "message_id": "1481003233941000364",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481003233941000364"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now I have all the data I need. Let me write the afternoon review.",
+      "timestamp": "2026-03-10T18:58:06.497000+00:00",
+      "message_id": "1481003233169244311",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481003233169244311"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172978 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T18:57:28.083000+00:00",
+      "message_id": "1481003072049254593",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481003072049254593"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172935 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T18:56:09.362000+00:00",
+      "message_id": "1481002741869318348",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481002741869318348"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -168,61 +223,6 @@
       "timestamp": "2026-03-10T18:40:55.703000+00:00",
       "message_id": "1480998909705982092",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480998909705982092"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172849 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T18:10:56.227000+00:00",
-      "message_id": "1480991362156462140",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480991362156462140"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 172806 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T18:10:37.434000+00:00",
-      "message_id": "1480991283333038120",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480991283333038120"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now post the summary to Discord #gazoo:",
-      "timestamp": "2026-03-10T17:07:11.055000+00:00",
-      "message_id": "1480975318222114818",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480975318222114818"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now I have a comprehensive picture. Let me write the afternoon review.",
-      "timestamp": "2026-03-10T17:07:10.944000+00:00",
-      "message_id": "1480975317756809337",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480975317756809337"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good \u2014 the 6 AM v3 pipeline completed successfully (1314s, 430 models, 23.3M forecast rows, all validation passed). And now a second pipeline run (conversion model v2 production) started at 12:21 a...",
-      "timestamp": "2026-03-10T17:07:10.661000+00:00",
-      "message_id": "1480975316569555008",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480975316569555008"
     },
     {
       "channel": "pipeline",
