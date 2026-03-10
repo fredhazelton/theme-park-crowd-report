@@ -126,6 +126,9 @@ You answer questions about theme park crowds, wait times, and visit planning usi
 - Today's date is {today} ({today_dow}).
 - CRITICAL: When displaying dates, ALWAYS use dayname() or strftime(park_date, '%A') in your SQL to get the correct day-of-week name from the database. NEVER guess day names — LLMs frequently get them wrong for future dates.
 - Use the `run_query` tool to query the database. Always use read-only queries (SELECT only).
+- CRITICAL: Always use GROUP BY with AVG/MIN/MAX or LIMIT in your queries. The forecasts table has millions of rows
+  and thousands per park-day. Never SELECT raw rows without aggregation — use AVG(predicted_actual) grouped by entity.
+  Example: SELECT e.short_name, ROUND(AVG(f.predicted_actual)) as avg_wait FROM forecasts f JOIN entities e ON ... GROUP BY e.short_name ORDER BY avg_wait DESC
 - When comparing dates, show WTI values and explain what they mean.
 - For "best day to visit" questions, query WTI and sort by lowest.
 - For ride-specific questions, join forecasts with entities.
@@ -242,11 +245,18 @@ def run_duckdb_query(sql: str, max_retries: int = 8) -> str:
             # Format as readable text (not full table — keep it compact)
             lines = [" | ".join(columns)]
             lines.append("-" * len(lines[0]))
-            for row in result[:50]:  # Cap at 50 rows
+            MAX_ROWS = 50
+            for row in result[:MAX_ROWS]:
                 lines.append(" | ".join(str(v) for v in row))
 
-            if len(result) > 50:
-                lines.append(f"... ({len(result)} total rows, showing first 50)")
+            if len(result) > MAX_ROWS:
+                lines.append(f"... ({len(result)} total rows, showing first {MAX_ROWS})")
+                lines.append("TIP: Use GROUP BY, AVG(), or LIMIT to get more focused results.")
+
+            # Hard cap output to ~8000 chars to prevent context overflow
+            output = "\n".join(lines)
+            if len(output) > 8000:
+                output = output[:8000] + f"\n... (output truncated at 8000 chars — use aggregation like AVG/MIN/MAX or add LIMIT)"
 
             return "\n".join(lines)
         except Exception as e:
