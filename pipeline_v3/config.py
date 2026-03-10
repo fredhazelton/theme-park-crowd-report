@@ -35,7 +35,11 @@ class PipelineConfig:
     prod_output_base: Path = field(default=None)  # Preserved for shadow reads
 
     # === Forecast ===
-    forecast_days: int = 365
+    # v3.0: 365 days (reduced from 730 to save memory during OOM era)
+    # v4.1: restored to 730 days — per-park chunking in s06 solved memory issues
+    #        (peak 11GB vs 50GB+), plenty of headroom on 64GB server.
+    #        Real user demand: teachers planning 2027 trips need 730-day forecasts.
+    forecast_days: int = 730
     forecast_workers: int = 1  # Sequential by default. Memory-safe.
 
     # === Training ===
