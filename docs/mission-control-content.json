@@ -114,11 +114,11 @@
             }
         ],
         "disk_main_pct": 90,
-        "disk_data_pct": 4,
+        "disk_data_pct": 5,
         "db_entities": 1710,
         "db_forecasts": 23469851,
         "db_live_waits": 123465112,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-10T13:00:05.779404"
+    "last_updated": "2026-03-10T13:15:04.728791"
 }
