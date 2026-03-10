@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T04:30:01Z",
+  "generated_at": "2026-03-10T04:45:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T03:54:41.699000+00:00"
+          "last_active": "2026-03-10T04:39:30.663000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "The sub-agent already posted the full summary to #fred-wilma, so Fred should see it. Let me just make sure it landed cleanly.",
+      "timestamp": "2026-03-10T04:39:30.663000+00:00",
+      "message_id": "1480787160100638801",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480787160100638801"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**\ud83d\udfe1 Medium (10 new):**\nFirecrawl async bug, afternoon tweets on hold, Model Competition Framework, Pipeline Twins, Apple Weather cards, Unhosted Twitch Stream, School Schedules, Mobile site fix, pe...",
+      "timestamp": "2026-03-10T04:39:07.702000+00:00",
+      "message_id": "1480787063795093607",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480787063795093607"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2705 **Discord Channel Review + Dino Task Audit COMPLETE**\n\nSwept 20 channels, all forum threads, and cross-referenced with tasks.json.\n\n**Results:**\n- **20 new tasks added** (task-029 \u2192 task-048)\n- *...",
+      "timestamp": "2026-03-10T04:39:07.569000+00:00",
+      "message_id": "1480787063237509286",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480787063237509286"
+    },
+    {
       "channel": "alerts",
       "channel_emoji": "\ud83d\udea8",
       "channel_id": "1479471928262529088",
@@ -201,39 +234,6 @@
       "timestamp": "2026-03-10T04:00:38.657000+00:00",
       "message_id": "1480777378958671872",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1480777378958671872"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 177977 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T03:54:41.699000+00:00",
-      "message_id": "1480775881768177695",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480775881768177695"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 177934 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T03:54:26.728000+00:00",
-      "message_id": "1480775818975252530",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480775818975252530"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 177891 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-10T03:54:09.618000+00:00",
-      "message_id": "1480775747210707135",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1480775747210707135"
     },
     {
       "channel": "gazoo",

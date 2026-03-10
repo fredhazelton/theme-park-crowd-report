@@ -3,12 +3,17 @@
         {
             "status_class": "active",
             "status_text": "\ud83d\udd04 Active",
-            "task": "Promote WTI blog article"
+            "task": "AK model underprediction during Spring Break"
         },
         {
             "status_class": "active",
             "status_text": "\ud83d\udd04 Active",
-            "task": "Synthetic vs real actuals weighting review"
+            "task": "Fix /crowd command (only /ask works)"
+        },
+        {
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
+            "task": "Promote WTI blog article"
         },
         {
             "status_class": "active",
@@ -19,11 +24,6 @@
             "status_class": "active",
             "status_text": "\ud83d\udd04 Active",
             "task": "Build Competitor Watch automated feed"
-        },
-        {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
-            "task": "Build Park Intel automated feed"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123364583,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-10T00:30:05.686074"
+    "last_updated": "2026-03-10T00:45:04.576833"
 }
