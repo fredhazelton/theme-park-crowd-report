@@ -16,7 +16,7 @@ Output: operating_calendar/operating_calendar.parquet
 INCREMENTAL LOGIC
 ================================================================================
 On first run (no existing calendar): builds full history from earliest observation.
-On subsequent runs: only rebuilds a recent window (today - 7d to today + 365d)
+On subsequent runs: only rebuilds a recent window (today - 7d to today + FORECAST_DAYS)
 and merges with the existing calendar. Historical dates are stable and untouched.
 
 Use --full to force a complete rebuild from scratch.
@@ -27,6 +27,7 @@ USAGE
   python src/build_operating_calendar.py
   python src/build_operating_calendar.py --full
   python src/build_operating_calendar.py --output-base /path --start-date 2025-01-01 --end-date 2026-12-31
+
 """
 
 from __future__ import annotations
@@ -41,6 +42,7 @@ import duckdb
 import pandas as pd
 
 from utils import get_output_base
+from utils.forecast_horizon import get_forecast_end_date
 
 # Sentinel dates per spec
 SENTINEL_UNKNOWN_START = "1900-01-01"
@@ -145,7 +147,7 @@ def main() -> None:
         "--end-date",
         type=str,
         default=None,
-        help="End date YYYY-MM-DD (default: today + 365)",
+        help="End date YYYY-MM-DD (default: today + FORECAST_DAYS from forecast_horizon.py)",
     )
     ap.add_argument("--full", action="store_true", help="Force full rebuild (ignore existing calendar)")
     ap.add_argument("--force", action="store_true", help="Alias for --full (backward compat)")
@@ -158,7 +160,8 @@ def main() -> None:
     logger = setup_logging(log_dir)
 
     today = date.today()
-    end_date = args.end_date or (today + timedelta(days=365)).isoformat()
+    # Use shared forecast horizon — same 730-day window as config.py and dim tables
+    end_date = args.end_date or get_forecast_end_date().isoformat()
 
     dim_path = base / "dimension_tables" / "dimentity.csv"
     raw_closures_dir = base / "raw_closures"
