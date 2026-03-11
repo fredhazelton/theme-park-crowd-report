@@ -3,1426 +3,634 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🪨 The Quarry — HazeyData Analytics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>The Quarry — HazeyData Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <style>
-        /* ═══════════════════════════════════════════════════
-           RESET & DESIGN TOKENS
-           ═══════════════════════════════════════════════════ */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --bg-primary: #0a1628;
-            --bg-secondary: #0f1d32;
-            --bg-card: rgba(255,255,255,0.05);
-            --border-card: rgba(255,255,255,0.1);
-            --border-accent: rgba(74,144,164,0.3);
-            --accent: #4a90a4;
-            --accent-light: #6bb5c9;
-            --accent-glow: rgba(74,144,164,0.15);
-            --accent-red: #f87171;
-            --accent-orange: #fb923c;
-            --accent-green: #4ade80;
-            --accent-yellow: #facc15;
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255,255,255,0.7);
-            --text-muted: rgba(255,255,255,0.4);
-            --font-text: 'Inter', -apple-system, sans-serif;
-            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            background: var(--bg-primary);
-            font-family: var(--font-text);
-            color: var(--text-primary);
-            line-height: 1.5;
-            min-height: 100vh;
-        }
-
-        /* Subtle grid background */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background:
-                linear-gradient(rgba(74,144,164,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(74,144,164,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ═══════════════════════════════════════════════════
-           HEADER
-           ═══════════════════════════════════════════════════ */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 28px;
-            border-bottom: 1px solid var(--border-card);
-            background: rgba(10,22,40,0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .logo-mark {
-            font-size: 28px;
-            line-height: 1;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo {
-            font-family: var(--font-mono);
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 3px;
-        }
-
-        .logo-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            letter-spacing: 1.5px;
-        }
-
-        .header-nav {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header-nav a {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--text-muted);
-            text-decoration: none;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: color 0.2s;
-        }
-
-        .header-nav a:hover {
-            color: var(--accent-light);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-family: var(--font-mono);
-        }
-
-        .refresh-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-green);
-            display: inline-block;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        /* ═══════════════════════════════════════════════════
-           MAIN CONTENT
-           ═══════════════════════════════════════════════════ */
-        .main {
-            position: relative;
-            z-index: 1;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px 28px 60px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        /* ═══════════════════════════════════════════════════
-           SECTION HEADERS
-           ═══════════════════════════════════════════════════ */
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 4px;
-        }
-
-        .section-header .icon {
-            font-size: 18px;
-        }
-
-        .section-header h2 {
-            font-family: var(--font-mono);
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .section-line {
-            height: 1px;
-            flex: 1;
-            background: linear-gradient(90deg, var(--border-accent), transparent);
-        }
-
-        /* ═══════════════════════════════════════════════════
-           CARDS
-           ═══════════════════════════════════════════════════ */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: 12px;
-            padding: 20px;
-            transition: border-color 0.2s;
-        }
-
-        .card:hover {
-            border-color: var(--border-accent);
-        }
-
-        .card-title {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--accent);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        /* ═══════════════════════════════════════════════════
-           ACCURACY OVERVIEW — BIG NUMBERS
-           ═══════════════════════════════════════════════════ */
-        .big-numbers {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-        }
-
-        .big-number-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 20px 16px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .big-number-card:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: var(--border-accent);
-        }
-
-        .big-number-card .num {
-            font-family: var(--font-mono);
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--accent-light);
-        }
-
-        .big-number-card .num.red { color: var(--accent-red); }
-        .big-number-card .num.green { color: var(--accent-green); }
-        .big-number-card .num.orange { color: var(--accent-orange); }
-
-        .big-number-card .lbl {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 6px;
-            font-family: var(--font-mono);
-        }
-
-        .big-number-card .sub {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 2px;
-            font-family: var(--font-mono);
-        }
-
-        /* ═══════════════════════════════════════════════════
-           DAILY CHART
-           ═══════════════════════════════════════════════════ */
-        .chart-wrap {
-            position: relative;
-            height: 300px;
-        }
-
-        /* ═══════════════════════════════════════════════════
-           PARK COMPARISON
-           ═══════════════════════════════════════════════════ */
-        .park-chart-wrap {
-            position: relative;
-            height: 350px;
-        }
-
-        /* ═══════════════════════════════════════════════════
-           ENTITY EXPLORER
-           ═══════════════════════════════════════════════════ */
-        .explorer-controls {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
-
-        .ctrl-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .ctrl-group label {
-            font-size: 10px;
-            font-family: var(--font-mono);
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .ctrl-group select {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid var(--border-card);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-            font-size: 13px;
-            padding: 8px 12px;
-            outline: none;
-            min-width: 220px;
-            cursor: pointer;
-        }
-
-        .ctrl-group select:focus {
-            border-color: var(--accent);
-        }
-
-        .explorer-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .explorer-stat {
-            text-align: center;
-            padding: 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 8px;
-        }
-
-        .explorer-stat .val {
-            font-family: var(--font-mono);
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--accent-light);
-        }
-
-        .explorer-stat .lbl {
-            font-size: 10px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Two-column layout for explorer + scoreboard */
-        .analytics-bottom {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-
-        /* ═══════════════════════════════════════════════════
-           SCOREBOARD
-           ═══════════════════════════════════════════════════ */
-        .scoreboard-search {
-            margin-bottom: 12px;
-        }
-
-        .scoreboard-search input {
-            width: 100%;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid var(--border-card);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-            font-size: 13px;
-            padding: 8px 12px;
-            outline: none;
-        }
-
-        .scoreboard-search input:focus {
-            border-color: var(--accent);
-        }
-
-        .scoreboard-search input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .scoreboard-table-wrap {
-            max-height: 520px;
-            overflow-y: auto;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .scoreboard-table-wrap::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .scoreboard-table-wrap::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.15);
-            border-radius: 3px;
-        }
-
-        table.scoreboard {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        table.scoreboard thead {
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-
-        table.scoreboard th {
-            background: rgba(74,144,164,0.15);
-            padding: 10px 12px;
-            text-align: left;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--accent);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            border-bottom: 1px solid var(--border-accent);
-        }
-
-        table.scoreboard th:hover {
-            color: var(--accent-light);
-        }
-
-        table.scoreboard th .sort-arrow {
-            margin-left: 4px;
-            opacity: 0.5;
-        }
-
-        table.scoreboard th.sorted .sort-arrow {
-            opacity: 1;
-        }
-
-        table.scoreboard td {
-            padding: 8px 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            font-family: var(--font-mono);
-            font-size: 12px;
-        }
-
-        table.scoreboard tr {
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        table.scoreboard tbody tr:hover {
-            background: rgba(74,144,164,0.1);
-        }
-
-        table.scoreboard .name-cell {
-            font-family: var(--font-text);
-            font-weight: 500;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        table.scoreboard .park-cell {
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .mae-green { color: var(--accent-green); }
-        .mae-yellow { color: var(--accent-yellow); }
-        .mae-red { color: var(--accent-red); }
-
-        /* ═══════════════════════════════════════════════════
-           LOADING & EMPTY STATES
-           ═══════════════════════════════════════════════════ */
-        .loading {
-            text-align: center;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-size: 12px;
-            padding: 20px;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-size: 13px;
-            padding: 40px 20px;
-        }
-
-        .empty-state .icon {
-            display: block;
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        /* ═══════════════════════════════════════════════════
-           FOOTER
-           ═══════════════════════════════════════════════════ */
-        .footer {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            padding: 20px;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border-card);
-        }
-
-        .footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            color: var(--accent-light);
-        }
-
-        /* ═══════════════════════════════════════════════════
-           RESPONSIVE
-           ═══════════════════════════════════════════════════ */
-        @media (max-width: 1100px) {
-            .analytics-bottom {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                padding: 10px 16px;
-            }
-
-            .header-nav {
-                display: none;
-            }
-
-            .header-right {
-                display: none;
-            }
-
-            .logo {
-                font-size: 15px;
-            }
-
-            .logo-sub {
-                font-size: 9px;
-            }
-
-            .logo-mark {
-                font-size: 22px;
-            }
-
-            .main {
-                padding: 16px 12px 40px;
-                gap: 16px;
-            }
-
-            .big-numbers {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .big-number-card .num {
-                font-size: 24px;
-            }
-
-            .card {
-                padding: 14px;
-                border-radius: 8px;
-            }
-
-            .explorer-controls {
-                flex-direction: column;
-            }
-
-            .ctrl-group select {
-                min-width: unset;
-                width: 100%;
-            }
-
-            .ctrl-group {
-                width: 100%;
-            }
-
-            .explorer-stats {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .scoreboard-table-wrap {
-                max-height: 360px;
-            }
-
-            table.scoreboard .park-cell {
-                display: none;
-            }
-
-            table.scoreboard .name-cell {
-                max-width: 120px;
-            }
-
-            .park-chart-wrap {
-                height: 300px;
-            }
-        }
+/* ══════════════════════════════════════════
+   RESET & TOKENS
+   ══════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --stone-950: #0c0a09;
+    --stone-900: #1a1816;
+    --stone-850: #221f1c;
+    --stone-800: #2c2825;
+    --stone-700: #3d3732;
+    --stone-600: #57504a;
+    --stone-500: #78716c;
+    --stone-400: #a8a29e;
+    --stone-300: #d6d3d1;
+    --stone-200: #e7e5e4;
+    --stone-100: #f5f5f4;
+
+    --amber-500: #f59e0b;
+    --amber-400: #fbbf24;
+    --amber-300: #fcd34d;
+
+    --teal-500: #14b8a6;
+    --teal-400: #2dd4bf;
+    --teal-300: #5eead4;
+
+    --rose-500: #f43f5e;
+    --rose-400: #fb7185;
+
+    --sky-500: #0ea5e9;
+    --sky-400: #38bdf8;
+
+    --green-500: #22c55e;
+    --green-400: #4ade80;
+
+    --font-body: 'DM Sans', -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Fira Code', monospace;
+
+    --radius: 12px;
+    --radius-sm: 8px;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--stone-950);
+    color: var(--stone-200);
+    font-family: var(--font-body);
+    line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════
+   LAYOUT
+   ══════════════════════════════════════════ */
+.app {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(12,10,9,0.8);
+    backdrop-filter: blur(16px);
+    z-index: 100;
+}
+.brand { display: flex; align-items: baseline; gap: 12px; }
+.brand-mark {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--amber-400);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+.brand-sub {
+    font-size: 12px;
+    color: var(--stone-500);
+    font-family: var(--font-mono);
+    letter-spacing: 0.5px;
+}
+.header-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--stone-500);
+}
+.pulse-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green-400);
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+    padding: 20px 28px;
+    overflow: auto;
+}
+
+/* CARDS */
+.card {
+    background: var(--stone-900);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(245,158,11,0.2), transparent);
+}
+.card-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--stone-500);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+/* BIG NUMBERS */
+.overview-row { grid-column: 1 / -1; }
+.big-numbers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+.stat-cell {
+    text-align: center;
+    padding: 14px 8px;
+    background: var(--stone-850);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255,255,255,0.03);
+}
+.stat-val {
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--stone-100);
+    line-height: 1.2;
+}
+.stat-val.good { color: var(--green-400); }
+.stat-val.warn { color: var(--amber-400); }
+.stat-val.bad { color: var(--rose-400); }
+.stat-label {
+    font-size: 11px;
+    color: var(--stone-500);
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.5px;
+}
+.inline-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+}
+.inline-stat {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--stone-400);
+}
+.inline-stat strong { color: var(--stone-200); }
+
+/* CHARTS */
+.chart-wrap { position: relative; height: 220px; }
+
+/* ENTITY EXPLORER */
+.explorer-controls { display: flex; gap: 12px; margin-bottom: 14px; }
+.ctrl-group { flex: 1; }
+.ctrl-group label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--stone-500);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.ctrl-group select {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--stone-850);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-sm);
+    color: var(--stone-200);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+}
+.ctrl-group select:focus { border-color: var(--amber-500); }
+.ctrl-group select option, .ctrl-group select optgroup {
+    background: var(--stone-900);
+    color: var(--stone-200);
+}
+.explorer-stats { display: flex; gap: 16px; margin-top: 12px; }
+.exp-stat {
+    text-align: center; flex: 1; padding: 8px;
+    background: var(--stone-850); border-radius: var(--radius-sm);
+}
+.exp-stat .val {
+    font-family: var(--font-mono); font-size: 18px;
+    font-weight: 600; color: var(--stone-100);
+}
+.exp-stat .lbl {
+    font-size: 10px; color: var(--stone-500);
+    font-family: var(--font-mono); letter-spacing: 0.5px;
+}
+
+/* SCOREBOARD */
+.scoreboard-search { margin-bottom: 12px; }
+.scoreboard-search input {
+    width: 100%; padding: 8px 12px;
+    background: var(--stone-850);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-sm);
+    color: var(--stone-200);
+    font-family: var(--font-mono); font-size: 12px; outline: none;
+}
+.scoreboard-search input:focus { border-color: var(--amber-500); }
+.scoreboard-search input::placeholder { color: var(--stone-600); }
+.scoreboard-wrap {
+    max-height: 400px; overflow-y: auto; border-radius: var(--radius-sm);
+}
+.scoreboard-wrap::-webkit-scrollbar { width: 4px; }
+.scoreboard-wrap::-webkit-scrollbar-track { background: transparent; }
+.scoreboard-wrap::-webkit-scrollbar-thumb { background: var(--stone-700); border-radius: 4px; }
+table.scoreboard { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--font-mono); }
+table.scoreboard thead { position: sticky; top: 0; z-index: 2; }
+table.scoreboard th {
+    padding: 8px 10px; text-align: left; background: var(--stone-850);
+    color: var(--stone-400); font-weight: 500; font-size: 10px;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    cursor: pointer; user-select: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06); white-space: nowrap;
+}
+table.scoreboard th:hover { color: var(--amber-400); }
+table.scoreboard th.sorted { color: var(--amber-400); }
+.sort-arrow { opacity: 0.4; }
+table.scoreboard th.sorted .sort-arrow { opacity: 1; }
+table.scoreboard td {
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.025);
+    color: var(--stone-300); white-space: nowrap;
+}
+table.scoreboard tr:hover td { background: rgba(245,158,11,0.03); }
+table.scoreboard tr { cursor: pointer; }
+.park-tag {
+    display: inline-block; padding: 1px 6px; border-radius: 4px;
+    font-size: 10px; font-weight: 500;
+    background: rgba(255,255,255,0.05); color: var(--stone-400);
+}
+.mae-good { color: var(--green-400); }
+.mae-ok { color: var(--amber-400); }
+.mae-bad { color: var(--rose-400); }
+.park-mk { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+.park-ep { background: rgba(168,85,247,0.15); color: #c4b5fd; }
+.park-hs { background: rgba(236,72,153,0.15); color: #f9a8d4; }
+.park-ak { background: rgba(34,197,94,0.15); color: #86efac; }
+.park-dl { background: rgba(14,165,233,0.15); color: #7dd3fc; }
+.park-ca { background: rgba(245,158,11,0.15); color: #fcd34d; }
+.park-uf { background: rgba(239,68,68,0.15); color: #fca5a5; }
+.park-uh { background: rgba(244,63,94,0.15); color: #fda4af; }
+.park-ia { background: rgba(20,184,166,0.15); color: #5eead4; }
+.park-eu { background: rgba(249,115,22,0.15); color: #fdba74; }
+.park-tdl, .park-tds { background: rgba(236,72,153,0.12); color: #f0abfc; }
+
+/* PARK BARS */
+.park-bars { display: flex; flex-direction: column; gap: 8px; }
+.park-bar-row {
+    display: grid; grid-template-columns: 140px 1fr 60px;
+    align-items: center; gap: 12px;
+}
+.park-bar-name {
+    font-family: var(--font-mono); font-size: 12px; color: var(--stone-300);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.park-bar-track {
+    height: 22px; background: var(--stone-850);
+    border-radius: 4px; overflow: hidden;
+}
+.park-bar-fill {
+    height: 100%; border-radius: 4px;
+    transition: width 0.6s ease; min-width: 2px;
+}
+.park-bar-val {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--stone-400); text-align: right;
+}
+
+.loading {
+    text-align: center; padding: 40px;
+    color: var(--stone-600); font-family: var(--font-mono); font-size: 12px;
+}
+
+@media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; padding: 12px; }
+    .overview-row { grid-column: 1; }
+    html, body { overflow: auto; height: auto; }
+    .app { height: auto; }
+    .header { padding: 10px 14px; }
+    .brand-sub { display: none; }
+}
     </style>
 </head>
 <body>
-
-    <!-- ═══════════════════════════════════════════════════
-         HEADER
-         ═══════════════════════════════════════════════════ -->
+<div class="app">
     <header class="header">
-        <div class="header-left">
-            <span class="logo-mark">🪨</span>
-            <div class="logo-text">
-                <span class="logo">THE QUARRY</span>
-                <span class="logo-sub">HazeyData Analytics</span>
-            </div>
+        <div class="brand">
+            <span class="brand-mark">⛏ The Quarry</span>
+            <span class="brand-sub">HazeyData Wait Time Analytics</span>
         </div>
-        <nav class="header-nav">
-            <a href="#overview">Overview</a>
-            <a href="#trend">Trend</a>
-            <a href="#parks">Parks</a>
-            <a href="#explorer">Explorer</a>
-            <a href="#scoreboard">Scoreboard</a>
-        </nav>
-        <div class="header-right">
-            <span class="refresh-dot"></span>
-            <span id="lastUpdate">Loading...</span>
+        <div class="header-meta">
+            <span id="evalRange"></span>
+            <span><span class="pulse-dot"></span> Updated <span id="lastUpdate">—</span></span>
         </div>
     </header>
 
-    <!-- ═══════════════════════════════════════════════════
-         MAIN CONTENT
-         ═══════════════════════════════════════════════════ -->
-    <main class="main">
-
-        <!-- ═══ SECTION 1: ACCURACY OVERVIEW ═══ -->
-        <section id="overview">
-            <div class="section-header">
-                <span class="icon">⛏️</span>
-                <h2>Accuracy Overview</h2>
-                <div class="section-line"></div>
-            </div>
-            <div class="big-numbers" id="bigNumbers">
-                <div class="loading">Loading accuracy data...</div>
-            </div>
-        </section>
-
-        <!-- ═══ SECTION 2: DAILY TREND ═══ -->
-        <section id="trend">
-            <div class="card">
-                <div class="card-title">📈 Daily Accuracy Trend</div>
-                <div class="chart-wrap">
-                    <canvas id="dailyMaeChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ SECTION 3: PARK COMPARISON ═══ -->
-        <section id="parks">
-            <div class="card">
-                <div class="card-title">🏰 Park Accuracy Comparison</div>
-                <div class="park-chart-wrap">
-                    <canvas id="parkComparisonChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ SECTION 4 + 5: EXPLORER & SCOREBOARD ═══ -->
-        <div class="analytics-bottom">
-
-            <!-- Entity Explorer -->
-            <section id="explorer">
-                <div class="card" id="panelExplorer">
-                    <div class="card-title">🔍 Entity Explorer</div>
-                    <div class="explorer-controls">
-                        <div class="ctrl-group">
-                            <label>Park</label>
-                            <select id="parkSelect">
-                                <option value="">All Parks</option>
-                            </select>
-                        </div>
-                        <div class="ctrl-group">
-                            <label>Entity</label>
-                            <select id="entitySelect">
-                                <option value="">Select an entity...</option>
-                            </select>
-                        </div>
-                        <div class="ctrl-group">
-                            <label>Date</label>
-                            <select id="dateSelect">
-                                <option value="">Select entity first...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="chart-wrap" style="height: 260px;">
-                        <canvas id="entityCurveChart"></canvas>
-                    </div>
-                    <div class="explorer-stats" id="explorerStats">
-                        <div class="explorer-stat"><div class="val" id="expMAE">—</div><div class="lbl">MAE</div></div>
-                        <div class="explorer-stat"><div class="val" id="expBias">—</div><div class="lbl">Bias</div></div>
-                        <div class="explorer-stat"><div class="val" id="expSlots">—</div><div class="lbl">Slots</div></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Entity Scoreboard -->
-            <section id="scoreboard">
-                <div class="card" id="panelScoreboard">
-                    <div class="card-title">🏆 Entity Scoreboard</div>
-                    <div class="scoreboard-search">
-                        <input type="text" id="scoreboardSearch" placeholder="Search entities, parks...">
-                    </div>
-                    <div class="scoreboard-table-wrap">
-                        <table class="scoreboard" id="scoreboardTable">
-                            <thead>
-                                <tr>
-                                    <th data-col="entity_code">Code <span class="sort-arrow">↕</span></th>
-                                    <th data-col="name">Name <span class="sort-arrow">↕</span></th>
-                                    <th data-col="park">Park <span class="sort-arrow">↕</span></th>
-                                    <th data-col="avg_mae" class="sorted">MAE <span class="sort-arrow">↑</span></th>
-                                    <th data-col="avg_bias">Bias <span class="sort-arrow">↕</span></th>
-                                    <th data-col="n_days">Days <span class="sort-arrow">↕</span></th>
-                                </tr>
-                            </thead>
-                            <tbody id="scoreboardBody">
-                                <tr><td colspan="6" class="loading">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+    <div class="main">
+        <div class="card overview-row">
+            <div class="card-title">Accuracy Overview</div>
+            <div class="big-numbers" id="bigNumbers"><div class="loading">Loading analytics...</div></div>
+            <div class="inline-stats" id="inlineStats"></div>
         </div>
 
-    </main>
+        <div class="card">
+            <div class="card-title">Daily Accuracy Trend</div>
+            <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
+        </div>
 
-    <!-- ═══════════════════════════════════════════════════
-         FOOTER
-         ═══════════════════════════════════════════════════ -->
-    <footer class="footer">
-        🪨 The Quarry · <a href="https://hazeydata.com" target="_blank">HazeyData</a> · Accuracy analytics for theme park wait time predictions
-    </footer>
+        <div class="card">
+            <div class="card-title">Entity Explorer</div>
+            <div class="explorer-controls">
+                <div class="ctrl-group">
+                    <label>Entity</label>
+                    <select id="entitySelect" onchange="onEntityChange()">
+                        <option value="">Select an entity...</option>
+                    </select>
+                </div>
+                <div class="ctrl-group">
+                    <label>Date</label>
+                    <select id="dateSelect" onchange="loadEntityCurve()">
+                        <option value="">Select entity first...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-wrap" style="height:200px;"><canvas id="entityChart"></canvas></div>
+            <div class="explorer-stats">
+                <div class="exp-stat"><div class="val" id="expMAE">—</div><div class="lbl">MAE</div></div>
+                <div class="exp-stat"><div class="val" id="expBias">—</div><div class="lbl">Bias</div></div>
+                <div class="exp-stat"><div class="val" id="expSlots">—</div><div class="lbl">Slots</div></div>
+            </div>
+        </div>
 
-    <!-- ═══════════════════════════════════════════════════
-         JAVASCRIPT
-         ═══════════════════════════════════════════════════ -->
-    <script>
-    // ═══════════════════════════════════════════════════════════════
-    // STATE
-    // ═══════════════════════════════════════════════════════════════
-    const State = {
-        accuracySummary: null,
-        dailyAccuracy: null,
-        entityScores: null,
-        entityList: null,
-        entityDatesIndex: null,
-        selectedEntity: null,
-        selectedDate: null,
-        selectedPark: '',
-        charts: {},
-        scoreboardSort: { col: 'avg_mae', asc: true },
-        scoreboardFilter: '',
-    };
+        <div class="card">
+            <div class="card-title">Entity Scoreboard</div>
+            <div class="scoreboard-search">
+                <input type="text" id="scoreboardSearch" placeholder="Search entities..." oninput="renderScoreboard()">
+            </div>
+            <div class="scoreboard-wrap">
+                <table class="scoreboard" id="scoreboardTable">
+                    <thead><tr>
+                        <th data-col="entity_code" onclick="sortScoreboard('entity_code')">Code <span class="sort-arrow">↕</span></th>
+                        <th data-col="name" onclick="sortScoreboard('name')">Name <span class="sort-arrow">↕</span></th>
+                        <th data-col="park" onclick="sortScoreboard('park')">Park <span class="sort-arrow">↕</span></th>
+                        <th data-col="avg_mae" class="sorted" onclick="sortScoreboard('avg_mae')">MAE <span class="sort-arrow">↑</span></th>
+                        <th data-col="avg_bias" onclick="sortScoreboard('avg_bias')">Bias <span class="sort-arrow">↕</span></th>
+                        <th data-col="n_days" onclick="sortScoreboard('n_days')">Days <span class="sort-arrow">↕</span></th>
+                    </tr></thead>
+                    <tbody id="scoreboardBody"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
 
-    const BASE = 'analytics-data/';
+        <div class="card">
+            <div class="card-title">Park Comparison — Avg MAE</div>
+            <div class="park-bars" id="parkBars"><div class="loading">Loading...</div></div>
+        </div>
+    </div>
+</div>
 
-    // ═══════════════════════════════════════════════════════════════
-    // DATA LOADING
-    // ═══════════════════════════════════════════════════════════════
-    async function fetchJSON(url) {
-        const r = await fetch(url + '?t=' + Date.now());
-        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-        return r.json();
+<script>
+const S = {
+    summary: null, daily: null, scores: null,
+    entities: null, datesIndex: null, charts: {},
+    sort: { col: 'avg_mae', asc: true },
+};
+const BASE = 'analytics-data/';
+
+async function fetchJSON(url) {
+    const r = await fetch(url + '?t=' + Date.now());
+    if (!r.ok) throw new Error(`${r.status}`);
+    return r.json();
+}
+
+async function init() {
+    try {
+        const [summary, daily, scores, entities, datesIndex] = await Promise.all([
+            fetchJSON(`${BASE}accuracy_summary.json`),
+            fetchJSON(`${BASE}daily_accuracy.json`),
+            fetchJSON(`${BASE}entity_scores.json`),
+            fetchJSON(`${BASE}entity_list.json`),
+            fetchJSON(`${BASE}entity_dates_index.json`).catch(() => null),
+        ]);
+        Object.assign(S, { summary, daily, scores, entities, datesIndex });
+        renderOverview(); renderDailyChart(); populateEntityDropdown();
+        renderScoreboard(); renderParkComparison(); updateTimestamp();
+    } catch (e) {
+        console.error('Load error:', e);
+        document.getElementById('bigNumbers').innerHTML =
+            '<div class="loading" style="color:var(--rose-400);">Failed to load analytics data</div>';
     }
+}
 
-    async function loadAllData() {
-        try {
-            const [summary, daily, scores, entities, datesIndex] = await Promise.all([
-                fetchJSON(`${BASE}accuracy_summary.json`),
-                fetchJSON(`${BASE}daily_accuracy.json`),
-                fetchJSON(`${BASE}entity_scores.json`),
-                fetchJSON(`${BASE}entity_list.json`),
-                fetchJSON(`${BASE}entity_dates_index.json`).catch(() => null),
-            ]);
-            State.accuracySummary = summary;
-            State.dailyAccuracy = daily;
-            State.entityScores = scores;
-            State.entityList = entities;
-            State.entityDatesIndex = datesIndex;
-
-            renderAccuracyOverview();
-            renderDailyChart();
-            renderParkComparison();
-            populateParkDropdown();
-            populateEntityDropdown();
-            renderScoreboard();
-            updateTimestamp();
-        } catch (e) {
-            console.error('Load error:', e);
-        }
+function updateTimestamp() {
+    document.getElementById('lastUpdate').textContent =
+        new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    if (S.summary) {
+        document.getElementById('evalRange').textContent =
+            `${S.summary.first_eval_date} → ${S.summary.last_eval_date}`;
     }
+}
 
-    function updateTimestamp() {
-        const now = new Date();
-        document.getElementById('lastUpdate').textContent =
-            now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
+function renderOverview() {
+    const s = S.summary; if (!s) return;
+    const mc = s.overall_mae < 8 ? 'good' : s.overall_mae < 12 ? 'warn' : 'bad';
+    const bc = Math.abs(s.overall_bias) < 3 ? 'good' : Math.abs(s.overall_bias) < 6 ? 'warn' : 'bad';
+    document.getElementById('bigNumbers').innerHTML = `
+        <div class="stat-cell"><div class="stat-val ${mc}">${s.overall_mae.toFixed(1)}</div><div class="stat-label">Overall MAE</div></div>
+        <div class="stat-cell"><div class="stat-val ${bc}">${s.overall_bias > 0 ? '+' : ''}${s.overall_bias.toFixed(1)}</div><div class="stat-label">Bias (min)</div></div>
+        <div class="stat-cell"><div class="stat-val">${s.overall_rmse.toFixed(1)}</div><div class="stat-label">RMSE</div></div>
+        <div class="stat-cell"><div class="stat-val">${s.entities_evaluated}</div><div class="stat-label">Entities</div></div>
+        <div class="stat-cell"><div class="stat-val">${s.dates_evaluated}</div><div class="stat-label">Days Eval</div></div>
+        <div class="stat-cell"><div class="stat-val">${s.mae_1day.toFixed(1)}</div><div class="stat-label">1-Day MAE</div></div>`;
+    document.getElementById('inlineStats').innerHTML = `
+        <div class="inline-stat">WTI MAE: <strong>${s.wti_mae}</strong></div>
+        <div class="inline-stat">WTI Bias: <strong>${s.wti_bias > 0 ? '+' : ''}${s.wti_bias}</strong></div>
+        <div class="inline-stat">WTI Dates: <strong>${s.wti_dates_evaluated}</strong></div>
+        <div class="inline-stat">Last Run: <strong>${s.last_run}</strong></div>`;
+}
 
-    // ═══════════════════════════════════════════════════════════════
-    // PANEL 1: ACCURACY OVERVIEW
-    // ═══════════════════════════════════════════════════════════════
-    function renderAccuracyOverview() {
-        const s = State.accuracySummary;
-        if (!s) return;
-
-        const biasColor = s.overall_bias > 0 ? '' : 'green';
-        const maeColor = s.overall_mae < 8 ? 'green' : s.overall_mae <= 15 ? '' : 'red';
-
-        document.getElementById('bigNumbers').innerHTML = `
-            <div class="big-number-card">
-                <div class="num ${maeColor}">${s.overall_mae.toFixed(1)}</div>
-                <div class="lbl">Overall MAE</div>
-                <div class="sub">min avg error</div>
-            </div>
-            <div class="big-number-card">
-                <div class="num ${biasColor}">${s.overall_bias > 0 ? '+' : ''}${s.overall_bias.toFixed(1)}</div>
-                <div class="lbl">Bias</div>
-                <div class="sub">${s.overall_bias > 0 ? 'over-predicting' : 'under-predicting'}</div>
-            </div>
-            <div class="big-number-card">
-                <div class="num">${s.overall_rmse.toFixed(1)}</div>
-                <div class="lbl">RMSE</div>
-                <div class="sub">root mean sq error</div>
-            </div>
-            <div class="big-number-card">
-                <div class="num">${s.entities_evaluated}</div>
-                <div class="lbl">Entities</div>
-                <div class="sub">rides tracked</div>
-            </div>
-            <div class="big-number-card">
-                <div class="num">${s.dates_evaluated}</div>
-                <div class="lbl">Days Eval</div>
-                <div class="sub">${s.first_eval_date} → ${s.last_eval_date}</div>
-            </div>
-            <div class="big-number-card">
-                <div class="num ${s.mae_1day < s.overall_mae ? 'green' : 'orange'}">${s.mae_1day.toFixed(1)}</div>
-                <div class="lbl">1-Day MAE</div>
-                <div class="sub">most recent day</div>
-            </div>
-        `;
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // PANEL 2: DAILY ACCURACY TREND
-    // ═══════════════════════════════════════════════════════════════
-    function renderDailyChart() {
-        const data = State.dailyAccuracy;
-        if (!data || data.length === 0) return;
-
-        const recent = data.slice(-30);
-        const labels = recent.map(d => {
-            const parts = d.park_date.split('-');
-            return `${parts[1]}/${parts[2]}`;
-        });
-        const maeValues = recent.map(d => d.mae);
-        const biasValues = recent.map(d => d.bias);
-
-        if (State.charts.dailyMae) State.charts.dailyMae.destroy();
-
-        const ctx = document.getElementById('dailyMaeChart').getContext('2d');
-        State.charts.dailyMae = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [
-                    {
-                        label: 'MAE',
-                        data: maeValues,
-                        borderColor: '#4a90a4',
-                        backgroundColor: 'rgba(74,144,164,0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 3,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#4a90a4',
-                        borderWidth: 2,
-                    },
-                    {
-                        label: 'Bias',
-                        data: biasValues,
-                        borderColor: '#f87171',
-                        backgroundColor: 'rgba(248,113,113,0.05)',
-                        fill: false,
-                        tension: 0.3,
-                        pointRadius: 2,
-                        pointHoverRadius: 5,
-                        pointBackgroundColor: '#f87171',
-                        borderWidth: 1.5,
-                        borderDash: [4, 4],
-                    }
-                ]
+function renderDailyChart() {
+    const data = S.daily; if (!data || !data.length) return;
+    const filtered = data.filter(d => d.n_entities >= 10);
+    const labels = filtered.map(d => { const p = d.park_date.split('-'); return `${p[1]}/${p[2]}`; });
+    if (S.charts.daily) S.charts.daily.destroy();
+    S.charts.daily = new Chart(document.getElementById('dailyChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'MAE', data: filtered.map(d => d.mae), borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.08)', fill: true, tension: 0.35, pointRadius: 3, pointBackgroundColor: '#fbbf24', pointBorderColor: 'transparent', borderWidth: 2.5 },
+                { label: 'Bias', data: filtered.map(d => d.bias), borderColor: '#fb7185', backgroundColor: 'rgba(251,113,133,0.04)', fill: false, tension: 0.35, pointRadius: 2, pointBackgroundColor: '#fb7185', pointBorderColor: 'transparent', borderWidth: 1.5, borderDash: [5, 5] }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: { labels: { color: 'rgba(255,255,255,0.5)', font: { family: "'IBM Plex Mono'", size: 11 }, usePointStyle: true, pointStyle: 'circle', padding: 16 } },
+                tooltip: { backgroundColor: 'rgba(12,10,9,0.95)', borderColor: 'rgba(251,191,36,0.3)', borderWidth: 1, titleFont: { family: "'IBM Plex Mono'", size: 11 }, bodyFont: { family: "'IBM Plex Mono'", size: 11 }, titleColor: '#fbbf24', bodyColor: '#e7e5e4', padding: 10, cornerRadius: 8, callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} min` } }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { intersect: false, mode: 'index' },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255,255,255,0.6)',
-                            font: { family: "'JetBrains Mono'", size: 11 },
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(10,22,40,0.95)',
-                        borderColor: 'rgba(74,144,164,0.4)',
-                        borderWidth: 1,
-                        titleFont: { family: "'JetBrains Mono'", size: 12 },
-                        bodyFont: { family: "'JetBrains Mono'", size: 11 },
-                        titleColor: '#4a90a4',
-                        bodyColor: '#fff',
-                        padding: 10,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} min`
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 10 } },
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                    },
-                    y: {
-                        ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 10 } },
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        title: {
-                            display: true,
-                            text: 'Minutes',
-                            color: 'rgba(255,255,255,0.4)',
-                            font: { family: "'JetBrains Mono'", size: 10 },
-                        }
-                    }
-                }
+            scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.3)', font: { family: "'IBM Plex Mono'", size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+                y: { ticks: { color: 'rgba(255,255,255,0.3)', font: { family: "'IBM Plex Mono'", size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' }, title: { display: true, text: 'Minutes', color: 'rgba(255,255,255,0.3)', font: { family: "'IBM Plex Mono'", size: 10 } } }
             }
-        });
-    }
+        }
+    });
+}
 
-    // ═══════════════════════════════════════════════════════════════
-    // PANEL 3: PARK ACCURACY COMPARISON (NEW)
-    // ═══════════════════════════════════════════════════════════════
-    function renderParkComparison() {
-        const scores = State.entityScores;
-        if (!scores) return;
+function populateEntityDropdown() {
+    const sel = document.getElementById('entitySelect');
+    const byPark = {};
+    (S.entities || []).forEach(e => { if (!byPark[e.park]) byPark[e.park] = []; byPark[e.park].push(e); });
+    let html = '<option value="">Select an entity...</option>';
+    Object.keys(byPark).sort().forEach(park => {
+        html += `<optgroup label="${park}">`;
+        byPark[park].sort((a,b) => a.name.localeCompare(b.name)).forEach(e => { html += `<option value="${e.entity_code}">${e.name} (${e.entity_code})</option>`; });
+        html += '</optgroup>';
+    });
+    sel.innerHTML = html;
+}
 
-        // Group by park, calculate averages
-        const parkMap = {};
-        scores.forEach(s => {
-            if (!parkMap[s.park]) parkMap[s.park] = { totalMae: 0, totalBias: 0, count: 0, totalDays: 0 };
-            parkMap[s.park].totalMae += s.avg_mae;
-            parkMap[s.park].totalBias += s.avg_bias;
-            parkMap[s.park].count++;
-            parkMap[s.park].totalDays += s.n_days;
-        });
+function onEntityChange() {
+    const entity = document.getElementById('entitySelect').value;
+    if (!entity) { document.getElementById('dateSelect').innerHTML = '<option value="">Select entity first...</option>'; clearEntityChart(); return; }
+    const dates = (S.datesIndex && S.datesIndex[entity]) || [];
+    if (!dates.length) { document.getElementById('dateSelect').innerHTML = '<option value="">No dates</option>'; return; }
+    const sorted = [...dates].sort().reverse();
+    document.getElementById('dateSelect').innerHTML = sorted.map(d => `<option value="${d}">${d}</option>`).join('');
+    document.getElementById('dateSelect').value = sorted[0];
+    loadEntityCurve();
+}
 
-        const parks = Object.entries(parkMap)
-            .map(([name, data]) => ({
-                name,
-                avgMae: data.totalMae / data.count,
-                avgBias: data.totalBias / data.count,
-                entities: data.count,
-            }))
-            .sort((a, b) => a.avgMae - b.avgMae);
+async function loadEntityCurve() {
+    const entity = document.getElementById('entitySelect').value;
+    const date = document.getElementById('dateSelect').value;
+    if (!entity || !date) { clearEntityChart(); return; }
+    try { renderEntityChart(await fetchJSON(`${BASE}entity_curves/${entity}/${date}.json`)); } catch { clearEntityChart(); }
+}
 
-        const labels = parks.map(p => p.name);
-        const maeData = parks.map(p => parseFloat(p.avgMae.toFixed(1)));
-        const biasData = parks.map(p => parseFloat(p.avgBias.toFixed(1)));
-
-        if (State.charts.parkComparison) State.charts.parkComparison.destroy();
-
-        const ctx = document.getElementById('parkComparisonChart').getContext('2d');
-        State.charts.parkComparison = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [
-                    {
-                        label: 'Avg MAE',
-                        data: maeData,
-                        backgroundColor: parks.map(p => {
-                            if (p.avgMae < 8) return 'rgba(74,222,128,0.6)';
-                            if (p.avgMae <= 15) return 'rgba(250,204,21,0.6)';
-                            return 'rgba(248,113,113,0.6)';
-                        }),
-                        borderColor: parks.map(p => {
-                            if (p.avgMae < 8) return '#4ade80';
-                            if (p.avgMae <= 15) return '#facc15';
-                            return '#f87171';
-                        }),
-                        borderWidth: 1,
-                        borderRadius: 4,
-                    },
-                    {
-                        label: 'Avg Bias',
-                        data: biasData,
-                        backgroundColor: 'rgba(74,144,164,0.4)',
-                        borderColor: '#4a90a4',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                    }
-                ]
+function renderEntityChart(data) {
+    if (!data || !data.length) { clearEntityChart(); return; }
+    const labels = data.map(d => { const p = d.time_slot.split(':'); return `${p[0]}:${p[1]}`; });
+    if (S.charts.entity) S.charts.entity.destroy();
+    S.charts.entity = new Chart(document.getElementById('entityChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Forecast', data: data.map(d => d.forecast_wait), borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.06)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2 },
+                { label: 'Actual', data: data.map(d => d.actual_wait), borderColor: '#2dd4bf', backgroundColor: 'rgba(45,212,191,0.04)', fill: false, tension: 0.3, pointRadius: 0, borderWidth: 2 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: { labels: { color: 'rgba(255,255,255,0.5)', font: { family: "'IBM Plex Mono'", size: 10 }, usePointStyle: true, padding: 12 } },
+                tooltip: { backgroundColor: 'rgba(12,10,9,0.95)', borderColor: 'rgba(251,191,36,0.3)', borderWidth: 1, titleFont: { family: "'IBM Plex Mono'", size: 10 }, bodyFont: { family: "'IBM Plex Mono'", size: 10 }, titleColor: '#fbbf24', bodyColor: '#e7e5e4', padding: 8, cornerRadius: 6, callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(0) : '—'} min` } }
             },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { intersect: false, mode: 'index' },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255,255,255,0.6)',
-                            font: { family: "'JetBrains Mono'", size: 11 },
-                            usePointStyle: true,
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(10,22,40,0.95)',
-                        borderColor: 'rgba(74,144,164,0.4)',
-                        borderWidth: 1,
-                        titleFont: { family: "'JetBrains Mono'", size: 12 },
-                        bodyFont: { family: "'JetBrains Mono'", size: 11 },
-                        titleColor: '#4a90a4',
-                        bodyColor: '#fff',
-                        padding: 10,
-                        cornerRadius: 8,
-                        callbacks: {
-                            afterTitle: (items) => {
-                                const parkName = items[0].label;
-                                const park = parks.find(p => p.name === parkName);
-                                return park ? `${park.entities} entities` : '';
-                            },
-                            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.x.toFixed(1)} min`
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 10 } },
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        title: {
-                            display: true,
-                            text: 'Minutes',
-                            color: 'rgba(255,255,255,0.4)',
-                            font: { family: "'JetBrains Mono'", size: 10 },
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            color: 'rgba(255,255,255,0.7)',
-                            font: { family: "'JetBrains Mono'", size: 11 },
-                        },
-                        grid: { display: false },
-                    }
-                }
-            }
-        });
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // PANEL 4: ENTITY EXPLORER
-    // ═══════════════════════════════════════════════════════════════
-    function populateParkDropdown() {
-        const list = State.entityList || [];
-        const parks = [...new Set(list.map(e => e.park))].sort();
-        const sel = document.getElementById('parkSelect');
-        sel.innerHTML = '<option value="">All Parks</option>' +
-            parks.map(p => `<option value="${p}">${p}</option>`).join('');
-    }
-
-    function populateEntityDropdown() {
-        const sel = document.getElementById('entitySelect');
-        const list = State.entityList || [];
-        const parkFilter = State.selectedPark;
-
-        // Group by park
-        const byPark = {};
-        list.forEach(e => {
-            if (parkFilter && e.park !== parkFilter) return;
-            if (!byPark[e.park]) byPark[e.park] = [];
-            byPark[e.park].push(e);
-        });
-
-        let html = '<option value="">Select an entity...</option>';
-        Object.keys(byPark).sort().forEach(park => {
-            html += `<optgroup label="${park}">`;
-            byPark[park].sort((a, b) => a.name.localeCompare(b.name)).forEach(e => {
-                html += `<option value="${e.entity_code}">${e.name} (${e.entity_code})</option>`;
-            });
-            html += '</optgroup>';
-        });
-        sel.innerHTML = html;
-
-        // Restore selection if still valid
-        if (State.selectedEntity) {
-            const exists = list.find(e => e.entity_code === State.selectedEntity);
-            if (exists && (!parkFilter || exists.park === parkFilter)) {
-                sel.value = State.selectedEntity;
+            scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.3)', font: { family: "'IBM Plex Mono'", size: 9 }, maxTicksLimit: 10 }, grid: { color: 'rgba(255,255,255,0.03)' } },
+                y: { ticks: { color: 'rgba(255,255,255,0.3)', font: { family: "'IBM Plex Mono'", size: 9 } }, grid: { color: 'rgba(255,255,255,0.03)' }, title: { display: true, text: 'Wait (min)', color: 'rgba(255,255,255,0.3)', font: { family: "'IBM Plex Mono'", size: 9 } } }
             }
         }
-    }
+    });
+    let absErr = 0, signedErr = 0, count = 0;
+    data.forEach(d => { if (d.actual_wait != null && d.forecast_wait != null) { absErr += Math.abs(d.forecast_wait - d.actual_wait); signedErr += (d.forecast_wait - d.actual_wait); count++; } });
+    document.getElementById('expMAE').textContent = count ? (absErr / count).toFixed(1) : '—';
+    document.getElementById('expBias').textContent = count ? ((signedErr / count) > 0 ? '+' : '') + (signedErr / count).toFixed(1) : '—';
+    document.getElementById('expSlots').textContent = count || '—';
+}
 
-    function populateDateDropdown(entityCode) {
-        const sel = document.getElementById('dateSelect');
-        const dates = (State.entityDatesIndex && State.entityDatesIndex[entityCode]) || [];
-        if (dates.length === 0) {
-            sel.innerHTML = '<option value="">No dates available</option>';
-            return;
-        }
-        const sorted = [...dates].sort().reverse();
-        sel.innerHTML = sorted.map(d => `<option value="${d}">${d}</option>`).join('');
-        sel.value = sorted[0];
-    }
+function clearEntityChart() {
+    if (S.charts.entity) S.charts.entity.destroy();
+    document.getElementById('entityChart').getContext('2d').clearRect(0, 0, 9999, 9999);
+    ['expMAE','expBias','expSlots'].forEach(id => document.getElementById(id).textContent = '—');
+}
 
-    function onParkChange() {
-        State.selectedPark = document.getElementById('parkSelect').value;
-        populateEntityDropdown();
-        // Clear date and curve
-        document.getElementById('dateSelect').innerHTML = '<option value="">Select entity first...</option>';
-        renderEntityCurveEmpty();
-    }
+function maeClass(v) { return v < 7 ? 'mae-good' : v < 12 ? 'mae-ok' : 'mae-bad'; }
+function parkClass(p) {
+    p = p.toLowerCase();
+    if (p.includes('magic kingdom')) return 'park-mk'; if (p.includes('epcot')) return 'park-ep';
+    if (p.includes('hollywood')) return 'park-hs'; if (p.includes('animal')) return 'park-ak';
+    if (p.includes('disneyland')) return 'park-dl'; if (p.includes('dca')) return 'park-ca';
+    if (p.includes('universal fl')) return 'park-uf'; if (p.includes('universal hollywood')) return 'park-uh';
+    if (p.includes('islands')) return 'park-ia'; if (p.includes('epic')) return 'park-eu';
+    if (p.includes('tokyo')) return 'park-tdl'; return '';
+}
+function shortPark(p) {
+    return {'Magic Kingdom':'MK','EPCOT':'EP','Hollywood Studios':'HS','Animal Kingdom':'AK','Disneyland':'DL','DCA':'DCA','Universal FL':'UF','Universal Hollywood':'UH','Islands of Adventure':'IA','Epic Universe':'EU','Tokyo Disney':'TDL'}[p] || p;
+}
 
-    function onEntityChange() {
-        const entity = document.getElementById('entitySelect').value;
-        if (!entity) {
-            document.getElementById('dateSelect').innerHTML = '<option value="">Select entity first...</option>';
-            renderEntityCurveEmpty();
-            return;
-        }
-        State.selectedEntity = entity;
-        populateDateDropdown(entity);
-        loadEntityCurve();
-    }
+function sortScoreboard(col) {
+    if (S.sort.col === col) S.sort.asc = !S.sort.asc;
+    else { S.sort.col = col; S.sort.asc = ['avg_mae','avg_bias','n_days'].includes(col); }
+    renderScoreboard();
+}
 
-    async function loadEntityCurve() {
-        const entity = document.getElementById('entitySelect').value;
-        const date = document.getElementById('dateSelect').value;
-        if (!entity || !date) {
-            renderEntityCurveEmpty();
-            return;
-        }
-
-        State.selectedEntity = entity;
-        State.selectedDate = date;
-
-        try {
-            const url = `${BASE}entity_curves/${entity}/${date}.json`;
-            const data = await fetchJSON(url);
-            renderEntityCurve(data);
-        } catch (e) {
-            renderEntityCurveEmpty();
-        }
-    }
-
-    function renderEntityCurve(data) {
-        if (!data || data.length === 0) {
-            renderEntityCurveEmpty();
-            return;
-        }
-
-        const labels = data.map(d => {
-            const parts = d.time_slot.split(':');
-            return `${parts[0]}:${parts[1]}`;
-        });
-        const forecast = data.map(d => d.forecast_wait);
-        const actual = data.map(d => d.actual_wait);
-
-        if (State.charts.entityCurve) State.charts.entityCurve.destroy();
-
-        const ctx = document.getElementById('entityCurveChart').getContext('2d');
-        State.charts.entityCurve = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [
-                    {
-                        label: 'Forecast',
-                        data: forecast,
-                        borderColor: '#4a90a4',
-                        backgroundColor: 'rgba(74,144,164,0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        borderWidth: 2,
-                    },
-                    {
-                        label: 'Actual',
-                        data: actual,
-                        borderColor: '#fb923c',
-                        backgroundColor: 'rgba(251,146,60,0.05)',
-                        fill: false,
-                        tension: 0.3,
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        borderWidth: 2,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { intersect: false, mode: 'index' },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255,255,255,0.6)',
-                            font: { family: "'JetBrains Mono'", size: 10 },
-                            usePointStyle: true,
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(10,22,40,0.95)',
-                        borderColor: 'rgba(74,144,164,0.4)',
-                        borderWidth: 1,
-                        titleFont: { family: "'JetBrains Mono'", size: 11 },
-                        bodyFont: { family: "'JetBrains Mono'", size: 10 },
-                        titleColor: '#4a90a4',
-                        bodyColor: '#fff',
-                        padding: 8,
-                        cornerRadius: 6,
-                        callbacks: {
-                            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} min`
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            color: 'rgba(255,255,255,0.4)',
-                            font: { family: "'JetBrains Mono'", size: 9 },
-                            maxTicksLimit: 12,
-                        },
-                        grid: { color: 'rgba(255,255,255,0.04)' },
-                    },
-                    y: {
-                        ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 9 } },
-                        grid: { color: 'rgba(255,255,255,0.04)' },
-                        title: {
-                            display: true,
-                            text: 'Wait (min)',
-                            color: 'rgba(255,255,255,0.4)',
-                            font: { family: "'JetBrains Mono'", size: 9 },
-                        }
-                    }
-                }
-            }
-        });
-
-        // Compute stats
-        let totalAbsErr = 0, totalSignedErr = 0, count = 0;
-        data.forEach(d => {
-            if (d.actual_wait != null && d.forecast_wait != null) {
-                totalAbsErr += Math.abs(d.forecast_wait - d.actual_wait);
-                totalSignedErr += (d.forecast_wait - d.actual_wait);
-                count++;
-            }
-        });
-        document.getElementById('expMAE').textContent = count ? (totalAbsErr / count).toFixed(1) : '—';
-        document.getElementById('expBias').textContent = count ? ((totalSignedErr / count) > 0 ? '+' : '') + (totalSignedErr / count).toFixed(1) : '—';
-        document.getElementById('expSlots').textContent = count || '—';
-    }
-
-    function renderEntityCurveEmpty() {
-        if (State.charts.entityCurve) State.charts.entityCurve.destroy();
-        State.charts.entityCurve = null;
-        document.getElementById('expMAE').textContent = '—';
-        document.getElementById('expBias').textContent = '—';
-        document.getElementById('expSlots').textContent = '—';
-        const canvas = document.getElementById('entityCurveChart');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
-        ctx.font = '13px JetBrains Mono';
-        ctx.textAlign = 'center';
-        ctx.fillText('Select an entity + date to view curves', canvas.width / 2, canvas.height / 2);
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // PANEL 5: ENTITY SCOREBOARD
-    // ═══════════════════════════════════════════════════════════════
-    function maeClass(mae) {
-        if (mae < 8) return 'mae-green';
-        if (mae <= 15) return 'mae-yellow';
-        return 'mae-red';
-    }
-
-    function escHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function renderScoreboard() {
-        const scores = State.entityScores;
-        if (!scores) return;
-
-        const { col, asc } = State.scoreboardSort;
-        const filter = State.scoreboardFilter.toLowerCase();
-
-        let filtered = scores;
-        if (filter) {
-            filtered = scores.filter(s =>
-                s.entity_code.toLowerCase().includes(filter) ||
-                s.name.toLowerCase().includes(filter) ||
-                s.park.toLowerCase().includes(filter)
-            );
-        }
-
-        // Sort
-        filtered = [...filtered].sort((a, b) => {
-            let va = a[col], vb = b[col];
-            if (typeof va === 'string') {
-                return asc ? va.localeCompare(vb) : vb.localeCompare(va);
-            }
-            return asc ? (va - vb) : (vb - va);
-        });
-
-        const tbody = document.getElementById('scoreboardBody');
-        if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No entities match</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = filtered.map(s => `
-            <tr data-entity="${s.entity_code}" onclick="selectEntityFromScoreboard('${s.entity_code}')">
-                <td><code>${escHtml(s.entity_code)}</code></td>
-                <td class="name-cell" title="${escHtml(s.name)}">${escHtml(s.name)}</td>
-                <td class="park-cell">${escHtml(s.park)}</td>
-                <td class="${maeClass(s.avg_mae)}">${s.avg_mae.toFixed(1)}</td>
-                <td>${s.avg_bias > 0 ? '+' : ''}${s.avg_bias.toFixed(1)}</td>
-                <td>${s.n_days}</td>
-            </tr>
-        `).join('');
-
-        // Update header sort indicators
-        document.querySelectorAll('#scoreboardTable th').forEach(th => {
-            const c = th.dataset.col;
-            th.classList.toggle('sorted', c === col);
-            const arrow = th.querySelector('.sort-arrow');
-            if (c === col) {
-                arrow.textContent = asc ? '↑' : '↓';
-            } else {
-                arrow.textContent = '↕';
-            }
-        });
-    }
-
-    function selectEntityFromScoreboard(entityCode) {
-        // Find the entity's park so we can set the park filter
-        const entity = (State.entityList || []).find(e => e.entity_code === entityCode);
-        if (entity) {
-            State.selectedPark = entity.park;
-            document.getElementById('parkSelect').value = entity.park;
-            populateEntityDropdown();
-        }
-
-        document.getElementById('entitySelect').value = entityCode;
-        State.selectedEntity = entityCode;
-        populateDateDropdown(entityCode);
-        loadEntityCurve();
-
-        // Scroll explorer into view
-        document.getElementById('panelExplorer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // EVENT LISTENERS
-    // ═══════════════════════════════════════════════════════════════
-    document.getElementById('parkSelect').addEventListener('change', onParkChange);
-    document.getElementById('entitySelect').addEventListener('change', onEntityChange);
-    document.getElementById('dateSelect').addEventListener('change', loadEntityCurve);
-
-    // Scoreboard sort
+function renderScoreboard() {
+    if (!S.scores) return;
+    const f = (document.getElementById('scoreboardSearch').value || '').toLowerCase();
+    let rows = S.scores.filter(e => !f || e.entity_code.toLowerCase().includes(f) || e.name.toLowerCase().includes(f) || e.park.toLowerCase().includes(f));
+    rows.sort((a, b) => { let va = a[S.sort.col], vb = b[S.sort.col]; if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); } return S.sort.asc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1); });
+    document.getElementById('scoreboardBody').innerHTML = rows.map(e => `
+        <tr onclick="selectFromScoreboard('${e.entity_code}')">
+            <td style="color:var(--stone-500)">${e.entity_code}</td><td>${e.name}</td>
+            <td><span class="park-tag ${parkClass(e.park)}">${shortPark(e.park)}</span></td>
+            <td class="${maeClass(e.avg_mae)}">${e.avg_mae.toFixed(1)}</td>
+            <td style="color:${e.avg_bias > 0 ? 'var(--amber-400)' : 'var(--teal-400)'}">${e.avg_bias > 0 ? '+' : ''}${e.avg_bias.toFixed(1)}</td>
+            <td style="color:var(--stone-500)">${e.n_days}</td>
+        </tr>`).join('');
     document.querySelectorAll('#scoreboardTable th').forEach(th => {
-        th.addEventListener('click', () => {
-            const col = th.dataset.col;
-            if (!col) return;
-            if (State.scoreboardSort.col === col) {
-                State.scoreboardSort.asc = !State.scoreboardSort.asc;
-            } else {
-                State.scoreboardSort.col = col;
-                State.scoreboardSort.asc = true;
-            }
-            renderScoreboard();
-        });
+        const col = th.dataset.col, arrow = th.querySelector('.sort-arrow');
+        if (col === S.sort.col) { th.classList.add('sorted'); arrow.textContent = S.sort.asc ? '↑' : '↓'; }
+        else { th.classList.remove('sorted'); arrow.textContent = '↕'; }
     });
+}
 
-    // Scoreboard search
-    document.getElementById('scoreboardSearch').addEventListener('input', (e) => {
-        State.scoreboardFilter = e.target.value;
-        renderScoreboard();
-    });
+function selectFromScoreboard(code) {
+    document.getElementById('entitySelect').value = code;
+    onEntityChange();
+    document.getElementById('entitySelect').closest('.card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
-    // ═══════════════════════════════════════════════════════════════
-    // INIT & AUTO-REFRESH
-    // ═══════════════════════════════════════════════════════════════
-    async function init() {
-        await loadAllData();
-        // Auto-refresh every 60s
-        setInterval(async () => {
-            await loadAllData();
-        }, 60000);
-    }
+function renderParkComparison() {
+    if (!S.scores) return;
+    const pd = {};
+    S.scores.forEach(e => { if (!pd[e.park]) pd[e.park] = { sum: 0, count: 0 }; pd[e.park].sum += e.avg_mae; pd[e.park].count++; });
+    const parks = Object.entries(pd).map(([n, d]) => ({ name: n, mae: d.sum / d.count, count: d.count })).sort((a, b) => a.mae - b.mae);
+    const max = Math.max(...parks.map(p => p.mae));
+    const colors = { 'Magic Kingdom':'#818cf8','EPCOT':'#a78bfa','Hollywood Studios':'#f472b6','Animal Kingdom':'#4ade80','Disneyland':'#38bdf8','DCA':'#fbbf24','Universal FL':'#f87171','Universal Hollywood':'#fb7185','Islands of Adventure':'#2dd4bf','Epic Universe':'#fb923c','Tokyo Disney':'#e879f9' };
+    document.getElementById('parkBars').innerHTML = parks.map(p => `
+        <div class="park-bar-row">
+            <div class="park-bar-name">${shortPark(p.name)} <span style="color:var(--stone-600);font-size:10px">(${p.count})</span></div>
+            <div class="park-bar-track"><div class="park-bar-fill" style="width:${(p.mae/max*100).toFixed(0)}%;background:${colors[p.name]||'#a8a29e'}"></div></div>
+            <div class="park-bar-val">${p.mae.toFixed(1)}</div>
+        </div>`).join('');
+}
 
-    init();
-    </script>
+init();
+</script>
 </body>
 </html>
