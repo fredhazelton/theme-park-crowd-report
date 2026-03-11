@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T03:15:01Z",
+  "generated_at": "2026-03-11T03:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-10T20:06:34.796000+00:00"
+          "last_active": "2026-03-11T03:19:39.949000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T02:50:43.917000+00:00"
+          "last_active": "2026-03-11T03:25:54.920000+00:00"
         }
       ]
     },
@@ -164,6 +164,50 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174617 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T03:25:54.920000+00:00",
+      "message_id": "1481131026997710909",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481131026997710909"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "[attachment/embed]",
+      "timestamp": "2026-03-11T03:19:39.949000+00:00",
+      "message_id": "1481129454255472761",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481129454255472761"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udd04 **Pipeline**\n- Data flowing \u2705 (last observation: just now)\n- 235 entities active\n- \u26a0\ufe0f Low entity count today (60 forecasts for Mar 11 \u2014 still early, overnight)\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udd17 **Quick ...",
+      "timestamp": "2026-03-11T03:19:36.066000+00:00",
+      "message_id": "1481129437968728125",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481129437968728125"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udccb **Mission Control \u2014 Live Status**\n*Updated by Wilma \u00b7 Last refresh: Mar 10, 2026 11:18 PM ET*\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83c\udfaf **Accuracy Snapshot**\n```\nOverall MAE:  9.4 min    Bias: +2.6 min    RMSE:...",
+      "timestamp": "2026-03-11T03:19:35.642000+00:00",
+      "message_id": "1481129436190474324",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481129436190474324"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174574 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-11T02:50:43.917000+00:00",
       "message_id": "1481122172809248799",
@@ -179,50 +223,6 @@
       "timestamp": "2026-03-11T02:20:43.689000+00:00",
       "message_id": "1481114622106009620",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481114622106009620"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "OK Fred, I've dug into this. Here's what's happening:\n\n**The problem:** When `/ask` gets a question about ride-level wait times, Claude issues queries against the `forecasts` table which has **64 m...",
-      "timestamp": "2026-03-11T02:12:07.845000+00:00",
-      "message_id": "1481112458499325992",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481112458499325992"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good news, honey \u2014 I responded to Barney in #barney-wilma-dev. **All six analytics JSONs he asked about already exist and auto-refresh 3x daily via cron.** The data pipeline for The Quarry is fully...",
-      "timestamp": "2026-03-10T20:06:34.796000+00:00",
-      "message_id": "1481020464624042165",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481020464624042165"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me also acknowledge Barney's architecture post in #mission-control:",
-      "timestamp": "2026-03-10T20:06:23.495000+00:00",
-      "message_id": "1481020417224343552",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481020417224343552"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good news \u2014 I've got the full picture. Let me respond to Barney in #barney-wilma-dev:",
-      "timestamp": "2026-03-10T20:06:07.085000+00:00",
-      "message_id": "1481020348395819159",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481020348395819159"
     },
     {
       "channel": "wilma",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 1,
-    "messages_today": 3
+    "active_channels_today": 2,
+    "messages_today": 6
   }
 }
