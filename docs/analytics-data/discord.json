@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T20:00:02Z",
+  "generated_at": "2026-03-11T20:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-11T06:04:39.272000+00:00"
+          "last_active": "2026-03-11T20:11:54.289000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Fair point! The evidence backs you up \u2014 you posted two Reddit replies this morning around 9:48 AM AND redesigned the entire Reddit workflow into the forum-based one-at-a-time system with drafts and...",
+      "timestamp": "2026-03-11T20:11:54.289000+00:00",
+      "message_id": "1481384192540672050",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481384192540672050"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "I got robbed! I posted a couple replies in Reddit and I redid the Reddit workflow to name it easier in the future",
+      "timestamp": "2026-03-11T20:11:33.467000+00:00",
+      "message_id": "1481384105206743226",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481384105206743226"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Afternoon review complete. Written to `gazoo-reviews/2026-03-11-afternoon.md` and posted to #gazoo.\n\n**Key findings:**\n- **2 of 6 AM issues addressed** \u2014 morning briefing fixed \u2705, Mr. Slate showing...",
+      "timestamp": "2026-03-11T20:04:36.520000+00:00",
+      "message_id": "1481382356404146257",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481382356404146257"
+    },
     {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
@@ -300,39 +333,6 @@
       "timestamp": "2026-03-11T07:00:01.777000+00:00",
       "message_id": "1481184910621278219",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481184910621278219"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Gazoo AM review is done. Full review written to `gazoo-reviews/2026-03-11.md` and summary posted to #gazoo. \n\nKey findings this morning:\n- **6/10 overall** \u2014 strong engineering day (14 commits, con...",
-      "timestamp": "2026-03-11T06:04:39.272000+00:00",
-      "message_id": "1481170975025533003",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481170975025533003"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Review complete and posted. Now let me log today's memory entry.",
-      "timestamp": "2026-03-11T06:04:37.681000+00:00",
-      "message_id": "1481170968352133120",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481170968352133120"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me post the summary to Discord #gazoo.",
-      "timestamp": "2026-03-11T06:04:37.453000+00:00",
-      "message_id": "1481170967396089857",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481170967396089857"
     },
     {
       "channel": "mission-control",
