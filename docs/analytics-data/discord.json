@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T16:30:01Z",
+  "generated_at": "2026-03-11T16:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-11T06:33:10.473000+00:00"
+          "last_active": "2026-03-11T16:44:49.272000+00:00"
         },
         {
           "name": "bam-bam",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "OK some thoughts:\n\n1. It's to ooverwhelming to post 5 or more of these at once. Post one and wait for me to respond (with reminders if needed)\n2. Upon selecting which one to send to the channel, dr...",
+      "timestamp": "2026-03-11T16:44:49.272000+00:00",
+      "message_id": "1481332078241906750",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481332078241906750"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "- Post title + link\n- First 200 chars of the post\n- Matched keywords\n- Engagement stats\n- Suggested marketing angle\n- \"Awaiting response draft\" status\n\n**What's your thinking?** Want to change the ...",
+      "timestamp": "2026-03-11T16:41:06.279000+00:00",
+      "message_id": "1481331142941737064",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481331142941737064"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Here's the full breakdown of the Reddit scout:\n\n**How it works:**\n\n1. **Runs every 6 hours** via cron (`reddit-scout`)\n2. Scans 5 subreddits: r/WaltDisneyWorld, r/Disneyland, r/DisneyPlanning, r/Di...",
+      "timestamp": "2026-03-11T16:41:06.094000+00:00",
+      "message_id": "1481331142165528737",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481331142165528737"
+    },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
@@ -269,28 +302,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481184910621278219"
     },
     {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Board status:** 51 tasks (36 done, 13 todo, 1 backlog, 1 blocked) | **Stale:** 0",
-      "timestamp": "2026-03-11T06:33:10.473000+00:00",
-      "message_id": "1481178152322596925",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481178152322596925"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\udd95 **Dino Work Session \u2014 March 11, 2026 AM**\n\n**Gazoo grade:** 5/10\n> \"The board exists but isn't driving action.\"\n\n**Fixed from Gazoo critique:**\n- Updated task-040 notes \u2014 clarified v4 deployed gl...",
-      "timestamp": "2026-03-11T06:33:10.230000+00:00",
-      "message_id": "1481178151303254087",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481178151303254087"
-    },
-    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -335,17 +346,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481129454255472761"
     },
     {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Every task any agent discovers \u2192 goes to Dino's board.** No orphaned work.\n\nBy the time you wake up each morning, every agent has already fixed yesterday's bugs AND shipped an improvement. Then G...",
-      "timestamp": "2026-03-10T19:38:41.310000+00:00",
-      "message_id": "1481013445515149413",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481013445515149413"
-    },
-    {
       "channel": "pipeline",
       "channel_emoji": "\ud83d\udd27",
       "channel_id": "1479351574177513576",
@@ -382,6 +382,6 @@
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 6,
-    "messages_today": 16
+    "messages_today": 17
   }
 }
