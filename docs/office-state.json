@@ -1,13 +1,13 @@
 {
-  "updated": "2026-03-10T22:33:56.242269+00:00",
+  "updated": "2026-03-11T07:09:02.813293+00:00",
   "agents": [
     {
       "id": "fred",
       "name": "Fred",
       "icon": "🧔",
-      "state": "idle",
+      "state": "resting",
       "zone": "rest",
-      "task": "Away",
+      "task": "Sleeping 😴",
       "color": "#facc15"
     },
     {
@@ -16,16 +16,16 @@
       "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "Mr. Slate PM work session — business report posted",
+      "task": "Arnold AM session: morning briefing + feed improvements",
       "color": "#4a90a4"
     },
     {
       "id": "barney",
       "name": "Barney",
       "icon": "🪨",
-      "state": "idle",
-      "zone": "tarpit-2",
-      "task": "Available on claude.ai",
+      "state": "offline",
+      "zone": "offsite",
+      "task": "",
       "color": "#4ade80"
     },
     {
@@ -78,8 +78,8 @@
       "name": "Mr. Slate",
       "icon": "💼",
       "state": "idle",
-      "zone": "corner-office",
-      "task": "Wrapping up for the day",
+      "zone": "offsite",
+      "task": "Off the clock",
       "color": "#a78bfa"
     }
   ],
