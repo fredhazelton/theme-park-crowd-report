@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T17:00:01Z",
+  "generated_at": "2026-03-11T17:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-11T16:59:55.272000+00:00"
+          "last_active": "2026-03-11T17:05:52.595000+00:00"
         },
         {
           "name": "bam-bam",
@@ -164,6 +164,17 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "Pebbles is done! 6 social templates ready \u2014 Reel covers, carousel cards (title + park + CTA), daily story, and share card. All with the wave gradient branding, day-by-day crowd bar charts, and a WT...",
+      "timestamp": "2026-03-11T17:05:52.595000+00:00",
+      "message_id": "1481337377002885442",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481337377002885442"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "**YABBA DABBA DOO!** \ud83e\uddb4\n\nPebbles is on the design bench! She's building:\n\n- \ud83d\udcf1 **Reel Cover** \u2014 9:16 vertical thumbnail for WTI animations\n- \ud83c\udfa0 **Carousel Cards** \u2014 swipeable weekly crowd forecasts by...",
       "timestamp": "2026-03-11T16:59:55.272000+00:00",
       "message_id": "1481335878281462024",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-11T16:59:23.419000+00:00",
       "message_id": "1481335744680165498",
       "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481335744680165498"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Want me to get Pebbles started on the Instagram visual templates now? She could knock out the Reel format, carousel cards, and story templates while you review Betty's strategy. Or would you rather...",
-      "timestamp": "2026-03-11T16:59:06.489000+00:00",
-      "message_id": "1481335673670733934",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481335673670733934"
     },
     {
       "channel": "fred-wilma",
