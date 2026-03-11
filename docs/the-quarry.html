@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🪨 The Quarry — HazeyData Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <style>
+        /* ═══════════════════════════════════════════════════
+           RESET & DESIGN TOKENS
+           ═══════════════════════════════════════════════════ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0a1628;
+            --bg-secondary: #0f1d32;
+            --bg-card: rgba(255,255,255,0.05);
+            --border-card: rgba(255,255,255,0.1);
+            --border-accent: rgba(74,144,164,0.3);
+            --accent: #4a90a4;
+            --accent-light: #6bb5c9;
+            --accent-glow: rgba(74,144,164,0.15);
+            --accent-red: #f87171;
+            --accent-orange: #fb923c;
+            --accent-green: #4ade80;
+            --accent-yellow: #facc15;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --font-text: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-primary);
+            font-family: var(--font-text);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(74,144,164,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,144,164,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════════════ */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 28px;
+            border-bottom: 1px solid var(--border-card);
+            background: rgba(10,22,40,0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-mark {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 3px;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 1.5px;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-nav a {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover {
+            color: var(--accent-light);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        .refresh-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           MAIN CONTENT
+           ═══════════════════════════════════════════════════ */
+        .main {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 28px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           SECTION HEADERS
+           ═══════════════════════════════════════════════════ */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .section-header .icon {
+            font-size: 18px;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .section-line {
+            height: 1px;
+            flex: 1;
+            background: linear-gradient(90deg, var(--border-accent), transparent);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           CARDS
+           ═══════════════════════════════════════════════════ */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--border-accent);
+        }
+
+        .card-title {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           ACCURACY OVERVIEW — BIG NUMBERS
+           ═══════════════════════════════════════════════════ */
+        .big-numbers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .big-number-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .big-number-card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--border-accent);
+        }
+
+        .big-number-card .num {
+            font-family: var(--font-mono);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+
+        .big-number-card .num.red { color: var(--accent-red); }
+        .big-number-card .num.green { color: var(--accent-green); }
+        .big-number-card .num.orange { color: var(--accent-orange); }
+
+        .big-number-card .lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+            font-family: var(--font-mono);
+        }
+
+        .big-number-card .sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-family: var(--font-mono);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           DAILY CHART
+           ═══════════════════════════════════════════════════ */
+        .chart-wrap {
+            position: relative;
+            height: 300px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           PARK COMPARISON
+           ═══════════════════════════════════════════════════ */
+        .park-chart-wrap {
+            position: relative;
+            height: 350px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           ENTITY EXPLORER
+           ═══════════════════════════════════════════════════ */
+        .explorer-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .ctrl-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ctrl-group label {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ctrl-group select {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 8px 12px;
+            outline: none;
+            min-width: 220px;
+            cursor: pointer;
+        }
+
+        .ctrl-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .explorer-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .explorer-stat {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+
+        .explorer-stat .val {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-light);
+        }
+
+        .explorer-stat .lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Two-column layout for explorer + scoreboard */
+        .analytics-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           SCOREBOARD
+           ═══════════════════════════════════════════════════ */
+        .scoreboard-search {
+            margin-bottom: 12px;
+        }
+
+        .scoreboard-search input {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 8px 12px;
+            outline: none;
+        }
+
+        .scoreboard-search input:focus {
+            border-color: var(--accent);
+        }
+
+        .scoreboard-search input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .scoreboard-table-wrap {
+            max-height: 520px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .scoreboard-table-wrap::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scoreboard-table-wrap::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+        }
+
+        table.scoreboard {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table.scoreboard thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        table.scoreboard th {
+            background: rgba(74,144,164,0.15);
+            padding: 10px 12px;
+            text-align: left;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-accent);
+        }
+
+        table.scoreboard th:hover {
+            color: var(--accent-light);
+        }
+
+        table.scoreboard th .sort-arrow {
+            margin-left: 4px;
+            opacity: 0.5;
+        }
+
+        table.scoreboard th.sorted .sort-arrow {
+            opacity: 1;
+        }
+
+        table.scoreboard td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+
+        table.scoreboard tr {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        table.scoreboard tbody tr:hover {
+            background: rgba(74,144,164,0.1);
+        }
+
+        table.scoreboard .name-cell {
+            font-family: var(--font-text);
+            font-weight: 500;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        table.scoreboard .park-cell {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .mae-green { color: var(--accent-green); }
+        .mae-yellow { color: var(--accent-yellow); }
+        .mae-red { color: var(--accent-red); }
+
+        /* ═══════════════════════════════════════════════════
+           LOADING & EMPTY STATES
+           ═══════════════════════════════════════════════════ */
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 40px 20px;
+        }
+
+        .empty-state .icon {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════ */
+        .footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 20px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-card);
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: var(--accent-light);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════ */
+        @media (max-width: 1100px) {
+            .analytics-bottom {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 16px;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .header-right {
+                display: none;
+            }
+
+            .logo {
+                font-size: 15px;
+            }
+
+            .logo-sub {
+                font-size: 9px;
+            }
+
+            .logo-mark {
+                font-size: 22px;
+            }
+
+            .main {
+                padding: 16px 12px 40px;
+                gap: 16px;
+            }
+
+            .big-numbers {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .big-number-card .num {
+                font-size: 24px;
+            }
+
+            .card {
+                padding: 14px;
+                border-radius: 8px;
+            }
+
+            .explorer-controls {
+                flex-direction: column;
+            }
+
+            .ctrl-group select {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .ctrl-group {
+                width: 100%;
+            }
+
+            .explorer-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .scoreboard-table-wrap {
+                max-height: 360px;
+            }
+
+            table.scoreboard .park-cell {
+                display: none;
+            }
+
+            table.scoreboard .name-cell {
+                max-width: 120px;
+            }
+
+            .park-chart-wrap {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════════════
+         HEADER
+         ═══════════════════════════════════════════════════ -->
+    <header class="header">
+        <div class="header-left">
+            <span class="logo-mark">🪨</span>
+            <div class="logo-text">
+                <span class="logo">THE QUARRY</span>
+                <span class="logo-sub">HazeyData Analytics</span>
+            </div>
+        </div>
+        <nav class="header-nav">
+            <a href="#overview">Overview</a>
+            <a href="#trend">Trend</a>
+            <a href="#parks">Parks</a>
+            <a href="#explorer">Explorer</a>
+            <a href="#scoreboard">Scoreboard</a>
+        </nav>
+        <div class="header-right">
+            <span class="refresh-dot"></span>
+            <span id="lastUpdate">Loading...</span>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════
+         MAIN CONTENT
+         ═══════════════════════════════════════════════════ -->
+    <main class="main">
+
+        <!-- ═══ SECTION 1: ACCURACY OVERVIEW ═══ -->
+        <section id="overview">
+            <div class="section-header">
+                <span class="icon">⛏️</span>
+                <h2>Accuracy Overview</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="big-numbers" id="bigNumbers">
+                <div class="loading">Loading accuracy data...</div>
+            </div>
+        </section>
+
+        <!-- ═══ SECTION 2: DAILY TREND ═══ -->
+        <section id="trend">
+            <div class="card">
+                <div class="card-title">📈 Daily Accuracy Trend</div>
+                <div class="chart-wrap">
+                    <canvas id="dailyMaeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SECTION 3: PARK COMPARISON ═══ -->
+        <section id="parks">
+            <div class="card">
+                <div class="card-title">🏰 Park Accuracy Comparison</div>
+                <div class="park-chart-wrap">
+                    <canvas id="parkComparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ SECTION 4 + 5: EXPLORER & SCOREBOARD ═══ -->
+        <div class="analytics-bottom">
+
+            <!-- Entity Explorer -->
+            <section id="explorer">
+                <div class="card" id="panelExplorer">
+                    <div class="card-title">🔍 Entity Explorer</div>
+                    <div class="explorer-controls">
+                        <div class="ctrl-group">
+                            <label>Park</label>
+                            <select id="parkSelect">
+                                <option value="">All Parks</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Entity</label>
+                            <select id="entitySelect">
+                                <option value="">Select an entity...</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Date</label>
+                            <select id="dateSelect">
+                                <option value="">Select entity first...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-wrap" style="height: 260px;">
+                        <canvas id="entityCurveChart"></canvas>
+                    </div>
+                    <div class="explorer-stats" id="explorerStats">
+                        <div class="explorer-stat"><div class="val" id="expMAE">—</div><div class="lbl">MAE</div></div>
+                        <div class="explorer-stat"><div class="val" id="expBias">—</div><div class="lbl">Bias</div></div>
+                        <div class="explorer-stat"><div class="val" id="expSlots">—</div><div class="lbl">Slots</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Entity Scoreboard -->
+            <section id="scoreboard">
+                <div class="card" id="panelScoreboard">
+                    <div class="card-title">🏆 Entity Scoreboard</div>
+                    <div class="scoreboard-search">
+                        <input type="text" id="scoreboardSearch" placeholder="Search entities, parks...">
+                    </div>
+                    <div class="scoreboard-table-wrap">
+                        <table class="scoreboard" id="scoreboardTable">
+                            <thead>
+                                <tr>
+                                    <th data-col="entity_code">Code <span class="sort-arrow">↕</span></th>
+                                    <th data-col="name">Name <span class="sort-arrow">↕</span></th>
+                                    <th data-col="park">Park <span class="sort-arrow">↕</span></th>
+                                    <th data-col="avg_mae" class="sorted">MAE <span class="sort-arrow">↑</span></th>
+                                    <th data-col="avg_bias">Bias <span class="sort-arrow">↕</span></th>
+                                    <th data-col="n_days">Days <span class="sort-arrow">↕</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="scoreboardBody">
+                                <tr><td colspan="6" class="loading">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════
+         FOOTER
+         ═══════════════════════════════════════════════════ -->
+    <footer class="footer">
+        🪨 The Quarry · <a href="https://hazeydata.com" target="_blank">HazeyData</a> · Accuracy analytics for theme park wait time predictions
+    </footer>
+
+    <!-- ═══════════════════════════════════════════════════
+         JAVASCRIPT
+         ═══════════════════════════════════════════════════ -->
+    <script>
+    // ═══════════════════════════════════════════════════════════════
+    // STATE
+    // ═══════════════════════════════════════════════════════════════
+    const State = {
+        accuracySummary: null,
+        dailyAccuracy: null,
+        entityScores: null,
+        entityList: null,
+        entityDatesIndex: null,
+        selectedEntity: null,
+        selectedDate: null,
+        selectedPark: '',
+        charts: {},
+        scoreboardSort: { col: 'avg_mae', asc: true },
+        scoreboardFilter: '',
+    };
+
+    const BASE = 'analytics-data/';
+
+    // ═══════════════════════════════════════════════════════════════
+    // DATA LOADING
+    // ═══════════════════════════════════════════════════════════════
+    async function fetchJSON(url) {
+        const r = await fetch(url + '?t=' + Date.now());
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+        return r.json();
+    }
+
+    async function loadAllData() {
+        try {
+            const [summary, daily, scores, entities, datesIndex] = await Promise.all([
+                fetchJSON(`${BASE}accuracy_summary.json`),
+                fetchJSON(`${BASE}daily_accuracy.json`),
+                fetchJSON(`${BASE}entity_scores.json`),
+                fetchJSON(`${BASE}entity_list.json`),
+                fetchJSON(`${BASE}entity_dates_index.json`).catch(() => null),
+            ]);
+            State.accuracySummary = summary;
+            State.dailyAccuracy = daily;
+            State.entityScores = scores;
+            State.entityList = entities;
+            State.entityDatesIndex = datesIndex;
+
+            renderAccuracyOverview();
+            renderDailyChart();
+            renderParkComparison();
+            populateParkDropdown();
+            populateEntityDropdown();
+            renderScoreboard();
+            updateTimestamp();
+        } catch (e) {
+            console.error('Load error:', e);
+        }
+    }
+
+    function updateTimestamp() {
+        const now = new Date();
+        document.getElementById('lastUpdate').textContent =
+            now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PANEL 1: ACCURACY OVERVIEW
+    // ═══════════════════════════════════════════════════════════════
+    function renderAccuracyOverview() {
+        const s = State.accuracySummary;
+        if (!s) return;
+
+        const biasColor = s.overall_bias > 0 ? '' : 'green';
+        const maeColor = s.overall_mae < 8 ? 'green' : s.overall_mae <= 15 ? '' : 'red';
+
+        document.getElementById('bigNumbers').innerHTML = `
+            <div class="big-number-card">
+                <div class="num ${maeColor}">${s.overall_mae.toFixed(1)}</div>
+                <div class="lbl">Overall MAE</div>
+                <div class="sub">min avg error</div>
+            </div>
+            <div class="big-number-card">
+                <div class="num ${biasColor}">${s.overall_bias > 0 ? '+' : ''}${s.overall_bias.toFixed(1)}</div>
+                <div class="lbl">Bias</div>
+                <div class="sub">${s.overall_bias > 0 ? 'over-predicting' : 'under-predicting'}</div>
+            </div>
+            <div class="big-number-card">
+                <div class="num">${s.overall_rmse.toFixed(1)}</div>
+                <div class="lbl">RMSE</div>
+                <div class="sub">root mean sq error</div>
+            </div>
+            <div class="big-number-card">
+                <div class="num">${s.entities_evaluated}</div>
+                <div class="lbl">Entities</div>
+                <div class="sub">rides tracked</div>
+            </div>
+            <div class="big-number-card">
+                <div class="num">${s.dates_evaluated}</div>
+                <div class="lbl">Days Eval</div>
+                <div class="sub">${s.first_eval_date} → ${s.last_eval_date}</div>
+            </div>
+            <div class="big-number-card">
+                <div class="num ${s.mae_1day < s.overall_mae ? 'green' : 'orange'}">${s.mae_1day.toFixed(1)}</div>
+                <div class="lbl">1-Day MAE</div>
+                <div class="sub">most recent day</div>
+            </div>
+        `;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PANEL 2: DAILY ACCURACY TREND
+    // ═══════════════════════════════════════════════════════════════
+    function renderDailyChart() {
+        const data = State.dailyAccuracy;
+        if (!data || data.length === 0) return;
+
+        const recent = data.slice(-30);
+        const labels = recent.map(d => {
+            const parts = d.park_date.split('-');
+            return `${parts[1]}/${parts[2]}`;
+        });
+        const maeValues = recent.map(d => d.mae);
+        const biasValues = recent.map(d => d.bias);
+
+        if (State.charts.dailyMae) State.charts.dailyMae.destroy();
+
+        const ctx = document.getElementById('dailyMaeChart').getContext('2d');
+        State.charts.dailyMae = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'MAE',
+                        data: maeValues,
+                        borderColor: '#4a90a4',
+                        backgroundColor: 'rgba(74,144,164,0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#4a90a4',
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Bias',
+                        data: biasValues,
+                        borderColor: '#f87171',
+                        backgroundColor: 'rgba(248,113,113,0.05)',
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#f87171',
+                        borderWidth: 1.5,
+                        borderDash: [4, 4],
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255,255,255,0.6)',
+                            font: { family: "'JetBrains Mono'", size: 11 },
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(10,22,40,0.95)',
+                        borderColor: 'rgba(74,144,164,0.4)',
+                        borderWidth: 1,
+                        titleFont: { family: "'JetBrains Mono'", size: 12 },
+                        bodyFont: { family: "'JetBrains Mono'", size: 11 },
+                        titleColor: '#4a90a4',
+                        bodyColor: '#fff',
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} min`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 10 } },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                    },
+                    y: {
+                        ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 10 } },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        title: {
+                            display: true,
+                            text: 'Minutes',
+                            color: 'rgba(255,255,255,0.4)',
+                            font: { family: "'JetBrains Mono'", size: 10 },
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PANEL 3: PARK ACCURACY COMPARISON (NEW)
+    // ═══════════════════════════════════════════════════════════════
+    function renderParkComparison() {
+        const scores = State.entityScores;
+        if (!scores) return;
+
+        // Group by park, calculate averages
+        const parkMap = {};
+        scores.forEach(s => {
+            if (!parkMap[s.park]) parkMap[s.park] = { totalMae: 0, totalBias: 0, count: 0, totalDays: 0 };
+            parkMap[s.park].totalMae += s.avg_mae;
+            parkMap[s.park].totalBias += s.avg_bias;
+            parkMap[s.park].count++;
+            parkMap[s.park].totalDays += s.n_days;
+        });
+
+        const parks = Object.entries(parkMap)
+            .map(([name, data]) => ({
+                name,
+                avgMae: data.totalMae / data.count,
+                avgBias: data.totalBias / data.count,
+                entities: data.count,
+            }))
+            .sort((a, b) => a.avgMae - b.avgMae);
+
+        const labels = parks.map(p => p.name);
+        const maeData = parks.map(p => parseFloat(p.avgMae.toFixed(1)));
+        const biasData = parks.map(p => parseFloat(p.avgBias.toFixed(1)));
+
+        if (State.charts.parkComparison) State.charts.parkComparison.destroy();
+
+        const ctx = document.getElementById('parkComparisonChart').getContext('2d');
+        State.charts.parkComparison = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Avg MAE',
+                        data: maeData,
+                        backgroundColor: parks.map(p => {
+                            if (p.avgMae < 8) return 'rgba(74,222,128,0.6)';
+                            if (p.avgMae <= 15) return 'rgba(250,204,21,0.6)';
+                            return 'rgba(248,113,113,0.6)';
+                        }),
+                        borderColor: parks.map(p => {
+                            if (p.avgMae < 8) return '#4ade80';
+                            if (p.avgMae <= 15) return '#facc15';
+                            return '#f87171';
+                        }),
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Avg Bias',
+                        data: biasData,
+                        backgroundColor: 'rgba(74,144,164,0.4)',
+                        borderColor: '#4a90a4',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255,255,255,0.6)',
+                            font: { family: "'JetBrains Mono'", size: 11 },
+                            usePointStyle: true,
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(10,22,40,0.95)',
+                        borderColor: 'rgba(74,144,164,0.4)',
+                        borderWidth: 1,
+                        titleFont: { family: "'JetBrains Mono'", size: 12 },
+                        bodyFont: { family: "'JetBrains Mono'", size: 11 },
+                        titleColor: '#4a90a4',
+                        bodyColor: '#fff',
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {
+                            afterTitle: (items) => {
+                                const parkName = items[0].label;
+                                const park = parks.find(p => p.name === parkName);
+                                return park ? `${park.entities} entities` : '';
+                            },
+                            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.x.toFixed(1)} min`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 10 } },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        title: {
+                            display: true,
+                            text: 'Minutes',
+                            color: 'rgba(255,255,255,0.4)',
+                            font: { family: "'JetBrains Mono'", size: 10 },
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: 'rgba(255,255,255,0.7)',
+                            font: { family: "'JetBrains Mono'", size: 11 },
+                        },
+                        grid: { display: false },
+                    }
+                }
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PANEL 4: ENTITY EXPLORER
+    // ═══════════════════════════════════════════════════════════════
+    function populateParkDropdown() {
+        const list = State.entityList || [];
+        const parks = [...new Set(list.map(e => e.park))].sort();
+        const sel = document.getElementById('parkSelect');
+        sel.innerHTML = '<option value="">All Parks</option>' +
+            parks.map(p => `<option value="${p}">${p}</option>`).join('');
+    }
+
+    function populateEntityDropdown() {
+        const sel = document.getElementById('entitySelect');
+        const list = State.entityList || [];
+        const parkFilter = State.selectedPark;
+
+        // Group by park
+        const byPark = {};
+        list.forEach(e => {
+            if (parkFilter && e.park !== parkFilter) return;
+            if (!byPark[e.park]) byPark[e.park] = [];
+            byPark[e.park].push(e);
+        });
+
+        let html = '<option value="">Select an entity...</option>';
+        Object.keys(byPark).sort().forEach(park => {
+            html += `<optgroup label="${park}">`;
+            byPark[park].sort((a, b) => a.name.localeCompare(b.name)).forEach(e => {
+                html += `<option value="${e.entity_code}">${e.name} (${e.entity_code})</option>`;
+            });
+            html += '</optgroup>';
+        });
+        sel.innerHTML = html;
+
+        // Restore selection if still valid
+        if (State.selectedEntity) {
+            const exists = list.find(e => e.entity_code === State.selectedEntity);
+            if (exists && (!parkFilter || exists.park === parkFilter)) {
+                sel.value = State.selectedEntity;
+            }
+        }
+    }
+
+    function populateDateDropdown(entityCode) {
+        const sel = document.getElementById('dateSelect');
+        const dates = (State.entityDatesIndex && State.entityDatesIndex[entityCode]) || [];
+        if (dates.length === 0) {
+            sel.innerHTML = '<option value="">No dates available</option>';
+            return;
+        }
+        const sorted = [...dates].sort().reverse();
+        sel.innerHTML = sorted.map(d => `<option value="${d}">${d}</option>`).join('');
+        sel.value = sorted[0];
+    }
+
+    function onParkChange() {
+        State.selectedPark = document.getElementById('parkSelect').value;
+        populateEntityDropdown();
+        // Clear date and curve
+        document.getElementById('dateSelect').innerHTML = '<option value="">Select entity first...</option>';
+        renderEntityCurveEmpty();
+    }
+
+    function onEntityChange() {
+        const entity = document.getElementById('entitySelect').value;
+        if (!entity) {
+            document.getElementById('dateSelect').innerHTML = '<option value="">Select entity first...</option>';
+            renderEntityCurveEmpty();
+            return;
+        }
+        State.selectedEntity = entity;
+        populateDateDropdown(entity);
+        loadEntityCurve();
+    }
+
+    async function loadEntityCurve() {
+        const entity = document.getElementById('entitySelect').value;
+        const date = document.getElementById('dateSelect').value;
+        if (!entity || !date) {
+            renderEntityCurveEmpty();
+            return;
+        }
+
+        State.selectedEntity = entity;
+        State.selectedDate = date;
+
+        try {
+            const url = `${BASE}entity_curves/${entity}/${date}.json`;
+            const data = await fetchJSON(url);
+            renderEntityCurve(data);
+        } catch (e) {
+            renderEntityCurveEmpty();
+        }
+    }
+
+    function renderEntityCurve(data) {
+        if (!data || data.length === 0) {
+            renderEntityCurveEmpty();
+            return;
+        }
+
+        const labels = data.map(d => {
+            const parts = d.time_slot.split(':');
+            return `${parts[0]}:${parts[1]}`;
+        });
+        const forecast = data.map(d => d.forecast_wait);
+        const actual = data.map(d => d.actual_wait);
+
+        if (State.charts.entityCurve) State.charts.entityCurve.destroy();
+
+        const ctx = document.getElementById('entityCurveChart').getContext('2d');
+        State.charts.entityCurve = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Forecast',
+                        data: forecast,
+                        borderColor: '#4a90a4',
+                        backgroundColor: 'rgba(74,144,164,0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Actual',
+                        data: actual,
+                        borderColor: '#fb923c',
+                        backgroundColor: 'rgba(251,146,60,0.05)',
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255,255,255,0.6)',
+                            font: { family: "'JetBrains Mono'", size: 10 },
+                            usePointStyle: true,
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(10,22,40,0.95)',
+                        borderColor: 'rgba(74,144,164,0.4)',
+                        borderWidth: 1,
+                        titleFont: { family: "'JetBrains Mono'", size: 11 },
+                        bodyFont: { family: "'JetBrains Mono'", size: 10 },
+                        titleColor: '#4a90a4',
+                        bodyColor: '#fff',
+                        padding: 8,
+                        cornerRadius: 6,
+                        callbacks: {
+                            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} min`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'rgba(255,255,255,0.4)',
+                            font: { family: "'JetBrains Mono'", size: 9 },
+                            maxTicksLimit: 12,
+                        },
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                    },
+                    y: {
+                        ticks: { color: 'rgba(255,255,255,0.4)', font: { family: "'JetBrains Mono'", size: 9 } },
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        title: {
+                            display: true,
+                            text: 'Wait (min)',
+                            color: 'rgba(255,255,255,0.4)',
+                            font: { family: "'JetBrains Mono'", size: 9 },
+                        }
+                    }
+                }
+            }
+        });
+
+        // Compute stats
+        let totalAbsErr = 0, totalSignedErr = 0, count = 0;
+        data.forEach(d => {
+            if (d.actual_wait != null && d.forecast_wait != null) {
+                totalAbsErr += Math.abs(d.forecast_wait - d.actual_wait);
+                totalSignedErr += (d.forecast_wait - d.actual_wait);
+                count++;
+            }
+        });
+        document.getElementById('expMAE').textContent = count ? (totalAbsErr / count).toFixed(1) : '—';
+        document.getElementById('expBias').textContent = count ? ((totalSignedErr / count) > 0 ? '+' : '') + (totalSignedErr / count).toFixed(1) : '—';
+        document.getElementById('expSlots').textContent = count || '—';
+    }
+
+    function renderEntityCurveEmpty() {
+        if (State.charts.entityCurve) State.charts.entityCurve.destroy();
+        State.charts.entityCurve = null;
+        document.getElementById('expMAE').textContent = '—';
+        document.getElementById('expBias').textContent = '—';
+        document.getElementById('expSlots').textContent = '—';
+        const canvas = document.getElementById('entityCurveChart');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = '13px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('Select an entity + date to view curves', canvas.width / 2, canvas.height / 2);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PANEL 5: ENTITY SCOREBOARD
+    // ═══════════════════════════════════════════════════════════════
+    function maeClass(mae) {
+        if (mae < 8) return 'mae-green';
+        if (mae <= 15) return 'mae-yellow';
+        return 'mae-red';
+    }
+
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function renderScoreboard() {
+        const scores = State.entityScores;
+        if (!scores) return;
+
+        const { col, asc } = State.scoreboardSort;
+        const filter = State.scoreboardFilter.toLowerCase();
+
+        let filtered = scores;
+        if (filter) {
+            filtered = scores.filter(s =>
+                s.entity_code.toLowerCase().includes(filter) ||
+                s.name.toLowerCase().includes(filter) ||
+                s.park.toLowerCase().includes(filter)
+            );
+        }
+
+        // Sort
+        filtered = [...filtered].sort((a, b) => {
+            let va = a[col], vb = b[col];
+            if (typeof va === 'string') {
+                return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+            }
+            return asc ? (va - vb) : (vb - va);
+        });
+
+        const tbody = document.getElementById('scoreboardBody');
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No entities match</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(s => `
+            <tr data-entity="${s.entity_code}" onclick="selectEntityFromScoreboard('${s.entity_code}')">
+                <td><code>${escHtml(s.entity_code)}</code></td>
+                <td class="name-cell" title="${escHtml(s.name)}">${escHtml(s.name)}</td>
+                <td class="park-cell">${escHtml(s.park)}</td>
+                <td class="${maeClass(s.avg_mae)}">${s.avg_mae.toFixed(1)}</td>
+                <td>${s.avg_bias > 0 ? '+' : ''}${s.avg_bias.toFixed(1)}</td>
+                <td>${s.n_days}</td>
+            </tr>
+        `).join('');
+
+        // Update header sort indicators
+        document.querySelectorAll('#scoreboardTable th').forEach(th => {
+            const c = th.dataset.col;
+            th.classList.toggle('sorted', c === col);
+            const arrow = th.querySelector('.sort-arrow');
+            if (c === col) {
+                arrow.textContent = asc ? '↑' : '↓';
+            } else {
+                arrow.textContent = '↕';
+            }
+        });
+    }
+
+    function selectEntityFromScoreboard(entityCode) {
+        // Find the entity's park so we can set the park filter
+        const entity = (State.entityList || []).find(e => e.entity_code === entityCode);
+        if (entity) {
+            State.selectedPark = entity.park;
+            document.getElementById('parkSelect').value = entity.park;
+            populateEntityDropdown();
+        }
+
+        document.getElementById('entitySelect').value = entityCode;
+        State.selectedEntity = entityCode;
+        populateDateDropdown(entityCode);
+        loadEntityCurve();
+
+        // Scroll explorer into view
+        document.getElementById('panelExplorer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // EVENT LISTENERS
+    // ═══════════════════════════════════════════════════════════════
+    document.getElementById('parkSelect').addEventListener('change', onParkChange);
+    document.getElementById('entitySelect').addEventListener('change', onEntityChange);
+    document.getElementById('dateSelect').addEventListener('change', loadEntityCurve);
+
+    // Scoreboard sort
+    document.querySelectorAll('#scoreboardTable th').forEach(th => {
+        th.addEventListener('click', () => {
+            const col = th.dataset.col;
+            if (!col) return;
+            if (State.scoreboardSort.col === col) {
+                State.scoreboardSort.asc = !State.scoreboardSort.asc;
+            } else {
+                State.scoreboardSort.col = col;
+                State.scoreboardSort.asc = true;
+            }
+            renderScoreboard();
+        });
+    });
+
+    // Scoreboard search
+    document.getElementById('scoreboardSearch').addEventListener('input', (e) => {
+        State.scoreboardFilter = e.target.value;
+        renderScoreboard();
+    });
+
+    // ═══════════════════════════════════════════════════════════════
+    // INIT & AUTO-REFRESH
+    // ═══════════════════════════════════════════════════════════════
+    async function init() {
+        await loadAllData();
+        // Auto-refresh every 60s
+        setInterval(async () => {
+            await loadAllData();
+        }, 60000);
+    }
+
+    init();
+    </script>
+</body>
+</html>
