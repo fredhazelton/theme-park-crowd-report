@@ -30,6 +30,20 @@ while [ $RETRY -lt $MAX_RETRIES ]; do
             echo "$(date) — Completeness check: OK" | tee -a "$LOG"
         fi
         
+        # Export analytics JSONs for The Quarry dashboard
+        echo "$(date) — Exporting analytics data for The Quarry..." | tee -a "$LOG"
+        .venv/bin/python3 scripts/generate_analytics_json.py >> "$LOG" 2>&1
+        if [ $? -eq 0 ]; then
+            echo "$(date) — Analytics export: OK" | tee -a "$LOG"
+            # Push to GitHub Pages
+            git add docs/analytics-data/ >> "$LOG" 2>&1
+            git commit -m "Auto-update analytics data (post-pipeline)" --no-verify >> "$LOG" 2>&1
+            git push >> "$LOG" 2>&1
+            echo "$(date) — Analytics data pushed to GitHub Pages" | tee -a "$LOG"
+        else
+            echo "$(date) — Analytics export: FAILED (non-blocking)" | tee -a "$LOG"
+        fi
+        
         echo "$(date) — Full v4 pipeline complete!" | tee -a "$LOG"
         exit 0
     fi
