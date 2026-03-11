@@ -83,7 +83,7 @@
         "days_evaluated": 25
     },
     "ask_analytics": {
-        "total_questions": 70,
+        "total_questions": 72,
         "unique_users": 20,
         "thumbs_up": 6,
         "thumbs_down": 0,
@@ -120,5 +120,5 @@
         "db_live_waits": 123560888,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-11T08:45:04.828664"
+    "last_updated": "2026-03-11T09:00:04.455213"
 }
