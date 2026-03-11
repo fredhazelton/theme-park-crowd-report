@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T16:15:01Z",
+  "generated_at": "2026-03-11T16:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T15:00:05.473000+00:00"
+          "last_active": "2026-03-11T16:27:46.149000+00:00"
         }
       ]
     },
@@ -164,10 +164,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Hey \u2014 marketing sprint check-in! Your Reddit targets are in #content-ideas and today's WTI animation is in #content-review. 30 min, that's it. The pipeline stuff can wait \u2014 growth can't. \ud83e\uddb4",
-      "timestamp": "2026-03-11T15:00:05.473000+00:00",
-      "message_id": "1481305722078625924",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481305722078625924"
+      "message": "Nice work on the Reddit replies! \ud83c\udf89\n\nRight \u2014 the Instagram \u2194 Facebook linking saga. Last time we tried, you kept hitting that blank page on Meta's developer portal. We landed on **Plan B**: skip the...",
+      "timestamp": "2026-03-11T16:27:46.149000+00:00",
+      "message_id": "1481327786953281618",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481327786953281618"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Thanks ! We did a couple reddit replies this morning - I shoudl revisit the instagram -> facebook problem",
+      "timestamp": "2026-03-11T16:27:21.588000+00:00",
+      "message_id": "1481327683936981032",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481327683936981032"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Good morning, Fred! \u2615\n\nTime for your daily Barney check-in \u2014 open up claude.ai and say hi to our Chief of Pipeline.\n\n**He's got 7 open pipeline items** waiting for your eyes. The big ones needing d...",
-      "timestamp": "2026-03-11T14:00:12.196000+00:00",
-      "message_id": "1481290650782793791",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481290650782793791"
+      "message": "Hey \u2014 marketing sprint check-in! Your Reddit targets are in #content-ideas and today's WTI animation is in #content-review. 30 min, that's it. The pipeline stuff can wait \u2014 growth can't. \ud83e\uddb4",
+      "timestamp": "2026-03-11T15:00:05.473000+00:00",
+      "message_id": "1481305722078625924",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481305722078625924"
     },
     {
       "channel": "morning-briefing",
@@ -223,17 +234,6 @@
       "timestamp": "2026-03-11T10:30:41.554000+00:00",
       "message_id": "1481237925688508419",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237925688508419"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Based on my heartbeat checks, I found one **critical** issue that required alerting:\n\n\ud83d\udea8 **Pipeline outputs are stale** - WTI and forecast data are 28 hours old (threshold: 26h). This has been repor...",
-      "timestamp": "2026-03-11T08:22:49.487000+00:00",
-      "message_id": "1481205746707468430",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481205746707468430"
     },
     {
       "channel": "mission-control",
