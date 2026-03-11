@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T01:45:01Z",
+  "generated_at": "2026-03-11T02:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T01:21:11.337000+00:00"
+          "last_active": "2026-03-11T01:50:44.201000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174488 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T01:50:44.201000+00:00",
+      "message_id": "1481107074506162277",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481107074506162277"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "OK Fred \u2014 here's the full picture of what happened and what I did:\n\n**Two-part fix:**\n1. \u2705 **Prevented future bloat** \u2014 converted 10 cron jobs from `main` \u2192 `isolated` sessions (done earlier)\n2. \u2705 ...",
       "timestamp": "2026-03-11T01:21:11.337000+00:00",
       "message_id": "1481099638575468765",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-11T01:21:11.203000+00:00",
       "message_id": "1481099638013427813",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481099638013427813"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now restart the gateway so it picks up the fresh session:",
-      "timestamp": "2026-03-11T01:20:28.701000+00:00",
-      "message_id": "1481099459747381261",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481099459747381261"
     },
     {
       "channel": "mission-control",
