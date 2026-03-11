@@ -3,27 +3,27 @@
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
+            "task": "Fix Arnold morning briefing (#morning-briefing dead since Mar 6)"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Fix pipeline_state.json staleness (frozen at Mar 8)"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Reddit promotion for WTI article (actual post)"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
             "task": "Content: Thanksgiving 2026 Crowd Predictions"
         },
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
             "task": "Fix Firecrawl async API bug"
-        },
-        {
-            "status_class": "high",
-            "status_text": "\ud83d\udeab Blocked",
-            "task": "Afternoon prediction tweets (ON HOLD)"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "Model Competition Framework"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "Pipeline Twins / Blue-Green Deploy for bot"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123465112,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-11T02:30:04.397711"
+    "last_updated": "2026-03-11T02:45:04.974403"
 }

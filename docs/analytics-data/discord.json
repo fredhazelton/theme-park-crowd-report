@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T06:30:01Z",
+  "generated_at": "2026-03-11T06:45:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T06:01:50.188000+00:00"
+          "last_active": "2026-03-11T06:31:50.151000+00:00"
         }
       ]
     },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-10T19:38:41.310000+00:00"
+          "last_active": "2026-03-11T06:33:10.473000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**Board status:** 51 tasks (36 done, 13 todo, 1 backlog, 1 blocked) | **Stale:** 0",
+      "timestamp": "2026-03-11T06:33:10.473000+00:00",
+      "message_id": "1481178152322596925",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481178152322596925"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\udd95 **Dino Work Session \u2014 March 11, 2026 AM**\n\n**Gazoo grade:** 5/10\n> \"The board exists but isn't driving action.\"\n\n**Fixed from Gazoo critique:**\n- Updated task-040 notes \u2014 clarified v4 deployed gl...",
+      "timestamp": "2026-03-11T06:33:10.230000+00:00",
+      "message_id": "1481178151303254087",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481178151303254087"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175117 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T06:31:50.151000+00:00",
+      "message_id": "1481177815427842082",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481177815427842082"
+    },
+    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -214,17 +247,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481170222504349717"
     },
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174832 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T05:55:54.298000+00:00",
-      "message_id": "1481168773124849704",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481168773124849704"
-    },
-    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -267,28 +289,6 @@
       "timestamp": "2026-03-10T19:38:41.310000+00:00",
       "message_id": "1481013445515149413",
       "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481013445515149413"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "```\n| Time | What                                              |\n| ---- | ------------------------------------------------- |\n| 6:00 | \ud83e\udd95 Dino sprint \u2192 task management improvements     |\n| 6:30 | \ud83d\udcf0 ...",
-      "timestamp": "2026-03-10T19:38:41.125000+00:00",
-      "message_id": "1481013444739203279",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481013444739203279"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "All built! Here's the complete daily machine:\n\n**\ud83c\udf19 Overnight \u2014 Gazoo Review + Bug Fixes**\n\n```\n| Time   | What                                                |\n| ------ | --------------------------...",
-      "timestamp": "2026-03-10T19:38:41.028000+00:00",
-      "message_id": "1481013444332359771",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481013444332359771"
     },
     {
       "channel": "pipeline",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 3,
-    "messages_today": 9
+    "active_channels_today": 4,
+    "messages_today": 11
   }
 }
