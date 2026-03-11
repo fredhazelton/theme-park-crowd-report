@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T02:00:01Z",
+  "generated_at": "2026-03-11T02:15:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T01:50:44.201000+00:00"
+          "last_active": "2026-03-11T02:12:07.845000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174488 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T01:50:44.201000+00:00",
-      "message_id": "1481107074506162277",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481107074506162277"
+      "message": "OK Fred, I've dug into this. Here's what's happening:\n\n**The problem:** When `/ask` gets a question about ride-level wait times, Claude issues queries against the `forecasts` table which has **64 m...",
+      "timestamp": "2026-03-11T02:12:07.845000+00:00",
+      "message_id": "1481112458499325992",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481112458499325992"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "OK Fred \u2014 here's the full picture of what happened and what I did:\n\n**Two-part fix:**\n1. \u2705 **Prevented future bloat** \u2014 converted 10 cron jobs from `main` \u2192 `isolated` sessions (done earlier)\n2. \u2705 ...",
-      "timestamp": "2026-03-11T01:21:11.337000+00:00",
-      "message_id": "1481099638575468765",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481099638575468765"
+      "message": "OK the bot print statements aren't getting to the journal for some reason. Let me check if there are recent `/ask` errors another way, and then focus on the fix. I know the root cause.",
+      "timestamp": "2026-03-11T02:10:34.853000+00:00",
+      "message_id": "1481112068462481408",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481112068462481408"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Back online. Now let me clean up those 4 new error messages and my narration clutter from earlier, then we wait for the next heartbeat to confirm it works.",
-      "timestamp": "2026-03-11T01:21:11.203000+00:00",
-      "message_id": "1481099638013427813",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481099638013427813"
+      "message": "The bot's stdout logging isn't getting captured in journald. Let me check the bot startup.",
+      "timestamp": "2026-03-11T02:10:26.856000+00:00",
+      "message_id": "1481112034920632522",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481112034920632522"
     },
     {
       "channel": "mission-control",
