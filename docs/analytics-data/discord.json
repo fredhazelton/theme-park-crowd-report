@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T02:45:01Z",
+  "generated_at": "2026-03-11T03:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T02:20:43.689000+00:00"
+          "last_active": "2026-03-11T02:50:43.917000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174574 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T02:50:43.917000+00:00",
+      "message_id": "1481122172809248799",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481122172809248799"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174531 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-11T02:20:43.689000+00:00",
       "message_id": "1481114622106009620",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-11T02:12:07.845000+00:00",
       "message_id": "1481112458499325992",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481112458499325992"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "OK the bot print statements aren't getting to the journal for some reason. Let me check if there are recent `/ask` errors another way, and then focus on the fix. I know the root cause.",
-      "timestamp": "2026-03-11T02:10:34.853000+00:00",
-      "message_id": "1481112068462481408",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481112068462481408"
     },
     {
       "channel": "mission-control",
