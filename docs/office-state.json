@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-11T07:09:02.813293+00:00",
+  "updated": "2026-03-11T08:32:56.642253+00:00",
   "agents": [
     {
       "id": "fred",
@@ -16,7 +16,7 @@
       "icon": "🦴",
       "state": "working",
       "zone": "desk-1",
-      "task": "Arnold AM session: morning briefing + feed improvements",
+      "task": "heartbeat check",
       "color": "#4a90a4"
     },
     {
@@ -77,9 +77,9 @@
       "id": "mr-slate",
       "name": "Mr. Slate",
       "icon": "💼",
-      "state": "idle",
-      "zone": "offsite",
-      "task": "Off the clock",
+      "state": "working",
+      "zone": "corner-office",
+      "task": "AM work session: competitive pricing research, pricing strategy v1 draft, business plan update",
       "color": "#a78bfa"
     }
   ],
