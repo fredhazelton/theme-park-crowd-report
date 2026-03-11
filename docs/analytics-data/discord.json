@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T23:45:01Z",
+  "generated_at": "2026-03-11T00:00:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-10T23:24:25.983000+00:00"
+          "last_active": "2026-03-11T00:00:01.771000+00:00"
         }
       ]
     },
@@ -164,32 +164,32 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174359 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T00:00:01.771000+00:00",
+      "message_id": "1481079214135578695",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481079214135578695"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174151 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-10T23:54:13.946000+00:00",
+      "message_id": "1481077755251654777",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481077755251654777"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "\u2705 **#the-quarry** added to config + TOOLS.md. I can see it now \u2014 the analytics dashboard pivot channel. \ud83e\udea8\u26cf\ufe0f",
       "timestamp": "2026-03-10T23:24:25.983000+00:00",
       "message_id": "1481070255991423016",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481070255991423016"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Back online! Let me update TOOLS.md with the new channel.",
-      "timestamp": "2026-03-10T23:24:25.642000+00:00",
-      "message_id": "1481070254561165412",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481070254561165412"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The errors were happening because every cron job was like a houseguest that never left \u2014 they'd check in, do their work, and leave all their luggage in the main session forever. Now they get their ...",
-      "timestamp": "2026-03-10T23:23:50.755000+00:00",
-      "message_id": "1481070108234354800",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481070108234354800"
     },
     {
       "channel": "mission-control",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 7,
-    "messages_today": 18
+    "active_channels_today": 1,
+    "messages_today": 1
   }
 }
