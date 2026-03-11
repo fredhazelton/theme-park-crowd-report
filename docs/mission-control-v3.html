@@ -20,7 +20,9 @@
             --border-accent: rgba(74,144,164,0.3);
             --accent: #4a90a4;
             --accent-light: #6bb5c9;
-            --accent-red: #f87171;
+            --accent-red: #A60038;
+            --accent-red-light: #f87171;
+            --accent-cyan-bright: #22d3ee;
             --accent-orange: #fb923c;
             --accent-green: #4ade80;
             --accent-yellow: #facc15;
@@ -295,7 +297,7 @@
         }
         .status-badge.high {
             background: rgba(248,113,113,0.15);
-            color: var(--accent-red);
+            color: var(--accent-red-light);
             border: 1px solid rgba(248,113,113,0.2);
         }
 
@@ -428,7 +430,7 @@
             font-weight: 700;
             color: var(--accent-light);
         }
-        .big-number-card .num.red { color: var(--accent-red); }
+        .big-number-card .num.red { color: var(--accent-red-light); }
         .big-number-card .num.green { color: var(--accent-green); }
         .big-number-card .lbl {
             font-size: 11px;
@@ -621,7 +623,7 @@
         }
         .mae-green { color: var(--accent-green); }
         .mae-yellow { color: var(--accent-yellow); }
-        .mae-red { color: var(--accent-red); }
+        .mae-red { color: var(--accent-red-light); }
 
         /* Two-column layout for explorer + scoreboard */
         .analytics-bottom {
@@ -836,7 +838,7 @@
             font-weight: 600;
         }
         .task-owner-badge.Fred { background: rgba(96,165,250,0.2); color: #60a5fa; }
-        .task-owner-badge.Wilma { background: rgba(34,211,238,0.2); color: #22d3ee; }
+        .task-owner-badge.Wilma { background: rgba(34,211,238,0.2); color: var(--accent-cyan-bright); }
         .task-owner-badge.Bam-Bam { background: rgba(251,146,60,0.2); color: #fb923c; }
         .task-owner-badge.Mr-Slate { background: rgba(251,146,60,0.2); color: #fb923c; }
         .priority-dot {
@@ -939,7 +941,7 @@
             flex-shrink: 0;
         }
         .live-avatar.Fred { background: rgba(96,165,250,0.25); color: #60a5fa; }
-        .live-avatar.Wilma { background: rgba(34,211,238,0.25); color: #22d3ee; }
+        .live-avatar.Wilma { background: rgba(34,211,238,0.25); color: var(--accent-cyan-bright); }
         .live-avatar.Bam-Bam { background: rgba(251,146,60,0.25); color: #fb923c; }
         .live-info { flex: 1; min-width: 0; }
         .live-task-name {
@@ -1057,8 +1059,8 @@
             color: var(--text-secondary);
         }
         .modal-btn.cancel:hover {
-            border-color: var(--accent-red);
-            color: var(--accent-red);
+            border-color: var(--accent-red-light);
+            color: var(--accent-red-light);
         }
         .modal-btn.save {
             background: rgba(74,144,164,0.25);
@@ -1188,7 +1190,7 @@
         }
         .project-status-badge.complete {
             background: rgba(34,211,238,0.15);
-            color: #22d3ee;
+            color: var(--accent-cyan-bright);
             border: 1px solid rgba(34,211,238,0.2);
         }
         .project-card-desc {
@@ -1222,7 +1224,7 @@
         .project-progress-bar .fill.active { background: var(--accent-green); }
         .project-progress-bar .fill.planning { background: var(--accent-yellow); }
         .project-progress-bar .fill.paused { background: rgba(255,255,255,0.3); }
-        .project-progress-bar .fill.complete { background: #22d3ee; }
+        .project-progress-bar .fill.complete { background: var(--accent-cyan-bright); }
         .project-progress-pct {
             font-family: var(--font-mono);
             font-size: 13px;
@@ -1262,7 +1264,7 @@
         }
         .project-priority-badge.high {
             background: rgba(248,113,113,0.15);
-            color: var(--accent-red);
+            color: var(--accent-red-light);
             border: 1px solid rgba(248,113,113,0.2);
         }
         .project-priority-badge.medium {
@@ -1323,13 +1325,13 @@
             border-radius: 20px;
             font-family: var(--font-mono);
             font-size: 12px;
-            color: #22d3ee;
+            color: var(--accent-cyan-bright);
             white-space: nowrap;
         }
         .ar-pill .ar-dot {
             width: 6px; height: 6px;
             border-radius: 50%;
-            background: #22d3ee;
+            background: var(--accent-cyan-bright);
             animation: pulse 2s ease-in-out infinite;
             flex-shrink: 0;
         }
@@ -1916,7 +1918,7 @@
         }
         .idea-status-badge.rejected {
             background: rgba(248,113,113,0.12);
-            color: var(--accent-red);
+            color: var(--accent-red-light);
             border: 1px solid rgba(248,113,113,0.2);
         }
         .idea-card-desc {
@@ -2002,7 +2004,7 @@
             color: var(--accent-green);
         }
         .finance-line-value.cost {
-            color: var(--accent-red);
+            color: var(--accent-red-light);
         }
         .finance-total-row {
             display: flex;
@@ -2076,7 +2078,7 @@
             font-family: var(--font-mono);
         }
         .error-msg {
-            color: var(--accent-red);
+            color: var(--accent-red-light);
             font-family: var(--font-mono);
             font-size: 12px;
             padding: 8px;
@@ -4528,7 +4530,7 @@ function renderIdeas() {
         <div class="big-number-card"><div class="num" style="color:var(--accent-light)">${s.new}</div><div class="lbl">New</div></div>
         <div class="big-number-card"><div class="num" style="color:var(--accent-yellow)">${s.exploring}</div><div class="lbl">Exploring</div></div>
         <div class="big-number-card"><div class="num" style="color:var(--accent-green)">${s.approved}</div><div class="lbl">Approved</div></div>
-        <div class="big-number-card"><div class="num" style="color:var(--accent-red)">${s.rejected}</div><div class="lbl">Rejected</div></div>
+        <div class="big-number-card"><div class="num" style="color:var(--accent-red-light)">${s.rejected}</div><div class="lbl">Rejected</div></div>
     `;
 
     // Filter and render
@@ -4599,7 +4601,7 @@ function renderFinance() {
             <div class="lbl">MRR</div>
         </div>
         <div class="big-number-card">
-            <div class="num" style="color:var(--accent-red)">${escHtml(s.monthly_costs)}</div>
+            <div class="num" style="color:var(--accent-red-light)">${escHtml(s.monthly_costs)}</div>
             <div class="lbl">Monthly Costs</div>
         </div>
         <div class="big-number-card">

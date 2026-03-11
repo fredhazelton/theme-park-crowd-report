@@ -55,6 +55,16 @@
             z-index: 100;
             backdrop-filter: blur(12px);
         }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--accent-red), transparent);
+            opacity: 0.4;
+        }
         .header-left {
             display: flex;
             align-items: center;
@@ -240,6 +250,52 @@
         .footer a:hover { color: var(--accent-light); }
 
         /* ═══════════════════════════════════════════════════
+           LIVE INDICATOR
+           ═══════════════════════════════════════════════════ */
+        .live-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            margin-right: 6px;
+            vertical-align: middle;
+            position: relative;
+        }
+        .live-dot::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0;
+            animation: live-pulse 2s ease-in-out infinite;
+        }
+        @keyframes live-pulse {
+            0%, 100% { opacity: 0; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.6); }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           CARD ANIMATIONS
+           ═══════════════════════════════════════════════════ */
+        @keyframes card-fade-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            animation: card-fade-in 0.4s ease-out both;
+        }
+        .grid .card:nth-child(1) { animation-delay: 0.05s; }
+        .grid .card:nth-child(2) { animation-delay: 0.10s; }
+        .grid .card:nth-child(3) { animation-delay: 0.15s; }
+        .grid .card:nth-child(4) { animation-delay: 0.20s; }
+        .grid .card:nth-child(5) { animation-delay: 0.25s; }
+        .grid .card:nth-child(6) { animation-delay: 0.30s; }
+        .grid .card:nth-child(7) { animation-delay: 0.35s; }
+        .grid .card:nth-child(8) { animation-delay: 0.40s; }
+
+        /* ═══════════════════════════════════════════════════
            SECTION LABELS (inline in JS)
            ═══════════════════════════════════════════════════ */
         .section-label {
@@ -262,6 +318,26 @@
             font-weight: 600;
             color: var(--text-primary);
         }
+
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 14px;
+            }
+            .logo { font-size: 14px; }
+            .logo-sub { font-size: 9px; }
+            .header-right { gap: 8px; }
+            .header-right a { font-size: 10px; padding: 3px 6px; }
+            .container { padding: 14px; }
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .card { padding: 14px 16px; }
+            .card h2 { font-size: 11px; }
+        }
     </style>
 </head>
 <body>
@@ -274,7 +350,7 @@
             </div>
         </div>
         <div class="header-right">
-            <span class="last-updated" id="lastUpdated">Loading…</span>
+            <span class="live-dot" id="liveDot"></span><span class="last-updated" id="lastUpdated">Loading…</span>
             <a href="mission-control-v3.html">v3</a>
             <a href="team.html">Team</a>
             <a href="office.html">Office</a>
@@ -314,6 +390,14 @@
     function render(d) {
         const ts = d.last_updated ? new Date(d.last_updated).toLocaleString() : 'Unknown';
         document.getElementById('lastUpdated').textContent = ts;
+
+        // Live dot color based on data freshness
+        const dot = document.getElementById('liveDot');
+        if (d.last_updated) {
+            const ageMin = (Date.now() - new Date(d.last_updated).getTime()) / 60000;
+            dot.style.background = ageMin < 10 ? 'var(--accent-green)' : ageMin < 30 ? 'var(--accent-yellow)' : 'var(--accent-red-light)';
+            dot.style.setProperty('--dot-color', dot.style.background);
+        }
 
         let html = '';
 

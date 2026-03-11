@@ -4,15 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Wait Time Curve</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0a1628;
+            --bg-secondary: #0f1d32;
+            --bg-card: rgba(255,255,255,0.05);
+            --border-card: rgba(255,255,255,0.1);
+            --border-accent: rgba(74,144,164,0.3);
+            --accent: #4a90a4;
+            --accent-light: #6bb5c9;
+            --accent-red: #A60038;
+            --accent-red-light: #f87171;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --font-text: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0a1628 0%, #0f1d32 100%);
-            color: #e0e0e0;
+            font-family: var(--font-text);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-secondary);
             min-height: 100vh;
             padding: 15px;
         }
@@ -28,21 +46,28 @@
             gap: 10px;
         }
         
-        h1 { font-size: 1.4rem; font-weight: 600; color: #fff; }
+        h1 {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
         
-        .entity-name { font-size: 0.95rem; color: #888; margin-top: 3px; }
+        .entity-name { font-size: 0.95rem; color: var(--text-muted); margin-top: 3px; }
         
         .badge {
-            background: #e17055;
+            background: var(--accent-red);
             color: white;
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 600;
+            font-family: var(--font-mono);
         }
         
         .chart-container {
-            background: #252542;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
             border-radius: 16px;
             padding: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -67,13 +92,14 @@
             align-items: center;
             gap: 6px;
             font-size: 12px;
+            color: var(--text-secondary);
         }
         
         .legend-color { width: 16px; height: 10px; border-radius: 3px; }
         .legend-dot { width: 6px; height: 6px; border-radius: 50%; }
         
-        .predicted-actual { background: linear-gradient(90deg, #74b9ff, #0984e3); }
-        .posted-dots { background: #636e72; }
+        .predicted-actual { background: linear-gradient(90deg, var(--accent-light), var(--accent)); }
+        .posted-dots { background: var(--text-muted); }
         
         .stats {
             display: grid;
@@ -83,20 +109,34 @@
         }
         
         .stat-card {
-            background: #0a1628;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-card);
             border-radius: 10px;
             padding: 12px 8px;
             text-align: center;
         }
         
-        .stat-value { font-size: 1.3rem; font-weight: 700; color: #fff; }
-        .stat-label { font-size: 0.7rem; color: #888; margin-top: 3px; }
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
         
         .date-info {
             text-align: center;
             margin-top: 15px;
             font-size: 0.85rem;
-            color: #666;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
         }
     </style>
 </head>
@@ -205,8 +245,8 @@ const SAMPLE_DATA =
                         label: 'Predicted Actual',
                         data: predictedData,
                         fill: true,
-                        backgroundColor: 'rgba(116, 185, 255, 0.5)',
-                        borderColor: '#74b9ff',
+                        backgroundColor: 'rgba(107, 181, 201, 0.5)',
+                        borderColor: '#6bb5c9',
                         borderWidth: 2,
                         tension: 0.4,
                         pointRadius: 0,
@@ -215,7 +255,7 @@ const SAMPLE_DATA =
                         label: 'Posted Wait',
                         data: postedData,
                         fill: false,
-                        backgroundColor: '#636e72',
+                        backgroundColor: 'rgba(255,255,255,0.4)',
                         borderColor: 'transparent',
                         pointRadius: 3,
                         pointHoverRadius: 5,
@@ -230,10 +270,10 @@ const SAMPLE_DATA =
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#252542',
+                        backgroundColor: 'rgba(15, 29, 50, 0.95)',
                         titleColor: '#fff',
-                        bodyColor: '#e0e0e0',
-                        borderColor: '#3a3a5c',
+                        bodyColor: 'rgba(255,255,255,0.7)',
+                        borderColor: 'rgba(255,255,255,0.1)',
                         borderWidth: 1,
                         padding: 12,
                         callbacks: {
@@ -247,12 +287,12 @@ const SAMPLE_DATA =
                         type: 'time',
                         time: { unit: 'hour', displayFormats: { hour: 'h a' } },
                         grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#888', maxRotation: 0 }
+                        ticks: { color: 'rgba(255,255,255,0.4)', maxRotation: 0 }
                     },
                     y: {
                         beginAtZero: true,
                         grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#888', callback: (v) => v + ' min' }
+                        ticks: { color: 'rgba(255,255,255,0.4)', callback: (v) => v + ' min' }
                     }
                 }
             }

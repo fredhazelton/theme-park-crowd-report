@@ -423,6 +423,27 @@ python src/build_dimensions.py               # Dimensions
 
 *(Wilma: add tasks here. Bam-Bam: work on these and move to Completed when done.)*
 
+### 🟡 FIX: v4 Pipeline Not Updating pipeline_state.json
+
+**Date:** 2026-03-10
+**Priority:** 🟡 MEDIUM — causes false stale alerts in every monitoring tool
+**Flagged by:** Gazoo (5 reviews in a row)
+
+**Problem:** `pipeline_v3/pipeline.py` (our "v4") never calls `scripts/pipeline_state.py` functions (`save_state()`, `record_step()`, `start_run()`). The old `hybrid_pipeline_v2.py` did update these, but v4 doesn't. Result: `/mnt/data/pipeline/state/pipeline_state.json` and `run_manifest.json` go stale after every v4 run.
+
+**Fix:** At the end of `pipeline_v3/pipeline.py` (after PIPELINE COMPLETE), call:
+1. `pipeline_state.start_run()` → creates manifest
+2. `pipeline_state.record_step('training', ran=True, ...)` for each step
+3. `pipeline_state.save_state({...})` with updated timestamps
+
+**Files:**
+- `pipeline_v3/pipeline.py` — needs to import and call `scripts/pipeline_state`
+- `scripts/pipeline_state.py` — STATE_DIR already points to the right place via symlink
+
+**Workaround (Wilma doing manually):** I'm updating the JSON files by hand after runs, but this needs to be automated.
+
+---
+
 ### 🔥 ARCHITECTURE: Shared DuckDB Data Layer + Bot Migration
 
 **Date:** Feb 19, 2026  
