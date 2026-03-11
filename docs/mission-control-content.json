@@ -3,11 +3,6 @@
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
-            "task": "Fix Arnold morning briefing (#morning-briefing dead since Mar 6)"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
             "task": "Fix pipeline_state.json staleness (frozen at Mar 8)"
         },
         {
@@ -24,6 +19,11 @@
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
             "task": "Fix Firecrawl async API bug"
+        },
+        {
+            "status_class": "high",
+            "status_text": "\ud83d\udeab Blocked",
+            "task": "Afternoon prediction tweets (ON HOLD)"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123465112,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-11T03:00:06.945858"
+    "last_updated": "2026-03-11T03:15:06.361043"
 }

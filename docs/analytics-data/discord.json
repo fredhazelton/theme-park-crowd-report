@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T07:00:01Z",
+  "generated_at": "2026-03-11T07:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-11T03:19:39.949000+00:00"
+          "last_active": "2026-03-11T07:00:01.777000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T06:31:50.151000+00:00"
+          "last_active": "2026-03-11T07:05:46.477000+00:00"
         }
       ]
     },
@@ -144,7 +144,7 @@
           "emoji": "\u2600\ufe0f",
           "purpose": "Automated morning briefings \u2014 daily agenda, weather, key metrics",
           "url": "https://discord.com/channels/1479350342318690505/1479351589176082526",
-          "last_active": "2026-03-06T05:38:03.265000+00:00"
+          "last_active": "2026-03-11T07:03:33.553000+00:00"
         },
         {
           "name": "mr-slate",
@@ -158,6 +158,61 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175561 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T07:05:46.477000+00:00",
+      "message_id": "1481186356397867019",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481186356397867019"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175518 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T07:03:55.986000+00:00",
+      "message_id": "1481185892965290064",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481185892965290064"
+    },
+    {
+      "channel": "morning-briefing",
+      "channel_emoji": "\u2600\ufe0f",
+      "channel_id": "1479351589176082526",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2600\ufe0f **Morning Briefing \u2014 Wednesday, March 11, 2026**\n\n**Pipeline:** \u2705 Healthy\n**Last scrape:** ~2026-03-11 03:03 ET (file mtime)\n\n**\ud83d\udcca Today's Crowd Levels (WTI)**\n\ud83c\udff0 WDW: \u26aa **MK** 21.1 \u00b7 \u26aa **EP** 22....",
+      "timestamp": "2026-03-11T07:03:33.553000+00:00",
+      "message_id": "1481185798874206302",
+      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481185798874206302"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175475 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T07:01:15.981000+00:00",
+      "message_id": "1481185221855547464",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481185221855547464"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-11T07:00:01.777000+00:00",
+      "message_id": "1481184910621278219",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481184910621278219"
+    },
     {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
@@ -179,17 +234,6 @@
       "timestamp": "2026-03-11T06:33:10.230000+00:00",
       "message_id": "1481178151303254087",
       "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481178151303254087"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175117 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T06:31:50.151000+00:00",
-      "message_id": "1481177815427842082",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481177815427842082"
     },
     {
       "channel": "gazoo",
@@ -225,28 +269,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481170967396089857"
     },
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174918 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T06:01:50.188000+00:00",
-      "message_id": "1481170265835831336",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481170265835831336"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174875 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T06:01:39.857000+00:00",
-      "message_id": "1481170222504349717",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481170222504349717"
-    },
-    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -267,17 +289,6 @@
       "timestamp": "2026-03-11T03:19:36.066000+00:00",
       "message_id": "1481129437968728125",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481129437968728125"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udccb **Mission Control \u2014 Live Status**\n*Updated by Wilma \u00b7 Last refresh: Mar 10, 2026 11:18 PM ET*\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83c\udfaf **Accuracy Snapshot**\n```\nOverall MAE:  9.4 min    Bias: +2.6 min    RMSE:...",
-      "timestamp": "2026-03-11T03:19:35.642000+00:00",
-      "message_id": "1481129436190474324",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481129436190474324"
     },
     {
       "channel": "wilma",
@@ -366,22 +377,11 @@
       "timestamp": "2026-03-09T17:01:27.322000+00:00",
       "message_id": "1480611488635814088",
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1480611488635814088"
-    },
-    {
-      "channel": "daily-digest",
-      "channel_emoji": "\ud83d\udcf0",
-      "channel_id": "1479351571656474756",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Tomorrow's Candidate:** Fix the pipeline_data_completeness.py monitoring bug to prevent false alarms, or build the Model Competition Framework that Barney requested.",
-      "timestamp": "2026-03-09T09:06:17.002000+00:00",
-      "message_id": "1480491907686600837",
-      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1480491907686600837"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 4,
-    "messages_today": 11
+    "active_channels_today": 5,
+    "messages_today": 12
   }
 }
