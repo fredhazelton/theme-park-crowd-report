@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-generate_analytics_json.py — Build analytics JSON files for Mission Control v3.
+generate_analytics_json.py — Build analytics JSON files for The Quarry dashboard.
 
 Reads from pipeline parquet/JSON files and generates JSON consumable by
-the MC v3 Analytics dashboard.
+the Quarry analytics dashboard (formerly Mission Control v3).
 
 Output files:
   docs/analytics-data/accuracy_summary.json
@@ -11,14 +11,21 @@ Output files:
   docs/analytics-data/entity_scores.json
   docs/analytics-data/entity_list.json
   docs/analytics-data/entity_curves/{entity_code}/{park_date}.json
+  docs/analytics-data/entity_dates_index.json
 """
 
 import json
 import os
 import shutil
+from datetime import date, timedelta
 from pathlib import Path
 
 import pandas as pd
+
+try:
+    import duckdb
+except ImportError:
+    duckdb = None
 
 # ── Paths ─────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -30,6 +37,9 @@ ACCURACY_DIR = Path("/mnt/data/pipeline/accuracy")
 SLOT_PARQUET = ACCURACY_DIR / "slot_accuracy.parquet"
 DAILY_PARQUET = ACCURACY_DIR / "entity_daily_accuracy.parquet"
 SUMMARY_JSON = ACCURACY_DIR / "accuracy_summary.json"
+
+# Fact tables for observation freshness
+PARQUET_DIR = Path("/mnt/data/pipeline/fact_tables/parquet")
 
 ENTITY_NAMES_CSV = Path.home() / "clawd-anthropic" / "entity_short_names_v3.csv"
 HAZEYDATA_ENTITIES = Path("/mnt/data/pipeline/dimension_tables/hazeydata_entities.csv")
@@ -111,8 +121,83 @@ def gen_daily_accuracy(daily: pd.DataFrame, entity_lookup: dict):
     write_json(OUT / "daily_accuracy.json", records)
 
 
-def gen_entity_scores(daily: pd.DataFrame, entity_lookup: dict):
-    """Aggregate by entity → avg MAE, bias, n_days, last_mae."""
+def get_observation_freshness() -> dict:
+    """Query fact table parquets for per-entity observation counts.
+
+    Returns dict[entity_code] → {obs_total, obs_yesterday, obs_last_7d}
+
+    This is the health indicator Fred requested: if obs_yesterday = 0
+    and the entity should be operating, something is wrong with the
+    scraper or data pipeline.
+    """
+    if duckdb is None:
+        print("  ⚠ duckdb not available — skipping observation freshness")
+        return {}
+
+    pq_str = str(PARQUET_DIR).replace("\\", "/")
+    if not PARQUET_DIR.exists() or not list(PARQUET_DIR.glob("*.parquet")):
+        print("  ⚠ No parquet files found — skipping observation freshness")
+        return {}
+
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+    week_ago = (date.today() - timedelta(days=7)).isoformat()
+
+    try:
+        con = duckdb.connect()
+
+        # Total obs per entity (POSTED only — what the scraper collects)
+        total_df = con.execute(f"""
+            SELECT entity_code, COUNT(*) as obs_total
+            FROM read_parquet('{pq_str}/*.parquet')
+            WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
+            GROUP BY entity_code
+        """).fetchdf()
+
+        # Yesterday's obs per entity
+        yesterday_df = con.execute(f"""
+            SELECT entity_code, COUNT(*) as obs_yesterday
+            FROM read_parquet('{pq_str}/*.parquet')
+            WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
+              AND CAST(park_date AS DATE) = DATE '{yesterday}'
+            GROUP BY entity_code
+        """).fetchdf()
+
+        # Last 7 days obs per entity
+        week_df = con.execute(f"""
+            SELECT entity_code, COUNT(*) as obs_last_7d
+            FROM read_parquet('{pq_str}/*.parquet')
+            WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
+              AND CAST(park_date AS DATE) >= DATE '{week_ago}'
+            GROUP BY entity_code
+        """).fetchdf()
+
+        con.close()
+
+        # Merge into lookup
+        total_map = dict(zip(total_df.entity_code, total_df.obs_total))
+        yesterday_map = dict(zip(yesterday_df.entity_code, yesterday_df.obs_yesterday))
+        week_map = dict(zip(week_df.entity_code, week_df.obs_last_7d))
+
+        all_entities = set(total_map.keys())
+        result = {}
+        for entity in all_entities:
+            result[entity] = {
+                "obs_total": int(total_map.get(entity, 0)),
+                "obs_yesterday": int(yesterday_map.get(entity, 0)),
+                "obs_last_7d": int(week_map.get(entity, 0)),
+            }
+
+        print(f"  ✓ Observation freshness: {len(result)} entities, "
+              f"{sum(1 for v in result.values() if v['obs_yesterday'] > 0)} active yesterday")
+        return result
+
+    except Exception as e:
+        print(f"  ⚠ Observation freshness query failed: {e}")
+        return {}
+
+
+def gen_entity_scores(daily: pd.DataFrame, entity_lookup: dict, obs_freshness: dict):
+    """Aggregate by entity → avg MAE, bias, n_days, last_mae + observation freshness."""
     # Get last date per entity for last_mae
     daily_sorted = daily.sort_values("park_date")
     last_rows = daily_sorted.groupby("entity_code").last().reset_index()
@@ -132,24 +217,42 @@ def gen_entity_scores(daily: pd.DataFrame, entity_lookup: dict):
     # Add name + park
     agg["name"] = agg.entity_code.map(lambda c: entity_lookup.get(c, {}).get("name", c))
     agg["park"] = agg.entity_code.map(lambda c: entity_lookup.get(c, {}).get("park", "?"))
+
+    # Add observation freshness
+    agg["obs_total"] = agg.entity_code.map(
+        lambda c: obs_freshness.get(c, {}).get("obs_total", 0))
+    agg["obs_yesterday"] = agg.entity_code.map(
+        lambda c: obs_freshness.get(c, {}).get("obs_yesterday", 0))
+    agg["obs_last_7d"] = agg.entity_code.map(
+        lambda c: obs_freshness.get(c, {}).get("obs_last_7d", 0))
+
     # Round
     for col in ["avg_mae", "avg_bias", "avg_rmse", "last_mae"]:
         agg[col] = agg[col].round(2)
     agg = agg.sort_values("avg_mae")
-    records = agg[["entity_code", "name", "park", "avg_mae", "avg_bias", "avg_rmse", "n_days", "last_mae"]].to_dict(orient="records")
+
+    output_cols = [
+        "entity_code", "name", "park",
+        "avg_mae", "avg_bias", "avg_rmse", "n_days", "last_mae",
+        "obs_total", "obs_yesterday", "obs_last_7d",
+    ]
+    records = agg[output_cols].to_dict(orient="records")
     write_json(OUT / "entity_scores.json", records)
 
 
-def gen_entity_list(daily: pd.DataFrame, entity_lookup: dict):
-    """Build dropdown list of entities."""
+def gen_entity_list(daily: pd.DataFrame, entity_lookup: dict, obs_freshness: dict):
+    """Build dropdown list of entities with observation freshness."""
     entities = sorted(daily.entity_code.unique())
     records = []
     for code in entities:
         info = entity_lookup.get(code, {})
+        obs = obs_freshness.get(code, {})
         records.append({
             "entity_code": code,
             "name": info.get("name", code),
             "park": info.get("park", "?"),
+            "obs_yesterday": obs.get("obs_yesterday", 0),
+            "obs_total": obs.get("obs_total", 0),
         })
     write_json(OUT / "entity_list.json", records)
 
@@ -188,7 +291,7 @@ def gen_entity_curves(slots: pd.DataFrame):
 
 def main():
     print("=" * 60)
-    print("Mission Control v3 — Analytics JSON Generator")
+    print("The Quarry — Analytics JSON Generator")
     print("=" * 60)
 
     print("\nLoading data...")
@@ -201,6 +304,10 @@ def main():
     slots = pd.read_parquet(SLOT_PARQUET)
     print(f"  slot_accuracy: {len(slots):,} rows")
 
+    # NEW: observation freshness from fact tables
+    print("\nQuerying observation freshness...")
+    obs_freshness = get_observation_freshness()
+
     print("\nGenerating JSON files...")
 
     # 1. Accuracy summary
@@ -209,11 +316,11 @@ def main():
     # 2. Daily accuracy
     gen_daily_accuracy(daily, entity_lookup)
 
-    # 3. Entity scores
-    gen_entity_scores(daily, entity_lookup)
+    # 3. Entity scores (now includes obs freshness)
+    gen_entity_scores(daily, entity_lookup, obs_freshness)
 
-    # 4. Entity list
-    gen_entity_list(daily, entity_lookup)
+    # 4. Entity list (now includes obs freshness)
+    gen_entity_list(daily, entity_lookup, obs_freshness)
 
     # 5. Entity curves
     gen_entity_curves(slots)
@@ -222,7 +329,7 @@ def main():
     print(f"   Output: {OUT.relative_to(PROJECT_ROOT)}/")
 
     # Also regenerate pipeline status / MC content JSON
-    print("\nAlso refreshing Mission Control pipeline status...")
+    print("\nAlso refreshing pipeline status...")
     try:
         import subprocess
         subprocess.run(
@@ -232,7 +339,7 @@ def main():
             check=True,
         )
     except Exception as e:
-        print(f"  ⚠ MC content refresh failed: {e}")
+        print(f"  ⚠ Pipeline status refresh failed: {e}")
 
 
 if __name__ == "__main__":
