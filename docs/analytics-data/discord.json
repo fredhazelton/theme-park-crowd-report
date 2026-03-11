@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T11:15:01Z",
+  "generated_at": "2026-03-11T11:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -144,7 +144,7 @@
           "emoji": "\u2600\ufe0f",
           "purpose": "Automated morning briefings \u2014 daily agenda, weather, key metrics",
           "url": "https://discord.com/channels/1479350342318690505/1479351589176082526",
-          "last_active": "2026-03-11T07:03:33.553000+00:00"
+          "last_active": "2026-03-11T11:30:02.740000+00:00"
         },
         {
           "name": "mr-slate",
@@ -158,6 +158,17 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "morning-briefing",
+      "channel_emoji": "\u2600\ufe0f",
+      "channel_id": "1479351589176082526",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2600\ufe0f **Morning Briefing \u2014 Wednesday, March 11, 2026**\n\n**Pipeline:** \ud83d\udd34 Critical\n**Last scrape:** ~2026-03-11 07:29 ET (file mtime)\n\n**\ud83d\udcca Today's Crowd Levels (WTI)**\n\ud83c\udff0 WDW: \u26aa **MK** 21.1 \u00b7 \u26aa **EP** 22...",
+      "timestamp": "2026-03-11T11:30:02.740000+00:00",
+      "message_id": "1481252862385193094",
+      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481252862385193094"
+    },
     {
       "channel": "alerts",
       "channel_emoji": "\ud83d\udea8",
@@ -366,22 +377,11 @@
       "timestamp": "2026-03-10T09:06:06.438000+00:00",
       "message_id": "1480854251243569295",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1480854251243569295"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Confirmed \u2014 PR #9 merged, `main` has the v4 commit at HEAD. 969 additions, 275 deletions. Clean.\n\nTomorrow's 6am cron will pick this up automatically. I'll be watching that run closely \u2014 first v4 p...",
-      "timestamp": "2026-03-09T17:01:27.322000+00:00",
-      "message_id": "1480611488635814088",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1480611488635814088"
     }
   ],
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 6,
-    "messages_today": 15
+    "messages_today": 16
   }
 }
