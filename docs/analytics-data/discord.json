@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T08:15:01Z",
+  "generated_at": "2026-03-11T08:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T07:51:23.820000+00:00"
+          "last_active": "2026-03-11T08:22:49.487000+00:00"
         }
       ]
     },
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-10T12:36:35.678000+00:00"
+          "last_active": "2026-03-11T08:22:40.413000+00:00"
         }
       ]
     },
@@ -164,6 +164,28 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "Based on my heartbeat checks, I found one **critical** issue that required alerting:\n\n\ud83d\udea8 **Pipeline outputs are stale** - WTI and forecast data are 28 hours old (threshold: 26h). This has been repor...",
+      "timestamp": "2026-03-11T08:22:49.487000+00:00",
+      "message_id": "1481205746707468430",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481205746707468430"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udea8 **CRITICAL: Pipeline Output Stale**\n\n**WTI:** 28h old (threshold: 26h)\n\u2022 Last updated: 2026-03-10 04:21 UTC\n\u2022 Should regenerate daily\n\n**Forecast:** 28h old (threshold: 26h) \n\u2022 Last updated: 2026...",
+      "timestamp": "2026-03-11T08:22:40.413000+00:00",
+      "message_id": "1481205708648091730",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481205708648091730"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175729 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-11T07:51:23.820000+00:00",
       "message_id": "1481197837646827613",
@@ -190,17 +212,6 @@
       "timestamp": "2026-03-11T07:21:23.915000+00:00",
       "message_id": "1481190288297820221",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481190288297820221"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175561 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T07:05:46.477000+00:00",
-      "message_id": "1481186356397867019",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481186356397867019"
     },
     {
       "channel": "morning-briefing",
@@ -357,17 +368,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480844180031934535"
     },
     {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **CRITICAL: Pipeline Validation Failing**\n\nPipeline hasn't completed successfully since **March 8th** (50+ hours ago) due to validation failures:\n\n**Issues:**\n\u2022 **WTI Anomalies:** 20 anomalous da...",
-      "timestamp": "2026-03-10T08:26:05.206000+00:00",
-      "message_id": "1480844179746852989",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480844179746852989"
-    },
-    {
       "channel": "pipeline",
       "channel_emoji": "\ud83d\udd27",
       "channel_id": "1479351574177513576",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 5,
-    "messages_today": 12
+    "active_channels_today": 6,
+    "messages_today": 13
   }
 }
