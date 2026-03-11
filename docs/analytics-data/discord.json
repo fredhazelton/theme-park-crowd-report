@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T07:30:02Z",
+  "generated_at": "2026-03-11T07:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-11T07:00:01.777000+00:00"
+          "last_active": "2026-03-11T07:30:02.165000+00:00"
         },
         {
           "name": "daily-digest",
@@ -159,6 +159,17 @@
   ],
   "recent_activity": [
     {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-11T07:30:02.165000+00:00",
+      "message_id": "1481192461995999253",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481192461995999253"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -278,17 +289,6 @@
       "timestamp": "2026-03-11T03:19:39.949000+00:00",
       "message_id": "1481129454255472761",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481129454255472761"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udd04 **Pipeline**\n- Data flowing \u2705 (last observation: just now)\n- 235 entities active\n- \u26a0\ufe0f Low entity count today (60 forecasts for Mar 11 \u2014 still early, overnight)\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udd17 **Quick ...",
-      "timestamp": "2026-03-11T03:19:36.066000+00:00",
-      "message_id": "1481129437968728125",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481129437968728125"
     },
     {
       "channel": "wilma",
