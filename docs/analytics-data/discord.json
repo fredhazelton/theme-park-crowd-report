@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-03-11T16:45:01Z",
+  "generated_at": "2026-03-11T17:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
     "icon_status": "configured",
-    "total_channels": 30,
+    "total_channels": 32,
     "total_categories": 6,
     "url": "https://discord.com/channels/1479350342318690505"
   },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-11T16:44:49.272000+00:00"
+          "last_active": "2026-03-11T16:59:55.272000+00:00"
         },
         {
           "name": "bam-bam",
@@ -162,12 +162,23 @@
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**YABBA DABBA DOO!** \ud83e\uddb4\n\nPebbles is on the design bench! She's building:\n\n- \ud83d\udcf1 **Reel Cover** \u2014 9:16 vertical thumbnail for WTI animations\n- \ud83c\udfa0 **Carousel Cards** \u2014 swipeable weekly crowd forecasts by...",
+      "timestamp": "2026-03-11T16:59:55.272000+00:00",
+      "message_id": "1481335878281462024",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481335878281462024"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
       "agent": "Fred Hazelton",
       "is_bot": false,
-      "message": "OK some thoughts:\n\n1. It's to ooverwhelming to post 5 or more of these at once. Post one and wait for me to respond (with reminders if needed)\n2. Upon selecting which one to send to the channel, dr...",
-      "timestamp": "2026-03-11T16:44:49.272000+00:00",
-      "message_id": "1481332078241906750",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481332078241906750"
+      "message": "Yes - lets go team! Yabba Dabba Do!",
+      "timestamp": "2026-03-11T16:59:23.419000+00:00",
+      "message_id": "1481335744680165498",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481335744680165498"
     },
     {
       "channel": "wilma",
@@ -175,21 +186,10 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "- Post title + link\n- First 200 chars of the post\n- Matched keywords\n- Engagement stats\n- Suggested marketing angle\n- \"Awaiting response draft\" status\n\n**What's your thinking?** Want to change the ...",
-      "timestamp": "2026-03-11T16:41:06.279000+00:00",
-      "message_id": "1481331142941737064",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481331142941737064"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Here's the full breakdown of the Reddit scout:\n\n**How it works:**\n\n1. **Runs every 6 hours** via cron (`reddit-scout`)\n2. Scans 5 subreddits: r/WaltDisneyWorld, r/Disneyland, r/DisneyPlanning, r/Di...",
-      "timestamp": "2026-03-11T16:41:06.094000+00:00",
-      "message_id": "1481331142165528737",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481331142165528737"
+      "message": "Want me to get Pebbles started on the Instagram visual templates now? She could knock out the Reel format, carousel cards, and story templates while you review Betty's strategy. Or would you rather...",
+      "timestamp": "2026-03-11T16:59:06.489000+00:00",
+      "message_id": "1481335673670733934",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481335673670733934"
     },
     {
       "channel": "fred-wilma",
