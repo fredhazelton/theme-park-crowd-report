@@ -322,6 +322,8 @@ def check_theme_park_news() -> list[dict]:
         ("https://wdwnt.com/feed/", "WDWNT"),
         ("https://blogmickey.com/feed/", "BlogMickey"),
         ("https://www.laughingplace.com/w/feed/", "Laughing Place"),
+        ("https://insidethemagic.net/feed/", "Inside the Magic"),
+        ("https://www.themeparktribune.com/feed/", "Theme Park Tribune"),
     ]
 
     crowd_keywords = [
@@ -332,6 +334,13 @@ def check_theme_park_news() -> list[dict]:
         "after hours", "event", "castle", "festival",
         "closure", "construction", "merchandise",
         "attendance", "delay", "soft open", "preview",
+        "incident", "evacuat", "injur", "hospital",
+        "park hop", "seaworld", "six flags", "cedar fair",
+        "earnings", "revenue", "results", "report",
+        "rule change", "policy", "disney world", "disneyland",
+        "universal", "magic kingdom", "epcot", "hollywood studios",
+        "animal kingdom", "islands of adventure",
+        "ride", "attraction", "rollercoaster", "coaster",
     ]
 
     for feed_url, name in rss_sources:
@@ -376,7 +385,24 @@ def check_theme_park_news() -> list[dict]:
             except Exception:
                 pass
 
-    return items[:12]
+    # Prefer source diversity: interleave sources so output isn't dominated by one
+    from collections import defaultdict
+    by_source = defaultdict(list)
+    for item in items:
+        by_source[item.get("source", "?")].append(item)
+    diverse_items = []
+    max_per_source = 4
+    # Cap each source
+    capped = {s: lst[:max_per_source] for s, lst in by_source.items()}
+    # Round-robin interleave
+    idx = 0
+    while any(capped.values()):
+        for source in list(capped.keys()):
+            if capped[source]:
+                diverse_items.append(capped[source].pop(0))
+            else:
+                del capped[source]
+    return diverse_items[:20]
 
 
 def check_reddit() -> list[dict]:
@@ -578,7 +604,7 @@ def build_report(results: dict) -> str:
     lines.append("## 📰 Theme Park News")
     news_items = results.get("theme_park_news", [])
     if news_items:
-        for item in news_items[:5]:
+        for item in news_items[:10]:
             lines.append(f"- **{item['title']}** ({item['source']}) — <{item['url']}>")
     else:
         lines.append("- Nothing crowd-impacting found today")
