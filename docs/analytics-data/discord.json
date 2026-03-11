@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T20:30:01Z",
+  "generated_at": "2026-03-11T20:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-11T17:05:52.595000+00:00"
+          "last_active": "2026-03-11T20:39:04.888000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Got it \u2014 afternoon tweets unblocked and running. Between that, the 8 Reddit comments, and the morning auto-tweets, your social presence is way more active than anyone was giving you credit for. I'l...",
+      "timestamp": "2026-03-11T20:39:04.888000+00:00",
+      "message_id": "1481391031768322262",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481391031768322262"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Good to know! Let me update that task \u2014 Dino had it marked as blocked.",
+      "timestamp": "2026-03-11T20:39:04.565000+00:00",
+      "message_id": "1481391030413819964",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481391030413819964"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**Fixed.** From now on:\n- \u2705 **Gazoo** checks `check_reddit_activity.py` before grading Fred on marketing\n- \u2705 **Marketing sprint nudge** will check your actual activity before nagging you\n- \u2705 **Dino...",
+      "timestamp": "2026-03-11T20:38:47.932000+00:00",
+      "message_id": "1481390960649965619",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481390960649965619"
+    },
+    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -190,39 +223,6 @@
       "timestamp": "2026-03-11T20:04:36.520000+00:00",
       "message_id": "1481382356404146257",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481382356404146257"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Pebbles is done! 6 social templates ready \u2014 Reel covers, carousel cards (title + park + CTA), daily story, and share card. All with the wave gradient branding, day-by-day crowd bar charts, and a WT...",
-      "timestamp": "2026-03-11T17:05:52.595000+00:00",
-      "message_id": "1481337377002885442",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481337377002885442"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**YABBA DABBA DOO!** \ud83e\uddb4\n\nPebbles is on the design bench! She's building:\n\n- \ud83d\udcf1 **Reel Cover** \u2014 9:16 vertical thumbnail for WTI animations\n- \ud83c\udfa0 **Carousel Cards** \u2014 swipeable weekly crowd forecasts by...",
-      "timestamp": "2026-03-11T16:59:55.272000+00:00",
-      "message_id": "1481335878281462024",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481335878281462024"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Yes - lets go team! Yabba Dabba Do!",
-      "timestamp": "2026-03-11T16:59:23.419000+00:00",
-      "message_id": "1481335744680165498",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481335744680165498"
     },
     {
       "channel": "fred-wilma",

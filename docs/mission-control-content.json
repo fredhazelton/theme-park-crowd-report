@@ -21,8 +21,8 @@
             "task": "Fix Firecrawl async API bug"
         },
         {
-            "status_class": "high",
-            "status_text": "\ud83d\udeab Blocked",
+            "status_class": "active",
+            "status_text": "\ud83d\udd04 Active",
             "task": "Afternoon prediction tweets (ON HOLD)"
         }
     ],
@@ -120,5 +120,5 @@
         "db_live_waits": 123560888,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-11T16:30:04.838473"
+    "last_updated": "2026-03-11T16:45:04.275189"
 }
