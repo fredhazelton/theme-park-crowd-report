@@ -77,6 +77,14 @@ BRAVE_API_KEY = None  # Set via env or config if available
 # How many days back to consider "recent"
 RECENT_DAYS = 7
 
+
+def _truncate(text: str, max_len: int = 120) -> str:
+    """Truncate text with ellipsis if it exceeds max_len."""
+    if len(text) <= max_len:
+        return text
+    return text[:max_len - 1] + "…"
+
+
 # ---------------------------------------------------------------------------
 # HTTP helpers
 # ---------------------------------------------------------------------------
@@ -203,7 +211,7 @@ def _parse_rss_feed(feed_url: str, source_name: str, max_items: int = 10,
                     summary = re.sub(r"<[^>]+>", " ", entry["summary"])[:200]
             
             items.append({
-                "title": title[:120],
+                "title": _truncate(title),
                 "url": link,
                 "source": source_name,
                 "snippet": summary,
@@ -244,7 +252,7 @@ def check_touringplans() -> list[dict]:
                                              "forum", "author/"]
                             if href not in seen_urls and not any(p in href for p in skip_patterns):
                                 seen_urls.add(href)
-                                items.append({"title": title[:120], "url": href, "source": "TouringPlans"})
+                                items.append({"title": _truncate(title), "url": href, "source": "TouringPlans"})
                     items = items[:8]
             except Exception:
                 pass
@@ -379,7 +387,7 @@ def check_theme_park_news() -> list[dict]:
                         title_lower = title.lower()
                         if any(kw in title_lower for kw in crowd_keywords):
                             seen.add(href)
-                            items.append({"title": title[:120], "url": href, "source": name})
+                            items.append({"title": _truncate(title), "url": href, "source": name})
                         if len(items) >= 8:
                             break
             except Exception:
@@ -467,7 +475,7 @@ def check_reddit() -> list[dict]:
                     if is_relevant or is_popular:
                         seen_urls.add(full_url)
                         items.append({
-                            "title": title[:120],
+                            "title": _truncate(title),
                             "url": full_url,
                             "source": f"Reddit r/{sub}",
                             "query": "subreddit_browse",
@@ -519,7 +527,7 @@ def check_reddit() -> list[dict]:
                     if label == "hazeydata" or any(t in title_lower for t in park_terms):
                         seen_urls.add(full_url)
                         items.append({
-                            "title": title[:120],
+                            "title": _truncate(title),
                             "url": full_url,
                             "source": f"Reddit r/{subreddit}",
                             "query": label,

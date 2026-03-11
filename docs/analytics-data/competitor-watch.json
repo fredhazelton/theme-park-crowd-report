@@ -1,10 +1,18 @@
 {
-  "generated_at": "2026-03-11T03:08:18.141896-04:00",
+  "generated_at": "2026-03-11T17:02:40.315487-04:00",
   "date": "2026-03-11",
   "categories": {
     "touringplans": {
       "count": 10,
       "items": [
+        {
+          "title": "Disney Data Dump March 11 2026",
+          "url": "https://touringplans.com/blog/disney-data-dump-march-11-2026/",
+          "source": "TouringPlans",
+          "snippet": "After a few weeks of winter wait time whiplash (holiday mash-ups, lingering long-weekend crowds, and the brief runDisney bump) the...",
+          "published": "2026-03-11",
+          "relevant": true
+        },
         {
           "title": "Mears Connect Standard- Morning Arrival",
           "url": "https://touringplans.com/blog/mears-connect-standard-morning-arrival/",
@@ -62,14 +70,6 @@
           "relevant": true
         },
         {
-          "title": "2026 Garden Graze Review",
-          "url": "https://touringplans.com/blog/2026-garden-graze-review/",
-          "source": "TouringPlans",
-          "snippet": "EPCOT&#8217;s Flower and Garden Festival is underway and one of the highlights is always the Garden Graze. Spoiler &#8211; the...",
-          "published": "2026-03-07",
-          "relevant": true
-        },
-        {
           "title": "2026 Guide to Volcano Bay Nights",
           "url": "https://touringplans.com/blog/2025-volcano-bay-nights-tickets-now-on-sale/",
           "source": "TouringPlans",
@@ -96,134 +96,142 @@
       "items": []
     },
     "theme_park_news": {
-      "count": 16,
+      "count": 17,
       "items": [
         {
-          "title": "Avengers Campus Opens New Iron Man-Themed Seating Area",
-          "url": "https://wdwnt.com/2026/03/avengers-campus-opens-new-iron-man-themed-seating-area/",
+          "title": "Stardust Racers Closure Extended Again Through April at Epic Universe",
+          "url": "https://wdwnt.com/2026/03/stardust-racers-closure-extended-again-through-april-at-epic-universe/",
           "source": "WDWNT",
-          "snippet": " We noticed a sizable new dedicated seating area has opened up during a recent walkthrough of Disney California Adventure. Additional Seating for Pym Test Kitchen Guests making their way through Aveng",
+          "snippet": " Stardust Racers at Epic Universe was supposed to reopen Saturday, but its refurbishment has been extended for the third time into early April. It originally closed for refurbishment on February 19. S",
           "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "\u201cI\u2019m Excited to Step Into The Next Era\u201d, WDW President Jeff Vahle Comments on New Experiences Chairman",
-          "url": "https://blogmickey.com/2026/03/jeff-vahle-comments-thomas-mazloum-disney-experiences-chairman/",
+          "title": "Stardust Struggles Continue: Universal Extends Stardust Racers Closure at Epic Universe, Again",
+          "url": "https://blogmickey.com/2026/03/stardust-racers-closure-extended-epic-universe-again/",
           "source": "BlogMickey",
-          "snippet": "Walt Disney World President Jeff Vahle has commented on the recent news that Disneyland President Thomas Mazloum has been named Chairman, Disney Experiences. In his statement, Vahle shared his excitem",
+          "snippet": "Universal Orlando Resort has announced that the Stardust Racers refurbishment at Universal Epic Universe has been extended again. This is the fourth time that the refurbishment has been extended. Here",
           "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Cast Member Couture: Take a Look at New Cast Member Costumes in Celebration of Fashion Week",
-          "url": "https://www.laughingplace.com/disney-parks/walt-disney-world-new-cast-member-costumes/",
+          "title": "New Ship, New Debut: All Eight Ships Featured in New Disney Cruise Line Merch Collection",
+          "url": "https://www.laughingplace.com/disney-parks/new-dcl-fleet-collection/",
           "source": "Laughing Place",
-          "snippet": "The devil is in the details at Disney Parks, including the amazing costumes cast members wear. Over at Walt Disney World, guests can now spot several new cast costumes around the resort. What\u2019s Happen",
-          "published": "2026-03-10",
+          "snippet": "With the newest addition to the Disney Cruise Line fleet comes a new collection of Disney Cruise Line merchandise that features - now - all eight ships.What's Happening:Disney Cruise Line has teased a",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Space Mountain Ride Closed After Incident Sends Five People to the Hospital",
-          "url": "https://insidethemagic.net/2026/03/space-mountain-tomorrowland-areas-evacuated-disneyland-jc1/",
+          "title": "Foreign Character Moves Into Original American Disney Park",
+          "url": "https://insidethemagic.net/2026/03/foreign-character-moves-into-original-american-disney-park-el1/",
           "source": "Inside the Magic",
-          "snippet": " On Tuesday afternoon, Disney cast members suddenly evacuated the Space Mountain roller coaster, Star Tours \u2013 The Adventures Continue, and other portions of Tomorrowland at Disneyland Park. Lines of D",
-          "published": "2026-03-10",
+          "snippet": " &#8220;Bluey&#8217;s Best Day Ever!&#8221; has arrived at Fantasyland Theatre in Disneyland Park, marking the Australian animated series&#8217; debut in the original American Disney park. Signage and",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Build Your Own Mickey & Castle Tiaras with Additional DIY Designs at Walt Disney World",
-          "url": "https://wdwnt.com/2026/03/build-your-own-tiaras-walt-disney-world/",
+          "title": "Disney names new theme parks chief",
+          "url": "https://www.themeparktribune.com/disney-names-new-theme-parks-chief/",
+          "source": "Theme Park Tribune",
+          "snippet": "    Disneyland Resort President Thomas Mazloum will be the next chairman of Disney\u2019s Experiences division.  \n The post  Disney names new theme parks chief  appeared first on  Theme Park Tribune . ",
+          "published": "2026-03-11",
+          "relevant": true
+        },
+        {
+          "title": "Groundwork Intensifies at Piston Peak National Park Construction Site as Dirt Piles Stack Up Across Site",
+          "url": "https://wdwnt.com/2026/03/groundwork-intensifies-at-piston-peak-national-park-construction-site-as-dirt-piles-stack-up-across-site/",
           "source": "WDWNT",
-          "snippet": " Two new customizable tiara bases have arrived for the DIY tiara experience at Arribas Brothers in Crystal Arts at Magic Kingdom. Build Your Own Mickey/Castle Tiara &#8211; $125 The option to design y",
+          "snippet": " A lot of new dirt has arrived at the future site of Piston Peak National Park in Magic Kingdom. Since our last look at the construction site, new piles of dirt have popped up all over the place. Pist",
           "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "\u2018Hoppers\u2019 Display Features Character Maquettes & Concept Art at Disney\u2019s Hollywood Studios",
-          "url": "https://blogmickey.com/2026/03/hoppers-character-maquettes-concept-art-hollywood-studios/",
+          "title": "Walt Disney World FREE Dining Offer Expected to Expand Tomorrow",
+          "url": "https://blogmickey.com/2026/03/walt-disney-world-free-dining-offer-expected-to-expand-tomorrow/",
           "source": "BlogMickey",
-          "snippet": "Guests visiting Disney&#8217;s Hollywood Studios can enjoy a Hoppers display in the Walt Disney Presents exhibit. Hoppers is the newest film from Pixar, and it is a wild adventure that introduces gues",
+          "snippet": "Today is the final day of the Visa Cardmember exclusive early access window for the Free Dining Plan offer for Walt Disney World vacations. With the conclusion of the offer window today, we expect tha",
           "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Disney Presidential Appointments: Meet the New Presidents of Disneyland Resort, Disney Parks International, and Disney C",
-          "url": "https://www.laughingplace.com/disney-business/new-presidents-disneyland-international-and-products/",
+          "title": "Hulu Gives Drama Pilot Order to \"Durango\" from \"Y: The Last Man\" Showrunner Eliza Clark",
+          "url": "https://www.laughingplace.com/entertainment/hulu-durango-pilot-order/",
           "source": "Laughing Place",
-          "snippet": "Jill Estorino has been chosen as the next President of Disneyland Resort as Thomas Mazloum prepares to take over as Chairman of Disney Experiences, plus two other Presidential promotions at Disney Exp",
-          "published": "2026-03-10",
+          "snippet": "Hulu has given a pilot order to a new drama titled Durango, hailing from Eliza Clark, showrunner of FX\u2019s Y: The Last Man.What's Happening:Deadline reports that Hulu has given a pilot order to Durango,",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "The \u201cDeath\u201d of the 7-Day Disney Trip: Why Families Are Checking Out Early",
-          "url": "https://insidethemagic.net/2026/03/the-death-of-the-7-day-disney-trip-why-families-are-checking-out-early-bwb1/",
+          "title": "EPCOT World Showcase Location Indefinitely Closed, No Word From Disney",
+          "url": "https://insidethemagic.net/2026/03/epcot-world-showcase-refreshment-port-remains-closed-jc1/",
           "source": "Inside the Magic",
-          "snippet": " For decades, the typical Walt Disney World vacation followed a familiar formula. Families would arrive in Orlando, check into a Disney resort hotel, and spend the next five to seven days almost entir",
-          "published": "2026-03-10",
+          "snippet": " An EPCOT World Showcase location has been closed since January 12, 2026, with no word from Walt Disney World Resort on when it will reopen. Construction walls surround the area, blocking guests from ",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Fantasyland Theatre Sign Removed in Prep for \u2018Bluey\u2019s Best Day Ever!\u2019 at Disneyland",
-          "url": "https://wdwnt.com/2026/03/fantasyland-theatre-sign-removed-in-prep-for-blueys-best-day-ever-at-disneyland/",
+          "title": "New Three Caballeros, Pinocchio, and Brother Bear T-Shirts at EPCOT",
+          "url": "https://wdwnt.com/2026/03/new-three-caballeros-pinocchio-brother-bear-t-shirts-epcot/",
           "source": "WDWNT",
-          "snippet": " The Fantasyland Theatre at Disneyland Park is currently closed to make way for a new stage show based on the popular kids&#8217; series&#160;Bluey. Production Work Continues for New Bluey Show Work h",
+          "snippet": " New EPCOT t-shirts inspired by World Showcase pavilions feature the Three Caballeros, Pinocchio, and Brother Bear characters. Three Caballeros Mexico Pavilion T-Shirt &#8211; $36.99 This yellow tee f",
           "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "BREAKING: Thomas Mazloum Named Chairman Disney Experiences, Succeeding Josh D\u2019Amaro",
-          "url": "https://blogmickey.com/2026/03/thomas-mazloum-named-chairman-disney-experiences/",
+          "title": "Limited-Time Oscars Display Features Titanic, Cruella, and More at Disney\u2019s Hollywood Studios",
+          "url": "https://blogmickey.com/2026/03/limited-time-oscars-display-hollywood-studios/",
           "source": "BlogMickey",
-          "snippet": "The Walt Disney Company has announced a number of leadership changes, with the most significant being the appointment of recent Disneyland President Thomas Mazloum to Chairman, Disney Experiences &#82",
-          "published": "2026-03-10",
+          "snippet": "Guests visiting Disney&#8217;s Hollywood Studios can check out a limited-time Oscars display within the Walt Disney Presents exhibit. The display case is toward the back of the exhibit, near the Walt ",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "New Disney Parks Head: Thomas Mazloum to Replace Josh D'Amaro as Chairman of Experiences",
-          "url": "https://www.laughingplace.com/disney-business/thomas-mazloum-chairman-of-disney-experiences/",
+          "title": "Disneyland Gets Ready for \"Bluey's Best Day Ever!\" as Signage Arrives at the Fantasyland Theatre",
+          "url": "https://www.laughingplace.com/disney-parks/blueys-best-day-ever-signage/",
           "source": "Laughing Place",
-          "snippet": "With Josh D\u2019Amaro set to become CEO of The Walt Disney Company, Disneyland Resort President Thomas Mazloum will take his place as Chairman of Disney Experiences. What\u2019s Happening:There are a lot of ch",
-          "published": "2026-03-10",
+          "snippet": "We're just over a week away from Bluey's long-awaited debut at the Disneyland Resort \u2013 and signage for the new experience has gone up at the Fantasyland Theatre!What's Happening:Disneyland is getting ",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Don\u2019t Pay Full Price for a \u201cPlaid\u201d: Disney\u2019s New 2026 Incentive Changes Everything",
-          "url": "https://insidethemagic.net/2026/03/dont-pay-full-price-for-a-plaid-disneys-new-2026-incentive-changes-everything-ab1/",
+          "title": "Disney World Updates Monorail Experience Effective March 2026",
+          "url": "https://insidethemagic.net/2026/03/disney-world-monorail-new-glowing-retro-logo-jc1/",
           "source": "Inside the Magic",
-          "snippet": " For many Walt Disney World enthusiasts, the Private VIP Tour represents the absolute pinnacle of the theme park experience. It is the ultimate &#8220;bucket list&#8221; item\u2014a day characterized by ze",
-          "published": "2026-03-10",
+          "snippet": " Walt Disney World Resort has quietly made a retro-inspired update to the Monorail that transports guests to Magic Kingdom Park, EPCOT, the Transportation &#38; Ticket Center, and several Disney Resor",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Tigger, Goofy, and Pluto Plush Magnet Buddies at Walt Disney World",
-          "url": "https://wdwnt.com/2026/03/tigger-magnet-buddy-at-walt-disney-world/",
+          "title": "Fa\u00e7ade Fully Stripped, Covered in Scaffolding at Monstropolis Construction Site",
+          "url": "https://wdwnt.com/2026/03/facade-fully-stripped-covered-in-scaffolding-at-monstropolis-construction-site/",
           "source": "WDWNT",
-          "snippet": " Walt Disney World has a new series of magnet buddies. These plush have magnetic hands so they can hold onto bag straps, lanyards, or other accessories. We found the Tigger buddy at Everything POP Sho",
+          "snippet": " Crews continue to work on various fa\u00e7ades in the former Muppets Courtyard at Disney&#8217;s Hollywood Studios as the space is transformed into Monstropolis. Monstropolis Construction More of the fa\u00e7a",
           "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Five Disneyland Cast Members Transported to Hospital Following Hazmat Reaction",
-          "url": "https://blogmickey.com/2026/03/five-disneyland-cast-members-transported-to-hospital-following-hazmat-reaction/",
+          "title": "Exterior Refurbishment of Disney\u2019s Contemporary Resort Begins Soon",
+          "url": "https://blogmickey.com/2026/03/exterior-refurbishment-disneys-contemporary-resort-begins-soon/",
           "source": "BlogMickey",
-          "snippet": "Five Disneyland Cast Members have been transported to a local hospital following a backstage hazmat reaction. Disneyland says that the reaction was triggered by building materials used by a contractor",
-          "published": "2026-03-10",
+          "snippet": "Walt Disney World has announced the next phases of work in the lengthy, ongoing refurbishment of Disney&#8217;s Contemporary Resort. The current refurbishment work began back in September 2024, and it",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Hazmat Response at Disneyland After Unknown Odor Near Star Tours Backstage Area",
-          "url": "https://www.laughingplace.com/disney-parks/disneyland-hazmat-incident-star-tours-backstage/",
+          "title": "Mickey and Minnie Sport F1-Inspired Shanghai Disneyland Outfits, Reveal New Merchandise Ahead of Chinese Grand Prix",
+          "url": "https://www.laughingplace.com/disney-parks/mickey-minnie-f1-outfits-merch-shanghai-disneyland/",
           "source": "Laughing Place",
-          "snippet": "Emergency crews responded to a hazmat situation Tuesday afternoon at Disneyland Park after an unusual odor was reported near a backstage area close to Star Tours.What\u2019s Happening:According to reportin",
-          "published": "2026-03-10",
+          "snippet": "Attention all race fans: the flag has dropped on the new \"Fuel the Magic\" collaboration between Formula One and Disney, and today Shanghai Disney Resort revealed new outfits to be worn by Mickey and M",
+          "published": "2026-03-11",
           "relevant": true
         },
         {
-          "title": "Disney Removes \u2018Inside Out\u2019 From Public Access, Effective March 2026",
-          "url": "https://insidethemagic.net/2026/03/dca-inside-out-emotional-whirlwind-extended-ride-closure-jc1/",
+          "title": "The \u20182D\u2019 Shift: Disney is Scrubbing 3D Effects from Its Newest Rides",
+          "url": "https://insidethemagic.net/2026/03/the-2d-shift-disney-is-scrubbing-3d-effects-from-its-newest-rides-sb1/",
           "source": "Inside the Magic",
-          "snippet": " Inside Out Emotional Whirlwind was scheduled to reopen after a two-day refurbishment on March 1, but it remains closed nine days later. This extended closure is the second time the Disney California ",
-          "published": "2026-03-10",
+          "snippet": " For decades, Disney built its theme park reputation on innovation. Audio-Animatronics, trackless ride systems, projection mapping, and immersive storytelling all helped transform attractions into exp",
+          "published": "2026-03-11",
           "relevant": true
         }
       ]
@@ -236,8 +244,8 @@
           "url": "https://www.reddit.com/r/Disneyland/comments/1rq999m/if_youre_thinking_about_coming_today_dont/",
           "source": "Reddit r/Disneyland",
           "query": "subreddit_browse",
-          "score": 628,
-          "comments": 120,
+          "score": 788,
+          "comments": 142,
           "relevant": true
         },
         {
@@ -245,26 +253,71 @@
           "url": "https://www.reddit.com/r/universalstudios/comments/1rns524/super_nintendo_world_is_insane/",
           "source": "Reddit r/UniversalStudios",
           "query": "subreddit_browse",
-          "score": 220,
+          "score": 230,
           "comments": 23,
           "relevant": true
         },
         {
-          "title": "This is insane",
-          "url": "https://www.reddit.com/r/Disneyland/comments/1rqc1e9/this_is_insane/",
-          "source": "Reddit r/Disneyland",
+          "title": "What's the most \"only at Disney World\" thing that's ever happened to you that you'd never believe if someone else told \u2026",
+          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rr3uee/whats_the_most_only_at_disney_world_thing_thats/",
+          "source": "Reddit r/WaltDisneyWorld",
           "query": "subreddit_browse",
-          "score": 110,
-          "comments": 45,
+          "score": 219,
+          "comments": 44,
           "relevant": true
         },
         {
-          "title": "Disneyland with low wait times for the first time in years.",
-          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rq0hjm/disneyland_with_low_wait_times_for_the_first_time/",
+          "title": "For anyone thinking of coming today 3/11",
+          "url": "https://www.reddit.com/r/Disneyland/comments/1rqz1ir/for_anyone_thinking_of_coming_today_311/",
+          "source": "Reddit r/Disneyland",
+          "query": "subreddit_browse",
+          "score": 117,
+          "comments": 57,
+          "relevant": true
+        },
+        {
+          "title": "Disneyland food quality",
+          "url": "https://www.reddit.com/r/Disneyland/comments/1rqvxtb/disneyland_food_quality/",
+          "source": "Reddit r/Disneyland",
+          "query": "subreddit_browse",
+          "score": 41,
+          "comments": 35,
+          "relevant": true
+        },
+        {
+          "title": "Stardust Racers Closure Extended",
+          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rr4qmf/stardust_racers_closure_extended/",
+          "source": "Reddit r/UniversalOrlando",
+          "query": "subreddit_browse",
+          "score": 33,
+          "comments": 30,
+          "relevant": true
+        },
+        {
+          "title": "Hagrids motorbike queue",
+          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rqv9i8/hagrids_motorbike_queue/",
+          "source": "Reddit r/UniversalOrlando",
+          "query": "subreddit_browse",
+          "score": 19,
+          "comments": 51,
+          "relevant": true
+        },
+        {
+          "title": "Two days at Disneyland with friends (mild drama) - how do I plan without micromanaging?",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rqs9hs/two_days_at_disneyland_with_friends_mild_drama/",
           "source": "Reddit r/DisneyPlanning",
           "query": "subreddit_browse",
-          "score": 20,
-          "comments": 46,
+          "score": 13,
+          "comments": 30,
+          "relevant": true
+        },
+        {
+          "title": "Yoshi EPA",
+          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rqu98c/yoshi_epa/",
+          "source": "Reddit r/UniversalOrlando",
+          "query": "subreddit_browse",
+          "score": 12,
+          "comments": 8,
           "relevant": true
         },
         {
@@ -277,8 +330,26 @@
           "relevant": true
         },
         {
-          "title": "help finding autographs",
-          "url": "https://www.reddit.com/r/disneyparks/comments/1rq6ebo/help_finding_autographs/",
+          "title": "Disney Japan Questions from a first time Disney-goer",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rr28km/disney_japan_questions_from_a_first_time/",
+          "source": "Reddit r/DisneyPlanning",
+          "query": "subreddit_browse",
+          "score": 2,
+          "comments": 0,
+          "relevant": true
+        },
+        {
+          "title": "Disneyland weather early next week",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rr5tcf/disneyland_weather_early_next_week/",
+          "source": "Reddit r/DisneyPlanning",
+          "query": "subreddit_browse",
+          "score": 1,
+          "comments": 6,
+          "relevant": true
+        },
+        {
+          "title": "Disney Japan Questions from a first time Disney-goer",
+          "url": "https://www.reddit.com/r/disneyparks/comments/1rr0ukp/disney_japan_questions_from_a_first_time/",
           "source": "Reddit r/disneyparks",
           "query": "subreddit_browse",
           "score": 1,
@@ -290,80 +361,17 @@
           "url": "https://www.reddit.com/r/universalstudios/comments/1rpb47d/universal_orlando/",
           "source": "Reddit r/UniversalStudios",
           "query": "subreddit_browse",
-          "score": 1,
-          "comments": 2,
-          "relevant": true
-        },
-        {
-          "title": "Going solo for a laid back trip however still want to make the most of things. Thoughts on Lightning Lanes?",
-          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rqi311/going_solo_for_a_laid_back_trip_however_still/",
-          "source": "Reddit r/DisneyPlanning",
-          "query": "subreddit_browse",
           "score": 0,
           "comments": 2,
           "relevant": true
-        },
-        {
-          "title": "Massively underrated",
-          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rpj5gm/massively_underrated/",
-          "source": "Reddit r/WaltDisneyWorld",
-          "query": "subreddit_browse",
-          "score": 2740,
-          "comments": 283,
-          "relevant": false
         },
         {
           "title": "Two Men Throw Incendiary Devices Into NYC Crowd, Reportedly Shout \u2018Allahu Akbar\u2019",
           "url": "https://www.reddit.com/r/Conservative/comments/1ro4c85/two_men_throw_incendiary_devices_into_nyc_crowd/",
           "source": "Reddit r/Conservative",
           "query": "hazeydata",
-          "score": 1572,
+          "score": 1575,
           "comments": 218
-        },
-        {
-          "title": "This Spaceship Earth tumbler is hands down my favorite souvenir from our recent trip!",
-          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rq2kou/this_spaceship_earth_tumbler_is_hands_down_my/",
-          "source": "Reddit r/WaltDisneyWorld",
-          "query": "subreddit_browse",
-          "score": 577,
-          "comments": 40,
-          "relevant": false
-        },
-        {
-          "title": "Former Disney Safari Driver Reveals Grim Reason Staff Are Trained To Drive Off If Someone Falls Into Crocodile Pit",
-          "url": "https://www.reddit.com/r/disneyparks/comments/1rpcfiq/former_disney_safari_driver_reveals_grim_reason/",
-          "source": "Reddit r/disneyparks",
-          "query": "subreddit_browse",
-          "score": 507,
-          "comments": 120,
-          "relevant": false
-        },
-        {
-          "title": "7 Disneyland employees hospitalized after 'unknown odor' in Tomorrowland",
-          "url": "https://www.reddit.com/r/Disneyland/comments/1rqcj82/7_disneyland_employees_hospitalized_after_unknown/",
-          "source": "Reddit r/Disneyland",
-          "query": "subreddit_browse",
-          "score": 366,
-          "comments": 42,
-          "relevant": false
-        },
-        {
-          "title": "Hazmat situation reported at Disneyland; 4 workers hospitalized",
-          "url": "https://www.reddit.com/r/Disneyland/comments/1rq9req/hazmat_situation_reported_at_disneyland_4_workers/",
-          "source": "Reddit r/Disneyland",
-          "query": "subreddit_browse",
-          "score": 313,
-          "comments": 37,
-          "relevant": false
-        },
-        {
-          "title": "What is \"Spring\" for WDW and Thunder Mountain?",
-          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rq2274/what_is_spring_for_wdw_and_thunder_mountain/",
-          "source": "Reddit r/WaltDisneyWorld",
-          "query": "subreddit_browse",
-          "score": 312,
-          "comments": 35,
-          "relevant": false
         }
       ]
     },
@@ -372,5 +380,5 @@
       "items": []
     }
   },
-  "total_items": 41
+  "total_items": 42
 }

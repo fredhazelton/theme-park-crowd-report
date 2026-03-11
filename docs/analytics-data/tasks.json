@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T03:08:43",
+  "generated_at": "2026-03-11T16:31:31",
   "summary": {
     "total": 51,
     "this_week": 51,
@@ -89,8 +89,8 @@
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-05T13:00:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "Twitter post done Mar 5. Reddit account set up (disneystatswhiz, Reddit Premium). Reddit targets posted in #content-ideas. Still needs direct WTI article promo on Reddit."
+      "updated": "2026-03-11T16:30:00",
+      "notes": "Twitter post done Mar 5. Reddit part split to task-051. Marking done for Twitter promo portion."
     },
     {
       "id": "task-007",
@@ -159,8 +159,8 @@
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-06T08:22:00",
-      "updated": "2026-03-06T08:22:00",
-      "notes": "Publish by mid-October. Needs forecast data closer to publish date."
+      "updated": "2026-03-11T16:30:00",
+      "notes": "DRAFT COMPLETE: 4,700-word article at ~/clawd-anthropic/content/blog/thanksgiving-2026-disney-crowd-predictions.md. Needs Fred review + WTI forecast data refresh closer to publish (mid-October). Low priority until closer to date."
     },
     {
       "id": "task-012",
@@ -467,8 +467,8 @@
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "Fred said 'put a hold on afternoon tweets until we get predictions better'. Afternoon cron disabled. Morning tweet (yesterday's observed WTI) still active. Re-enable after v4 is verified. Source: #twitter-x."
+      "updated": "2026-03-11T16:30:00",
+      "notes": "Fred said 'put a hold on afternoon tweets until we get predictions better'. Afternoon cron disabled. Morning tweet (yesterday's observed WTI) still active. Blocked on AK accuracy improvement. Unblock criteria: AK WTI predictions within \u00b15 of actuals for 3+ consecutive days."
     },
     {
       "id": "task-034",
@@ -565,8 +565,8 @@
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-11T02:30:00",
-      "notes": "v4 deployed global 1.5x cap \u2014 improvement over uncapped but per-park tuning still needed. Barney recommended as v4.1. Feb 26 uncapped errors: CA +34.3, IA +16.1, MK +13.4. Source: #pipeline."
+      "updated": "2026-03-11T16:30:00",
+      "notes": "PARTIAL: v4 deployed global 1.5x cap \u2014 improvement over uncapped. Still needs per-park tuning. Barney's recommendation: TDL 2.0x, IA 1.2x, CA 1.3x. Assigned to Barney as v4.1 work. Feb 26 uncapped errors: CA +34.3, IA +16.1, MK +13.4."
     },
     {
       "id": "task-041",
@@ -705,8 +705,8 @@
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-11T02:30:00",
-      "updated": "2026-03-11T02:30:00",
-      "notes": "Flagged by Gazoo review 2026-03-11. Both 6 AM cron and 730-day run completed but neither updated this file. Source: Gazoo review."
+      "updated": "2026-03-11T16:30:00",
+      "notes": "Flagged by Gazoo review 2026-03-11. Both 6 AM cron and 730-day run completed but neither updated this file. Added to WILMA-BAMBAM.md as Bam-Bam task. This is a ~30 min fix \u2014 likely pipeline.sh not calling state update after successful completion. Check run_pipeline.sh and step completion hooks."
     },
     {
       "id": "task-051",
@@ -719,8 +719,8 @@
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-11T02:30:00",
-      "updated": "2026-03-11T02:30:00",
-      "notes": "Flagged by Gazoo review 2026-03-11. Article launched Mar 3, now 8 days without Reddit promotion. Reddit targets were posted in #content-ideas. Highest-ROI marketing action available. Source: Gazoo review, task-006 notes."
+      "updated": "2026-03-11T16:30:00",
+      "notes": "\ud83d\udd34 OVERDUE \u2014 flagged in 3 consecutive Gazoo reviews. Article launched Mar 3, now 8 days without Reddit promotion. Reddit account (disneystatswhiz) has Premium. Target subs: r/WaltDisneyWorld, r/DisneyWorld, r/disneyparks. This is a 5-minute copy-paste task. Highest-ROI marketing action available. NEEDS FRED ACTION."
     }
   ],
   "live_activity": []
