@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T01:15:01Z",
+  "generated_at": "2026-03-11T01:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T01:00:01.579000+00:00"
+          "last_active": "2026-03-11T01:21:11.337000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174445 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T01:00:01.579000+00:00",
-      "message_id": "1481094312824537291",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481094312824537291"
+      "message": "OK Fred \u2014 here's the full picture of what happened and what I did:\n\n**Two-part fix:**\n1. \u2705 **Prevented future bloat** \u2014 converted 10 cron jobs from `main` \u2192 `isolated` sessions (done earlier)\n2. \u2705 ...",
+      "timestamp": "2026-03-11T01:21:11.337000+00:00",
+      "message_id": "1481099638575468765",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481099638575468765"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174402 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T00:30:01.738000+00:00",
-      "message_id": "1481086763744104490",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481086763744104490"
+      "message": "Back online. Now let me clean up those 4 new error messages and my narration clutter from earlier, then we wait for the next heartbeat to confirm it works.",
+      "timestamp": "2026-03-11T01:21:11.203000+00:00",
+      "message_id": "1481099638013427813",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481099638013427813"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174359 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T00:00:01.771000+00:00",
-      "message_id": "1481079214135578695",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481079214135578695"
+      "message": "Now restart the gateway so it picks up the fresh session:",
+      "timestamp": "2026-03-11T01:20:28.701000+00:00",
+      "message_id": "1481099459747381261",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481099459747381261"
     },
     {
       "channel": "mission-control",
