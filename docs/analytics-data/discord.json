@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T10:30:01Z",
+  "generated_at": "2026-03-11T10:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": "2026-03-11T08:22:40.413000+00:00"
+          "last_active": "2026-03-11T10:30:42.181000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Got it \u2014 `#park-intel` is `1479351592108036249`. Let me post the report.",
+      "timestamp": "2026-03-11T10:30:42.181000+00:00",
+      "message_id": "1481237928318472302",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237928318472302"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "The script saves the chunks for me to post. Let me check which channel #park-intel is.",
+      "timestamp": "2026-03-11T10:30:41.799000+00:00",
+      "message_id": "1481237926716379207",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237926716379207"
+    },
+    {
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "The script generated the report but wants me to post it via the message tool. Let me grab the report content and post it.",
+      "timestamp": "2026-03-11T10:30:41.554000+00:00",
+      "message_id": "1481237925688508419",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237925688508419"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -168,17 +201,6 @@
       "timestamp": "2026-03-11T08:22:49.487000+00:00",
       "message_id": "1481205746707468430",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481205746707468430"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **CRITICAL: Pipeline Output Stale**\n\n**WTI:** 28h old (threshold: 26h)\n\u2022 Last updated: 2026-03-10 04:21 UTC\n\u2022 Should regenerate daily\n\n**Forecast:** 28h old (threshold: 26h) \n\u2022 Last updated: 2026...",
-      "timestamp": "2026-03-11T08:22:40.413000+00:00",
-      "message_id": "1481205708648091730",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481205708648091730"
     },
     {
       "channel": "fred-wilma",
@@ -335,17 +357,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1480962349832867901"
     },
     {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Barney",
-      "is_bot": true,
-      "message": "\u2705 **RESOLVED: v4 Pipeline First Production Run \u2014 SUCCESS**\n\nThe 8:26am validation alert is stale (same AK 2009 anomaly + 827 entity coverage gap from previous days).\n\nv4 completed at 6:21am \u2014 all 1...",
-      "timestamp": "2026-03-10T12:36:35.678000+00:00",
-      "message_id": "1480907222115553303",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480907222115553303"
-    },
-    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -355,17 +366,6 @@
       "timestamp": "2026-03-10T09:06:06.438000+00:00",
       "message_id": "1480854251243569295",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1480854251243569295"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Files:**\n\u2022 Validation report: `/mnt/data/pipeline/pipeline_validation/validation_report.txt`\n\u2022 Last log: `/mnt/data/pipeline/logs/daily_pipeline_2026-03-08.log`",
-      "timestamp": "2026-03-10T08:26:05.274000+00:00",
-      "message_id": "1480844180031934535",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1480844180031934535"
     },
     {
       "channel": "pipeline",
@@ -382,6 +382,6 @@
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 6,
-    "messages_today": 13
+    "messages_today": 15
   }
 }
