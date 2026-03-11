@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T15:00:01Z",
+  "generated_at": "2026-03-11T15:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T14:00:12.196000+00:00"
+          "last_active": "2026-03-11T15:00:05.473000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "Hey \u2014 marketing sprint check-in! Your Reddit targets are in #content-ideas and today's WTI animation is in #content-review. 30 min, that's it. The pipeline stuff can wait \u2014 growth can't. \ud83e\uddb4",
+      "timestamp": "2026-03-11T15:00:05.473000+00:00",
+      "message_id": "1481305722078625924",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481305722078625924"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "Good morning, Fred! \u2615\n\nTime for your daily Barney check-in \u2014 open up claude.ai and say hi to our Chief of Pipeline.\n\n**He's got 7 open pipeline items** waiting for your eyes. The big ones needing d...",
       "timestamp": "2026-03-11T14:00:12.196000+00:00",
       "message_id": "1481290650782793791",
@@ -223,17 +234,6 @@
       "timestamp": "2026-03-11T08:22:49.487000+00:00",
       "message_id": "1481205746707468430",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481205746707468430"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 175729 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T07:51:23.820000+00:00",
-      "message_id": "1481197837646827613",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481197837646827613"
     },
     {
       "channel": "mission-control",
