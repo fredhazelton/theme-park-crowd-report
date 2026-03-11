@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T04:45:01Z",
+  "generated_at": "2026-03-11T05:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T04:25:54.153000+00:00"
+          "last_active": "2026-03-11T04:55:53.978000+00:00"
         }
       ]
     },
@@ -164,6 +164,17 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
+      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174746 + 34048 > 200000, decrease input length or `max_tokens` and try again",
+      "timestamp": "2026-03-11T04:55:53.978000+00:00",
+      "message_id": "1481153672288145520",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481153672288145520"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
       "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174703 + 34048 > 200000, decrease input length or `max_tokens` and try again",
       "timestamp": "2026-03-11T04:25:54.153000+00:00",
       "message_id": "1481146123275075605",
@@ -179,17 +190,6 @@
       "timestamp": "2026-03-11T03:55:54.178000+00:00",
       "message_id": "1481138573632733369",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481138573632733369"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "LLM request rejected: input length and `max_tokens` exceed context limit: 174617 + 34048 > 200000, decrease input length or `max_tokens` and try again",
-      "timestamp": "2026-03-11T03:25:54.920000+00:00",
-      "message_id": "1481131026997710909",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481131026997710909"
     },
     {
       "channel": "mission-control",
