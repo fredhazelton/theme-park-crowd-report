@@ -119,9 +119,10 @@ def crowd_css_class(wti: float, is_min: bool = False, is_max: bool = False) -> s
 # ── Date Helpers ──────────────────────────────────────────────────────────────
 
 def next_weekday(dt: datetime.date, weekday: int) -> datetime.date:
-    """Find the next occurrence of a given weekday (0=Mon, 6=Sun)."""
+    """Find the next occurrence of a given weekday (0=Mon, 6=Sun).
+    If today IS that weekday, return today (article covers this week)."""
     days_ahead = weekday - dt.weekday()
-    if days_ahead <= 0:
+    if days_ahead < 0:
         days_ahead += 7
     return dt + datetime.timedelta(days=days_ahead)
 
