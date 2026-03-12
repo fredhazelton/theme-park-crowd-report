@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T16:31:31",
+  "generated_at": "2026-03-12T02:32:03",
   "summary": {
     "total": 51,
     "this_week": 51,
@@ -152,15 +152,15 @@
       "id": "task-011",
       "title": "Content: Thanksgiving 2026 Crowd Predictions",
       "description": "Blog/article analyzing predicted Thanksgiving 2026 crowds.",
-      "status": "todo",
+      "status": "backlog",
       "column": "backlog",
-      "priority": "medium",
+      "priority": "low",
       "owner": "Fred",
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-06T08:22:00",
-      "updated": "2026-03-11T16:30:00",
-      "notes": "DRAFT COMPLETE: 4,700-word article at ~/clawd-anthropic/content/blog/thanksgiving-2026-disney-crowd-predictions.md. Needs Fred review + WTI forecast data refresh closer to publish (mid-October). Low priority until closer to date."
+      "updated": "2026-03-12T02:30:00",
+      "notes": "DRAFT COMPLETE: 4,700-word article at ~/clawd-anthropic/content/blog/thanksgiving-2026-disney-crowd-predictions.md. Needs Fred review + WTI forecast data refresh closer to publish (mid-October). [Dino 2026-03-12] Moved to backlog with Oct 15 due date \u2014 no action needed until fall. Draft exists and is ready for data refresh."
     },
     {
       "id": "task-012",
@@ -418,15 +418,15 @@
       "id": "task-030",
       "title": "Fix Firecrawl async API bug",
       "description": "firecrawl_batch_scraper.py expects synchronous data but Extract API v1 is async. Needs polling loop: POST /v1/extract \u2192 get job ID \u2192 GET /v1/extract/{id} until completed.",
-      "status": "todo",
+      "status": "backlog",
       "column": "backlog",
-      "priority": "medium",
+      "priority": "low",
       "owner": "Barney",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "Discovered by Wilma overnight while running entity-registry tasks. 0/8 districts succeeded. Source: #entity-registry."
+      "updated": "2026-03-12T02:30:00",
+      "notes": "Discovered by Wilma overnight while running entity-registry tasks. 0/8 districts succeeded. Source: #entity-registry. [Dino 2026-03-12] Moved to backlog \u2014 blocked on Firecrawl API changes, not on critical path. School schedules feature (task-038) completed without it. Revisit if Firecrawl scraping needed again."
     },
     {
       "id": "task-031",
@@ -460,29 +460,29 @@
       "id": "task-033",
       "title": "Afternoon prediction tweets (ON HOLD)",
       "description": "Auto-tweet afternoon predictions (3 PM cron) for tomorrow's WTI. Currently disabled due to AK model issues.",
-      "status": "blocked",
-      "column": "review",
+      "status": "done",
+      "column": "done",
       "priority": "medium",
       "owner": "Wilma",
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-11T16:30:00",
-      "notes": "Fred said 'put a hold on afternoon tweets until we get predictions better'. Afternoon cron disabled. Morning tweet (yesterday's observed WTI) still active. Blocked on AK accuracy improvement. Unblock criteria: AK WTI predictions within \u00b15 of actuals for 3+ consecutive days."
+      "updated": "2026-03-12T02:06:00",
+      "notes": "Confirmed done by Fred \u2014 afternoon prediction tweets are set up and working."
     },
     {
       "id": "task-034",
       "title": "Model Competition Framework",
       "description": "Build prediction ledger, evaluation harness, challenger template, and blend analysis for comparing multiple models per entity. First real challenger by March 21.",
-      "status": "todo",
+      "status": "backlog",
       "column": "backlog",
       "priority": "medium",
       "owner": "Barney",
       "project": "Modeling",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "Design doc at ~/clawd-anthropic/docs/MODEL_COMPETITION_DESIGN.md. Key: per-entity evaluation, raw predictions stored, tournament format. Assignment posted to #barney. Source: #barney."
+      "updated": "2026-03-12T02:30:00",
+      "notes": "Design doc at ~/clawd-anthropic/docs/MODEL_COMPETITION_DESIGN.md. Key: per-entity evaluation, raw predictions stored, tournament format. Assignment posted to #barney. Source: #barney. [Dino 2026-03-12] Moved to backlog \u2014 Barney occupied with higher-priority pipeline work. Original Mar 21 deadline missed. Reset due date to Mar 28. Will re-evaluate if not started by then."
     },
     {
       "id": "task-035",
@@ -495,8 +495,8 @@
       "project": "Infrastructure",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "Three options evaluated: A (symlink swap), B (dual DuckDB), C (read-only snapshots). Fred prefers C. Barney consulted. Source: #ideas 'Pipeline twins', #barney."
+      "updated": "2026-03-12T02:30:00",
+      "notes": "Three options evaluated: A (symlink swap), B (dual DuckDB), C (read-only snapshots). Fred prefers C. Barney consulted. Source: #ideas 'Pipeline twins', #barney. [Dino 2026-03-12] Added due date. Important for stability but not blocking anything currently."
     },
     {
       "id": "task-036",
@@ -509,8 +509,8 @@
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "Fred idea. Reference screenshots saved at ~/stream-overlay/design-inspiration/ios-weather-app/. Need mockup rendering (Python Pillow/Cairo). Source: #content-ideas, #bam-bam, #ideas 'Weather App Design'."
+      "updated": "2026-03-12T02:30:00",
+      "notes": "Fred idea. Reference screenshots saved at ~/stream-overlay/design-inspiration/ios-weather-app/. Need mockup rendering (Python Pillow/Cairo). Source: #content-ideas, #bam-bam, #ideas 'Weather App Design'. [Dino 2026-03-12] High value for social sharing. Added due date."
     },
     {
       "id": "task-037",
@@ -523,8 +523,8 @@
       "project": "Streaming",
       "is_recurring": true,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "POC: 3 parks (MK, EP, HS). 5 auto-rotating screens (overview, attraction spotlight, leaderboard, daily curve, forecast). Architecture: single HTML page polling API, OBS/ffmpeg capture, RTMP to Twitch. #twitch channel created. Source: #ideas 'Unhosted Twitch Stream', #twitch."
+      "updated": "2026-03-12T02:30:00",
+      "notes": "POC: 3 parks (MK, EP, HS). 5 auto-rotating screens (overview, attraction spotlight, leaderboard, daily curve, forecast). Architecture: single HTML page polling API, OBS/ffmpeg capture, RTMP to Twitch. #twitch channel created. Source: #ideas 'Unhosted Twitch Stream', #twitch. [Dino 2026-03-12] Longer timeline \u2014 needs Mac Mini setup. Due date set for mid-April."
     },
     {
       "id": "task-038",
@@ -558,29 +558,29 @@
       "id": "task-040",
       "title": "Per-park quantile mapping configuration",
       "description": "Make quantile mapping stretch factor per-park configurable instead of global 1.5x cap. Some parks need more stretch (TDL: 2.0), others less (IA: 1.2, CA: 1.3).",
-      "status": "todo",
-      "column": "backlog",
+      "status": "done",
+      "column": "done",
       "priority": "medium",
       "owner": "Barney",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-11T16:30:00",
-      "notes": "PARTIAL: v4 deployed global 1.5x cap \u2014 improvement over uncapped. Still needs per-park tuning. Barney's recommendation: TDL 2.0x, IA 1.2x, CA 1.3x. Assigned to Barney as v4.1 work. Feb 26 uncapped errors: CA +34.3, IA +16.1, MK +13.4."
+      "updated": "2026-03-12T02:07:00",
+      "notes": "Confirmed done by Fred. Per-park stretch factors are configured in pipeline_v3/config.py (quantile_mapping_per_park_stretch) and active in production."
     },
     {
       "id": "task-041",
       "title": "Disney Trip Planning Podcast",
       "description": "Create an automated AI-generated podcast about Disney trip planning using crowd data and predictions.",
-      "status": "todo",
+      "status": "backlog",
       "column": "backlog",
       "priority": "low",
       "owner": "Fred",
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "22-message discussion thread in #ideas. Concept explored. Source: #ideas 'Disney Trip Planning Podcast'."
+      "updated": "2026-03-12T02:30:00",
+      "notes": "22-message discussion thread in #ideas. Concept explored. Source: #ideas 'Disney Trip Planning Podcast'. [Dino 2026-03-12] Moved to backlog \u2014 nice-to-have, not on critical path. Revisit after core product has users."
     },
     {
       "id": "task-042",
@@ -635,8 +635,8 @@
       "project": "Discord Bot",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "Fred noticed users requesting heat maps via /ask. More shareable than text tables. Source: #discord-bot."
+      "updated": "2026-03-12T02:30:00",
+      "notes": "Fred noticed users requesting heat maps via /ask. More shareable than text tables. Source: #discord-bot. [Dino 2026-03-12] User-requested feature \u2014 good for engagement. Due date added."
     },
     {
       "id": "task-046",
@@ -670,15 +670,15 @@
       "id": "task-048",
       "title": "QT API park mapping fix (DL = Gardaland, not Disneyland)",
       "description": "Queue-times park 12 returns Gardaland data, not Disneyland Anaheim. QT park 16 is the real DL. Need to update park mapping.",
-      "status": "todo",
-      "column": "backlog",
+      "status": "done",
+      "column": "done",
       "priority": "medium",
       "owner": "Barney",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-10T05:04:00",
-      "notes": "Discovered during QT API re-run for entity registry. TDL/TDS fixed (274/275). DL still wrong. Source: #entity-registry."
+      "updated": "2026-03-12T03:44:00",
+      "notes": "Discovered during QT API re-run for entity registry. TDL/TDS fixed (274/275). DL still wrong. Source: #entity-registry. VERIFIED by Wilma: QUEUE_TIMES_PARK_MAP already uses park 16 (Disneyland Anaheim), not park 12 (Gardaland). Entity mapping CSV confirms correct ride IDs. Task was already resolved."
     },
     {
       "id": "task-049",
@@ -698,29 +698,29 @@
       "id": "task-050",
       "title": "Fix pipeline_state.json staleness (frozen at Mar 8)",
       "description": "pipeline_state.json hasn't been updated since March 8 despite successful pipeline runs on Mar 9 and 10. Every monitoring script reading it gets stale data.",
-      "status": "todo",
-      "column": "backlog",
+      "status": "done",
+      "column": "done",
       "priority": "high",
       "owner": "Wilma",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-11T02:30:00",
-      "updated": "2026-03-11T16:30:00",
-      "notes": "Flagged by Gazoo review 2026-03-11. Both 6 AM cron and 730-day run completed but neither updated this file. Added to WILMA-BAMBAM.md as Bam-Bam task. This is a ~30 min fix \u2014 likely pipeline.sh not calling state update after successful completion. Check run_pipeline.sh and step completion hooks."
+      "updated": "2026-03-12T01:52:00",
+      "notes": "Flagged by Gazoo review 2026-03-11. Both 6 AM cron and 730-day run completed but neither updated this file. Added to WILMA-BAMBAM.md as Bam-Bam task. This is a ~30 min fix \u2014 likely pipeline.sh not calling state update after successful completion. Check run_pipeline.sh and step completion hooks. Fixed by Wilma: v3 pipeline now bridges to legacy pipeline_status.json via utils.pipeline_status. Committed b6e370ce."
     },
     {
       "id": "task-051",
       "title": "Reddit promotion for WTI article (actual post)",
       "description": "Reddit account (disneystatswhiz) created with Premium, but the actual WTI article has never been posted to Reddit. Twitter promo done Mar 5, Reddit still pending.",
-      "status": "todo",
+      "status": "cancelled",
       "column": "backlog",
       "priority": "high",
       "owner": "Fred",
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-11T02:30:00",
-      "updated": "2026-03-11T16:30:00",
-      "notes": "\ud83d\udd34 OVERDUE \u2014 flagged in 3 consecutive Gazoo reviews. Article launched Mar 3, now 8 days without Reddit promotion. Reddit account (disneystatswhiz) has Premium. Target subs: r/WaltDisneyWorld, r/DisneyWorld, r/disneyparks. This is a 5-minute copy-paste task. Highest-ROI marketing action available. NEEDS FRED ACTION."
+      "updated": "2026-03-12T01:53:00",
+      "notes": "CANCELLED by Fred: Direct self-promotion posts get removed by subreddit mods. The Reddit Scout (disneystatswhiz) is already doing organic engagement in target subs \u2014 helpful comments with crowd data, not link drops. That is the correct Reddit strategy. Gazoo was wrong to keep escalating this."
     }
   ],
   "live_activity": []

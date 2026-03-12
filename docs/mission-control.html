@@ -125,15 +125,18 @@
            CARDS
            ═══════════════════════════════════════════════════ */
         .card {
-            background: var(--bg-card);
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-card);
             border-radius: 10px;
             padding: 18px 20px;
-            transition: background 0.2s, border-color 0.2s;
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
         .card:hover {
             background: var(--bg-card-hover);
             border-color: var(--border-accent);
+            box-shadow: 0 0 20px rgba(74,144,164,0.08), 0 4px 16px rgba(0,0,0,0.2);
         }
         .card h2 {
             font-family: var(--font-mono);
@@ -493,7 +496,7 @@
 
         document.getElementById('grid').innerHTML = html;
         document.getElementById('footer').innerHTML =
-            'Auto-refreshes every 60s &nbsp;·&nbsp; <a href="https://hazeydata.ai">hazeydata.ai</a> &nbsp;·&nbsp; <a href="https://discord.gg/Bz89uXrD">Discord</a>';
+            'Auto-refreshes every 60s &nbsp;·&nbsp; <a href="https://hazeydata.ai">hazeydata.ai</a> &nbsp;·&nbsp; <a href="https://discord.gg/pUgpecugth">Discord</a>';
     }
 
     load();

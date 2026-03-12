@@ -242,13 +242,18 @@
            CARDS
            ═══════════════════════════════════════════════════ */
         .card {
-            background: var(--bg-card);
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-card);
             border-radius: 12px;
             padding: 20px;
-            transition: border-color 0.2s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .card:hover { border-color: var(--border-accent); }
+        .card:hover {
+            border-color: var(--border-accent);
+            box-shadow: 0 0 20px rgba(74,144,164,0.08), 0 4px 16px rgba(0,0,0,0.2);
+        }
         .card-title {
             font-family: var(--font-mono);
             font-size: 11px;
