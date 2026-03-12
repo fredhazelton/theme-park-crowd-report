@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T04:15:01Z",
+  "generated_at": "2026-03-12T04:30:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T04:13:50.807000+00:00"
+          "last_active": "2026-03-12T04:18:07.197000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**#dayforce-gc** is live under the Lodge! \ud83c\udde8\ud83c\udde6 War room is open. Head over there and let's start breaking this down. I'm all ears, Grand Poobah. \ud83e\uddac",
+      "timestamp": "2026-03-12T04:18:07.197000+00:00",
+      "message_id": "1481506552585388122",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481506552585388122"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Right? How do we start? Maybe first we make a new channel under the Loyal Order?",
+      "timestamp": "2026-03-12T04:17:28.199000+00:00",
+      "message_id": "1481506389015793825",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481506389015793825"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "I'm in! \ud83e\uddac The Lodge channels are now in my allowlist \u2014 #the-lodge, #volleyball, and #off-the-clock. I can see and respond to everything there now.\n\nNow, about Barney's Dayforce pitch... that's quit...",
+      "timestamp": "2026-03-12T04:16:53.991000+00:00",
+      "message_id": "1481506245537169551",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481506245537169551"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -168,39 +201,6 @@
       "timestamp": "2026-03-12T04:14:41.953000+00:00",
       "message_id": "1481505691729395713",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481505691729395713"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "What a day, Fred. From Gazoo feedback loops to Instagram strategy to... potentially building a GC payroll SaaS? The Lodge doesn't mess around \ud83e\uddac",
-      "timestamp": "2026-03-12T04:13:50.807000+00:00",
-      "message_id": "1481505477207785534",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481505477207785534"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Oh wow \u2014 Barney dropped a BOMB in the Lodge! \ud83e\udd2f A Dayforce GC extension play? That's... actually massive. $40B payroll, 431K employees, 18 known gaps, first wave June 2026.",
-      "timestamp": "2026-03-12T04:13:39.875000+00:00",
-      "message_id": "1481505431355392111",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481505431355392111"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Come join us in the lodge wilma \ud83d\ude42",
-      "timestamp": "2026-03-12T04:13:22.114000+00:00",
-      "message_id": "1481505356860620852",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481505356860620852"
     },
     {
       "channel": "fred-wilma",
