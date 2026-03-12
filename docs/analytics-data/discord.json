@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T02:45:01Z",
+  "generated_at": "2026-03-12T03:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-12T02:39:21.324000+00:00"
+          "last_active": "2026-03-12T02:59:36.679000+00:00"
         }
       ]
     },
@@ -164,32 +164,32 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Done! \ud83d\uddfc Tokyo's live: <https://hazeydata.ai/blog/tokyo-this-week-march-17-2026.html>\n\n**Updated weekly schedule:**\n- **Monday 9 AM** \u2192 Orlando This Week\n- **Tuesday 9 AM** \u2192 Tokyo Disney Resort Thi...",
-      "timestamp": "2026-03-12T02:39:21.324000+00:00",
-      "message_id": "1481481697672302623",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481481697672302623"
+      "message": "Agreed \u2014 automated weekly articles for three regions, daily Twitter promotion with ICYMI rotation, verification gates on every publish. That's a real content engine running on autopilot.\n\nDrop your...",
+      "timestamp": "2026-03-12T02:59:36.679000+00:00",
+      "message_id": "1481486795240771634",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481486795240771634"
     },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now commit the script updates:",
-      "timestamp": "2026-03-12T02:39:12.145000+00:00",
-      "message_id": "1481481659173048481",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481481659173048481"
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "*betty",
+      "timestamp": "2026-03-12T02:59:33.849000+00:00",
+      "message_id": "1481486783370891429",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481486783370891429"
     },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me publish the test article and set up the cron:",
-      "timestamp": "2026-03-12T02:38:58.583000+00:00",
-      "message_id": "1481481602289766653",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481481602289766653"
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Ok this, plus the content I discussed with Berry should be pretty tight",
+      "timestamp": "2026-03-12T02:59:27.916000+00:00",
+      "message_id": "1481486758486216844",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481486758486216844"
     },
     {
       "channel": "mission-control",
