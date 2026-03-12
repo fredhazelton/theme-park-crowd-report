@@ -8,22 +8,22 @@
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
+            "task": "Set up Cloudflare Web Analytics on hazeydata.ai"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Design and build /pricing page on hazeydata.ai"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
             "task": "Model Competition Framework"
         },
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
             "task": "Pipeline Twins / Blue-Green Deploy for bot"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "Apple Weather-Style Crowd Report Images"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "Unhosted Twitch Stream (Data TV)"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123560888,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-12T04:30:04.488080"
+    "last_updated": "2026-03-12T04:45:03.782772"
 }
