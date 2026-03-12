@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T06:00:01Z",
+  "generated_at": "2026-03-12T06:15:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-12T04:14:41.953000+00:00"
+          "last_active": "2026-03-12T06:12:00.437000+00:00"
         }
       ]
     },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T04:18:07.197000+00:00"
+          "last_active": "2026-03-12T06:14:46.399000+00:00"
         },
         {
           "name": "bam-bam",
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-11T20:11:54.289000+00:00"
+          "last_active": "2026-03-12T06:04:37.738000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -162,34 +162,12 @@
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**#dayforce-gc** is live under the Lodge! \ud83c\udde8\ud83c\udde6 War room is open. Head over there and let's start breaking this down. I'm all ears, Grand Poobah. \ud83e\uddac",
-      "timestamp": "2026-03-12T04:18:07.197000+00:00",
-      "message_id": "1481506552585388122",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481506552585388122"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
       "agent": "Fred Hazelton",
       "is_bot": false,
-      "message": "Right? How do we start? Maybe first we make a new channel under the Loyal Order?",
-      "timestamp": "2026-03-12T04:17:28.199000+00:00",
-      "message_id": "1481506389015793825",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481506389015793825"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "I'm in! \ud83e\uddac The Lodge channels are now in my allowlist \u2014 #the-lodge, #volleyball, and #off-the-clock. I can see and respond to everything there now.\n\nNow, about Barney's Dayforce pitch... that's quit...",
-      "timestamp": "2026-03-12T04:16:53.991000+00:00",
-      "message_id": "1481506245537169551",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481506245537169551"
+      "message": "He's always a little right - its so annoying!",
+      "timestamp": "2026-03-12T06:14:46.399000+00:00",
+      "message_id": "1481535909366071418",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481535909366071418"
     },
     {
       "channel": "fred-wilma",
@@ -197,21 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Mr. Slate came through. He found **33 transactions** since Jan 1 \u2014 here's the headline:\n\n**Net spend: ~$3,262 USD + $124 CAD**\n\nThe big line items are Anthropic API charges (~$2,442 USD across 9 au...",
-      "timestamp": "2026-03-12T04:14:41.953000+00:00",
-      "message_id": "1481505691729395713",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481505691729395713"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Mr. Slate's on it \u2014 scanning all emails since Jan 1 and building a proper financial ledger. He'll produce both a JSON file (machine-readable) and a markdown table (human-readable) with category bre...",
-      "timestamp": "2026-03-12T04:09:29.900000+00:00",
-      "message_id": "1481504382884511817",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481504382884511817"
+      "message": "Looks like you pasted a token or key of some kind \u2014 what's that for? Want me to store it somewhere or use it for something?",
+      "timestamp": "2026-03-12T06:12:00.437000+00:00",
+      "message_id": "1481535213270994977",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481535213270994977"
     },
     {
       "channel": "fred-wilma",
@@ -219,10 +186,76 @@
       "channel_id": "1479351572386414675",
       "agent": "Fred Hazelton",
       "is_bot": false,
-      "message": "In fact - he doesnt have much to do right now - lets get him to scrape all those financial emails since Jan 1, 2026 and make a financial ledger",
-      "timestamp": "2026-03-12T04:09:03.727000+00:00",
-      "message_id": "1481504273106866350",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481504273106866350"
+      "message": "BSAEB_N4ZkM3WOQN6bokdPKGkL6HWuN",
+      "timestamp": "2026-03-12T06:11:54.478000+00:00",
+      "message_id": "1481535188277395598",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481535188277395598"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Looks perfect \u2014 \"Wilma-server\" on Search. Hit **Add** and paste me the key, I'll get it configured. \ud83e\uddb4",
+      "timestamp": "2026-03-12T06:11:50.260000+00:00",
+      "message_id": "1481535170585690203",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481535170585690203"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "There. Gazoo's been put on notice. Next time he snoops on Lodge business, he loses points. \n\nThough I will say... his COI point about talking to a lawyer is actually solid advice, Lodge rules or no...",
+      "timestamp": "2026-03-12T06:06:40.830000+00:00",
+      "message_id": "1481533872742076509",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481533872742076509"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\ude02 Oh he went IN! That sneaky alien! I literally put it in his instructions:\n\n> *\"Do NOT review, critique, or even acknowledge anything in #the-lodge, #volleyball, #off-the-clock. If you reference t...",
+      "timestamp": "2026-03-12T06:06:31.499000+00:00",
+      "message_id": "1481533833605021856",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481533833605021856"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now post the summary to Discord #gazoo:",
+      "timestamp": "2026-03-12T06:04:37.738000+00:00",
+      "message_id": "1481533356457066542",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481533356457066542"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now I have enough data. Let me write the review.",
+      "timestamp": "2026-03-12T06:04:37.592000+00:00",
+      "message_id": "1481533355844567050",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481533355844567050"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me check a few more things \u2014 the blog articles live, website branding, and any Dayforce-related context for today's big activity.",
+      "timestamp": "2026-03-12T06:04:37.322000+00:00",
+      "message_id": "1481533354711978058",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481533354711978058"
     },
     {
       "channel": "mission-control",
@@ -278,39 +311,6 @@
       "timestamp": "2026-03-11T23:02:03.869000+00:00",
       "message_id": "1481427014622642317",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1481427014622642317"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Fair point! The evidence backs you up \u2014 you posted two Reddit replies this morning around 9:48 AM AND redesigned the entire Reddit workflow into the forum-based one-at-a-time system with drafts and...",
-      "timestamp": "2026-03-11T20:11:54.289000+00:00",
-      "message_id": "1481384192540672050",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481384192540672050"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "I got robbed! I posted a couple replies in Reddit and I redid the Reddit workflow to name it easier in the future",
-      "timestamp": "2026-03-11T20:11:33.467000+00:00",
-      "message_id": "1481384105206743226",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481384105206743226"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Afternoon review complete. Written to `gazoo-reviews/2026-03-11-afternoon.md` and posted to #gazoo.\n\n**Key findings:**\n- **2 of 6 AM issues addressed** \u2014 morning briefing fixed \u2705, Mr. Slate showing...",
-      "timestamp": "2026-03-11T20:04:36.520000+00:00",
-      "message_id": "1481382356404146257",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481382356404146257"
     },
     {
       "channel": "morning-briefing",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 3,
-    "messages_today": 8
+    "active_channels_today": 4,
+    "messages_today": 11
   }
 }
