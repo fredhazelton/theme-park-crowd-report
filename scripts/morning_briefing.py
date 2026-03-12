@@ -196,6 +196,31 @@ def get_scraper_freshness() -> str:
     return "unknown"
 
 
+def get_v3_pipeline_status() -> dict | None:
+    """Check v3 pipeline status from pipeline_status.json (more reliable than bot health check alone)."""
+    status_file = Path("/mnt/data/pipeline/state/pipeline_status.json")
+    try:
+        if status_file.exists():
+            with open(status_file) as f:
+                data = json.load(f)
+            pipeline = data.get("pipeline", {})
+            steps = pipeline.get("steps", {})
+            # Check if all steps completed
+            all_done = all(s.get("status") == "done" for s in steps.values()) if steps else False
+            last_updated = data.get("last_updated", "")
+            wti_done = steps.get("wti", {}).get("done_at", "")
+            return {
+                "all_done": all_done,
+                "last_updated": last_updated,
+                "wti_done_at": wti_done,
+                "started_at": pipeline.get("started_at", ""),
+                "step_count": len(steps),
+            }
+    except Exception:
+        pass
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Format the briefing
 # ---------------------------------------------------------------------------
@@ -204,14 +229,41 @@ def format_briefing() -> str:
     lines = []
     lines.append(f"☀️ **Morning Briefing — {DOW}, {NOW.strftime('%B %d, %Y')}**\n")
 
-    # 1. Pipeline Status
+    # 1. Pipeline Status — use v3 pipeline_status.json as primary, bot health as secondary
+    v3 = get_v3_pipeline_status()
     status = get_pipeline_status()
-    health = status.get("status", "unknown")
-    health_emoji = {"healthy": "✅", "degraded": "⚠️", "critical": "🔴"}.get(health, "❓")
+    bot_health = status.get("status", "unknown")
+
+    if v3 and v3["all_done"]:
+        # v3 pipeline completed — trust it even if bot health check shows stale
+        health = "healthy"
+        health_emoji = "✅"
+        if v3["wti_done_at"]:
+            try:
+                wti_dt = datetime.fromisoformat(v3["wti_done_at"])
+                hours_ago = (NOW - wti_dt.astimezone(ET)).total_seconds() / 3600
+                if hours_ago > 26:
+                    health = "degraded"
+                    health_emoji = "⚠️"
+            except Exception:
+                pass
+    else:
+        health = bot_health
+        health_emoji = {"healthy": "✅", "degraded": "⚠️", "critical": "🔴"}.get(health, "❓")
+
     lines.append(f"**Pipeline:** {health_emoji} {health.title()}")
 
     scraper = get_scraper_freshness()
     lines.append(f"**Last scrape:** {scraper}")
+
+    # Show last pipeline completion time if available
+    if v3 and v3["wti_done_at"]:
+        try:
+            wti_dt = datetime.fromisoformat(v3["wti_done_at"])
+            lines.append(f"**Last pipeline run:** {wti_dt.astimezone(ET).strftime('%Y-%m-%d %H:%M ET')}")
+        except Exception:
+            pass
+
     lines.append("")
 
     # 2. Today's WTI
