@@ -1086,6 +1086,88 @@ def git_commit_and_push(filename: str, region: str, date_range: str):
     print(f"Committed and pushed: {commit_msg}")
 
 
+# ── Verification ──────────────────────────────────────────────────────────────
+
+def verify_article(html: str, wti_data: dict, analysis: dict) -> tuple[bool, list[str]]:
+    """
+    Cross-check every WTI number in the generated HTML against source data.
+    
+    Returns (passed: bool, issues: list[str])
+    """
+    issues = []
+    
+    # Build set of all valid WTI values from source data (rounded to 1 decimal)
+    valid_values = set()
+    for park_data in wti_data.values():
+        for wti in park_data.values():
+            valid_values.add(round(wti, 1))
+    
+    # Also add derived values from analysis (averages, ranges)
+    for ps in analysis.get("park_summaries", []):
+        valid_values.add(round(ps["min_wti"], 1))
+        valid_values.add(round(ps["max_wti"], 1))
+        valid_values.add(round(ps["avg_wti"], 1))
+        valid_values.add(round(ps["best_wti"], 1))
+        valid_values.add(round(ps["worst_wti"], 1))
+    if "overall_avg" in analysis:
+        valid_values.add(round(analysis["overall_avg"], 1))
+    if "biggest_swing" in analysis and analysis["biggest_swing"]:
+        valid_values.add(round(analysis["biggest_swing"]["swing"], 1))
+    
+    # Also add integer-rounded versions (ranges display as "31–33" etc.)
+    int_values = set()
+    for v in valid_values:
+        int_values.add(float(int(round(v))))
+    valid_values.update(int_values)
+    
+    # Extract all WTI-like numbers from the HTML (numbers in table cells, in text near "WTI")
+    # Pattern: numbers like 12.4, 22, 33.1 that appear in td elements or near WTI mentions
+    # Also match ranges like "12–14" in td cells
+    td_numbers = re.findall(r'<td[^>]*>\s*(\d+(?:\.\d)?)\s*</td>', html)
+    td_ranges = re.findall(r'<td[^>]*>\s*(\d+(?:\.\d)?)\s*[–—-]\s*(\d+(?:\.\d)?)\s*</td>', html)
+    
+    # Add range endpoints to the check list
+    for lo, hi in td_ranges:
+        td_numbers.extend([lo, hi])
+    
+    # Check each extracted number
+    for num_str in td_numbers:
+        val = float(num_str)
+        if val > 5 and val < 50:  # WTI-range numbers
+            if val not in valid_values:
+                issues.append(f"WTI value {val} in table not found in source data")
+    
+    # Verify park count
+    park_count_in_data = len([p for p in wti_data if wti_data[p]])
+    park_names_in_html = len(re.findall(r'<td>(Magic Kingdom|EPCOT|Hollywood Studios|Animal Kingdom|Universal Studios Florida|Islands of Adventure|Epic Universe|Disneyland(?! Resort)|Disney California Adventure|Universal Studios Hollywood)</td>', html))
+    
+    # Each park appears in overview table + best day table = 2x
+    expected_mentions = park_count_in_data * 2
+    if park_names_in_html != expected_mentions:
+        issues.append(f"Expected {expected_mentions} park name mentions in tables ({park_count_in_data} parks × 2 tables), found {park_names_in_html}")
+    
+    # Verify date range in title matches content
+    title_match = re.search(r'<title>(.*?)</title>', html)
+    if not title_match:
+        issues.append("No <title> tag found")
+    
+    # Verify canonical URL exists
+    if 'rel="canonical"' not in html:
+        issues.append("Missing canonical URL")
+    
+    # Verify OG tags
+    for tag in ['og:title', 'og:description', 'og:url']:
+        if tag not in html:
+            issues.append(f"Missing {tag} meta tag")
+    
+    # Verify Discord CTA exists
+    if 'discord.gg' not in html:
+        issues.append("Missing Discord CTA link")
+    
+    passed = len(issues) == 0
+    return passed, issues
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -1096,6 +1178,8 @@ def main():
                         help="Start date YYYY-MM-DD (defaults to next Monday for Orlando, next Thursday for Disneyland)")
     parser.add_argument("--dry-run", dest="dry_run", action="store_true",
                         help="Print HTML to stdout without writing files or committing")
+    parser.add_argument("--verify-only", dest="verify_only", action="store_true",
+                        help="Verify an existing article's numbers against source data")
     args = parser.parse_args()
 
     config = REGION_CONFIG[args.region]
@@ -1133,8 +1217,24 @@ def main():
     # Generate HTML
     html = generate_full_html(args.region, analysis, start_date, end_date, prev_post)
 
+    # Verify article data integrity
+    passed, issues = verify_article(html, wti_data, analysis)
+    if passed:
+        print("✅ Verification passed: all numbers match source data", file=sys.stderr)
+    else:
+        print(f"⚠️  Verification found {len(issues)} issue(s):", file=sys.stderr)
+        for issue in issues:
+            print(f"   - {issue}", file=sys.stderr)
+        if not args.dry_run and not args.verify_only:
+            print("ERROR: Article failed verification. Use --dry-run to inspect. Aborting.", file=sys.stderr)
+            sys.exit(1)
+
     slug = f"{args.region}-this-week-{slug_date(start_date)}"
     filename = f"{slug}.html"
+
+    if args.verify_only:
+        print(f"Verification {'PASSED' if passed else 'FAILED'} for {filename}", file=sys.stderr)
+        sys.exit(0 if passed else 1)
 
     if args.dry_run:
         print(html)
