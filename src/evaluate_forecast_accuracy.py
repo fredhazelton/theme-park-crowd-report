@@ -24,6 +24,7 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 from datetime import datetime, timedelta
 
@@ -35,6 +36,14 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 log = logging.getLogger(__name__)
+
+
+def _extract_date_from_filename(filename):
+    """Extract YYYY-MM-DD from any archive filename.
+
+    Works for forecast_*, forecast_v3_*, wti_*, etc."""
+    match = re.search(r"(\d{4}-\d{2}-\d{2})", filename)
+    return match.group(1) if match else None
 
 
 def get_config(output_base: str) -> dict:
@@ -220,7 +229,7 @@ def evaluate_accuracy(
         earliest_eval = min(eval_dates)
         valid_archives = [
             f for f in archive_files 
-            if os.path.basename(f).replace("forecast_", "").replace(".parquet", "") < earliest_eval
+            if (_extract_date_from_filename(f) or "") < earliest_eval
         ]
         forecast_archive = valid_archives[-1] if valid_archives else archive_files[0]
         log.info("Using archived forecast: %s", os.path.basename(forecast_archive))
@@ -426,7 +435,7 @@ def evaluate_accuracy(
             for eval_d in wti_date_list:
                 valid_wti_archives = [
                     f for f in wti_archives
-                    if os.path.basename(f).replace("wti_", "").replace(".parquet", "") < eval_d
+                    if (_extract_date_from_filename(f) or "") < eval_d
                 ]
                 if not valid_wti_archives:
                     continue
