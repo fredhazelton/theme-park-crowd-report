@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T11:30:01Z",
+  "generated_at": "2026-03-12T11:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T07:53:25.164000+00:00"
+          "last_active": "2026-03-12T11:30:53.685000+00:00"
         },
         {
           "name": "bam-bam",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "```\n\ud83d\udcca WTI Accuracy Report \u2014 2026-03-11\n\n\u26a0\ufe0f No forecast/actual comparison available for this date.\n```",
+      "timestamp": "2026-03-12T11:30:53.685000+00:00",
+      "message_id": "1481615463929614388",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481615463929614388"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me check yesterday's data for comparison:",
+      "timestamp": "2026-03-12T11:30:45.410000+00:00",
+      "message_id": "1481615429222010920",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481615429222010920"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "- Tokyo parks stable at 1.5 (TDL) and 1.3\u2192**1.5** (TDS)\n- Universal steady at 1.3\n\n**TL;DR:** Accuracy is stable day-over-day. The adaptive stretch factors shifted notably for MK (up) and DL (down)...",
+      "timestamp": "2026-03-12T11:30:42.330000+00:00",
+      "message_id": "1481615416303419444",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481615416303419444"
+    },
     {
       "channel": "morning-briefing",
       "channel_emoji": "\u2600\ufe0f",
@@ -236,28 +269,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481577496481894432"
     },
     {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Deleted it. \ud83d\uddd1\ufe0f\n\n**What to do now:**\n1. Go to <https://discord.com/developers/applications> \u2192 select the bot \u2192 **Bot** \u2192 **Reset Token**\n2. Copy the new token\n3. Update it wherever it's configured (...",
-      "timestamp": "2026-03-12T07:53:25.164000+00:00",
-      "message_id": "1481560734465921147",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481560734465921147"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udea8 **Fred \u2014 that's a Discord bot token!** Delete that message and regenerate the token ASAP in the [Discord Developer Portal](https://discord.com/developers/applications). Once a token is posted in ...",
-      "timestamp": "2026-03-12T07:53:17.909000+00:00",
-      "message_id": "1481560704036114576",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481560704036114576"
-    },
-    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -267,17 +278,6 @@
       "timestamp": "2026-03-12T07:00:02.279000+00:00",
       "message_id": "1481547300592685078",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481547300592685078"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "- **0 stale tasks** (down from 1)\n\nMission Control tasks.json regenerated. Board is clean. \ud83e\uddf9",
-      "timestamp": "2026-03-12T06:33:32.115000+00:00",
-      "message_id": "1481540630961197239",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481540630961197239"
     },
     {
       "channel": "fred-wilma",
