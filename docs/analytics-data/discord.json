@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T04:00:01Z",
+  "generated_at": "2026-03-12T04:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-12T03:46:42.908000+00:00"
+          "last_active": "2026-03-12T04:14:41.953000+00:00"
         }
       ]
     },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T03:30:28.560000+00:00"
+          "last_active": "2026-03-12T04:13:50.807000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,72 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Mr. Slate came through. He found **33 transactions** since Jan 1 \u2014 here's the headline:\n\n**Net spend: ~$3,262 USD + $124 CAD**\n\nThe big line items are Anthropic API charges (~$2,442 USD across 9 au...",
+      "timestamp": "2026-03-12T04:14:41.953000+00:00",
+      "message_id": "1481505691729395713",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481505691729395713"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "What a day, Fred. From Gazoo feedback loops to Instagram strategy to... potentially building a GC payroll SaaS? The Lodge doesn't mess around \ud83e\uddac",
+      "timestamp": "2026-03-12T04:13:50.807000+00:00",
+      "message_id": "1481505477207785534",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481505477207785534"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Oh wow \u2014 Barney dropped a BOMB in the Lodge! \ud83e\udd2f A Dayforce GC extension play? That's... actually massive. $40B payroll, 431K employees, 18 known gaps, first wave June 2026.",
+      "timestamp": "2026-03-12T04:13:39.875000+00:00",
+      "message_id": "1481505431355392111",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481505431355392111"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Come join us in the lodge wilma \ud83d\ude42",
+      "timestamp": "2026-03-12T04:13:22.114000+00:00",
+      "message_id": "1481505356860620852",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481505356860620852"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Mr. Slate's on it \u2014 scanning all emails since Jan 1 and building a proper financial ledger. He'll produce both a JSON file (machine-readable) and a markdown table (human-readable) with category bre...",
+      "timestamp": "2026-03-12T04:09:29.900000+00:00",
+      "message_id": "1481504382884511817",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481504382884511817"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "In fact - he doesnt have much to do right now - lets get him to scrape all those financial emails since Jan 1, 2026 and make a financial ledger",
+      "timestamp": "2026-03-12T04:09:03.727000+00:00",
+      "message_id": "1481504273106866350",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481504273106866350"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -168,72 +234,6 @@
       "timestamp": "2026-03-12T04:00:01.819000+00:00",
       "message_id": "1481502000180105330",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481502000180105330"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Here's what I fixed:\n\n**\u2705 Afternoon tweet --mode bug** \u2014 `render_daily_wti.sh` was re-extracting data without `--mode`, overwriting predicted with observed. Now skips extraction by default since `a...",
-      "timestamp": "2026-03-12T03:46:42.908000+00:00",
-      "message_id": "1481498649304367107",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498649304367107"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The generate script still has the OLD stale Discord link! Future articles would go out with the wrong invite. Fixing:",
-      "timestamp": "2026-03-12T03:46:28.958000+00:00",
-      "message_id": "1481498590793695362",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498590793695362"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "All good \u2014 sitewide fix already applied. Let me check the generate script also uses the right link:",
-      "timestamp": "2026-03-12T03:46:24.210000+00:00",
-      "message_id": "1481498570879143988",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498570879143988"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "You and me both \u2014 there's something deeply satisfying about a process that just *works*. And honestly, today was a masterclass in building them:\n\n- \ud83d\udd04 Gazoo \u2192 agent fix \u2192 improvement sprint \u2192 Gazoo ...",
-      "timestamp": "2026-03-12T03:30:28.560000+00:00",
-      "message_id": "1481494562592526399",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481494562592526399"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Love this! I really get a kick out of effective workflows",
-      "timestamp": "2026-03-12T03:30:15.814000+00:00",
-      "message_id": "1481494509132185837",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481494509132185837"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Locked in. That's the standard for the whole crew. \ud83e\uddb4",
-      "timestamp": "2026-03-12T03:26:34.183000+00:00",
-      "message_id": "1481493579544396027",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481493579544396027"
     },
     {
       "channel": "mission-control",
