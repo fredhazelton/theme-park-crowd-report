@@ -67,14 +67,15 @@
         
         .thanks .heart {
             color: #A60038;
+            display: inline-block;
             animation: heartbeat 1.5s ease-in-out infinite;
         }
         
         @keyframes heartbeat {
             0%, 100% { transform: scale(1); }
-            25% { transform: scale(1.1); }
+            25% { transform: scale(1.15); }
             50% { transform: scale(1); }
-            75% { transform: scale(1.1); }
+            75% { transform: scale(1.15); }
         }
         
         .subtext {
@@ -86,12 +87,14 @@
         }
         
         .cta-box {
-            background: rgba(10, 22, 40, 0.8);
-            border: 1px solid rgba(74, 144, 164, 0.4);
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(74, 144, 164, 0.3);
+            border-radius: 12px;
             padding: 30px 50px;
             margin-bottom: 50px;
             display: inline-block;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
         .cta-title {

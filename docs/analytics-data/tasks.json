@@ -768,15 +768,15 @@
       "id": "task-055",
       "title": "Design and build /pricing page on hazeydata.ai",
       "description": "Create pricing page showing 3 consumer tiers (Free/Explorer $4.99/Pro $9.99). Start with Coming Soon + email capture. Per go-to-market-week1.md Day 2. Even without Stripe, signals this is a real product.",
-      "status": "todo",
-      "column": "backlog",
+      "status": "review",
+      "column": "review",
       "priority": "high",
       "owner": "Pebbles",
       "project": "Business",
       "is_recurring": false,
       "created": "2026-03-12",
-      "updated": "2026-03-12T16:30:00",
-      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo."
+      "updated": "2026-03-12T18:00:00",
+      "notes": "[Pebbles PM 2026-03-12] Pricing page built with 3 consumer tiers, B2B API section, feature comparison table, email waitlist. Glassmorphism design system. Deployed to web/pricing.html."
     }
   ],
   "live_activity": []
