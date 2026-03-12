@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T06:15:02Z",
+  "generated_at": "2026-03-12T06:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-12T06:12:00.437000+00:00"
+          "last_active": "2026-03-12T06:15:51.936000+00:00"
         }
       ]
     },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T06:14:46.399000+00:00"
+          "last_active": "2026-03-12T06:18:18.344000+00:00"
         },
         {
           "name": "bam-bam",
@@ -162,45 +162,12 @@
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "He's always a little right - its so annoying!",
-      "timestamp": "2026-03-12T06:14:46.399000+00:00",
-      "message_id": "1481535909366071418",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481535909366071418"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Looks like you pasted a token or key of some kind \u2014 what's that for? Want me to store it somewhere or use it for something?",
-      "timestamp": "2026-03-12T06:12:00.437000+00:00",
-      "message_id": "1481535213270994977",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481535213270994977"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "BSAEB_N4ZkM3WOQN6bokdPKGkL6HWuN",
-      "timestamp": "2026-03-12T06:11:54.478000+00:00",
-      "message_id": "1481535188277395598",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481535188277395598"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Looks perfect \u2014 \"Wilma-server\" on Search. Hit **Add** and paste me the key, I'll get it configured. \ud83e\uddb4",
-      "timestamp": "2026-03-12T06:11:50.260000+00:00",
-      "message_id": "1481535170585690203",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481535170585690203"
+      "message": "Got it \u2014 Fred wants Gazoo to be warmer. The personality is currently \"snarky\" and \"brutally honest\" with \"grudging\" praise. Fred's saying he wouldn't mind Gazoo showing a bit more of that secret in...",
+      "timestamp": "2026-03-12T06:18:18.344000+00:00",
+      "message_id": "1481536798327967836",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481536798327967836"
     },
     {
       "channel": "wilma",
@@ -208,21 +175,54 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "There. Gazoo's been put on notice. Next time he snoops on Lodge business, he loses points. \n\nThough I will say... his COI point about talking to a lawyer is actually solid advice, Lodge rules or no...",
-      "timestamp": "2026-03-12T06:06:40.830000+00:00",
-      "message_id": "1481533872742076509",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481533872742076509"
+      "message": "Now I have context \u2014 Fred's talking about Gazoo. Gazoo gave accurate but perhaps cold/clinical feedback, and Fred wants more warmth from him. Let me check what Gazoo is and where his personality is...",
+      "timestamp": "2026-03-12T06:17:56.267000+00:00",
+      "message_id": "1481536705730314372",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481536705730314372"
     },
     {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "I wouldn't hate a little more warmth behind his comments. After all, WE created him!",
+      "timestamp": "2026-03-12T06:16:31.670000+00:00",
+      "message_id": "1481536350904909905",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481536350904909905"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\ud83d\ude02 Oh he went IN! That sneaky alien! I literally put it in his instructions:\n\n> *\"Do NOT review, critique, or even acknowledge anything in #the-lodge, #volleyball, #off-the-clock. If you reference t...",
-      "timestamp": "2026-03-12T06:06:31.499000+00:00",
-      "message_id": "1481533833605021856",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481533833605021856"
+      "message": "Brave Search API key is configured and the gateway restarted successfully. \ud83d\udd0d I can now use `web_search` for lookups anytime you need it.",
+      "timestamp": "2026-03-12T06:15:51.936000+00:00",
+      "message_id": "1481536184248438896",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481536184248438896"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Found it \u2014 the Brave Search API key goes under `tools.web.search.apiKey`. Let me patch that in.",
+      "timestamp": "2026-03-12T06:15:31.697000+00:00",
+      "message_id": "1481536099359658005",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481536099359658005"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "I need to check the config schema for where Brave Search API keys go.",
+      "timestamp": "2026-03-12T06:15:25.179000+00:00",
+      "message_id": "1481536072021311612",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481536072021311612"
     },
     {
       "channel": "gazoo",
