@@ -24,11 +24,28 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import tweepy
+from urllib.parse import urlencode
 
 # ── Paths ────────────────────────────────────────────────────────
 BLOG_DIR = Path.home() / "hazeydata.ai" / "blog"
 STATE_FILE = Path.home() / "hazeydata" / "pipeline" / "state" / "blog_promo_state.json"
 BASE_URL = "https://hazeydata.ai/blog"
+
+
+# ── UTM Helpers ──────────────────────────────────────────────────
+
+def add_utm(url: str, source: str = "twitter", medium: str = "social",
+            campaign: str = "blog_promo", content: str = "") -> str:
+    """Add UTM tracking parameters to a URL."""
+    params = {
+        "utm_source": source,
+        "utm_medium": medium,
+        "utm_campaign": campaign,
+    }
+    if content:
+        params["utm_content"] = content
+    separator = "&" if "?" in url else "?"
+    return f"{url}{separator}{urlencode(params)}"
 
 # Articles to never ICYMI (too old, not evergreen, etc.)
 EXCLUDE_SLUGS = set()
@@ -167,7 +184,8 @@ def pick_icymi(articles: list[dict], state: dict) -> dict | None:
 def compose_new_tweet(article: dict) -> str:
     """Compose tweet for a freshly published article."""
     title = article["title"]
-    url = article["url"]
+    url = add_utm(article["url"], source="twitter", medium="social",
+                  campaign="blog_promo", content="new")
 
     if article["region"] == "orlando":
         hooks = [
@@ -200,7 +218,8 @@ def compose_new_tweet(article: dict) -> str:
 def compose_icymi_tweet(article: dict) -> str:
     """Compose ICYMI tweet for an older article."""
     title = article["title"]
-    url = article["url"]
+    url = add_utm(article["url"], source="twitter", medium="social",
+                  campaign="blog_promo", content="icymi")
 
     if article["is_weekly"]:
         return f"📌 ICYMI: {title}\n\nStill relevant if you're planning a trip this week. Park-by-park crowd data inside.\n\n{url}"
