@@ -366,7 +366,7 @@ def generate_article_body(region: str, analysis: dict, start_date: datetime.date
     parts.append("""
             <div class="blog-cta-box">
                 <p><strong>Get daily WTI forecasts for all 12 parks.</strong> Just type <code>/today</code> or <code>/crowd</code> in the Discord — free during beta.</p>
-                <a href="https://discord.gg/wGcKWqdt" class="btn btn-primary" target="_blank" style="margin-top: 0.5rem;">Join the Discord — It's Free</a>
+                <a href="https://discord.gg/pUgpecugth" class="btn btn-primary" target="_blank" style="margin-top: 0.5rem;">Join the Discord — It's Free</a>
             </div>""")
 
     # ── Author sig ──
@@ -866,7 +866,7 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
             <div class="nav-links">
                 <a href="/">Home</a>
                 <a href="/blog/">Blog</a>
-                <a href="https://discord.gg/wGcKWqdt" class="btn btn-sm" target="_blank">Join Discord</a>
+                <a href="https://discord.gg/pUgpecugth" class="btn btn-sm" target="_blank">Join Discord</a>
             </div>
         </nav>
         <div class="hero-content">
@@ -901,7 +901,7 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
                 <a href="/">Home</a>
                 <a href="/blog/">Blog</a>
                 <a href="/bio.html">About</a>
-                <a href="https://discord.gg/wGcKWqdt" target="_blank">Discord</a>
+                <a href="https://discord.gg/pUgpecugth" target="_blank">Discord</a>
                 <a href="https://twitter.com/disneystatswhiz" target="_blank">Twitter</a>
                 <a href="mailto:fred@hazeydata.ai">Contact</a>
             </div>
