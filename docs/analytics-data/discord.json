@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T19:30:02Z",
+  "generated_at": "2026-03-12T19:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T19:22:57.466000+00:00"
+          "last_active": "2026-03-12T19:44:20.910000+00:00"
         },
         {
           "name": "bam-bam",
@@ -164,21 +164,10 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Done \u2014 every heartbeat I'll check for new emails from Anik beyond the usual appointment/receipt stuff. The moment she reaches out about Clawdbot, you'll know. \ud83e\uddb4",
-      "timestamp": "2026-03-12T19:22:57.466000+00:00",
-      "message_id": "1481734262477553787",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481734262477553787"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Let\u2019s add to your heartbeat to check for messages from her",
-      "timestamp": "2026-03-12T19:22:43.726000+00:00",
-      "message_id": "1481734204847820841",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481734204847820841"
+      "message": "Take a look and let me know what you'd tweak! Should deploy in about a minute. \ud83e\udea8",
+      "timestamp": "2026-03-12T19:44:20.910000+00:00",
+      "message_id": "1481739645631856852",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481739645631856852"
     },
     {
       "channel": "wilma",
@@ -186,10 +175,21 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Not yet \u2014 just the usual appointment confirmations and a receipt. Nothing new from her asking about Clawdbot. She might still be with clients or thinking about what to write. I'll keep watching! \ud83d\udc40",
-      "timestamp": "2026-03-12T19:21:59.908000+00:00",
-      "message_id": "1481734021061939434",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481734021061939434"
+      "message": "It's live! \ud83c\udf89\n\n**\ud83d\udc49 <https://hazeydata.ai/construction-pitch.html>**\n\n10 animated slides \u2014 navigate with arrow keys, spacebar, swipe, or the buttons:\n\n1. **Title** \u2014 Building Smarter \ud83c\udfd7\ufe0f\ud83e\uddb4\n2. **The Pro...",
+      "timestamp": "2026-03-12T19:44:20.705000+00:00",
+      "message_id": "1481739644772155647",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481739644772155647"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me get this up on the draft page so you can see it:",
+      "timestamp": "2026-03-12T19:43:44.820000+00:00",
+      "message_id": "1481739494259560558",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481739494259560558"
     },
     {
       "channel": "fred-wilma",
