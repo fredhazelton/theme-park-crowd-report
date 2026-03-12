@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T03:15:01Z",
+  "generated_at": "2026-03-12T03:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-11T20:39:04.888000+00:00"
+          "last_active": "2026-03-12T03:26:34.183000+00:00"
         },
         {
           "name": "bam-bam",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Locked in. That's the standard for the whole crew. \ud83e\uddb4",
+      "timestamp": "2026-03-12T03:26:34.183000+00:00",
+      "message_id": "1481493579544396027",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481493579544396027"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "OK, so we are all set. This is the new workflow for any content review.  Somebody builds it they render it on the draft page put the link into the content review. I click on it, interact with it by...",
+      "timestamp": "2026-03-12T03:26:24.940000+00:00",
+      "message_id": "1481493540776444146",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481493540776444146"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Even better \u2014 one less thing to build! \ud83d\ude04 Keep it simple. \ud83e\uddb4",
+      "timestamp": "2026-03-12T03:25:37.824000+00:00",
+      "message_id": "1481493343157489878",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481493343157489878"
+    },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
@@ -234,39 +267,6 @@
       "timestamp": "2026-03-11T23:02:03.869000+00:00",
       "message_id": "1481427014622642317",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1481427014622642317"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Got it \u2014 afternoon tweets unblocked and running. Between that, the 8 Reddit comments, and the morning auto-tweets, your social presence is way more active than anyone was giving you credit for. I'l...",
-      "timestamp": "2026-03-11T20:39:04.888000+00:00",
-      "message_id": "1481391031768322262",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481391031768322262"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good to know! Let me update that task \u2014 Dino had it marked as blocked.",
-      "timestamp": "2026-03-11T20:39:04.565000+00:00",
-      "message_id": "1481391030413819964",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481391030413819964"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Fixed.** From now on:\n- \u2705 **Gazoo** checks `check_reddit_activity.py` before grading Fred on marketing\n- \u2705 **Marketing sprint nudge** will check your actual activity before nagging you\n- \u2705 **Dino...",
-      "timestamp": "2026-03-11T20:38:47.932000+00:00",
-      "message_id": "1481390960649965619",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481390960649965619"
     },
     {
       "channel": "gazoo",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 2,
-    "messages_today": 4
+    "active_channels_today": 3,
+    "messages_today": 7
   }
 }
