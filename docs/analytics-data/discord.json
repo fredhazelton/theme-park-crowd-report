@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T20:45:01Z",
+  "generated_at": "2026-03-12T21:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": ""
+          "last_active": "2026-03-12T09:00:01.540000+00:00"
         },
         {
           "name": "daily-digest",
@@ -71,7 +71,7 @@
           "emoji": "\ud83d\udea8",
           "purpose": "System alerts \u2014 pipeline failures, accuracy drops, infrastructure issues",
           "url": "https://discord.com/channels/1479350342318690505/1479471928262529088",
-          "last_active": ""
+          "last_active": "2026-03-11T10:30:42.181000+00:00"
         }
       ]
     },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T20:37:15.575000+00:00"
+          "last_active": "2026-03-12T20:58:59.385000+00:00"
         },
         {
           "name": "bam-bam",
@@ -96,7 +96,7 @@
           "emoji": "\ud83c\udfcf",
           "purpose": "Bam-Bam's workspace \u2014 coding tasks, Discord bot development",
           "url": "https://discord.com/channels/1479350342318690505/1479351580347072675",
-          "last_active": ""
+          "last_active": "2026-03-08T05:05:27.753000+00:00"
         },
         {
           "name": "barney",
@@ -162,12 +162,12 @@
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Amazing!!",
-      "timestamp": "2026-03-12T20:37:15.575000+00:00",
-      "message_id": "1481752961141964810",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481752961141964810"
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Back online \u2014 **#side-hustles** is now in my allowlist. Try me over there, I should be listening now! \ud83e\uddac\ud83e\uddb4",
+      "timestamp": "2026-03-12T20:58:59.385000+00:00",
+      "message_id": "1481758429717463155",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481758429717463155"
     },
     {
       "channel": "wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\ud83e\udd95 **Dino Work Session \u2014 March 12, 2026 PM** (posting here \u2014 Discord API issues on #dino forum)\n\n**AM grade:** 6/10 \u2192 **PM grade:** 6/10\n\n**Progress:**\n- Fixed schema inconsistencies: normalized 3 t...",
-      "timestamp": "2026-03-12T20:34:33.864000+00:00",
-      "message_id": "1481752282877132972",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481752282877132972"
+      "message": "I see \u2014 need to add `side-hustles` and `validation-queue` to the allowlist:",
+      "timestamp": "2026-03-12T20:58:40.344000+00:00",
+      "message_id": "1481758349853986888",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481758349853986888"
     },
     {
       "channel": "wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Full crew's in! 3\u00d73 grid now:\n\n```\n| \ud83e\uddb4 Wilma        | \ud83e\udea8 Barney              | \ud83c\udfcf Bam-Bam        |\n| --------------- | ---------------------- | ----------------- |\n| **Ops Manager**     | **Strategic...",
-      "timestamp": "2026-03-12T20:34:09.597000+00:00",
-      "message_id": "1481752181093699705",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481752181093699705"
+      "message": "Right \u2014 same problem as the Lodge earlier. I need to add #side-hustles to my channel allowlist. Let me fix that:",
+      "timestamp": "2026-03-12T20:58:30.238000+00:00",
+      "message_id": "1481758307466088498",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481758307466088498"
     },
     {
       "channel": "gazoo",
@@ -324,6 +324,39 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1481578576477421736"
     },
     {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-12T09:00:01.540000+00:00",
+      "message_id": "1481577496481894432",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481577496481894432"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-12T07:00:02.279000+00:00",
+      "message_id": "1481547300592685078",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481547300592685078"
+    },
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-12T04:00:01.819000+00:00",
+      "message_id": "1481502000180105330",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481502000180105330"
+    },
+    {
       "channel": "morning-briefing",
       "channel_emoji": "\u2600\ufe0f",
       "channel_id": "1479351589176082526",
@@ -335,53 +368,20 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481252862385193094"
     },
     {
-      "channel": "morning-briefing",
-      "channel_emoji": "\u2600\ufe0f",
-      "channel_id": "1479351589176082526",
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\u2600\ufe0f **Morning Briefing \u2014 Wednesday, March 11, 2026**\n\n**Pipeline:** \u2705 Healthy\n**Last scrape:** ~2026-03-11 03:03 ET (file mtime)\n\n**\ud83d\udcca Today's Crowd Levels (WTI)**\n\ud83c\udff0 WDW: \u26aa **MK** 21.1 \u00b7 \u26aa **EP** 22....",
-      "timestamp": "2026-03-11T07:03:33.553000+00:00",
-      "message_id": "1481185798874206302",
-      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481185798874206302"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Pulled and confirmed. `main` is at `dc1a832` \u2014 PR #13 code is in place. s05 conversion and s06 synthetic steps are both there under `pipeline_v3/steps/`.\n\nReady for tomorrow's 6am cron. Same monito...",
-      "timestamp": "2026-03-10T16:16:52.560000+00:00",
-      "message_id": "1480962657736462437",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1480962657736462437"
-    },
-    {
-      "channel": "modeling",
-      "channel_emoji": "\ud83e\uddea",
-      "channel_id": "1479351576232591491",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83d\udfe2 **Synthetic really helps high-error entities** \u2014 EP155: 11.36 \u2192 9.86, MK23: 9.81 \u2192 7.97. When real data is noisy, synthetic provides useful regularization.\n\n\ud83d\udfe1 **Adaptive sigmoid was a bust** \u2014 it...",
-      "timestamp": "2026-03-06T17:44:04.894000+00:00",
-      "message_id": "1479535052273484040",
-      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535052273484040"
-    },
-    {
-      "channel": "modeling",
-      "channel_emoji": "\ud83e\uddea",
-      "channel_id": "1479351576232591491",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "## \ud83e\uddea Weighting Experiment Complete \u2014 Synthetic vs Real Data\n\nJust finished running all 105 model combinations (15 entities \u00d7 7 weighting schemes). Full results: `research/weighting-experiment-resul...",
-      "timestamp": "2026-03-06T17:44:04.705000+00:00",
-      "message_id": "1479535051480760360",
-      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535051480760360"
+      "message": "Got it \u2014 `#park-intel` is `1479351592108036249`. Let me post the report.",
+      "timestamp": "2026-03-11T10:30:42.181000+00:00",
+      "message_id": "1481237928318472302",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237928318472302"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 6,
-    "messages_today": 15
+    "active_channels_today": 7,
+    "messages_today": 18
   }
 }
