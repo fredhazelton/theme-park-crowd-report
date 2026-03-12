@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T06:30:01Z",
+  "generated_at": "2026-03-12T06:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T06:18:18.344000+00:00"
+          "last_active": "2026-03-12T06:33:32.115000+00:00"
         },
         {
           "name": "bam-bam",
@@ -164,10 +164,10 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Got it \u2014 Fred wants Gazoo to be warmer. The personality is currently \"snarky\" and \"brutally honest\" with \"grudging\" praise. Fred's saying he wouldn't mind Gazoo showing a bit more of that secret in...",
-      "timestamp": "2026-03-12T06:18:18.344000+00:00",
-      "message_id": "1481536798327967836",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481536798327967836"
+      "message": "- **0 stale tasks** (down from 1)\n\nMission Control tasks.json regenerated. Board is clean. \ud83e\uddf9",
+      "timestamp": "2026-03-12T06:33:32.115000+00:00",
+      "message_id": "1481540630961197239",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481540630961197239"
     },
     {
       "channel": "wilma",
@@ -175,21 +175,21 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Now I have context \u2014 Fred's talking about Gazoo. Gazoo gave accurate but perhaps cold/clinical feedback, and Fred wants more warmth from him. Let me check what Gazoo is and where his personality is...",
-      "timestamp": "2026-03-12T06:17:56.267000+00:00",
-      "message_id": "1481536705730314372",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481536705730314372"
+      "message": "\ud83e\udd95 **Dino Work Session \u2014 March 12, 2026 AM**\n\n**Gazoo grade:** 6/10\n> *\"8 remaining todos include stale items like task-030 and task-034 that haven't moved since creation. Time for a prune.\"*\n\n**Fix...",
+      "timestamp": "2026-03-12T06:33:31.893000+00:00",
+      "message_id": "1481540630030188636",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481540630030188636"
     },
     {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "I wouldn't hate a little more warmth behind his comments. After all, WE created him!",
-      "timestamp": "2026-03-12T06:16:31.670000+00:00",
-      "message_id": "1481536350904909905",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481536350904909905"
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Got it \u2014 Fred wants Gazoo to be warmer. The personality is currently \"snarky\" and \"brutally honest\" with \"grudging\" praise. Fred's saying he wouldn't mind Gazoo showing a bit more of that secret in...",
+      "timestamp": "2026-03-12T06:18:18.344000+00:00",
+      "message_id": "1481536798327967836",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481536798327967836"
     },
     {
       "channel": "fred-wilma",

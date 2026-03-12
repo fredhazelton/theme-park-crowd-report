@@ -8,22 +8,22 @@
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
-            "task": "Content: Thanksgiving 2026 Crowd Predictions"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
-            "task": "Fix Firecrawl async API bug"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
             "task": "Model Competition Framework"
         },
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
             "task": "Pipeline Twins / Blue-Green Deploy for bot"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Apple Weather-Style Crowd Report Images"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Unhosted Twitch Stream (Data TV)"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123560888,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-12T02:30:04.326127"
+    "last_updated": "2026-03-12T02:45:04.482090"
 }
