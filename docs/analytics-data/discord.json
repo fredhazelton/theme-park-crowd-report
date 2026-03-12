@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T11:15:01Z",
+  "generated_at": "2026-03-12T11:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -55,7 +55,7 @@
           "emoji": "\ud83d\udd27",
           "purpose": "Pipeline monitoring \u2014 ETL status, forecast runs, data quality checks",
           "url": "https://discord.com/channels/1479350342318690505/1479351574177513576",
-          "last_active": "2026-03-10T16:16:52.560000+00:00"
+          "last_active": "2026-03-12T11:21:58.865000+00:00"
         },
         {
           "name": "modeling",
@@ -144,7 +144,7 @@
           "emoji": "\u2600\ufe0f",
           "purpose": "Automated morning briefings \u2014 daily agenda, weather, key metrics",
           "url": "https://discord.com/channels/1479350342318690505/1479351589176082526",
-          "last_active": "2026-03-11T11:30:02.740000+00:00"
+          "last_active": "2026-03-12T11:30:03.111000+00:00"
         },
         {
           "name": "mr-slate",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "morning-briefing",
+      "channel_emoji": "\u2600\ufe0f",
+      "channel_id": "1479351589176082526",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2600\ufe0f **Morning Briefing \u2014 Thursday, March 12, 2026**\n\n**Pipeline:** \ud83d\udd34 Critical\n**Last scrape:** ~2026-03-12 07:28 ET (file mtime)\n\n**\ud83d\udcca Today's Crowd Levels (WTI)**\n\ud83c\udff0 WDW: \u26aa **MK** 22.5 \u00b7 \ud83d\udc8e **EP** 15....",
+      "timestamp": "2026-03-12T11:30:03.111000+00:00",
+      "message_id": "1481615251807146095",
+      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481615251807146095"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Yes \u2014 pipeline ran and completed successfully this morning. \u2705\n\n**Today's run (v4, first full production):**\n- **Started:** 6:00 AM | **Completed:** 6:50 AM | **Total: 50 minutes**\n- All 12 steps pa...",
+      "timestamp": "2026-03-12T11:21:58.865000+00:00",
+      "message_id": "1481613220732080210",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481613220732080210"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Did we get a pipeline refresh this morning as scheduled?",
+      "timestamp": "2026-03-12T11:21:22.648000+00:00",
+      "message_id": "1481613068827099147",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481613068827099147"
+    },
     {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
@@ -344,44 +377,11 @@
       "timestamp": "2026-03-11T10:30:42.181000+00:00",
       "message_id": "1481237928318472302",
       "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237928318472302"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The script saves the chunks for me to post. Let me check which channel #park-intel is.",
-      "timestamp": "2026-03-11T10:30:41.799000+00:00",
-      "message_id": "1481237926716379207",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237926716379207"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "The script generated the report but wants me to post it via the message tool. Let me grab the report content and post it.",
-      "timestamp": "2026-03-11T10:30:41.554000+00:00",
-      "message_id": "1481237925688508419",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237925688508419"
-    },
-    {
-      "channel": "morning-briefing",
-      "channel_emoji": "\u2600\ufe0f",
-      "channel_id": "1479351589176082526",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\u2600\ufe0f **Morning Briefing \u2014 Wednesday, March 11, 2026**\n\n**Pipeline:** \u2705 Healthy\n**Last scrape:** ~2026-03-11 03:03 ET (file mtime)\n\n**\ud83d\udcca Today's Crowd Levels (WTI)**\n\ud83c\udff0 WDW: \u26aa **MK** 21.1 \u00b7 \u26aa **EP** 22....",
-      "timestamp": "2026-03-11T07:03:33.553000+00:00",
-      "message_id": "1481185798874206302",
-      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481185798874206302"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 5,
-    "messages_today": 15
+    "active_channels_today": 7,
+    "messages_today": 18
   }
 }
