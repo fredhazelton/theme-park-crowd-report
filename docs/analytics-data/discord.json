@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T15:00:01Z",
+  "generated_at": "2026-03-12T15:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-12T14:00:06.476000+00:00"
+          "last_active": "2026-03-12T15:00:12.823000+00:00"
         }
       ]
     },
@@ -158,6 +158,28 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "March 12 is within the sprint window (Mar 8\u201321), so time to nudge.",
+      "timestamp": "2026-03-12T15:00:12.823000+00:00",
+      "message_id": "1481668140772360234",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481668140772360234"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Hey \u2014 marketing sprint check-in! Your Reddit targets are in #content-ideas and today's WTI animation is in #content-review. 30 min, that's it. The pipeline stuff can wait \u2014 growth can't. \ud83e\uddb4",
+      "timestamp": "2026-03-12T15:00:09.550000+00:00",
+      "message_id": "1481668127044538613",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481668127044538613"
+    },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
@@ -289,28 +311,6 @@
       "timestamp": "2026-03-12T07:00:02.279000+00:00",
       "message_id": "1481547300592685078",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481547300592685078"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Brave Search API key is configured and the gateway restarted successfully. \ud83d\udd0d I can now use `web_search` for lookups anytime you need it.",
-      "timestamp": "2026-03-12T06:15:51.936000+00:00",
-      "message_id": "1481536184248438896",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481536184248438896"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Found it \u2014 the Brave Search API key goes under `tools.web.search.apiKey`. Let me patch that in.",
-      "timestamp": "2026-03-12T06:15:31.697000+00:00",
-      "message_id": "1481536099359658005",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481536099359658005"
     },
     {
       "channel": "gazoo",
