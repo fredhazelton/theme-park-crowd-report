@@ -16,14 +16,14 @@
             "task": "Fix Firecrawl async API bug"
         },
         {
-            "status_class": "active",
-            "status_text": "\ud83d\udd04 Active",
-            "task": "Afternoon prediction tweets (ON HOLD)"
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Model Competition Framework"
         },
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
-            "task": "Model Competition Framework"
+            "task": "Pipeline Twins / Blue-Green Deploy for bot"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123560888,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-11T22:00:04.240961"
+    "last_updated": "2026-03-11T22:15:04.150654"
 }

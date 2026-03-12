@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T02:00:01Z",
+  "generated_at": "2026-03-12T02:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-12T01:53:48.885000+00:00"
+          "last_active": "2026-03-12T02:14:15.867000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Killed it. You're absolutely right \u2014 Gazoo kept flagging it as \"just a 5-minute copy-paste\" but that's a great way to get banned from those subs. The Reddit Scout's organic approach (helpful commen...",
-      "timestamp": "2026-03-12T01:53:48.885000+00:00",
-      "message_id": "1481470236992602132",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481470236992602132"
+      "message": "Good, I have everything I need. Here's the plan:\n\n**The automation:**\n1. A Python script that pulls WTI data from DuckDB, generates the article HTML using the existing template style, and commits +...",
+      "timestamp": "2026-03-12T02:14:15.867000+00:00",
+      "message_id": "1481475383327981694",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481475383327981694"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Yeah, you're right \u2014 that's a bad task. Gazoo created it and kept escalating it, but direct self-promotion links on those Disney subs would absolutely get nuked by the mods. \n\nThe Reddit Scout acco...",
-      "timestamp": "2026-03-12T01:53:39.386000+00:00",
-      "message_id": "1481470197151039519",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481470197151039519"
+      "message": "Love it. Let me look at what the existing Orlando article uses so I can build the automation right.",
+      "timestamp": "2026-03-12T02:13:33.045000+00:00",
+      "message_id": "1481475203719499909",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481475203719499909"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Fred Hazelton",
       "is_bot": false,
-      "message": "Task-051 We can\u2019t promote on Reddit - those posts get moderated and removed for self promotion. Is this some other idea?",
-      "timestamp": "2026-03-12T01:53:26.091000+00:00",
-      "message_id": "1481470141387767890",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481470141387767890"
+      "message": "Let\u2019s get Betty to auto post those Orlando articles weekly and also get her to auto-post Disneyland This week posts as well but on a different day",
+      "timestamp": "2026-03-12T02:13:26.740000+00:00",
+      "message_id": "1481475177274671205",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481475177274671205"
     },
     {
       "channel": "daily-digest",
