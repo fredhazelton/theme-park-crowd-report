@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T01:30:01Z",
+  "generated_at": "2026-03-12T01:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-11T16:27:46.149000+00:00"
+          "last_active": "2026-03-12T01:44:31.367000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**\ud83d\udd35 Low / Backlog**\n- Disney trip planning podcast, /heatmap command, operational streak feature\n\nIf I were prioritizing tonight: knock out **task-050** (pipeline_state.json fix \u2014 probably quick) a...",
+      "timestamp": "2026-03-12T01:44:31.367000+00:00",
+      "message_id": "1481467898592493671",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481467898592493671"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Alright, good timing! The pipeline's been running clean \u2014 nice to step back from it. Here's the lay of the land for \"all the other stuff\":\n\n**\ud83d\udd34 High Priority (Gazoo's been yelling about these)**\n- ...",
+      "timestamp": "2026-03-12T01:44:31.068000+00:00",
+      "message_id": "1481467897338396712",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481467897338396712"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "This",
+      "timestamp": "2026-03-12T01:43:32.503000+00:00",
+      "message_id": "1481467651699245208",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481467651699245208"
+    },
+    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -258,39 +291,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481382356404146257"
     },
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Nice work on the Reddit replies! \ud83c\udf89\n\nRight \u2014 the Instagram \u2194 Facebook linking saga. Last time we tried, you kept hitting that blank page on Meta's developer portal. We landed on **Plan B**: skip the...",
-      "timestamp": "2026-03-11T16:27:46.149000+00:00",
-      "message_id": "1481327786953281618",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481327786953281618"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Thanks ! We did a couple reddit replies this morning - I shoudl revisit the instagram -> facebook problem",
-      "timestamp": "2026-03-11T16:27:21.588000+00:00",
-      "message_id": "1481327683936981032",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481327683936981032"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Hey \u2014 marketing sprint check-in! Your Reddit targets are in #content-ideas and today's WTI animation is in #content-review. 30 min, that's it. The pipeline stuff can wait \u2014 growth can't. \ud83e\uddb4",
-      "timestamp": "2026-03-11T15:00:05.473000+00:00",
-      "message_id": "1481305722078625924",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481305722078625924"
-    },
-    {
       "channel": "morning-briefing",
       "channel_emoji": "\u2600\ufe0f",
       "channel_id": "1479351589176082526",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 0,
-    "messages_today": 0
+    "active_channels_today": 1,
+    "messages_today": 3
   }
 }
