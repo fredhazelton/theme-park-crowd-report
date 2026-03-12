@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T03:45:01Z",
+  "generated_at": "2026-03-12T04:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-12T02:30:01.615000+00:00"
+          "last_active": "2026-03-12T04:00:01.819000+00:00"
         },
         {
           "name": "daily-digest",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-12T03:44:56.348000+00:00"
+          "last_active": "2026-03-12T03:46:42.908000+00:00"
         }
       ]
     },
@@ -159,15 +159,15 @@
   ],
   "recent_activity": [
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "OK so the Thanksgiving article was approved with \"\ud83d\udcc5 Schedule\" in #content-review. The draft exists but there's no actual scheduling backend \u2014 those buttons are just links. Since Thanksgiving is in ...",
-      "timestamp": "2026-03-12T03:44:56.348000+00:00",
-      "message_id": "1481498202359205949",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498202359205949"
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-12T04:00:01.819000+00:00",
+      "message_id": "1481502000180105330",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481502000180105330"
     },
     {
       "channel": "fred-wilma",
@@ -175,21 +175,32 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "On it. Let me knock these out.",
-      "timestamp": "2026-03-12T03:44:44.331000+00:00",
-      "message_id": "1481498151956250794",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498151956250794"
+      "message": "Here's what I fixed:\n\n**\u2705 Afternoon tweet --mode bug** \u2014 `render_daily_wti.sh` was re-extracting data without `--mode`, overwriting predicted with observed. Now skips extraction by default since `a...",
+      "timestamp": "2026-03-12T03:46:42.908000+00:00",
+      "message_id": "1481498649304367107",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498649304367107"
     },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "OK fix whatever you can. The new blog workflow was supposed to schedule the post for some time in the future that it felt was appropriate. It might be scheduled for 10 AM or something tomorrow you ...",
-      "timestamp": "2026-03-12T03:44:38.586000+00:00",
-      "message_id": "1481498127860109504",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498127860109504"
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "The generate script still has the OLD stale Discord link! Future articles would go out with the wrong invite. Fixing:",
+      "timestamp": "2026-03-12T03:46:28.958000+00:00",
+      "message_id": "1481498590793695362",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498590793695362"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "All good \u2014 sitewide fix already applied. Let me check the generate script also uses the right link:",
+      "timestamp": "2026-03-12T03:46:24.210000+00:00",
+      "message_id": "1481498570879143988",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498570879143988"
     },
     {
       "channel": "wilma",
@@ -366,22 +377,11 @@
       "timestamp": "2026-03-11T07:03:33.553000+00:00",
       "message_id": "1481185798874206302",
       "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481185798874206302"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-11T07:00:01.777000+00:00",
-      "message_id": "1481184910621278219",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481184910621278219"
     }
   ],
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 3,
-    "messages_today": 7
+    "messages_today": 8
   }
 }
