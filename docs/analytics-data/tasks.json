@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-03-12T02:32:03",
+  "generated_at": "2026-03-12T05:02:53",
   "summary": {
-    "total": 51,
-    "this_week": 51,
+    "total": 55,
+    "this_week": 55,
     "in_progress": 0,
     "completed_this_week": 0,
     "pct_complete": 0
@@ -721,6 +721,62 @@
       "created": "2026-03-11T02:30:00",
       "updated": "2026-03-12T01:53:00",
       "notes": "CANCELLED by Fred: Direct self-promotion posts get removed by subreddit mods. The Reddit Scout (disneystatswhiz) is already doing organic engagement in target subs \u2014 helpful comments with crowd data, not link drops. That is the correct Reddit strategy. Gazoo was wrong to keep escalating this."
+    },
+    {
+      "id": "task-052",
+      "title": "Set up Cloudflare Web Analytics on hazeydata.ai",
+      "description": "Add Cloudflare Web Analytics (free) to all pages. Critical for marketing ROI \u2014 cannot measure ANYTHING without site analytics. One JS snippet.",
+      "status": "open",
+      "column": "backlog",
+      "priority": "high",
+      "owner": "Wilma",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-12",
+      "updated": "",
+      "notes": ""
+    },
+    {
+      "id": "task-053",
+      "title": "Fix Discord invite link inconsistency across site",
+      "description": "Main page + quarry use discord.gg/wGcKWqdt, blog uses discord.gg/pUgpecugth. Standardize to ONE link across all pages. Gazoo flagged this.",
+      "status": "open",
+      "column": "backlog",
+      "priority": "medium",
+      "owner": "Wilma",
+      "project": "Discord Bot",
+      "is_recurring": false,
+      "created": "2026-03-12",
+      "updated": "",
+      "notes": ""
+    },
+    {
+      "id": "task-054",
+      "title": "Add UTM parameters to all Reddit/social links",
+      "description": "All outbound links to hazeydata.ai should use UTM parameters (?utm_source=reddit&utm_medium=organic&utm_campaign=disneystatswhiz). Required for marketing attribution. See mr-slate/marketing-roi.md.",
+      "status": "done",
+      "column": "done",
+      "priority": "medium",
+      "owner": "Wilma",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-12",
+      "updated": "2026-03-12T05:15:00",
+      "notes": "DONE: UTM params added to tweet_blog_promo.py (new + icymi tweets). Created utm_link.py CLI helper for Reddit/Twitter/Discord links. Fixed stale Discord link in PENCIL_FIGMA_SETUP.md. Commit 8fe2709a. Marketing attribution ready once Cloudflare Web Analytics goes live (task-052)."
+    },
+    {
+      "id": "task-055",
+      "title": "Design and build /pricing page on hazeydata.ai",
+      "description": "Create pricing page showing 3 consumer tiers (Free/Explorer $4.99/Pro $9.99). Start with Coming Soon + email capture. Per go-to-market-week1.md Day 2. Even without Stripe, signals this is a real product.",
+      "status": "open",
+      "column": "backlog",
+      "priority": "high",
+      "owner": "Wilma",
+      "project": "Pipeline",
+      "is_recurring": false,
+      "created": "2026-03-12",
+      "updated": "",
+      "notes": ""
     }
   ],
   "live_activity": []
