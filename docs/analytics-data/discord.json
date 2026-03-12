@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T03:30:01Z",
+  "generated_at": "2026-03-12T03:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-12T02:59:36.679000+00:00"
+          "last_active": "2026-03-12T03:44:56.348000+00:00"
         }
       ]
     },
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T03:26:34.183000+00:00"
+          "last_active": "2026-03-12T03:30:28.560000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,61 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "OK so the Thanksgiving article was approved with \"\ud83d\udcc5 Schedule\" in #content-review. The draft exists but there's no actual scheduling backend \u2014 those buttons are just links. Since Thanksgiving is in ...",
+      "timestamp": "2026-03-12T03:44:56.348000+00:00",
+      "message_id": "1481498202359205949",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498202359205949"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "On it. Let me knock these out.",
+      "timestamp": "2026-03-12T03:44:44.331000+00:00",
+      "message_id": "1481498151956250794",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498151956250794"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "OK fix whatever you can. The new blog workflow was supposed to schedule the post for some time in the future that it felt was appropriate. It might be scheduled for 10 AM or something tomorrow you ...",
+      "timestamp": "2026-03-12T03:44:38.586000+00:00",
+      "message_id": "1481498127860109504",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481498127860109504"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "You and me both \u2014 there's something deeply satisfying about a process that just *works*. And honestly, today was a masterclass in building them:\n\n- \ud83d\udd04 Gazoo \u2192 agent fix \u2192 improvement sprint \u2192 Gazoo ...",
+      "timestamp": "2026-03-12T03:30:28.560000+00:00",
+      "message_id": "1481494562592526399",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481494562592526399"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "Love this! I really get a kick out of effective workflows",
+      "timestamp": "2026-03-12T03:30:15.814000+00:00",
+      "message_id": "1481494509132185837",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481494509132185837"
+    },
+    {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
@@ -168,61 +223,6 @@
       "timestamp": "2026-03-12T03:26:34.183000+00:00",
       "message_id": "1481493579544396027",
       "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481493579544396027"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "OK, so we are all set. This is the new workflow for any content review.  Somebody builds it they render it on the draft page put the link into the content review. I click on it, interact with it by...",
-      "timestamp": "2026-03-12T03:26:24.940000+00:00",
-      "message_id": "1481493540776444146",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481493540776444146"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Even better \u2014 one less thing to build! \ud83d\ude04 Keep it simple. \ud83e\uddb4",
-      "timestamp": "2026-03-12T03:25:37.824000+00:00",
-      "message_id": "1481493343157489878",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481493343157489878"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Agreed \u2014 automated weekly articles for three regions, daily Twitter promotion with ICYMI rotation, verification gates on every publish. That's a real content engine running on autopilot.\n\nDrop your...",
-      "timestamp": "2026-03-12T02:59:36.679000+00:00",
-      "message_id": "1481486795240771634",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481486795240771634"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "*betty",
-      "timestamp": "2026-03-12T02:59:33.849000+00:00",
-      "message_id": "1481486783370891429",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481486783370891429"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Ok this, plus the content I discussed with Berry should be pretty tight",
-      "timestamp": "2026-03-12T02:59:27.916000+00:00",
-      "message_id": "1481486758486216844",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481486758486216844"
     },
     {
       "channel": "mission-control",
