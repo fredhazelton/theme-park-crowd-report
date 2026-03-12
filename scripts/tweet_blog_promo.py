@@ -86,6 +86,8 @@ def discover_articles() -> list[dict]:
             region = "orlando"
         elif "disneyland" in html_file.name:
             region = "disneyland"
+        elif "tokyo" in html_file.name:
+            region = "tokyo"
         else:
             region = "general"
 
@@ -178,6 +180,12 @@ def compose_new_tweet(article: dict) -> str:
             f"📊 New: {title}\n\nDisneyland or California Adventure? Here's what the data says this week.\n\n{url}",
             f"🏔️ Fresh SoCal crowd outlook: {title}\n\nPark-by-park WTI breakdown for Disneyland Resort.\n\n{url}",
             f"📈 This week's Disneyland crowd forecast is live.\n\n{title}\n\n{url}",
+        ]
+    elif article["region"] == "tokyo":
+        hooks = [
+            f"📊 New: {title}\n\nTokyo Disneyland or DisneySea? Here's what the crowd data says this week.\n\n{url}",
+            f"🗼 Fresh Tokyo Disney crowd outlook: {title}\n\nPark-by-park WTI breakdown — plan smarter.\n\n{url}",
+            f"📈 This week's Tokyo Disney Resort crowd forecast is live.\n\n{title}\n\n{url}",
         ]
     else:
         hooks = [

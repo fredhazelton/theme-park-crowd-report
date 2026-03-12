@@ -38,6 +38,8 @@ PARK_NAMES = {
     "DL": "Disneyland",
     "CA": "Disney California Adventure",
     "UH": "Universal Studios Hollywood",
+    "TDL": "Tokyo Disneyland",
+    "TDS": "Tokyo DisneySea",
 }
 
 # Short names for nav links
@@ -52,6 +54,8 @@ PARK_SHORT_NAMES = {
     "DL": "Disneyland",
     "CA": "California Adventure",
     "UH": "Universal Hollywood",
+    "TDL": "Tokyo Disneyland",
+    "TDS": "Tokyo DisneySea",
 }
 
 REGION_CONFIG = {
@@ -72,6 +76,15 @@ REGION_CONFIG = {
         "region_tags": ["Disneyland", "Southern California"],
         "description_template": "Your data-driven guide to Disneyland and Southern California theme park crowds for {date_range}. Park-by-park WTI forecasts, best days to visit, and practical advice.",
         "author_sig": 'Written by the <a href="https://hazeydata.ai">Theme Park Crowd Report</a> team — data-driven crowd forecasts covering Disneyland Resort and Universal Studios Hollywood.',
+    },
+    "tokyo": {
+        "parks": ["TDL", "TDS"],
+        "title_prefix": "Tokyo Disney Resort This Week",
+        "default_weekday": 1,  # Tuesday
+        "meta_tags": ["Weekly Outlook", "WTI"],
+        "region_tags": ["Tokyo Disney Resort", "Japan"],
+        "description_template": "Your data-driven guide to Tokyo Disney Resort crowds for {date_range}. Park-by-park WTI forecasts, best days to visit, and practical advice.",
+        "author_sig": 'Written by the <a href="https://hazeydata.ai">Theme Park Crowd Report</a> team — data-driven crowd forecasts for 12 parks worldwide, including Tokyo Disney Resort.',
     },
 }
 
@@ -1139,7 +1152,7 @@ def verify_article(html: str, wti_data: dict, analysis: dict) -> tuple[bool, lis
     
     # Verify park count
     park_count_in_data = len([p for p in wti_data if wti_data[p]])
-    park_names_in_html = len(re.findall(r'<td>(Magic Kingdom|EPCOT|Hollywood Studios|Animal Kingdom|Universal Studios Florida|Islands of Adventure|Epic Universe|Disneyland(?! Resort)|Disney California Adventure|Universal Studios Hollywood)</td>', html))
+    park_names_in_html = len(re.findall(r'<td>(Magic Kingdom|EPCOT|Hollywood Studios|Animal Kingdom|Universal Studios Florida|Islands of Adventure|Epic Universe|Disneyland(?! Resort)|Disney California Adventure|Universal Studios Hollywood|Tokyo Disneyland|Tokyo DisneySea)</td>', html))
     
     # Each park appears in overview table + best day table = 2x
     expected_mentions = park_count_in_data * 2
@@ -1172,7 +1185,7 @@ def verify_article(html: str, wti_data: dict, analysis: dict) -> tuple[bool, lis
 
 def main():
     parser = argparse.ArgumentParser(description="Generate weekly blog post for hazeydata.ai")
-    parser.add_argument("--region", required=True, choices=["orlando", "disneyland"],
+    parser.add_argument("--region", required=True, choices=["orlando", "disneyland", "tokyo"],
                         help="Region to generate article for")
     parser.add_argument("--week-of", dest="week_of", default=None,
                         help="Start date YYYY-MM-DD (defaults to next Monday for Orlando, next Thursday for Disneyland)")
