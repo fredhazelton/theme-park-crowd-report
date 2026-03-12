@@ -33,7 +33,7 @@ If you see this when opening a `.pen` file (e.g. Pencil’s welcome file):
    - In the Extensions panel, open Pencil → **Version History** → **Install Another Version** → pick a slightly older release and test.
 
 5. **Ask Pencil**
-   - [Discord](https://discord.gg/pUgpecugth)  
+   - [Discord](https://discord.gg/2Estr7sbP7)  
    - [pencil.dev](https://pencil.dev) for support links
 
 ## Using Figma designs

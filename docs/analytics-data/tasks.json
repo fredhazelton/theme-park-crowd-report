@@ -739,7 +739,7 @@
     {
       "id": "task-053",
       "title": "Fix Discord invite link inconsistency across site",
-      "description": "Main page + quarry use discord.gg/wGcKWqdt, blog uses discord.gg/pUgpecugth. Standardize to ONE link across all pages. Gazoo flagged this.",
+      "description": "Main page + quarry use discord.gg/wGcKWqdt, blog uses discord.gg/2Estr7sbP7. Standardize to ONE link across all pages. Gazoo flagged this.",
       "status": "open",
       "column": "backlog",
       "priority": "medium",
