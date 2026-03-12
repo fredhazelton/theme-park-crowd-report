@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-11T23:45:01Z",
+  "generated_at": "2026-03-12T00:00:02Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 7,
-    "messages_today": 20
+    "active_channels_today": 0,
+    "messages_today": 0
   }
 }
