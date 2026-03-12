@@ -19,15 +19,42 @@ from datetime import date, datetime, timezone
 from importlib import import_module
 from pathlib import Path
 
-# Ensure pipeline_v3 is importable
-if str(Path(__file__).parent.parent) not in sys.path:
-    sys.path.insert(0, str(Path(__file__).parent.parent))
+# Ensure pipeline_v3 and src/ are importable
+_repo_root = str(Path(__file__).parent.parent)
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
+_src_dir = str(Path(__file__).parent.parent / "src")
+if _src_dir not in sys.path:
+    sys.path.insert(0, _src_dir)
 
 from pipeline_v3.config import load_config
 from pipeline_v3.core.logging import PipelineLogger
 from pipeline_v3.core.metrics import PipelineMetrics
 from pipeline_v3.core.paths import log_events_path
 from pipeline_v3.steps import STEP_ORDER
+
+# v3→legacy bridge: keep pipeline_status.json updated for monitoring scripts
+try:
+    from utils.pipeline_status import pipeline_start as _ps_start, step_done as _ps_step_done, step_failed as _ps_step_failed
+    _HAS_PIPELINE_STATUS = True
+except ImportError:
+    _HAS_PIPELINE_STATUS = False
+
+# Map v3 step names → legacy step names used by pipeline_status.json
+_V3_TO_LEGACY_STEP = {
+    "s01_sync": None,        # no legacy equivalent
+    "s02_etl": "etl",
+    "s03_dimensions": "dimensions",
+    "s04_aggregates": "aggregates",
+    "s05_conversion": "report",
+    "s06_synthetic": None,   # no legacy equivalent
+    "s07_training": "training",
+    "s08_forecast": "forecast",
+    "s09_wti": "wti",
+    "s10_accuracy": None,    # no legacy equivalent
+    "s11_deploy": None,      # no legacy equivalent
+    "s12_validate": None,    # no legacy equivalent
+}
 
 
 def main():
@@ -84,6 +111,14 @@ def main():
     else:
         steps = STEP_ORDER
 
+    # Update legacy pipeline_status.json for monitoring scripts
+    if _HAS_PIPELINE_STATUS and not args.step and not cfg.shadow:
+        try:
+            _ps_start(cfg.output_base)
+            log.info("Legacy pipeline_status.json initialized")
+        except Exception as e:
+            log.warning(f"Could not init pipeline_status.json: {e}")
+
     # Execute steps
     failed = False
     for step_name in steps:
@@ -101,6 +136,15 @@ def main():
             rows_out = result.get("rows", 0) if isinstance(result, dict) else 0
             metrics.end_step(step_name, rows_out=rows_out)
 
+            # Update legacy pipeline_status.json
+            if _HAS_PIPELINE_STATUS and not cfg.shadow:
+                legacy = _V3_TO_LEGACY_STEP.get(step_name)
+                if legacy:
+                    try:
+                        _ps_step_done(cfg.output_base, legacy)
+                    except Exception:
+                        pass
+
             # Save step events
             step_log.save_events(log_events_path(cfg, run_date))
 
@@ -108,6 +152,15 @@ def main():
             log.error(f"Step {step_name} FAILED: {e}")
             metrics.fail_step(step_name, str(e))
             failed = True
+
+            # Update legacy pipeline_status.json on failure
+            if _HAS_PIPELINE_STATUS and not cfg.shadow:
+                legacy = _V3_TO_LEGACY_STEP.get(step_name)
+                if legacy:
+                    try:
+                        _ps_step_failed(cfg.output_base, legacy)
+                    except Exception:
+                        pass
             # In shadow mode, continue on failure. In production, stop.
             if not cfg.shadow:
                 break
