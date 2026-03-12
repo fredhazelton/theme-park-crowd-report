@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T07:45:01Z",
+  "generated_at": "2026-03-12T08:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T06:33:32.115000+00:00"
+          "last_active": "2026-03-12T07:53:25.164000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,28 @@
   ],
   "recent_activity": [
     {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Deleted it. \ud83d\uddd1\ufe0f\n\n**What to do now:**\n1. Go to <https://discord.com/developers/applications> \u2192 select the bot \u2192 **Bot** \u2192 **Reset Token**\n2. Copy the new token\n3. Update it wherever it's configured (...",
+      "timestamp": "2026-03-12T07:53:25.164000+00:00",
+      "message_id": "1481560734465921147",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481560734465921147"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udea8 **Fred \u2014 that's a Discord bot token!** Delete that message and regenerate the token ASAP in the [Discord Developer Portal](https://discord.com/developers/applications). Once a token is posted in ...",
+      "timestamp": "2026-03-12T07:53:17.909000+00:00",
+      "message_id": "1481560704036114576",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481560704036114576"
+    },
+    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -179,28 +201,6 @@
       "timestamp": "2026-03-12T06:33:32.115000+00:00",
       "message_id": "1481540630961197239",
       "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481540630961197239"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\udd95 **Dino Work Session \u2014 March 12, 2026 AM**\n\n**Gazoo grade:** 6/10\n> *\"8 remaining todos include stale items like task-030 and task-034 that haven't moved since creation. Time for a prune.\"*\n\n**Fix...",
-      "timestamp": "2026-03-12T06:33:31.893000+00:00",
-      "message_id": "1481540630030188636",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481540630030188636"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Got it \u2014 Fred wants Gazoo to be warmer. The personality is currently \"snarky\" and \"brutally honest\" with \"grudging\" praise. Fred's saying he wouldn't mind Gazoo showing a bit more of that secret in...",
-      "timestamp": "2026-03-12T06:18:18.344000+00:00",
-      "message_id": "1481536798327967836",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481536798327967836"
     },
     {
       "channel": "fred-wilma",
