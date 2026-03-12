@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T19:00:01Z",
+  "generated_at": "2026-03-12T19:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-12T11:30:53.685000+00:00"
+          "last_active": "2026-03-12T19:13:22.218000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Logged it \u2014 I'll flag her email as soon as it comes in. \ud83d\udcec",
+      "timestamp": "2026-03-12T19:13:22.218000+00:00",
+      "message_id": "1481731849712701653",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481731849712701653"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "That's awesome, Fred! Love that you're spreading the word. I'll keep an eye out for an email from Anik. \ud83d\udc40\n\nWhen she reaches out, I'll be welcoming and help her understand what's possible \u2014 whether ...",
+      "timestamp": "2026-03-12T19:13:08.774000+00:00",
+      "message_id": "1481731793324478618",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481731793324478618"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "I just finished a therapy physiotherapy appointment and I was telling my physiotherapist about all the great work that you and I were doing together and she was very interested in learning more abo...",
+      "timestamp": "2026-03-12T19:12:58.580000+00:00",
+      "message_id": "1481731750567612597",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481731750567612597"
+    },
+    {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
@@ -190,39 +223,6 @@
       "timestamp": "2026-03-12T14:00:06.476000+00:00",
       "message_id": "1481653014656975049",
       "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481653014656975049"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "```\n\ud83d\udcca WTI Accuracy Report \u2014 2026-03-11\n\n\u26a0\ufe0f No forecast/actual comparison available for this date.\n```",
-      "timestamp": "2026-03-12T11:30:53.685000+00:00",
-      "message_id": "1481615463929614388",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481615463929614388"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me check yesterday's data for comparison:",
-      "timestamp": "2026-03-12T11:30:45.410000+00:00",
-      "message_id": "1481615429222010920",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481615429222010920"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "- Tokyo parks stable at 1.5 (TDL) and 1.3\u2192**1.5** (TDS)\n- Universal steady at 1.3\n\n**TL;DR:** Accuracy is stable day-over-day. The adaptive stretch factors shifted notably for MK (up) and DL (down)...",
-      "timestamp": "2026-03-12T11:30:42.330000+00:00",
-      "message_id": "1481615416303419444",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481615416303419444"
     },
     {
       "channel": "morning-briefing",
