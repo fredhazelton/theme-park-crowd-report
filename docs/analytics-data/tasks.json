@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-13T02:31:43",
+  "generated_at": "2026-03-13T16:31:19",
   "summary": {
     "total": 55,
     "this_week": 55,
@@ -509,8 +509,8 @@
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-12T02:30:00",
-      "notes": "Fred idea. Reference screenshots saved at ~/stream-overlay/design-inspiration/ios-weather-app/. Need mockup rendering (Python Pillow/Cairo). Source: #content-ideas, #bam-bam, #ideas 'Weather App Design'. [Dino 2026-03-12] High value for social sharing. Added due date."
+      "updated": "2026-03-13T16:30:00",
+      "notes": "Fred idea. Reference screenshots saved at ~/stream-overlay/design-inspiration/ios-weather-app/. Need mockup rendering (Python Pillow/Cairo). Source: #content-ideas, #bam-bam, #ideas 'Weather App Design'. [Dino 2026-03-12] High value for social sharing. Added due date. [Dino PM 2026-03-13] \u26a0\ufe0f AGENT ACTIVITY FLAG: Bam-Bam has been silent for 3 days (no commits, no activity since ~Mar 10). This task has no progress. Consider reassigning to Pebbles (visual design strength) or Wilma if Bam-Bam remains inactive by end of Mar 14."
     },
     {
       "id": "task-037",
@@ -729,12 +729,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "critical",
-      "owner": "Bam-bam",
+      "owner": "Fred",
       "project": "Business",
       "is_recurring": false,
       "created": "2026-03-12",
-      "updated": "2026-03-13T02:30:00",
-      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo. [Dino AM 2026-03-13] \u26a0\ufe0f ESCALATED: Flagged in 4 consecutive Gazoo reviews. 3+ days open, zero progress. Priority elevated to critical. Single JS snippet \u2014 blocks ALL marketing measurement. Owner Bam-Bam needs to act or reassign."
+      "updated": "2026-03-13T16:30:00",
+      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo. [Dino AM 2026-03-13] \u26a0\ufe0f ESCALATED: Flagged in 4 consecutive Gazoo reviews. 3+ days open, zero progress. Priority elevated to critical. Single JS snippet \u2014 blocks ALL marketing measurement. Owner Bam-Bam needs to act or reassign. [Wilma AM 2026-03-13] Prepared inject-analytics.sh script (committed to hazeydata.ai/scripts/). BLOCKER: Cloudflare API tokens lack Web Analytics (RUM) permission. Fred needs to create beacon token in CF dashboard (30 sec). Instructions at agents/wilma/TASK-052-INSTRUCTIONS.md. [Dino PM 2026-03-13] DAY 5 OPEN. Fred-blocked (needs CF beacon token). Bam-Bam cannot act. Reassigning owner to Fred until token provided. After token: Wilma has inject-analytics.sh ready to deploy immediately."
     },
     {
       "id": "task-053",
@@ -768,15 +768,15 @@
       "id": "task-055",
       "title": "Design and build /pricing page on hazeydata.ai",
       "description": "Create pricing page showing 3 consumer tiers (Free/Explorer $4.99/Pro $9.99). Start with Coming Soon + email capture. Per go-to-market-week1.md Day 2. Even without Stripe, signals this is a real product.",
-      "status": "todo",
-      "column": "backlog",
+      "status": "done",
+      "column": "done",
       "priority": "high",
       "owner": "Pebbles",
       "project": "Business",
       "is_recurring": false,
       "created": "2026-03-12",
-      "updated": "2026-03-13T02:30:00",
-      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo. [Dino AM 2026-03-13] Design DONE (Pebbles committed 937-line pricing.html, commit 0f0b8eb5). BUT: page returns 404 on production \u2014 not deployed to Cloudflare Pages. Escalated in metadata. Needs deploy step only."
+      "updated": "2026-03-13T09:03:00",
+      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo. [Dino AM 2026-03-13] Design DONE (Pebbles committed 937-line pricing.html, commit 0f0b8eb5). BUT: page returns 404 on production \u2014 not deployed to Cloudflare Pages. Escalated in metadata. Needs deploy step only. [Wilma AM 2026-03-13] DEPLOYED to production. Copied pricing.html from theme-park-crowd-report/web/ to hazeydata.ai repo. Added to sitemap. Live at hazeydata.ai/pricing (200 OK). Commit 616806d."
     }
   ],
   "live_activity": []
