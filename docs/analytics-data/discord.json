@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-13T12:30:01Z",
+  "generated_at": "2026-03-13T12:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -55,7 +55,7 @@
           "emoji": "\ud83d\udd27",
           "purpose": "Pipeline monitoring \u2014 ETL status, forecast runs, data quality checks",
           "url": "https://discord.com/channels/1479350342318690505/1479351574177513576",
-          "last_active": "2026-03-12T11:21:58.865000+00:00"
+          "last_active": "2026-03-13T12:41:59.221000+00:00"
         },
         {
           "name": "modeling",
@@ -158,6 +158,39 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now I've got the full picture. Here's what happened:\n\n**The old v2 pipeline (`run_daily_pipeline.sh`) ran through March 8.** It included `evaluate_forecast_accuracy.py` which properly updated `enti...",
+      "timestamp": "2026-03-13T12:41:59.221000+00:00",
+      "message_id": "1481995742750048278",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481995742750048278"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "OK here's what's actually happening. Let me check one more thing \u2014 where the accuracy data that *does* exist is coming from:",
+      "timestamp": "2026-03-13T12:40:59.723000+00:00",
+      "message_id": "1481995493197480119",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481995493197480119"
+    },
+    {
+      "channel": "pipeline",
+      "channel_emoji": "\ud83d\udd27",
+      "channel_id": "1479351574177513576",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Let me trace this properly.",
+      "timestamp": "2026-03-13T12:40:37.268000+00:00",
+      "message_id": "1481995399014387845",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481995399014387845"
+    },
     {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
@@ -335,28 +368,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481615251807146095"
     },
     {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Yes \u2014 pipeline ran and completed successfully this morning. \u2705\n\n**Today's run (v4, first full production):**\n- **Started:** 6:00 AM | **Completed:** 6:50 AM | **Total: 50 minutes**\n- All 12 steps pa...",
-      "timestamp": "2026-03-12T11:21:58.865000+00:00",
-      "message_id": "1481613220732080210",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481613220732080210"
-    },
-    {
-      "channel": "pipeline",
-      "channel_emoji": "\ud83d\udd27",
-      "channel_id": "1479351574177513576",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "Did we get a pipeline refresh this morning as scheduled?",
-      "timestamp": "2026-03-12T11:21:22.648000+00:00",
-      "message_id": "1481613068827099147",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481613068827099147"
-    },
-    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -366,22 +377,11 @@
       "timestamp": "2026-03-12T09:00:01.540000+00:00",
       "message_id": "1481577496481894432",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481577496481894432"
-    },
-    {
-      "channel": "morning-briefing",
-      "channel_emoji": "\u2600\ufe0f",
-      "channel_id": "1479351589176082526",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\u2600\ufe0f **Morning Briefing \u2014 Wednesday, March 11, 2026**\n\n**Pipeline:** \ud83d\udd34 Critical\n**Last scrape:** ~2026-03-11 07:29 ET (file mtime)\n\n**\ud83d\udcca Today's Crowd Levels (WTI)**\n\ud83c\udff0 WDW: \u26aa **MK** 21.1 \u00b7 \u26aa **EP** 22...",
-      "timestamp": "2026-03-11T11:30:02.740000+00:00",
-      "message_id": "1481252862385193094",
-      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481252862385193094"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 5,
-    "messages_today": 12
+    "active_channels_today": 6,
+    "messages_today": 15
   }
 }
