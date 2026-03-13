@@ -8,11 +8,6 @@
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
-            "task": "Design and build /pricing page on hazeydata.ai"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
             "task": "Model Competition Framework"
         },
         {
@@ -24,6 +19,11 @@
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
             "task": "Apple Weather-Style Crowd Report Images"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Unhosted Twitch Stream (Data TV)"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123647612,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-13T05:00:05.020947"
+    "last_updated": "2026-03-13T05:15:04.943069"
 }
