@@ -6,26 +6,90 @@
     <title>Daily Wait Time Curve</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
+        /* ═══════════════════════════════════════════════════
+           DESIGN SYSTEM — HazeyData Brand
+           Navy #0a1628 · Red #A60038 · Cyan #4a90a4
+           JetBrains Mono + Inter
+           ═══════════════════════════════════════════════════ */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        :root {
+            --bg-primary: #0a1628;
+            --bg-secondary: #0f1d32;
+            --bg-card: rgba(255,255,255,0.03);
+            --bg-card-hover: rgba(255,255,255,0.06);
+            --bg-glass: rgba(255,255,255,0.04);
+            --border-card: rgba(255,255,255,0.08);
+            --border-accent: rgba(74,144,164,0.3);
+            --accent: #4a90a4;
+            --accent-light: #6bb5c9;
+            --accent-glow: rgba(74,144,164,0.15);
+            --accent-red: #A60038;
+            --accent-red-light: #e05577;
+            --accent-green: #4ade80;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --font-text: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #e0e0e0;
+            font-family: var(--font-text);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
-        
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(74,144,164,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,144,164,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Ambient gradient orbs — dark glassmorphism depth */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(74,144,164,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: ambientFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes ambientFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-40px, 30px) scale(1.05); }
+            66% { transform: translate(20px, -20px) scale(0.95); }
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
-        
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -34,45 +98,61 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        
+
         h1 {
+            font-family: var(--font-mono);
             font-size: 1.8rem;
             font-weight: 600;
-            color: #fff;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
         }
-        
+
         .controls {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-        
+
         select, input {
             padding: 10px 15px;
-            border: 1px solid #3a3a5c;
+            border: 1px solid var(--border-accent);
             border-radius: 8px;
-            background: #252542;
-            color: #e0e0e0;
-            font-size: 14px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
             cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        
+
         select:hover, input:hover {
-            border-color: #5a5a8c;
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
-        
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
         .chart-container {
-            background: #252542;
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-card);
             border-radius: 16px;
             padding: 25px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
         }
-        
+
         .chart-wrapper {
             position: relative;
             height: 500px;
         }
-        
+
         .legend {
             display: flex;
             justify-content: center;
@@ -80,68 +160,109 @@
             margin-top: 20px;
             flex-wrap: wrap;
         }
-        
+
         .legend-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-secondary);
         }
-        
+
         .legend-color {
             width: 20px;
             height: 12px;
             border-radius: 3px;
         }
-        
+
         .legend-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
         }
-        
-        .observed-actual { background: linear-gradient(90deg, #00d4aa, #00b894); }
-        .predicted-actual { background: linear-gradient(90deg, #74b9ff, #0984e3); }
-        .posted-dots { background: #636e72; }
-        
+
+        .observed-actual { background: linear-gradient(90deg, var(--accent-green), #22c55e); }
+        .predicted-actual { background: linear-gradient(90deg, var(--accent-light), var(--accent)); }
+        .posted-dots { background: var(--text-muted); }
+
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
-        
+
         .stat-card {
-            background: #1a1a2e;
-            border-radius: 10px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
             padding: 15px;
             text-align: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        
+
+        .stat-card:hover {
+            border-color: var(--border-accent);
+            box-shadow: 0 4px 20px rgba(74,144,164,0.1);
+        }
+
         .stat-value {
+            font-family: var(--font-mono);
             font-size: 1.8rem;
             font-weight: 700;
-            color: #fff;
+            color: var(--accent-light);
         }
-        
+
         .stat-label {
-            font-size: 0.85rem;
-            color: #888;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
             margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
+
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 400px;
-            color: #888;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
         }
-        
+
         .entity-name {
-            font-size: 1.1rem;
-            color: #888;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: var(--accent);
             margin-top: 5px;
+        }
+
+        /* Accessibility: focus-visible outlines */
+        select:focus-visible, input:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            h1 { font-size: 1.4rem; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .chart-wrapper { height: 350px; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .stat-value { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -373,14 +494,14 @@
             // Build datasets
             const datasets = [];
             
-            // Observed actuals (if available) - Green area
+            // Observed actuals (if available) - Brand green area
             if (actualPoints.length > 0) {
                 datasets.push({
                     label: 'Observed Actual',
                     data: actualPoints,
                     fill: true,
-                    backgroundColor: 'rgba(0, 212, 170, 0.4)',
-                    borderColor: '#00d4aa',
+                    backgroundColor: 'rgba(74, 222, 128, 0.25)',
+                    borderColor: '#4ade80',
                     borderWidth: 2,
                     tension: 0.4,
                     pointRadius: 0,
@@ -388,25 +509,25 @@
                 });
             }
             
-            // Predicted actuals - Blue area
+            // Predicted actuals - Brand cyan area
             datasets.push({
                 label: 'Predicted Actual',
                 data: predictedData,
                 fill: true,
-                backgroundColor: actualPoints.length > 0 ? 'rgba(116, 185, 255, 0.3)' : 'rgba(116, 185, 255, 0.5)',
-                borderColor: '#74b9ff',
+                backgroundColor: actualPoints.length > 0 ? 'rgba(74, 144, 164, 0.25)' : 'rgba(74, 144, 164, 0.4)',
+                borderColor: '#6bb5c9',
                 borderWidth: 2,
                 tension: 0.4,
                 pointRadius: 0,
                 order: 1
             });
             
-            // Posted times - Subtle dots
+            // Posted times - Subtle muted dots
             datasets.push({
                 label: 'Posted Wait',
                 data: postedData,
                 fill: false,
-                backgroundColor: '#636e72',
+                backgroundColor: 'rgba(255,255,255,0.3)',
                 borderColor: 'transparent',
                 pointRadius: 3,
                 pointHoverRadius: 5,
@@ -429,12 +550,14 @@
                             display: false
                         },
                         tooltip: {
-                            backgroundColor: '#252542',
+                            backgroundColor: 'rgba(15, 29, 50, 0.95)',
                             titleColor: '#fff',
-                            bodyColor: '#e0e0e0',
-                            borderColor: '#3a3a5c',
+                            bodyColor: 'rgba(255,255,255,0.8)',
+                            borderColor: 'rgba(74,144,164,0.3)',
                             borderWidth: 1,
                             padding: 12,
+                            titleFont: { family: "'JetBrains Mono', monospace", size: 13 },
+                            bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
                             callbacks: {
                                 title: (items) => {
                                     const date = new Date(items[0].parsed.x);
@@ -460,19 +583,21 @@
                                 }
                             },
                             grid: {
-                                color: 'rgba(255,255,255,0.05)'
+                                color: 'rgba(74,144,164,0.06)'
                             },
                             ticks: {
-                                color: '#888'
+                                color: 'rgba(255,255,255,0.4)',
+                                font: { family: "'JetBrains Mono', monospace", size: 11 }
                             }
                         },
                         y: {
                             beginAtZero: true,
                             grid: {
-                                color: 'rgba(255,255,255,0.05)'
+                                color: 'rgba(74,144,164,0.06)'
                             },
                             ticks: {
-                                color: '#888',
+                                color: 'rgba(255,255,255,0.4)',
+                                font: { family: "'JetBrains Mono', monospace", size: 11 },
                                 callback: (value) => value + ' min'
                             }
                         }
