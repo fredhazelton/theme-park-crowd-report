@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-13T11:15:01Z",
+  "generated_at": "2026-03-13T11:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -144,7 +144,7 @@
           "emoji": "\u2600\ufe0f",
           "purpose": "Automated morning briefings \u2014 daily agenda, weather, key metrics",
           "url": "https://discord.com/channels/1479350342318690505/1479351589176082526",
-          "last_active": "2026-03-12T11:30:03.111000+00:00"
+          "last_active": "2026-03-13T11:30:02.819000+00:00"
         },
         {
           "name": "mr-slate",
@@ -158,6 +158,17 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "morning-briefing",
+      "channel_emoji": "\u2600\ufe0f",
+      "channel_id": "1479351589176082526",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\u2600\ufe0f **Morning Briefing \u2014 Friday, March 13, 2026**\n\n**Pipeline:** \u2705 Healthy\n**Last scrape:** ~2026-03-13 07:26 ET (file mtime)\n**Last pipeline run:** 2026-03-13 06:42 ET\n\n**\ud83d\udcca Today's Crowd Levels (WT...",
+      "timestamp": "2026-03-13T11:30:02.819000+00:00",
+      "message_id": "1481977638447878198",
+      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481977638447878198"
+    },
     {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
@@ -366,22 +377,11 @@
       "timestamp": "2026-03-11T11:30:02.740000+00:00",
       "message_id": "1481252862385193094",
       "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481252862385193094"
-    },
-    {
-      "channel": "alerts",
-      "channel_emoji": "\ud83d\udea8",
-      "channel_id": "1479471928262529088",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Got it \u2014 `#park-intel` is `1479351592108036249`. Let me post the report.",
-      "timestamp": "2026-03-11T10:30:42.181000+00:00",
-      "message_id": "1481237928318472302",
-      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237928318472302"
     }
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 4,
-    "messages_today": 10
+    "active_channels_today": 5,
+    "messages_today": 11
   }
 }
