@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-13T11:30:01Z",
+  "generated_at": "2026-03-13T11:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-13T06:32:54.780000+00:00"
+          "last_active": "2026-03-13T11:31:02.379000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "```\n\ud83d\udcca WTI Accuracy Report \u2014 2026-03-12\n\n\u26a0\ufe0f No forecast/actual comparison available for this date.\n```",
+      "timestamp": "2026-03-13T11:31:02.379000+00:00",
+      "message_id": "1481977888260620350",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481977888260620350"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now I have everything. Let me compose and send the report.",
+      "timestamp": "2026-03-13T11:30:54.277000+00:00",
+      "message_id": "1481977854278500362",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481977854278500362"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "**Takeaway:** WTI MAE crept up on the Mar 11 eval (8.2 vs 4.8), mostly driven by EU outliers (28.6 error on Mar 9) and MK (17.3). DL and UF remain solid. Worth watching EU \u2014 it's consistently the h...",
+      "timestamp": "2026-03-13T11:30:51.571000+00:00",
+      "message_id": "1481977842928586894",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481977842928586894"
+    },
+    {
       "channel": "morning-briefing",
       "channel_emoji": "\u2600\ufe0f",
       "channel_id": "1479351589176082526",
@@ -225,28 +258,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481909687359111248"
     },
     {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "**Board:** 55 tasks | 6 todo | 5 backlog | 43 done | 1 cancelled\n**Tasks updated:** 4 (task-052, task-053, task-055 + metadata overhaul)",
-      "timestamp": "2026-03-13T06:32:54.780000+00:00",
-      "message_id": "1481902862232584323",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481902862232584323"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\udd95 **Dino Work Session \u2014 2026-03-13 AM**\n\n**Gazoo grade:** 7/10\n**Critique:** \"Dino should be flagging blockers, not just maintaining the board.\"\n\n**Fixed from Gazoo:**\n- Added `escalations` array t...",
-      "timestamp": "2026-03-13T06:32:54.661000+00:00",
-      "message_id": "1481902861733335061",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481902861733335061"
-    },
-    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -278,17 +289,6 @@
       "timestamp": "2026-03-13T06:04:16.359000+00:00",
       "message_id": "1481895654652510279",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481895654652510279"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Fred Hazelton",
-      "is_bot": false,
-      "message": "I know i've given you a lot of task today but can we focus back on dayforce-gc for a bit - responses there are slow",
-      "timestamp": "2026-03-12T21:15:45.033000+00:00",
-      "message_id": "1481762647711154176",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1481762647711154176"
     },
     {
       "channel": "fred-wilma",
@@ -382,6 +382,6 @@
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 5,
-    "messages_today": 11
+    "messages_today": 12
   }
 }
