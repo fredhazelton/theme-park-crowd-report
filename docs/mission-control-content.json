@@ -38,7 +38,7 @@
             "emoji": "\ud83d\udd04",
             "event": "Conversion model retrain",
             "date": "Mar 16",
-            "days_out": 4,
+            "days_out": 3,
             "urgency": ""
         }
     ],
@@ -120,5 +120,5 @@
         "db_live_waits": 123647612,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-12T23:45:04.250226"
+    "last_updated": "2026-03-13T00:00:05.777856"
 }
