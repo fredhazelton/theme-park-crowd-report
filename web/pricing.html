@@ -476,6 +476,70 @@
         }
 
         /* ═══════════════════════════════════════════════════
+           FAQ
+           ═══════════════════════════════════════════════════ */
+        .faq-section {
+            position: relative; z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+        .faq-section h2 {
+            text-align: center;
+            font-size: 24px; font-weight: 700;
+            margin-bottom: 32px;
+        }
+        .faq-grid {
+            display: flex; flex-direction: column;
+            gap: 8px;
+        }
+        .faq-item {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.2s;
+        }
+        .faq-item:hover { border-color: rgba(255,255,255,0.12); }
+        .faq-q {
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%;
+            padding: 18px 22px;
+            background: none; border: none;
+            color: var(--text-primary);
+            font-family: var(--font-text);
+            font-size: 14px; font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: color 0.2s;
+        }
+        .faq-q:hover { color: var(--accent-light); }
+        .faq-arrow {
+            font-size: 20px; font-weight: 300;
+            color: var(--text-muted);
+            transition: transform 0.3s, color 0.2s;
+        }
+        .faq-item.open .faq-arrow {
+            transform: rotate(90deg);
+            color: var(--accent);
+        }
+        .faq-a {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        .faq-item.open .faq-a {
+            max-height: 300px;
+            padding: 0 22px 18px;
+        }
+        .faq-a p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════════════════
            WAITLIST / EMAIL CAPTURE
            ═══════════════════════════════════════════════════ */
         .waitlist-section {
@@ -636,6 +700,8 @@
             .section-title { font-size: 20px; }
             .pricing-grid, .api-grid { max-width: 100%; padding: 0 8px; }
             .compare-table { font-size: 10px; overflow-x: auto; }
+            .faq-q { font-size: 13px; padding: 14px 16px; }
+            .faq-section { padding: 30px 16px 40px; }
         }
 
         /* Accessibility: focus-visible outlines */
@@ -893,6 +959,67 @@
         </div>
     </section>
 
+    <!-- FAQ -->
+    <section class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    <span>What is WTI?</span>
+                    <span class="faq-arrow">›</span>
+                </button>
+                <div class="faq-a">
+                    <p>WTI (Wait Time Index) is our proprietary crowd metric that combines wait time data, historical patterns, and seasonal trends into a single 0-100 score. Lower = quieter. It's designed to be intuitive — think of it like a weather forecast, but for crowds.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    <span>How accurate are the predictions?</span>
+                    <span class="faq-arrow">›</span>
+                </button>
+                <div class="faq-a">
+                    <p>Our models achieve a Mean Absolute Error (MAE) of ~6.8 WTI points across all parks. For context, that means our crowd level predictions are typically within 1 tier of the actual result. We train 424+ models daily using 2+ years of historical data.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    <span>Which parks do you cover?</span>
+                    <span class="faq-arrow">›</span>
+                </button>
+                <div class="faq-a">
+                    <p>We cover 12 parks: Magic Kingdom, EPCOT, Hollywood Studios, Animal Kingdom, Disneyland, California Adventure, Universal Studios Florida, Islands of Adventure, Tokyo Disneyland, Tokyo DisneySea, Europa-Park, and the upcoming Epic Universe.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    <span>Can I cancel anytime?</span>
+                    <span class="faq-arrow">›</span>
+                </button>
+                <div class="faq-a">
+                    <p>Yes! No contracts, no commitments. Cancel anytime from your account settings. Annual plans are prorated if you cancel early.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    <span>What makes this different from other crowd calendars?</span>
+                    <span class="faq-arrow">›</span>
+                </button>
+                <div class="faq-a">
+                    <p>Most crowd calendars use simple heuristics — holiday overlaps, school schedules. We use machine learning models trained on millions of actual wait time observations, updated daily. Our predictions adapt in real-time to trends other tools miss.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    <span>Is there an API for developers?</span>
+                    <span class="faq-arrow">›</span>
+                </button>
+                <div class="faq-a">
+                    <p>Yes! We offer the first API in the theme park data space. Developer ($49/mo), Business ($499/mo), and Enterprise tiers available. RESTful endpoints with JSON responses. <a href="https://discord.gg/2Estr7sbP7" style="color:var(--accent)">Join Discord</a> for early API access.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- WAITLIST -->
     <section class="waitlist-section">
         <div class="waitlist-card">
@@ -938,6 +1065,12 @@
             document.querySelectorAll('.plan-price-note[data-monthly]').forEach(el => {
                 el.textContent = isAnnual ? el.dataset.annual : el.dataset.monthly;
             });
+        }
+
+        // FAQ toggle
+        function toggleFaq(btn) {
+            const item = btn.closest('.faq-item');
+            item.classList.toggle('open');
         }
 
         // Waitlist (placeholder — store in localStorage for now)

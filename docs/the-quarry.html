@@ -11,12 +11,17 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-    --bg:          #080f1e;
-    --bg-card:     rgba(10, 26, 52, 0.88);
-    --bg-hover:    rgba(16, 36, 66, 0.92);
-    --cyan:        #5ab4cc;
-    --cyan-dim:    rgba(90, 180, 204, 0.20);
-    --cyan-glow:   rgba(90, 180, 204, 0.06);
+    /* ═══ Design System: Navy #0a1628 · Red #A60038 · Cyan #4a90a4 ═══ */
+    --bg:          #0a1628;
+    --bg-card:     rgba(15, 29, 50, 0.88);
+    --bg-hover:    rgba(20, 40, 70, 0.92);
+    --cyan:        #4a90a4;
+    --cyan-dim:    rgba(74, 144, 164, 0.20);
+    --cyan-glow:   rgba(74, 144, 164, 0.06);
+    --cyan-light:  #6bb5c9;
+    --red:         #A60038;
+    --red-light:   #e05577;
+    --red-dim:     rgba(166, 0, 56, 0.15);
     --gold:        #c9a227;
     --gold-dim:    rgba(201, 162, 39, 0.17);
     --orchid:      #9b7fb6;
@@ -25,25 +30,59 @@
     --slate-dim:   rgba(136, 146, 176, 0.13);
     --burnt:       #e07b54;
     --burnt-dim:   rgba(224, 123, 84, 0.17);
-    --text:        #e9f4ff;
-    --text-dim:    rgba(233, 244, 255, 0.54);
-    --text-faint:  rgba(233, 244, 255, 0.27);
-    --border:      rgba(90, 180, 204, 0.14);
-    --border-hi:   rgba(90, 180, 204, 0.36);
+    --green:       #4ade80;
+    --text:        #ffffff;
+    --text-dim:    rgba(255, 255, 255, 0.54);
+    --text-faint:  rgba(255, 255, 255, 0.27);
+    --border:      rgba(74, 144, 164, 0.14);
+    --border-hi:   rgba(74, 144, 164, 0.36);
     --mono:        'JetBrains Mono', monospace;
     --sans:        'Inter', sans-serif;
 }
 
 html, body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
 
+/* Subtle grid background — design system consistency */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+        linear-gradient(rgba(74,144,164,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,144,164,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ambient gradient orb */
+body::after {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(74,144,164,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
 /* ── HEADER ─────────────────────────────────────────────── */
 .hdr {
-    background: rgba(8,15,30,0.98);
+    background: rgba(10,22,40,0.96);
     border-bottom: 1px solid var(--border);
     padding: 0 28px;
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; gap: 14px; height: 52px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+.hdr::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--red, #A60038), transparent);
+    opacity: 0.4;
 }
 .hdr-logo {
     font-family: var(--mono); font-size: 15px; font-weight: 600;
@@ -62,11 +101,13 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--sans)
 
 /* ── TAB NAV ────────────────────────────────────────────── */
 .tab-nav {
-    background: rgba(8,15,30,0.98);
+    background: rgba(10,22,40,0.96);
     border-bottom: 1px solid var(--border);
     padding: 0 28px; display: flex;
     position: sticky; top: 52px; z-index: 90;
-    backdrop-filter: blur(10px); overflow-x: auto;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow-x: auto;
 }
 .tab-btn {
     padding: 12px 20px; background: none; border: none;
@@ -93,10 +134,17 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--sans)
 /* ── CARD ────────────────────────────────────────────────── */
 .card {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 16px;
-    transition: border-color .15s;
+    border-radius: 12px; padding: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03);
+    transition: border-color .2s, box-shadow .2s, transform .2s;
 }
-.card:hover { border-color: var(--border-hi); }
+.card:hover {
+    border-color: var(--border-hi);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+    transform: translateY(-1px);
+}
 
 /* ── KPI STRIP ──────────────────────────────────────────── */
 .kpi-grid {
@@ -105,10 +153,17 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--sans)
 }
 .kpi {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 14px 16px; text-align: center;
-    transition: border-color .15s;
+    border-radius: 10px; padding: 14px 16px; text-align: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: border-color .2s, box-shadow .2s, transform .2s;
 }
-.kpi:hover { border-color: var(--border-hi); }
+.kpi:hover {
+    border-color: var(--border-hi);
+    box-shadow: 0 4px 20px rgba(74,144,164,0.1);
+    transform: translateY(-2px);
+}
 .kpi-lbl { font-size: 9px; font-family: var(--mono); color: var(--text-faint); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
 .kpi-val { font-size: 26px; font-weight: 700; color: var(--cyan); line-height: 1; margin-bottom: 5px; }
 .kpi-sub { font-size: 10px; color: var(--text-faint); }
@@ -162,11 +217,18 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--sans)
 /* ── PROJECT CARD ───────────────────────────────────────── */
 .proj-card {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 16px;
+    border-radius: 12px; padding: 16px;
     display: flex; flex-direction: column; gap: 8px;
-    transition: border-color .15s;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03);
+    transition: border-color .2s, box-shadow .2s, transform .2s;
 }
-.proj-card:hover { border-color: var(--border-hi); }
+.proj-card:hover {
+    border-color: var(--border-hi);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+}
 .proj-name  { font-weight: 600; font-size: 14px; }
 .proj-desc  { font-size: 12px; color: var(--text-dim); line-height: 1.55; flex: 1; }
 .proj-pct   { font-size: 17px; font-weight: 700; color: var(--cyan); font-family: var(--mono); }
@@ -175,10 +237,15 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--sans)
 .task-item {
     display: flex; flex-direction: column; gap: 5px;
     padding: 10px 14px; background: var(--bg-card);
-    border: 1px solid var(--border); border-radius: 6px;
-    transition: border-color .15s;
+    border: 1px solid var(--border); border-radius: 8px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: border-color .2s, transform .2s;
 }
-.task-item:hover   { border-color: var(--border-hi); }
+.task-item:hover {
+    border-color: var(--border-hi);
+    transform: translateX(2px);
+}
 .task-title        { font-weight: 500; font-size: 13px; }
 .task-notes        { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
 .task-foot         { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-faint); flex-wrap: wrap; }
@@ -197,11 +264,18 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--sans)
 /* ── SOCIAL CARDS ───────────────────────────────────────── */
 .soc-card {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 16px;
+    border-radius: 12px; padding: 16px;
     display: flex; flex-direction: column; gap: 10px;
-    transition: border-color .15s;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03);
+    transition: border-color .2s, box-shadow .2s, transform .2s;
 }
-.soc-card:hover  { border-color: var(--border-hi); }
+.soc-card:hover {
+    border-color: var(--border-hi);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+}
 .soc-plat  { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--cyan); }
 .soc-hndl  { font-size: 12px; color: var(--text-dim); }
 .soc-stats { display: flex; gap: 18px; }
@@ -251,11 +325,18 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--sans)
 /* ── IDEA CARD ──────────────────────────────────────────── */
 .idea-card {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 14px;
+    border-radius: 12px; padding: 14px;
     display: flex; flex-direction: column; gap: 8px;
-    transition: border-color .15s;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03);
+    transition: border-color .2s, box-shadow .2s, transform .2s;
 }
-.idea-card:hover { border-color: var(--border-hi); }
+.idea-card:hover {
+    border-color: var(--border-hi);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+}
 .idea-ttl   { font-weight: 600; font-size: 13px; }
 .idea-desc  { font-size: 12px; color: var(--text-dim); line-height: 1.55; flex: 1; }
 .idea-foot  { display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: var(--text-faint); }
@@ -349,6 +430,20 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--sans)
 .pbar-track{ height: 20px; background: var(--slate-dim); border-radius: 4px; overflow: hidden; }
 .pbar-fill { height: 100%; border-radius: 4px; min-width: 2px; transition: width .6s ease; }
 .pbar-val  { font-family: var(--mono); font-size: 12px; color: var(--text-dim); text-align: right; }
+
+/* Accessibility: focus-visible outlines */
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
 
 @media (max-width: 860px) {
     .tab-pane { padding: 16px 14px 48px; }
