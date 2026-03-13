@@ -75,12 +75,12 @@
         }
     },
     "accuracy": {
-        "entity_mae": "9.1 min",
+        "entity_mae": "9.0 min",
         "entity_bias": "+2.2 min",
-        "overall_rmse": "10.4",
-        "wti_mae": "6.8",
-        "wti_bias": "1.5",
-        "days_evaluated": 28
+        "overall_rmse": "10.3",
+        "wti_mae": "6.7",
+        "wti_bias": "1.2",
+        "days_evaluated": 29
     },
     "ask_analytics": {
         "total_questions": 72,
@@ -120,5 +120,5 @@
         "db_live_waits": 123685097,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-13T08:45:04.318416"
+    "last_updated": "2026-03-13T09:00:04.929913"
 }

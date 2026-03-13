@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-13T12:45:01Z",
+  "generated_at": "2026-03-13T13:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -55,7 +55,7 @@
           "emoji": "\ud83d\udd27",
           "purpose": "Pipeline monitoring \u2014 ETL status, forecast runs, data quality checks",
           "url": "https://discord.com/channels/1479350342318690505/1479351574177513576",
-          "last_active": "2026-03-13T12:41:59.221000+00:00"
+          "last_active": "2026-03-13T12:49:52.629000+00:00"
         },
         {
           "name": "modeling",
@@ -164,10 +164,10 @@
       "channel_id": "1479351574177513576",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Now I've got the full picture. Here's what happened:\n\n**The old v2 pipeline (`run_daily_pipeline.sh`) ran through March 8.** It included `evaluate_forecast_accuracy.py` which properly updated `enti...",
-      "timestamp": "2026-03-13T12:41:59.221000+00:00",
-      "message_id": "1481995742750048278",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481995742750048278"
+      "message": "Done. Step 10 is fully implemented and live. Here's the summary:\n\n**What was broken:** When v4 merged on March 9, the cron switched from `run_daily_pipeline.sh` (v2) to `pipeline_v3/pipeline.py`. T...",
+      "timestamp": "2026-03-13T12:49:52.629000+00:00",
+      "message_id": "1481997728367120474",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481997728367120474"
     },
     {
       "channel": "pipeline",
@@ -175,10 +175,10 @@
       "channel_id": "1479351574177513576",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "OK here's what's actually happening. Let me check one more thing \u2014 where the accuracy data that *does* exist is coming from:",
-      "timestamp": "2026-03-13T12:40:59.723000+00:00",
-      "message_id": "1481995493197480119",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481995493197480119"
+      "message": "Everything's flowing. Now let me commit:",
+      "timestamp": "2026-03-13T12:49:38.376000+00:00",
+      "message_id": "1481997668585574433",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481997668585574433"
     },
     {
       "channel": "pipeline",
@@ -186,10 +186,10 @@
       "channel_id": "1479351574177513576",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Let me trace this properly.",
-      "timestamp": "2026-03-13T12:40:37.268000+00:00",
-      "message_id": "1481995399014387845",
-      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481995399014387845"
+      "message": "It works. Here's what just happened:\n\n- **Found March 12** as the 1 new date to evaluate (today's ETL picked up yesterday's actuals \u2705)\n- **222 entity-dates** scored \u2014 MAE 6.8, bias +0.6 for March 1...",
+      "timestamp": "2026-03-13T12:49:31.897000+00:00",
+      "message_id": "1481997641410936994",
+      "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481997641410936994"
     },
     {
       "channel": "wilma",
