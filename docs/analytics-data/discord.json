@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-13T20:00:01Z",
+  "generated_at": "2026-03-13T20:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-13T19:33:43.374000+00:00"
+          "last_active": "2026-03-13T20:06:03.439000+00:00"
         },
         {
           "name": "bam-bam",
@@ -136,7 +136,7 @@
           "emoji": "\ud83d\udc7d",
           "purpose": "Gazoo's workspace \u2014 nightly reviews, devil's advocate, R&D",
           "url": "https://discord.com/channels/1479350342318690505/1479351587129262232",
-          "last_active": "2026-03-13T06:04:16.783000+00:00"
+          "last_active": "2026-03-13T20:03:07.378000+00:00"
         },
         {
           "name": "morning-briefing",
@@ -164,21 +164,10 @@
       "channel_id": "1479351579185250436",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Done \u2014 responded in #dayforce-gc with full status and next steps. Prioritizing Chantale's validation setup first (Fred's ask), then the flag flipping batch. \ud83e\uddb4",
-      "timestamp": "2026-03-13T19:33:43.374000+00:00",
-      "message_id": "1482099359477796937",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482099359477796937"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Got it \u2014 Barney's been busy and is waiting on me. Let me respond:",
-      "timestamp": "2026-03-13T19:33:26+00:00",
-      "message_id": "1482099286605828397",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482099286605828397"
+      "message": "I'm in #dayforce-gc \u2014 ready for orders. \ud83e\uddac\ud83e\uddb4",
+      "timestamp": "2026-03-13T20:06:03.439000+00:00",
+      "message_id": "1482107496700186738",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482107496700186738"
     },
     {
       "channel": "wilma",
@@ -186,10 +175,54 @@
       "channel_id": "1479351579185250436",
       "agent": "Fred Hazelton",
       "is_bot": false,
-      "message": "Hey wilma, can you give us an updated response in <#1481506425409765478> ?",
-      "timestamp": "2026-03-13T19:33:14.762000+00:00",
-      "message_id": "1482099239470239877",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482099239470239877"
+      "message": "Join us in <#1481506425409765478> again please",
+      "timestamp": "2026-03-13T20:05:43.033000+00:00",
+      "message_id": "1482107411111350407",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482107411111350407"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now commit and post to Discord:",
+      "timestamp": "2026-03-13T20:03:07.378000+00:00",
+      "message_id": "1482106758246957269",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1482106758246957269"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Good. I have enough data. Let me now compile the afternoon review. Key findings:\n\n**AM Issues from the 2 AM review:**\n1. \ud83d\udd34 Pricing page 404 \u2192 \u2705 **FIXED** by Wilma (deployed to production, now 200 O...",
+      "timestamp": "2026-03-13T20:03:05.552000+00:00",
+      "message_id": "1482106750588026952",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1482106750588026952"
+    },
+    {
+      "channel": "gazoo",
+      "channel_emoji": "\ud83d\udc7d",
+      "channel_id": "1479351587129262232",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Now let me check the #fred-wilma channel for Fred's activity today:",
+      "timestamp": "2026-03-13T20:03:05.287000+00:00",
+      "message_id": "1482106749476671709",
+      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1482106749476671709"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Done \u2014 responded in #dayforce-gc with full status and next steps. Prioritizing Chantale's validation setup first (Fred's ask), then the flag flipping batch. \ud83e\uddb4",
+      "timestamp": "2026-03-13T19:33:43.374000+00:00",
+      "message_id": "1482099359477796937",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482099359477796937"
     },
     {
       "channel": "fred-wilma",
@@ -322,39 +355,6 @@
       "timestamp": "2026-03-13T07:00:02.017000+00:00",
       "message_id": "1481909687359111248",
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481909687359111248"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now post the summary to Discord #gazoo:",
-      "timestamp": "2026-03-13T06:04:16.783000+00:00",
-      "message_id": "1481895656430895118",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481895656430895118"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now I have everything I need. Let me write the review:",
-      "timestamp": "2026-03-13T06:04:16.602000+00:00",
-      "message_id": "1481895655671726091",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481895655671726091"
-    },
-    {
-      "channel": "gazoo",
-      "channel_emoji": "\ud83d\udc7d",
-      "channel_id": "1479351587129262232",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Good \u2014 zombie posts confirmed dead. Now let me check a few more things and then write the review:",
-      "timestamp": "2026-03-13T06:04:16.359000+00:00",
-      "message_id": "1481895654652510279",
-      "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1481895654652510279"
     },
     {
       "channel": "fred-wilma",
