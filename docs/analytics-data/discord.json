@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-13T13:15:01Z",
+  "generated_at": "2026-03-13T13:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -22,7 +22,7 @@
           "emoji": "\ud83c\udfaf",
           "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
           "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-13T09:30:01.326000+00:00"
+          "last_active": "2026-03-13T13:30:02.186000+00:00"
         },
         {
           "name": "daily-digest",
@@ -158,6 +158,17 @@
     }
   ],
   "recent_activity": [
+    {
+      "channel": "mission-control",
+      "channel_emoji": "\ud83c\udfaf",
+      "channel_id": "1479351570121621569",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83e\uddb4 Mission Control Status",
+      "timestamp": "2026-03-13T13:30:02.186000+00:00",
+      "message_id": "1482007834781814795",
+      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1482007834781814795"
+    },
     {
       "channel": "pipeline",
       "channel_emoji": "\ud83d\udd27",
@@ -366,22 +377,11 @@
       "timestamp": "2026-03-12T11:30:03.111000+00:00",
       "message_id": "1481615251807146095",
       "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481615251807146095"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-12T09:00:01.540000+00:00",
-      "message_id": "1481577496481894432",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481577496481894432"
     }
   ],
   "stats": {
     "messages_shown": 20,
     "active_channels_today": 6,
-    "messages_today": 15
+    "messages_today": 16
   }
 }
