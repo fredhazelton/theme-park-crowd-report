@@ -8,11 +8,6 @@
         {
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
-            "task": "Set up Cloudflare Web Analytics on hazeydata.ai"
-        },
-        {
-            "status_class": "medium",
-            "status_text": "\ud83d\udcdd Todo",
             "task": "Design and build /pricing page on hazeydata.ai"
         },
         {
@@ -24,6 +19,11 @@
             "status_class": "medium",
             "status_text": "\ud83d\udcdd Todo",
             "task": "Pipeline Twins / Blue-Green Deploy for bot"
+        },
+        {
+            "status_class": "medium",
+            "status_text": "\ud83d\udcdd Todo",
+            "task": "Apple Weather-Style Crowd Report Images"
         }
     ],
     "key_dates": [
@@ -120,5 +120,5 @@
         "db_live_waits": 123647612,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-13T02:30:04.581235"
+    "last_updated": "2026-03-13T02:45:04.782609"
 }
