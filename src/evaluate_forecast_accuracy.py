@@ -329,6 +329,10 @@ def evaluate_accuracy(
                 CASE WHEN a.actual_wait > 0 
                      THEN ABS(f.forecast_wait - a.actual_wait) / a.actual_wait * 100 
                      ELSE NULL END as pct_error,
+                -- sMAPE: symmetric, handles near-zero better
+                CASE WHEN (f.forecast_wait + a.actual_wait) > 0
+                     THEN ABS(f.forecast_wait - a.actual_wait) / ((f.forecast_wait + a.actual_wait) / 2.0) * 100
+                     ELSE NULL END as smape,
                 -- Horizon
                 DATEDIFF('day', f.forecast_made_date::DATE, f.park_date::DATE) as horizon_days,
                 '{run_date}' as evaluation_date
@@ -362,6 +366,7 @@ def evaluate_accuracy(
                     AVG(absolute_error) as mae,
                     SQRT(AVG(signed_error * signed_error)) as rmse,
                     AVG(pct_error) as mape,
+                    AVG(smape) as smape,
                     PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY absolute_error) as median_ae
                 FROM slot_df
                 GROUP BY entity_code, park_date, evaluation_date, forecast_made_date, 
@@ -536,6 +541,8 @@ def generate_summary(output_base: str, con: duckdb.DuckDBPyConnection):
             AVG(mae) as overall_mae,
             AVG(bias) as overall_bias,
             AVG(mape) as overall_mape,
+            AVG(smape) as overall_smape,
+            AVG(CASE WHEN avg_actual >= 5 THEN mape END) as overall_mape_filtered,
             AVG(rmse) as overall_rmse,
             -- By horizon bucket
             AVG(CASE WHEN horizon_days <= 1 THEN mae END) as mae_1day,
@@ -575,10 +582,12 @@ def generate_summary(output_base: str, con: duckdb.DuckDBPyConnection):
     with open(summary_path, "w") as f:
         json.dump(summary, f, indent=2, default=str)
     
-    log.info("Summary: MAE=%.1f min | bias=%.1f | MAPE=%.1f%% | %d dates evaluated",
+    log.info("Summary: MAE=%.1f min | bias=%.1f | sMAPE=%.1f%% | MAPE=%.1f%% (filtered≥5min: %.1f%%) | %d dates evaluated",
              summary.get("overall_mae", 0) or 0,
              summary.get("overall_bias", 0) or 0,
+             summary.get("overall_smape", 0) or 0,
              summary.get("overall_mape", 0) or 0,
+             summary.get("overall_mape_filtered", 0) or 0,
              summary.get("dates_evaluated", 0) or 0)
 
 
