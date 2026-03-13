@@ -1,38 +1,88 @@
 {
-  "generated_at": "2026-03-12T17:02:15.007696-04:00",
-  "date": "2026-03-12",
+  "generated_at": "2026-03-13T03:02:15.070907-04:00",
+  "date": "2026-03-13",
   "categories": {
     "touringplans": {
-      "count": 5,
+      "count": 10,
       "items": [
+        {
+          "title": "Disney Dining Plan Tips & Current Meal Photos",
+          "url": "https://touringplans.com/blog/disney-dining-plan-tips-current-meal-photos/",
+          "source": "TouringPlans",
+          "snippet": "Now that Disney has released Free Dining for everyone, we&#8217;d like to share a few of our favorite tips for...",
+          "published": "2026-03-12",
+          "relevant": true
+        },
         {
           "title": "Disney World Opening Dates Announced!",
           "url": "https://touringplans.com/blog/disney-world-opening-dates-announced/",
           "source": "TouringPlans",
+          "snippet": "Disney just announced SEVEN opening dates for new and refurbished attractions across all 4 parks! Hopefully you were planning a...",
+          "published": "2026-03-12",
           "relevant": true
         },
         {
           "title": "Free Dining is Back!",
           "url": "https://touringplans.com/blog/free-dining-is-back/",
           "source": "TouringPlans",
+          "snippet": "Disney just released a new Free Dining Offer ! This time it&#8217;s for everyone! Offer Overview Enjoy a free dining...",
+          "published": "2026-03-12",
           "relevant": true
         },
         {
-          "title": "Vacation Planning Guide",
-          "url": "https://touringplans.com/blog/disney-world-vacation-trip-planning-guide/",
+          "title": "Five \u201cFree\u201d Flower & Garden Festival Activities",
+          "url": "https://touringplans.com/blog/five-free-flower-garden-festival-activities/",
           "source": "TouringPlans",
+          "snippet": "We still have 82 days of EPCOT&#8217;s Flower and Garden Festival left- lots of time to plan a visit! If...",
+          "published": "2026-03-11",
+          "relevant": true
+        },
+        {
+          "title": "Disney Data Dump March 11 2026",
+          "url": "https://touringplans.com/blog/disney-data-dump-march-11-2026/",
+          "source": "TouringPlans",
+          "snippet": "After a few weeks of winter wait time whiplash (holiday mash-ups, lingering long-weekend crowds, and the brief runDisney bump) the...",
+          "published": "2026-03-11",
+          "relevant": true
+        },
+        {
+          "title": "Mears Connect Standard- Morning Arrival",
+          "url": "https://touringplans.com/blog/mears-connect-standard-morning-arrival/",
+          "source": "TouringPlans",
+          "snippet": "We tested Mears Connect Standard transportation from MCO, Orlando International Airport, to Disney&#8217;s Pop Century Resort. We used this same...",
+          "published": "2026-03-10",
+          "relevant": true
+        },
+        {
+          "title": "The Best $50 You Can Spend at EPCOT\u2019s Flower & Garden",
+          "url": "https://touringplans.com/blog/the-best-50-you-can-spend-at-epcots-flower-garden/",
+          "source": "TouringPlans",
+          "snippet": "We ate everything at EPCOT&#8217;s Flower &#38; Garden Festival and have narrowed down the best $50 you can spend if...",
+          "published": "2026-03-09",
+          "relevant": true
+        },
+        {
+          "title": "Photo Tour of Magic Kingdom Construction",
+          "url": "https://touringplans.com/blog/photo-tour-of-magic-kingdom-construction/",
+          "source": "TouringPlans",
+          "snippet": "The Magic Kingdom is busy getting ready for a big summer if the the construction walls and scrims are any...",
+          "published": "2026-03-08",
+          "relevant": true
+        },
+        {
+          "title": "2026 Guide to Volcano Bay Nights",
+          "url": "https://touringplans.com/blog/2025-volcano-bay-nights-tickets-now-on-sale/",
+          "source": "TouringPlans",
+          "snippet": "Enjoy exclusive Volcano Bay time under the stars with DJs and characters at Volcano Bay Nights! Find out all the...",
+          "published": "2026-03-10",
           "relevant": false
         },
         {
-          "title": "Vacation Planning Guide",
-          "url": "https://touringplans.com/blog/universal-orlando-trip-planning-timeline/",
+          "title": "10 Reasons Castaway Cay and Lookout Cay May Become Your Favorite Ports",
+          "url": "https://touringplans.com/blog/10-reasons-castaway-cay-and-lookout-cay-may-become-your-favorite-ports/",
           "source": "TouringPlans",
-          "relevant": false
-        },
-        {
-          "title": "Tips for Plus Size Guests",
-          "url": "https://touringplans.com/blog/tips-for-plus-size-guests-at-universal-orlando-resort/",
-          "source": "TouringPlans",
+          "snippet": "I\u2019ve been asked before what\u2019s so special about a private island destination stop when you\u2019re on a cruise. These days,...",
+          "published": "2026-03-09",
           "relevant": false
         }
       ]
@@ -46,32 +96,167 @@
       "items": []
     },
     "theme_park_news": {
-      "count": 5,
+      "count": 20,
       "items": [
         {
-          "title": "Princess Dolls Discounted at Walt Disney World",
-          "url": "https://wdwnt.com/2026/03/princess-dolls-discounted-at-walt-disney-world/",
-          "source": "WDWNT"
+          "title": "\u2018Big Hero 6,\u2019 \u2018Lady and the Tramp,\u2019 Mickey and Minnie Pins at Disneyland Resort",
+          "url": "https://wdwnt.com/2026/03/new-big-hero-6-lady-the-tramp-mickey-and-minnie-pins-at-disneyland-resort/",
+          "source": "WDWNT",
+          "snippet": " In addition to limited edition pins, Disneyland Resort has released several new open edition pins this week, including pins inspired by Lady &#38; the Tramp and Big Hero 6. Mickey &#38; Minnie Weddin",
+          "published": "2026-03-13",
+          "relevant": true
         },
         {
-          "title": "Forecasting Construction Timelines",
-          "url": "https://blogmickey.com/2024/08/forecasting-construction-timelines-for-cars-themed-frontierland-expansion-villains-land-coming-to-magic-kingdom/",
-          "source": "BlogMickey"
+          "title": "Disney Destiny Cruise Ship Named in TIME\u2019s \u201cWorld\u2019s Greatest Places 2026\u201d",
+          "url": "https://blogmickey.com/2026/03/disney-destiny-cruise-ship-named-in-times-worlds-greatest-places-2026/",
+          "source": "BlogMickey",
+          "snippet": "The Disney Destiny cruise ship has been named as one of TIME&#8217;s World&#8217;s Greatest Places 2026. The cruise ship is Disney&#8217;s seventh cruise ship, and the latest Wish-class ship to take t",
+          "published": "2026-03-13",
+          "relevant": true
         },
         {
-          "title": "Treehouse Villas Refurbishment Confirmed for Disney\u2019s Saratoga Springs Resort",
-          "url": "https://wdwnt.com/2026/03/treehouse-villas-refurbishment-saratoga-springs-resort/",
-          "source": "WDWNT"
+          "title": "Women Who Make the Magic: Experiencing Disneyland's Newest Tour",
+          "url": "https://www.laughingplace.com/disney-parks/women-who-make-the-magic-tour-experience/",
+          "source": "Laughing Place",
+          "snippet": "Last Friday, Disneyland launched its newest guided experience, Women Who Make the Magic, a tour highlighting the many women whose creativity and determination helped shape the park.After ensuring the ",
+          "published": "2026-03-12",
+          "relevant": true
         },
         {
-          "title": "Jurassic Park Archway Added to Rumored Universal Fan Fest Nights Walkthrough Experience",
-          "url": "https://wdwnt.com/2026/03/jurassic-park-archway-rumored-universal-fan-fest-nights-walkthrough-experience/",
-          "source": "WDWNT"
+          "title": "Firetrucks and Ambulances Block Backstage Access Near New Universal Studios Attraction",
+          "url": "https://insidethemagic.net/2026/03/universal-studios-emergency-response-emd1/",
+          "source": "Inside the Magic",
+          "snippet": " Theme parks are carefully choreographed worlds where every detail is designed to immerse guests in storytelling and adventure. At Universal Studios Hollywood, that magic often comes in the form of bl",
+          "published": "2026-03-13",
+          "relevant": true
         },
         {
-          "title": "Queue Handrails and Light Poles Added Outside Buzz Lightyear\u2019s Space Ranger Spin at Magic Kingdom",
-          "url": "https://wdwnt.com/2026/03/queue-handrails-poles-buzz-lightyears-space-ranger-spin/",
-          "source": "WDWNT"
+          "title": "\u2018Sailor Moon\u2019 coming to Universal Fan Fest Nights",
+          "url": "https://www.themeparktribune.com/sailor-moon-coming-to-universal-fan-fest-nights/",
+          "source": "Theme Park Tribune",
+          "snippet": "    Universal Hollywood's Fan Fest Nights is importing a \"Sailor Moon\" short film first shown at Universal Japan.  \n The post  \u2018Sailor Moon\u2019 coming to Universal Fan Fest Nights  appeared first on  The",
+          "published": "2026-03-13",
+          "relevant": true
+        },
+        {
+          "title": "Soarin\u2019 Across America at EPCOT Opening Date & Around the World Closing Date",
+          "url": "https://www.disneytouristblog.com/soarin-across-america-epcot-opening-date-news/",
+          "source": "Disney Tourist Blog",
+          "snippet": " Walt Disney World has announced the opening date for Soarin&#8217; Across America at EPCOT and shared new behind-the-scenes looks at filming. They&#8217;ve also revealed the closing date for Soarin&#",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Disney World Opening Dates Announced!",
+          "url": "https://touringplans.com/blog/disney-world-opening-dates-announced/",
+          "source": "TouringPlans Blog",
+          "snippet": "Disney just announced SEVEN opening dates for new and refurbished attractions across all 4 parks! Hopefully you were planning a...",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "JetBlue and Disneyland Paris Announce World of Frozen Trip Sweepstakes",
+          "url": "https://wdwnt.com/2026/03/jetblue-airlines-and-disneyland-paris-announce-world-of-frozen-trip-sweepstakes/",
+          "source": "WDWNT",
+          "snippet": " For a limited time, guests can enter for a chance to win a trip for four to visit Disneyland Paris and the new World of Frozen land while flying JetBlue&#8217;s premium Mint experience. JetBlue x Dis",
+          "published": "2026-03-13",
+          "relevant": true
+        },
+        {
+          "title": "The Muppets Easter Egg Display at Disney\u2019s Contemporary Resort (2026)",
+          "url": "https://blogmickey.com/2026/03/the-muppets-easter-egg-display-at-disneys-contemporary-resort-2026/",
+          "source": "BlogMickey",
+          "snippet": "It&#8217;s the Easter season at Walt Disney World, and that means the arrival of the highly themed Easter egg displays at some of the resorts. We&#8217;ve already taken a look at the Yacht Club and Be",
+          "published": "2026-03-13",
+          "relevant": true
+        },
+        {
+          "title": "Photos: Chocolate Easter Eggs Arrive at Walt Disney World Resorts for 2026",
+          "url": "https://www.laughingplace.com/disney-parks/walt-disney-world-resorts-2026-easter-egg/",
+          "source": "Laughing Place",
+          "snippet": "As Easter approaches, some of Walt Disney World's Deluxe Resort lobbies feature sweet-smelling, impressive Easter egg displays, all hand-made by Disney\u2019s talented culinary teams. Each sculpted confect",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Lightning Lane, Wait Times, and Vacation Planning Undergo Big Change at Disney World in New Update",
+          "url": "https://insidethemagic.net/2026/03/my-disney-experience-app-update-wdw-emd1/",
+          "source": "Inside the Magic",
+          "snippet": " For many visitors heading to Walt Disney World Resort, the magic begins before they ever scan into a theme park. From dining reservations to ride wait times, much of the modern Disney vacation now ru",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Disney names new theme parks chief",
+          "url": "https://www.themeparktribune.com/disney-names-new-theme-parks-chief/",
+          "source": "Theme Park Tribune",
+          "snippet": "    Disneyland Resort President Thomas Mazloum will be the next chairman of Disney\u2019s Experiences division.  \n The post  Disney names new theme parks chief  appeared first on  Theme Park Tribune . ",
+          "published": "2026-03-11",
+          "relevant": true
+        },
+        {
+          "title": "Disney World\u2019s Biggest Ticket Deal for Everyone is Back & Better, Including Magic Kingdom in 2026!",
+          "url": "https://www.disneytouristblog.com/4-park-magic-ticket-discount-disney-world-admission-summer-2026/",
+          "source": "Disney Tourist Blog",
+          "snippet": " Walt Disney World has brought back the 4-Day, 4-Park Magic Ticket Deal for late Spring to early Fall 2026, available for the general public to purchase that don&#8217;t require reservations. This sha",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Five \u201cFree\u201d Flower & Garden Festival Activities",
+          "url": "https://touringplans.com/blog/five-free-flower-garden-festival-activities/",
+          "source": "TouringPlans Blog",
+          "snippet": "We still have 82 days of EPCOT&#8217;s Flower and Garden Festival left- lots of time to plan a visit! If...",
+          "published": "2026-03-11",
+          "relevant": true
+        },
+        {
+          "title": "\u2018Mickey Mouse Club\u2019 Merchandise Collection by Her Universe Available Online at Disney Store",
+          "url": "https://wdwnt.com/2026/03/mickey-mouse-club-by-her-universe-disney-store/",
+          "source": "WDWNT",
+          "snippet": " The Mickey Mouse Club merchandise collection by Her Universe is now available online at DisneyStore.com. Check out all the items below. Cardigan Sweater for Women &#8211; $84.99 The collegiate stylin",
+          "published": "2026-03-13",
+          "relevant": true
+        },
+        {
+          "title": "Tomorrowland Rock Repainting Project Halfway Complete at Magic Kingdom",
+          "url": "https://blogmickey.com/2026/03/tomorrowland-rock-repainting-project-about-halfway-complete-at-magic-kingdom/",
+          "source": "BlogMickey",
+          "snippet": "The Tomorrowland rock repainting project is about halfway done at Magic Kingdom, judging by my untrained (but hopefully observant) eye. We first told you about the repainting project last month as cre",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Photos: Work Continues on Storybook Circus Tents at Magic Kingdom",
+          "url": "https://www.laughingplace.com/disney-parks/storybook-circus-petes-silly-sideshow/",
+          "source": "Laughing Place",
+          "snippet": "We recently visited Magic Kingdom where Storybook Circus is in the midst of a refurbishment. Big Top Souvenirs is now currently completely enveloped in themed scrims.These massive covers feature tan, ",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Stuck in the \u201cTragic\u201d Kingdom: Why Orlando\u2019s Roads are the Worst in America\u2014and a Nightmare for Disney Travelers",
+          "url": "https://insidethemagic.net/2026/03/roads-leading-to-disney-world-voted-worst-in-the-nation-causing-massive-delays-for-disney-fans-rl1/",
+          "source": "Inside the Magic",
+          "snippet": " You\u2019ve spent the last fourteen hours immersed in a world of pixie dust, $12 churros, and the infectious laughter of children. You\u2019ve conquered the mountains\u2014Space, Big Thunder, and Seven Dwarfs\u2014and y",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Big Thunder Mountain Railroad Reopening Date Derailed to May 2026",
+          "url": "https://www.disneytouristblog.com/big-thunder-mountain-railroad-reopening-date-delay-may-2026/",
+          "source": "Disney Tourist Blog",
+          "snippet": " Walt Disney World has announced its Summer 2026 slate, revealing opening dates, details &#38; discounts. One attraction that did not\u00a0receive a reopening date was Big Thunder Mountain Railroad. Howeve",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Disney Data Dump March 11 2026",
+          "url": "https://touringplans.com/blog/disney-data-dump-march-11-2026/",
+          "source": "TouringPlans Blog",
+          "snippet": "After a few weeks of winter wait time whiplash (holiday mash-ups, lingering long-weekend crowds, and the brief runDisney bump) the...",
+          "published": "2026-03-11",
+          "relevant": true
         }
       ]
     },
@@ -79,30 +264,12 @@
       "count": 15,
       "items": [
         {
-          "title": "What's the most \"only at Disney World\" thing that's ever happened to you that you'd never believe if someone else told \u2026",
-          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rr3uee/whats_the_most_only_at_disney_world_thing_thats/",
-          "source": "Reddit r/WaltDisneyWorld",
-          "query": "subreddit_browse",
-          "score": 1231,
-          "comments": 218,
-          "relevant": true
-        },
-        {
-          "title": "Stardust Racers Closure Extended",
-          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rr4qmf/stardust_racers_closure_extended/",
+          "title": "Universal says additional capacity enhancements to Stardust Racers is contributing to its extended downtime",
+          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rs1vqw/universal_says_additional_capacity_enhancements/",
           "source": "Reddit r/UniversalOrlando",
           "query": "subreddit_browse",
-          "score": 217,
-          "comments": 168,
-          "relevant": true
-        },
-        {
-          "title": "Character Actors in Disney Anaheim: How do you feel when adults come to take photos with you?",
-          "url": "https://www.reddit.com/r/Disneyland/comments/1rrgb52/character_actors_in_disney_anaheim_how_do_you/",
-          "source": "Reddit r/Disneyland",
-          "query": "subreddit_browse",
-          "score": 162,
-          "comments": 262,
+          "score": 165,
+          "comments": 56,
           "relevant": true
         },
         {
@@ -110,26 +277,17 @@
           "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rriynm/stardust_struggles_continue_universal_extends/",
           "source": "Reddit r/UniversalOrlando",
           "query": "subreddit_browse",
-          "score": 114,
-          "comments": 73,
+          "score": 138,
+          "comments": 75,
           "relevant": true
         },
         {
-          "title": "Summer 2026 at Disney World: Everything That's Happening",
-          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rrpv00/summer_2026_at_disney_world_everything_thats/",
+          "title": "Springtime at Walt Disney World",
+          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rsdktr/springtime_at_walt_disney_world/",
           "source": "Reddit r/WaltDisneyWorld",
           "query": "subreddit_browse",
-          "score": 54,
-          "comments": 27,
-          "relevant": true
-        },
-        {
-          "title": "Universal says additional capacity enhancements to Stardust Racers is contributing to its extended downtime",
-          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rs1vqw/universal_says_additional_capacity_enhancements/",
-          "source": "Reddit r/UniversalOrlando",
-          "query": "subreddit_browse",
-          "score": 51,
-          "comments": 19,
+          "score": 44,
+          "comments": 4,
           "relevant": true
         },
         {
@@ -137,8 +295,8 @@
           "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rs0ivo/universal_epic_universe_worlds_greatest_places/",
           "source": "Reddit r/UniversalOrlando",
           "query": "subreddit_browse",
-          "score": 25,
-          "comments": 2,
+          "score": 42,
+          "comments": 3,
           "relevant": true
         },
         {
@@ -146,13 +304,22 @@
           "url": "https://www.reddit.com/r/universalstudios/comments/1rriz3g/stardust_struggles_continue_universal_extends/",
           "source": "Reddit r/UniversalStudios",
           "query": "subreddit_browse",
-          "score": 11,
+          "score": 12,
           "comments": 1,
           "relevant": true
         },
         {
           "title": "Lightning Lane Plan with 5 and 8 year olds at Disneyland",
           "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rs2c66/lightning_lane_plan_with_5_and_8_year_olds_at/",
+          "source": "Reddit r/DisneyPlanning",
+          "query": "subreddit_browse",
+          "score": 5,
+          "comments": 5,
+          "relevant": true
+        },
+        {
+          "title": "POP Vs POFQ",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rsb7kt/pop_vs_pofq/",
           "source": "Reddit r/DisneyPlanning",
           "query": "subreddit_browse",
           "score": 1,
@@ -169,6 +336,24 @@
           "relevant": true
         },
         {
+          "title": "Pixar place hotel pool",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1rsceba/pixar_place_hotel_pool/",
+          "source": "Reddit r/DisneyPlanning",
+          "query": "subreddit_browse",
+          "score": 0,
+          "comments": 9,
+          "relevant": true
+        },
+        {
+          "title": "Finding a quiet spot to recharge in Galaxy Edge is impossible",
+          "url": "https://www.reddit.com/r/disneyparks/comments/1rs3n01/finding_a_quiet_spot_to_recharge_in_galaxy_edge/",
+          "source": "Reddit r/disneyparks",
+          "query": "subreddit_browse",
+          "score": 0,
+          "comments": 7,
+          "relevant": true
+        },
+        {
           "title": "Possible incident at IoA 1:45-2:00pm",
           "url": "https://www.reddit.com/r/universalstudios/comments/1rrg2zk/possible_incident_at_ioa_145200pm/",
           "source": "Reddit r/UniversalStudios",
@@ -182,34 +367,34 @@
           "url": "https://www.reddit.com/r/Conservative/comments/1ro4c85/two_men_throw_incendiary_devices_into_nyc_crowd/",
           "source": "Reddit r/Conservative",
           "query": "hazeydata",
-          "score": 1581,
+          "score": 1584,
           "comments": 217
+        },
+        {
+          "title": "Streamer Oblivion was streaming from Disneyland last night and was the target of the swatting incident that occurred",
+          "url": "https://www.reddit.com/r/Disneyland/comments/1rs8eo9/streamer_oblivion_was_streaming_from_disneyland/",
+          "source": "Reddit r/Disneyland",
+          "query": "subreddit_browse",
+          "score": 1438,
+          "comments": 632,
+          "relevant": false
         },
         {
           "title": "Downtown Disney Parking",
           "url": "https://www.reddit.com/r/Disneyland/comments/1rrhbjr/downtown_disney_parking/",
           "source": "Reddit r/Disneyland",
           "query": "subreddit_browse",
-          "score": 935,
-          "comments": 32,
+          "score": 1326,
+          "comments": 42,
           "relevant": false
         },
         {
-          "title": "Universal Orlando at dusk.",
-          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rr7r7c/universal_orlando_at_dusk/",
-          "source": "Reddit r/UniversalOrlando",
+          "title": "I keep seeing these sunglasses being worn around the park and I can\u2019t stop thinking they are meant for Henry J Waternoo\u2026",
+          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rrv8y5/i_keep_seeing_these_sunglasses_being_worn_around/",
+          "source": "Reddit r/WaltDisneyWorld",
           "query": "subreddit_browse",
-          "score": 486,
-          "comments": 21,
-          "relevant": false
-        },
-        {
-          "title": "Tons of cops and helicopters outside Disneyland right now",
-          "url": "https://www.reddit.com/r/Disneyland/comments/1rrhykg/tons_of_cops_and_helicopters_outside_disneyland/",
-          "source": "Reddit r/Disneyland",
-          "query": "subreddit_browse",
-          "score": 474,
-          "comments": 142,
+          "score": 699,
+          "comments": 26,
           "relevant": false
         }
       ]
@@ -219,5 +404,5 @@
       "items": []
     }
   },
-  "total_items": 25
+  "total_items": 45
 }

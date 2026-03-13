@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-12T16:31:26",
+  "generated_at": "2026-03-13T02:31:43",
   "summary": {
     "total": 55,
     "this_week": 55,
@@ -728,27 +728,27 @@
       "description": "Add Cloudflare Web Analytics (free) to all pages. Critical for marketing ROI \u2014 cannot measure ANYTHING without site analytics. One JS snippet.",
       "status": "todo",
       "column": "backlog",
-      "priority": "high",
+      "priority": "critical",
       "owner": "Bam-bam",
       "project": "Business",
       "is_recurring": false,
       "created": "2026-03-12",
-      "updated": "2026-03-12T16:30:00",
-      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo."
+      "updated": "2026-03-13T02:30:00",
+      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo. [Dino AM 2026-03-13] \u26a0\ufe0f ESCALATED: Flagged in 4 consecutive Gazoo reviews. 3+ days open, zero progress. Priority elevated to critical. Single JS snippet \u2014 blocks ALL marketing measurement. Owner Bam-Bam needs to act or reassign."
     },
     {
       "id": "task-053",
       "title": "Fix Discord invite link inconsistency across site",
       "description": "Main page + quarry use discord.gg/wGcKWqdt, blog uses discord.gg/2Estr7sbP7. Standardize to ONE link across all pages. Gazoo flagged this.",
-      "status": "todo",
-      "column": "backlog",
+      "status": "done",
+      "column": "done",
       "priority": "medium",
       "owner": "Bam-bam",
       "project": "Website",
       "is_recurring": false,
       "created": "2026-03-12",
-      "updated": "2026-03-12T16:30:00",
-      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo."
+      "updated": "2026-03-13T02:30:00",
+      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo. [Dino AM 2026-03-13] Marked DONE \u2014 Gazoo 2026-03-13 confirmed: 'Every page now uses discord.gg/2Estr7sbP7. The year-view.html link was updated. Blog articles all use the correct link. This five-review saga is OVER.'"
     },
     {
       "id": "task-054",
@@ -768,15 +768,15 @@
       "id": "task-055",
       "title": "Design and build /pricing page on hazeydata.ai",
       "description": "Create pricing page showing 3 consumer tiers (Free/Explorer $4.99/Pro $9.99). Start with Coming Soon + email capture. Per go-to-market-week1.md Day 2. Even without Stripe, signals this is a real product.",
-      "status": "review",
-      "column": "review",
+      "status": "todo",
+      "column": "backlog",
       "priority": "high",
       "owner": "Pebbles",
       "project": "Business",
       "is_recurring": false,
       "created": "2026-03-12",
-      "updated": "2026-03-12T18:00:00",
-      "notes": "[Pebbles PM 2026-03-12] Pricing page built with 3 consumer tiers, B2B API section, feature comparison table, email waitlist. Glassmorphism design system. Deployed to web/pricing.html."
+      "updated": "2026-03-13T02:30:00",
+      "notes": "[Dino PM 2026-03-12] Status normalized: open \u2192 todo. [Dino AM 2026-03-13] Design DONE (Pebbles committed 937-line pricing.html, commit 0f0b8eb5). BUT: page returns 404 on production \u2014 not deployed to Cloudflare Pages. Escalated in metadata. Needs deploy step only."
     }
   ],
   "live_activity": []

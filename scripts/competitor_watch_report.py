@@ -7,10 +7,11 @@ relevant to HazeyData's crowd prediction business, then posts a
 formatted digest to the Discord #competitor-watch channel.
 
 Sources monitored:
-  1. TouringPlans — blog posts, announcements, data dumps
+  1. TouringPlans — blog posts, announcements, data dumps (RSS + HTML)
   2. Thrill Data — competing crowd prediction service
   3. Undercover Tourist — deals, crowd predictions, blog content
-  4. Theme park news — WDWNT, BlogMickey, major industry moves
+  4. Theme park news — WDWNT, BlogMickey, Laughing Place, Inside the Magic,
+     Theme Park Tribune, Orlando Informer, Disney Tourist Blog (all via RSS)
   5. Reddit mentions — crowd calendar, wait times, best time to visit
   6. HazeyData mentions — anyone talking about us
 
@@ -332,6 +333,9 @@ def check_theme_park_news() -> list[dict]:
         ("https://www.laughingplace.com/w/feed/", "Laughing Place"),
         ("https://insidethemagic.net/feed/", "Inside the Magic"),
         ("https://www.themeparktribune.com/feed/", "Theme Park Tribune"),
+        ("https://orlandoinformer.com/feed/", "Orlando Informer"),
+        ("https://feeds.feedburner.com/DisneyTouristBlog", "Disney Tourist Blog"),
+        ("https://touringplans.com/blog/feed/", "TouringPlans Blog"),
     ]
 
     crowd_keywords = [
