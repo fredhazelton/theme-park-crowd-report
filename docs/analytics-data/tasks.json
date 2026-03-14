@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-14T16:31:15",
+  "generated_at": "2026-03-14T19:01:28",
   "summary": {
     "total": 85,
     "this_week": 85,
@@ -785,12 +785,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "low",
-      "owner": "Wilma",
+      "owner": "Pebbles",
       "project": "Discord Bot",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14",
-      "notes": ""
+      "updated": "2026-03-14T19:00:00",
+      "notes": " [Wilma PM audit] Assigned to Pebbles."
     },
     {
       "id": "TASK-2",
@@ -803,8 +803,8 @@
       "project": "Content",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14",
-      "notes": ""
+      "updated": "2026-03-14T19:00:00",
+      "notes": " [Wilma PM audit] Assigned to Wilma."
     },
     {
       "id": "TASK-3",
@@ -813,12 +813,12 @@
       "status": "in_progress",
       "column": "in_progress",
       "priority": "high",
-      "owner": "Wilma",
+      "owner": "Mr. Slate",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14T04:30:00",
-      "notes": "Mr. Slate AM session: Full funding proposal outline drafted at mr-slate/accord-funding-proposal-outline.md. Covers problem statement, ACCORD solution (866 tests, 26 CAs), $15M+/yr estimated GoC savings, alignment with GC AI Strategy 2025-2027. Four funding paths identified: TBS Innovation Fund, ESDC Standing Offer, PSPC ProServices, NRC IRAP. BLOCKED on Noah meeting March 16 for conflict-of-interest clearance."
+      "updated": "2026-03-14T19:00:00",
+      "notes": "Mr. Slate AM session: Full funding proposal outline drafted at mr-slate/accord-funding-proposal-outline.md. Covers problem statement, ACCORD solution (866 tests, 26 CAs), $15M+/yr estimated GoC savings, alignment with GC AI Strategy 2025-2027. Four funding paths identified: TBS Innovation Fund, ESDC Standing Offer, PSPC ProServices, NRC IRAP. BLOCKED on Noah meeting March 16 for conflict-of-interest clearance. [Wilma PM audit] Assigned to Mr. Slate."
     },
     {
       "id": "TASK-4",
@@ -827,12 +827,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "high",
-      "owner": "Wilma",
+      "owner": "Arnold",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14",
-      "notes": ""
+      "updated": "2026-03-14T19:00:00",
+      "notes": " [Wilma PM audit] Assigned to Arnold."
     },
     {
       "id": "TASK-5",
@@ -855,12 +855,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "high",
-      "owner": "Wilma",
+      "owner": "Mr. Slate",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14",
-      "notes": ""
+      "updated": "2026-03-14T19:00:00",
+      "notes": " [Wilma PM audit] Assigned to Mr. Slate."
     },
     {
       "id": "TASK-7",
@@ -869,12 +869,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "high",
-      "owner": "Wilma",
+      "owner": "Arnold",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14",
-      "notes": ""
+      "updated": "2026-03-14T19:00:00",
+      "notes": " [Wilma PM audit] Assigned to Arnold."
     },
     {
       "id": "TASK-8",
@@ -883,12 +883,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "medium",
-      "owner": "Wilma",
+      "owner": "Betty",
       "project": "Pipeline",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14",
-      "notes": ""
+      "updated": "2026-03-14T19:00:00",
+      "notes": " [Wilma PM audit] Assigned to Betty."
     },
     {
       "id": "task-056",
@@ -995,12 +995,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "high",
-      "owner": "",
+      "owner": "Wilma",
       "project": "CDR",
       "is_recurring": false,
       "created": "2026-03-14T15:17:00",
-      "updated": "2026-03-14T15:45:00",
-      "notes": "Define the minimum viable CDR-OS AND the cdr-strip tool (protocol extraction). Two parts: (1) What software stack does a station need? Local LLM inference (MLX/llama.cpp), Terry agent, VAP type system, protocol packaging, registry client. (2) cdr-strip tool that takes a working Clawdbot/application workspace and produces a shareable VAP protocol package. Test subject: Wilma (Station Zero). Output: spec doc + prototype architecture. Reference: ~/clawd/memory/canadian-digital-railway.md (Layers 2, 2.5, 2.75)."
+      "updated": "2026-03-14T19:00:00",
+      "notes": "Define the minimum viable CDR-OS AND the cdr-strip tool (protocol extraction). Two parts: (1) What software stack does a station need? Local LLM inference (MLX/llama.cpp), Terry agent, VAP type system, protocol packaging, registry client. (2) cdr-strip tool that takes a working Clawdbot/application workspace and produces a shareable VAP protocol package. Test subject: Wilma (Station Zero). Output: spec doc + prototype architecture. Reference: ~/clawd/memory/canadian-digital-railway.md (Layers 2, 2.5, 2.75). [Wilma PM audit] Assigned to Wilma."
     },
     {
       "id": "task-064",
@@ -1107,12 +1107,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "medium",
-      "owner": "",
+      "owner": "Barney",
       "project": "CDR",
       "is_recurring": false,
       "created": "2026-03-14T15:40:00",
-      "updated": "2026-03-14T15:40:00",
-      "notes": "Formalize the Variable Abstraction Protocol. Define: the abstract variable naming convention (Y, X1-Xn), the type hierarchy (CDRField subtypes), documentation tier system (type-only / role / usage guidance), and the verification linting rules. Output: a spec document that could be implemented in any language. Reference: Layer 2.75 in ~/clawd/memory/canadian-digital-railway.md."
+      "updated": "2026-03-14T19:00:00",
+      "notes": "Formalize the Variable Abstraction Protocol. Define: the abstract variable naming convention (Y, X1-Xn), the type hierarchy (CDRField subtypes), documentation tier system (type-only / role / usage guidance), and the verification linting rules. Output: a spec document that could be implemented in any language. Reference: Layer 2.75 in ~/clawd/memory/canadian-digital-railway.md. [Wilma PM audit] Assigned to Barney."
     },
     {
       "id": "task-072",
@@ -1163,12 +1163,12 @@
       "status": "todo",
       "column": "backlog",
       "priority": "low",
-      "owner": "",
+      "owner": "Barney",
       "project": "CDR",
       "is_recurring": false,
       "created": "2026-03-14T15:40:00",
-      "updated": "2026-03-14T15:55:00",
-      "notes": "Evaluate programming languages for implementing the CDR VAP type system. Julia was raised as inspiration for its excellent type system (parametric types, multiple dispatch, user-defined structures). But don't default to Python either \u2014 evaluate properly. Languages to consider: Julia (rich types, scientific ecosystem), Rust (trait system, safety guarantees), TypeScript (branded types, web-native), Haskell (typeclasses, formal verification), Scala (JVM ecosystem), and yes Python (ecosystem size, accessibility). Criteria: expressiveness of type definitions, ease of auto-generating adapters for other languages, Apple Silicon performance, data science ecosystem quality, learning curve for target audience (researchers, data scientists, GC analysts). Output: recommendation doc with pros/cons matrix."
+      "updated": "2026-03-14T19:00:00",
+      "notes": "Evaluate programming languages for implementing the CDR VAP type system. Julia was raised as inspiration for its excellent type system (parametric types, multiple dispatch, user-defined structures). But don't default to Python either \u2014 evaluate properly. Languages to consider: Julia (rich types, scientific ecosystem), Rust (trait system, safety guarantees), TypeScript (branded types, web-native), Haskell (typeclasses, formal verification), Scala (JVM ecosystem), and yes Python (ecosystem size, accessibility). Criteria: expressiveness of type definitions, ease of auto-generating adapters for other languages, Apple Silicon performance, data science ecosystem quality, learning curve for target audience (researchers, data scientists, GC analysts). Output: recommendation doc with pros/cons matrix. [Wilma PM audit] Assigned to Barney."
     },
     {
       "id": "task-076",
