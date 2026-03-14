@@ -427,11 +427,24 @@ def main():
         diagnoses.append(diag)
 
     # After all fixes applied, retry failed questions and notify users
+    # IMPORTANT: Deduplicate by (user_id, question) to avoid spam when the
+    # same question appears multiple times in the log (e.g., self-heal retries
+    # re-logging to ask_questions.jsonl).
     if args.fix:
+        seen_questions = set()  # (user_id, question_normalized)
         for f, diag in zip(failures, diagnoses):
             ts = f.get("timestamp", "")
             if ts in already_notified:
                 continue  # Don't re-notify for the same failure
+
+            # Deduplicate: only retry ONCE per unique (user, question) combo
+            dedup_key = (f.get("user_id", ""), f.get("question", "").strip().lower())
+            if dedup_key in seen_questions:
+                diag["user_notified"] = False
+                diag["skipped"] = "duplicate_question"
+                logger.info(f"Skipping duplicate retry for @{f.get('username')}: {f.get('question', '')[:60]}")
+                continue
+            seen_questions.add(dedup_key)
 
             # Wait a beat for any DB operations to settle
             time.sleep(1)
@@ -452,6 +465,10 @@ def main():
                 )
                 if notified:
                     already_notified.add(ts)
+                    # Also mark ALL timestamps for this question as notified
+                    for f2 in failures:
+                        if (f2.get("user_id", ""), f2.get("question", "").strip().lower()) == dedup_key:
+                            already_notified.add(f2.get("timestamp", ""))
                     diag["user_notified"] = True
                     diag["corrected_answer"] = new_answer[:200]
                     logger.info(f"✅ Re-answered @{f.get('username')}'s question and notified them")

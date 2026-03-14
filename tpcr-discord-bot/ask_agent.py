@@ -33,10 +33,25 @@ def _is_bad_response(answer: str) -> bool:
     return any(p in answer_lower for p in _FAILURE_PATTERNS)
 
 
+_SELF_HEAL_LOCK = None  # Timestamp of last self-heal trigger
+
+
 def _trigger_self_heal(question: str, user_id: str, username: str, answer: str):
-    """Fire the ask_response_monitor in the background to diagnose and fix."""
+    """Fire the ask_response_monitor in the background to diagnose and fix.
+    
+    Rate-limited: only fires once per 60 seconds to prevent cascading retries.
+    """
+    global _SELF_HEAL_LOCK
     import subprocess
     import os
+    import time as _t
+
+    # Rate limit: don't fire more than once per 60 seconds
+    now = _t.time()
+    if _SELF_HEAL_LOCK and (now - _SELF_HEAL_LOCK) < 60:
+        return  # Already triggered recently, skip
+    _SELF_HEAL_LOCK = now
+
     script = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "scripts", "ask_response_monitor.py"
