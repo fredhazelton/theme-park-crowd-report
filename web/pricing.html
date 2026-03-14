@@ -805,7 +805,7 @@
                 </div>
                 <div class="plan-price-note" data-monthly="Billed monthly" data-annual="$39.99 billed annually">Billed monthly</div>
                 <p class="plan-desc">All parks, 90-day forecasts, and AI-powered crowd intelligence for your next trip.</p>
-                <button class="plan-cta soon"><span>Join Waitlist</span></button>
+                <a href="https://buy.stripe.com/test_7sY14oa1k1lq8GcencdfG00" class="plan-cta primary" data-monthly-href="https://buy.stripe.com/test_7sY14oa1k1lq8GcencdfG00" data-annual-href="https://buy.stripe.com/test_6oUfZi3CW6FK6y4frgdfG01">Subscribe Now</a>
                 <div class="feature-divider"></div>
                 <div class="features-title">Everything in Free, plus</div>
                 <ul class="features-list">
@@ -828,7 +828,7 @@
                 </div>
                 <div class="plan-price-note" data-monthly="Billed monthly" data-annual="$79.99 billed annually">Billed monthly</div>
                 <p class="plan-desc">The ultimate trip planner. 730-day forecasts, ride-level predictions, and personalized AI planning.</p>
-                <button class="plan-cta soon"><span>Join Waitlist</span></button>
+                <a href="https://buy.stripe.com/test_dRmeVegpI2pu09G6UKdfG02" class="plan-cta primary" data-monthly-href="https://buy.stripe.com/test_dRmeVegpI2pu09G6UKdfG02" data-annual-href="https://buy.stripe.com/test_8x2dRaddwggkg8E2EudfG03" style="background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-red-light) 100%);">Subscribe Now</a>
                 <div class="feature-divider"></div>
                 <div class="features-title">Everything in Explorer, plus</div>
                 <ul class="features-list">
@@ -1065,6 +1065,11 @@
             document.querySelectorAll('.plan-price-note[data-monthly]').forEach(el => {
                 el.textContent = isAnnual ? el.dataset.annual : el.dataset.monthly;
             });
+
+            // Swap Stripe payment links for monthly/annual
+            document.querySelectorAll('.plan-cta[data-monthly-href]').forEach(el => {
+                el.href = isAnnual ? el.dataset.annualHref : el.dataset.monthlyHref;
+            });
         }
 
         // FAQ toggle
@@ -1093,6 +1098,17 @@
         document.getElementById('waitlistEmail')?.addEventListener('keydown', e => {
             if (e.key === 'Enter') joinWaitlist();
         });
+
+        // Show success banner if returning from Stripe checkout
+        if (new URLSearchParams(window.location.search).get('subscribed') === 'true') {
+            const banner = document.createElement('div');
+            banner.innerHTML = '🎉 <strong>Welcome aboard!</strong> Your subscription is active. Check your email for next steps.';
+            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999;padding:16px 24px;background:linear-gradient(135deg,#065f46,#047857);color:#ecfdf5;text-align:center;font-size:14px;font-family:var(--font-text);box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+            document.body.prepend(banner);
+            setTimeout(() => banner.style.opacity = '0', 8000);
+            setTimeout(() => banner.remove(), 9000);
+            banner.style.transition = 'opacity 1s';
+        }
     </script>
 
 </body>
