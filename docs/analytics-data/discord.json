@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-14T04:00:01Z",
+  "generated_at": "2026-03-14T04:15:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -17,20 +17,12 @@
       "description": "Core HQ channels \u2014 daily ops, planning, and Fred-Wilma direct line",
       "channels": [
         {
-          "name": "mission-control",
-          "id": "1479351570121621569",
-          "emoji": "\ud83c\udfaf",
-          "purpose": "Central command \u2014 status updates, key decisions, daily priorities",
-          "url": "https://discord.com/channels/1479350342318690505/1479351570121621569",
-          "last_active": "2026-03-13T13:30:02.186000+00:00"
-        },
-        {
-          "name": "daily-digest",
-          "id": "1479351571656474756",
-          "emoji": "\ud83d\udcf0",
-          "purpose": "Automated daily summary \u2014 pipeline health, accuracy metrics, task progress",
-          "url": "https://discord.com/channels/1479350342318690505/1479351571656474756",
-          "last_active": "2026-03-13T23:04:53.803000+00:00"
+          "name": "briefing",
+          "id": "1482227277508120576",
+          "emoji": "\ud83d\udcca",
+          "purpose": "All automated reports \u2014 accuracy, park intel, competitor watch, MC status",
+          "url": "https://discord.com/channels/1479350342318690505/1482227277508120576",
+          "last_active": ""
         },
         {
           "name": "fred-wilma",
@@ -38,7 +30,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-14T03:58:27.295000+00:00"
+          "last_active": "2026-03-14T04:14:49.558000+00:00"
         }
       ]
     },
@@ -144,7 +136,7 @@
           "emoji": "\u2600\ufe0f",
           "purpose": "Automated morning briefings \u2014 daily agenda, weather, key metrics",
           "url": "https://discord.com/channels/1479350342318690505/1479351589176082526",
-          "last_active": "2026-03-13T11:30:02.819000+00:00"
+          "last_active": ""
         },
         {
           "name": "mr-slate",
@@ -164,10 +156,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "Not nested channels, no \u2014 Discord doesn't support channels inside channels. But we have a few options that get close:\n\n- **Threads** \u2014 any channel can spawn threads (temporary or persistent). Good ...",
-      "timestamp": "2026-03-14T03:58:27.295000+00:00",
-      "message_id": "1482226379448913931",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482226379448913931"
+      "message": "A few things to fix:\n\n1. **`reddit_scout.py`** \u2014 references old `reddit-archive` channel ID (but the cron job already uses the forum, so this is likely a fallback)\n2. **`sync_discord_to_mc.py`** \u2014 ...",
+      "timestamp": "2026-03-14T04:14:49.558000+00:00",
+      "message_id": "1482230499358281730",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482230499358281730"
     },
     {
       "channel": "fred-wilma",
@@ -175,21 +167,21 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\u2022 **May 27** \u2014 GitHub token expiry warning\nLean and mean. \ud83e\uddf9",
-      "timestamp": "2026-03-14T03:58:18.702000+00:00",
-      "message_id": "1482226343406997696",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482226343406997696"
+      "message": "Exactly right. Forum threads auto-archive after inactivity \u2014 they just fade into the background. No migration needed, the archive channels are just dead weight.\n\nLet me rip the band-aid. First let ...",
+      "timestamp": "2026-03-14T04:14:42.706000+00:00",
+      "message_id": "1482230470619041963",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482230470619041963"
     },
     {
       "channel": "fred-wilma",
       "channel_emoji": "\ud83e\uddb4",
       "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\u2022 **6:30 AM** \u2014 Park Intel\n\u2022 **7:30 AM** \u2014 Accuracy Briefing (combined)\n\u2022 **9:00 AM** \u2014 Stale Task Check\n\u2022 **1:00 PM** \u2014 Competitor Watch\n\ud83d\udc26 Twitter/Social\n\n\u2022 **7:30 AM** \u2014 Morning tweet (yesterday'...",
-      "timestamp": "2026-03-14T03:58:18.508000+00:00",
-      "message_id": "1482226342593560818",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482226342593560818"
+      "agent": "Fred Hazelton",
+      "is_bot": false,
+      "message": "I love all these suggestions - for the archives in threads those can just become stale threads, right? No need to migrate them anywhere",
+      "timestamp": "2026-03-14T04:14:17.871000+00:00",
+      "message_id": "1482230366453498036",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482230366453498036"
     },
     {
       "channel": "wilma",
@@ -225,39 +217,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482201369166217377"
     },
     {
-      "channel": "daily-digest",
-      "channel_emoji": "\ud83d\udcf0",
-      "channel_id": "1479351571656474756",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Report posted. Let me also commit the memory update.",
-      "timestamp": "2026-03-13T23:04:53.803000+00:00",
-      "message_id": "1482152503108698245",
-      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1482152503108698245"
-    },
-    {
-      "channel": "daily-digest",
-      "channel_emoji": "\ud83d\udcf0",
-      "channel_id": "1479351571656474756",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me post the report to Discord #daily-digest.",
-      "timestamp": "2026-03-13T23:04:53.727000+00:00",
-      "message_id": "1482152502790062161",
-      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1482152502790062161"
-    },
-    {
-      "channel": "daily-digest",
-      "channel_emoji": "\ud83d\udcf0",
-      "channel_id": "1479351571656474756",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Now let me update today's memory and post the report.",
-      "timestamp": "2026-03-13T23:04:52.097000+00:00",
-      "message_id": "1482152495953346642",
-      "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1482152495953346642"
-    },
-    {
       "channel": "gazoo",
       "channel_emoji": "\ud83d\udc7d",
       "channel_id": "1479351587129262232",
@@ -289,17 +248,6 @@
       "timestamp": "2026-03-13T20:03:05.287000+00:00",
       "message_id": "1482106749476671709",
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1482106749476671709"
-    },
-    {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-13T13:30:02.186000+00:00",
-      "message_id": "1482007834781814795",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1482007834781814795"
     },
     {
       "channel": "pipeline",
@@ -335,48 +283,92 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351574177513576/1481997641410936994"
     },
     {
-      "channel": "morning-briefing",
-      "channel_emoji": "\u2600\ufe0f",
-      "channel_id": "1479351589176082526",
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\u2600\ufe0f **Morning Briefing \u2014 Friday, March 13, 2026**\n\n**Pipeline:** \u2705 Healthy\n**Last scrape:** ~2026-03-13 07:26 ET (file mtime)\n**Last pipeline run:** 2026-03-13 06:42 ET\n\n**\ud83d\udcca Today's Crowd Levels (WT...",
-      "timestamp": "2026-03-13T11:30:02.819000+00:00",
-      "message_id": "1481977638447878198",
-      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481977638447878198"
+      "message": "Got it \u2014 `#park-intel` is `1479351592108036249`. Let me post the report.",
+      "timestamp": "2026-03-11T10:30:42.181000+00:00",
+      "message_id": "1481237928318472302",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237928318472302"
     },
     {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-13T09:30:01.326000+00:00",
-      "message_id": "1481947433196982273",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481947433196982273"
+      "message": "The script saves the chunks for me to post. Let me check which channel #park-intel is.",
+      "timestamp": "2026-03-11T10:30:41.799000+00:00",
+      "message_id": "1481237926716379207",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237926716379207"
     },
     {
-      "channel": "mission-control",
-      "channel_emoji": "\ud83c\udfaf",
-      "channel_id": "1479351570121621569",
+      "channel": "alerts",
+      "channel_emoji": "\ud83d\udea8",
+      "channel_id": "1479471928262529088",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\ud83e\uddb4 Mission Control Status",
-      "timestamp": "2026-03-13T07:00:02.017000+00:00",
-      "message_id": "1481909687359111248",
-      "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481909687359111248"
+      "message": "The script generated the report but wants me to post it via the message tool. Let me grab the report content and post it.",
+      "timestamp": "2026-03-11T10:30:41.554000+00:00",
+      "message_id": "1481237925688508419",
+      "url": "https://discord.com/channels/1479350342318690505/1479471928262529088/1481237925688508419"
     },
     {
-      "channel": "morning-briefing",
-      "channel_emoji": "\u2600\ufe0f",
-      "channel_id": "1479351589176082526",
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\u2600\ufe0f **Morning Briefing \u2014 Thursday, March 12, 2026**\n\n**Pipeline:** \ud83d\udd34 Critical\n**Last scrape:** ~2026-03-12 07:28 ET (file mtime)\n\n**\ud83d\udcca Today's Crowd Levels (WTI)**\n\ud83c\udff0 WDW: \u26aa **MK** 22.5 \u00b7 \ud83d\udc8e **EP** 15....",
-      "timestamp": "2026-03-12T11:30:03.111000+00:00",
-      "message_id": "1481615251807146095",
-      "url": "https://discord.com/channels/1479350342318690505/1479351589176082526/1481615251807146095"
+      "message": "\ud83c\udfa8 **Rendering request from Fred:** Apple Weather-style crowd report images\n\nCheck the new post in <#1479351603193450648> for full details. TL;DR \u2014 generate mockup images that look like iOS Weather ...",
+      "timestamp": "2026-03-08T05:05:27.753000+00:00",
+      "message_id": "1480068915278123152",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480068915278123152"
+    },
+    {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Preview still (frame 90/150):",
+      "timestamp": "2026-03-08T03:56:46.821000+00:00",
+      "message_id": "1480051630836682762",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480051630836682762"
+    },
+    {
+      "channel": "bam-bam",
+      "channel_emoji": "\ud83c\udfcf",
+      "channel_id": "1479351580347072675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Run it: `bash scripts/render_daily_wti.sh`",
+      "timestamp": "2026-03-08T03:56:42.115000+00:00",
+      "message_id": "1480051611098284145",
+      "url": "https://discord.com/channels/1479350342318690505/1479351580347072675/1480051611098284145"
+    },
+    {
+      "channel": "modeling",
+      "channel_emoji": "\ud83e\uddea",
+      "channel_id": "1479351576232591491",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udfe2 **Synthetic really helps high-error entities** \u2014 EP155: 11.36 \u2192 9.86, MK23: 9.81 \u2192 7.97. When real data is noisy, synthetic provides useful regularization.\n\n\ud83d\udfe1 **Adaptive sigmoid was a bust** \u2014 it...",
+      "timestamp": "2026-03-06T17:44:04.894000+00:00",
+      "message_id": "1479535052273484040",
+      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535052273484040"
+    },
+    {
+      "channel": "modeling",
+      "channel_emoji": "\ud83e\uddea",
+      "channel_id": "1479351576232591491",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "## \ud83e\uddea Weighting Experiment Complete \u2014 Synthetic vs Real Data\n\nJust finished running all 105 model combinations (15 entities \u00d7 7 weighting schemes). Full results: `research/weighting-experiment-resul...",
+      "timestamp": "2026-03-06T17:44:04.705000+00:00",
+      "message_id": "1479535051480760360",
+      "url": "https://discord.com/channels/1479350342318690505/1479351576232591491/1479535051480760360"
     }
   ],
   "stats": {
