@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-14T03:45:01Z",
+  "generated_at": "2026-03-14T04:00:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-14T03:44:51.485000+00:00"
+          "last_active": "2026-03-14T03:58:27.295000+00:00"
         }
       ]
     },
@@ -164,10 +164,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\ud83d\udd0d Questions for you:\n\n1. **Delete all 6 disabled jobs?** (dead weight)\n2. **Delete the 8 stale one-shots?** (#22-30, all past dates except github token)\n3. **daily-accuracy-report vs daily-wti-accu...",
-      "timestamp": "2026-03-14T03:44:51.485000+00:00",
-      "message_id": "1482222957693632658",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482222957693632658"
+      "message": "Not nested channels, no \u2014 Discord doesn't support channels inside channels. But we have a few options that get close:\n\n- **Threads** \u2014 any channel can spawn threads (temporary or persistent). Good ...",
+      "timestamp": "2026-03-14T03:58:27.295000+00:00",
+      "message_id": "1482226379448913931",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482226379448913931"
     },
     {
       "channel": "fred-wilma",
@@ -175,10 +175,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "\ud83d\udce3 NUDGES (2)\n\n19. **daily-barney-checkin** \u2014 10 AM \u2192 #fred-wilma\n20. **marketing-sprint-nudge** \u2014 11 AM \u2192 #fred-wilma (sprint ends Mar 21)\n\n\u23f0 ONE-SHOT/STALE REMINDERS (8)\n\n21. **github-token-expiry...",
-      "timestamp": "2026-03-14T03:44:50.904000+00:00",
-      "message_id": "1482222955256872960",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482222955256872960"
+      "message": "\u2022 **May 27** \u2014 GitHub token expiry warning\nLean and mean. \ud83e\uddf9",
+      "timestamp": "2026-03-14T03:58:18.702000+00:00",
+      "message_id": "1482226343406997696",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482226343406997696"
     },
     {
       "channel": "fred-wilma",
@@ -186,10 +186,10 @@
       "channel_id": "1479351572386414675",
       "agent": "Theme Park Crowd Report",
       "is_bot": true,
-      "message": "8. **daily-accuracy-report** \u2014 7:30 AM \u2192 #wilma \u2705\n9. **daily-wti-accuracy-report** \u2014 7:30 AM \u2192 #wilma \u2705 (duplicate with #8?)\n10. **stale-task-daily-check** \u2014 9 AM \u2192 #wilma \u2705\n11. **competitor-watch-...",
-      "timestamp": "2026-03-14T03:44:50.688000+00:00",
-      "message_id": "1482222954350645299",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482222954350645299"
+      "message": "\u2022 **6:30 AM** \u2014 Park Intel\n\u2022 **7:30 AM** \u2014 Accuracy Briefing (combined)\n\u2022 **9:00 AM** \u2014 Stale Task Check\n\u2022 **1:00 PM** \u2014 Competitor Watch\n\ud83d\udc26 Twitter/Social\n\n\u2022 **7:30 AM** \u2014 Morning tweet (yesterday'...",
+      "timestamp": "2026-03-14T03:58:18.508000+00:00",
+      "message_id": "1482226342593560818",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482226342593560818"
     },
     {
       "channel": "wilma",
