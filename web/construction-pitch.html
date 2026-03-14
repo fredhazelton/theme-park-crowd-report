@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Building Smarter — AI for Construction</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
   :root {
     --navy: #0a1628;
@@ -338,16 +338,19 @@
   }
 
   .nav button {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
     color: white;
     padding: 12px 24px;
     border-radius: 12px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: 'Inter', sans-serif;
+    font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
 
   .nav button:hover {
@@ -359,10 +362,11 @@
     position: fixed;
     top: 0;
     left: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--orange), var(--cyan));
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--orange), var(--red));
     transition: width 0.4s ease;
     z-index: 100;
+    box-shadow: 0 0 8px rgba(74,144,164,0.3);
   }
 
   .slide-counter {
@@ -370,8 +374,9 @@
     bottom: 35px;
     left: 40px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.4);
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
     z-index: 100;
   }
 
@@ -380,9 +385,11 @@
     position: fixed;
     top: 20px;
     right: 40px;
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.3);
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.25);
     font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     z-index: 100;
   }
 
@@ -442,6 +449,20 @@
     font-size: 1.5rem;
     opacity: 0.15;
     letter-spacing: 20px;
+  }
+
+  /* Accessibility: focus-visible outlines */
+  button:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 </style>
 </head>
