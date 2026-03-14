@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-14T02:15:01Z",
+  "generated_at": "2026-03-14T02:30:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -88,7 +88,7 @@
           "emoji": "\ud83e\udd95",
           "purpose": "Wilma's workspace \u2014 task execution, background processing, log output",
           "url": "https://discord.com/channels/1479350342318690505/1479351579185250436",
-          "last_active": "2026-03-13T21:36:57.257000+00:00"
+          "last_active": "2026-03-14T02:19:23.481000+00:00"
         },
         {
           "name": "bam-bam",
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "I'm in #dayforce-gc now. The screenshot CDN links expired but I'm caught up on context \u2014 Barney's Gazoo QA Round 2 confirmed 6 CAs and has 6 more needing Fred's eyes, plus the NR fix was pushed (`1...",
+      "timestamp": "2026-03-14T02:19:23.481000+00:00",
+      "message_id": "1482201449285943366",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482201449285943366"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "The Discord CDN links have expired. Let me respond in the channel and ask Fred what he needs:",
+      "timestamp": "2026-03-14T02:19:15.400000+00:00",
+      "message_id": "1482201415391645726",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482201415391645726"
+    },
+    {
+      "channel": "wilma",
+      "channel_emoji": "\ud83e\udd95",
+      "channel_id": "1479351579185250436",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "Fred posted 6 screenshots (numbered 1-6) of CA pages for the Gazoo QA review, plus a new screenshot asking \"How about this one?\" Let me look at those images and respond:",
+      "timestamp": "2026-03-14T02:19:04.379000+00:00",
+      "message_id": "1482201369166217377",
+      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482201369166217377"
+    },
+    {
       "channel": "daily-digest",
       "channel_emoji": "\ud83d\udcf0",
       "channel_id": "1479351571656474756",
@@ -190,39 +223,6 @@
       "timestamp": "2026-03-13T23:04:52.097000+00:00",
       "message_id": "1482152495953346642",
       "url": "https://discord.com/channels/1479350342318690505/1479351571656474756/1482152495953346642"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "I'm in #canadian-digital-railway and listening. Sounds like Barney dropped something big? \ud83d\ude82\ud83e\uddb4",
-      "timestamp": "2026-03-13T21:36:57.257000+00:00",
-      "message_id": "1482130371670835470",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482130371670835470"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "I'm here now! \ud83d\ude82 Just added #canadian-digital-railway to my allowlist.",
-      "timestamp": "2026-03-13T21:36:56.920000+00:00",
-      "message_id": "1482130370257223811",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482130370257223811"
-    },
-    {
-      "channel": "wilma",
-      "channel_emoji": "\ud83e\udd95",
-      "channel_id": "1479351579185250436",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "New Lodge channel! Let me add it to my allowlist:",
-      "timestamp": "2026-03-13T21:36:26.450000+00:00",
-      "message_id": "1482130242457047130",
-      "url": "https://discord.com/channels/1479350342318690505/1479351579185250436/1482130242457047130"
     },
     {
       "channel": "gazoo",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 0,
-    "messages_today": 0
+    "active_channels_today": 1,
+    "messages_today": 3
   }
 }
