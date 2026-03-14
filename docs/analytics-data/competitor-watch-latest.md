@@ -1,6 +1,7 @@
-# 🔭 Competitor Watch — Friday, March 13, 2026
+# 🔭 Competitor Watch — Saturday, March 14, 2026
 
 ## 📊 TouringPlans
+- **Getting to Know – Halloween Horror Nights Premium Scream Night** — <https://touringplans.com/blog/getting-to-know-halloween-horror-nights-premium-scream-night-draft/>
 - **The Best Food from 2026 Disney California Adventure Food & Wine Festival** — <https://touringplans.com/blog/the-best-food-from-2026-disney-california-adventure-food-wine-festival/>
 - **Disney Dining Plan Tips & Current Meal Photos** — <https://touringplans.com/blog/disney-dining-plan-tips-current-meal-photos/>
 - **Disney World Opening Dates Announced!** — <https://touringplans.com/blog/disney-world-opening-dates-announced/>
@@ -8,7 +9,6 @@
 - **Five “Free” Flower & Garden Festival Activities** — <https://touringplans.com/blog/five-free-flower-garden-festival-activities/>
 - **Disney Data Dump March 11 2026** — <https://touringplans.com/blog/disney-data-dump-march-11-2026/>
 - **Mears Connect Standard- Morning Arrival** — <https://touringplans.com/blog/mears-connect-standard-morning-arrival/>
-- **The Best $50 You Can Spend at EPCOT’s Flower & Garden** — <https://touringplans.com/blog/the-best-50-you-can-spend-at-epcots-flower-garden/>
 - *+2 other post(s) (non-crowd-related)*
 
 ## 🎯 Thrill Data
@@ -18,25 +18,25 @@
 - Unable to fetch (Cloudflare protected) — manual check recommended
 
 ## 📰 Theme Park News
-- **First Look at Bluey Popcorn Bucket Coming to Disneyland for ‘Bluey’s Best Day Ever!’** (WDWNT) — <https://wdwnt.com/2026/03/first-look-bluey-popcorn-bucket-disneyland-blueys-best-day-ever/>
-- **New Buzz Lightyear On-Ride Photo Adds Blastin’ Stats** (BlogMickey) — <https://blogmickey.com/2026/03/new-buzz-lightyear-on-ride-photo-adds-blastin-stats/>
-- **More Details Revealed as the Fantasyland Theatre Transforms into Bluey's School for Her "Best Day Ever!"** (Laughing Place) — <https://www.laughingplace.com/disney-parks/blueys-best-day-ever-disneyland-more-details/>
-- **Mickey Mouse Has Been Gifted a Formula 1 Race Car at International Disney Park** (Inside the Magic) — <https://insidethemagic.net/2026/03/mickey-mouse-has-been-gifted-a-formula-1-race-car-at-international-disney-park-el1/>
-- **‘Sailor Moon’ coming to Universal Fan Fest Nights** (Theme Park Tribune) — <https://www.themeparktribune.com/sailor-moon-coming-to-universal-fan-fest-nights/>
-- **Rankings & Opening Dates for Disney World’s 14 New Summer Announcements!** (Disney Tourist Blog) — <https://www.disneytouristblog.com/rankings-opening-dates-for-disney-worlds-14-new-summer-announcements/>
-- **The Best Food from 2026 Disney California Adventure Food & Wine Festival** (TouringPlans Blog) — <https://touringplans.com/blog/the-best-food-from-2026-disney-california-adventure-food-wine-festival/>
-- **Porte Cochère Begins Refurbishment at Disney’s Grand Floridian Resort & Spa** (WDWNT) — <https://wdwnt.com/2026/03/porte-cochere-begins-refurbishment-disneys-grand-floridian/>
-- **Tokyo Disney Resort Shares Aerial Photo of New Space Mountain Attraction, Opening 2027** (BlogMickey) — <https://blogmickey.com/2026/03/tokyo-disney-resort-aerial-photo-new-space-mountain-construction/>
-- **Don't Scare Your Wallet! Enjoy Big Savings at Universal Horror Unleashed in Las Vegas Through April** (Laughing Place) — <https://www.laughingplace.com/parks/universal-horror-unleashed-deals-april-2026/>
+- **Garden Grove Launches Disneyland Resort Shuttle Service to Replace ART Buses** (WDWNT) — <https://wdwnt.com/2026/03/garden-grove-launches-disneyland-resort-shuttle-service-to-replace-art-buses/>
+- **Universal Creates Permanent Fireworks Launch Site for Epic Universe** (BlogMickey) — <https://blogmickey.com/2026/03/permanent-fireworks-launch-site-epic-universe/>
+- **Marvel Games' Danny Koo on Choosing the Next Characters for "Marvel Rivals" and Navigating Different Power Sets** (Laughing Place) — <https://www.laughingplace.com/entertainment/marvel-rivals-interview-danny-koo-characters/>
+- **Disney Guests Can Take New Disney Trash Home as a Souvenir** (Inside the Magic) — <https://insidethemagic.net/2026/03/disney-guests-can-take-new-disney-trash-home-as-a-souvenir-el1/>
+- **‘Sesame Street’ owner sues to end SeaWorld contract** (Theme Park Tribune) — <https://www.themeparktribune.com/sesame-street-owner-sues-to-end-seaworld-contract/>
+- **Florida Reports Record 143 Million Visitors & Orlando Airport Hits 58 Million, as Disney World Drops** (Disney Tourist Blog) — <https://www.disneytouristblog.com/florida-reports-record-143-million-visitors-orlando-airport-hits-58-million-as-disney-world-drops/>
+- **The SATURDAY SIX spends a day at SeaWorld’s DISCOVERY COVE (and explains why YOU need to go!)** (TouringPlans Blog) — <https://touringplans.com/blog/the-saturday-six-spends-a-day-at-seaworlds-discovery-cove-and-explains-why-you-need-to-go/>
+- **Princess Cavalcade Debuting at Disney Adventure World in Disneyland Paris** (WDWNT) — <https://wdwnt.com/2026/03/princess-cavalcade-debuting-at-disney-adventure-world-in-disneyland-paris/>
+- **Disney Princesses Cavalcade Coming to Disney Adventure World This Summer** (BlogMickey) — <https://blogmickey.com/2026/03/disney-princesses-cavalcade-coming-to-disney-adventure-world-this-summer/>
+- **Disney Consumer Products on Fandom, Gaming, and the Future of Cultural Relevance at SXSW** (Laughing Place) — <https://www.laughingplace.com/disney-merchandise/disney-consumer-products-sxsw-2026/>
 
 ## 💬 Reddit Mentions
-- **Springtime at Walt Disney World** (Reddit r/WaltDisneyWorld) — <https://www.reddit.com/r/WaltDisneyWorld/comments/1rsdktr/springtime_at_walt_disney_world/>
-- **Universal says additional capacity enhancements to Stardust Racers is contributing to its extended downtime** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rs1vqw/universal_says_additional_capacity_enhancements/>
-- **Stardust Struggles Continue: Universal Extends Stardust Racers Closure at Epic Universe, Again** (Reddit r/UniversalStudios) — <https://www.reddit.com/r/universalstudios/comments/1rriz3g/stardust_struggles_continue_universal_extends/>
-- **California adventure spring break lightning lane strategy** (Reddit r/DisneyPlanning) — <https://www.reddit.com/r/DisneyPlanning/comments/1rssbew/california_adventure_spring_break_lightning_lane/>
-- **WDW Planning Advice - New 4 Days - $100 Day Tickets** (Reddit r/DisneyPlanning) — <https://www.reddit.com/r/DisneyPlanning/comments/1rslno5/wdw_planning_advice_new_4_days_100_day_tickets/>
+- **Is Disneyland breaking down?** (Reddit r/Disneyland) — <https://www.reddit.com/r/Disneyland/comments/1rtc19o/is_disneyland_breaking_down/>
+- **All of this for a 60 second ride?! No thanks. Tron is awesome but not work a 2 Hour and 15 minute wait…** (Reddit r/WaltDisneyWorld) — <https://www.reddit.com/r/WaltDisneyWorld/comments/1rt7lxu/all_of_this_for_a_60_second_ride_no_thanks_tron/>
+- **Spring Break at IoA** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rtiowj/spring_break_at_ioa/>
+- **Disney Making Sweeping Ride Closure Plan Changes to Improve Guest Experience** (Reddit r/Disneyland) — <https://www.reddit.com/r/Disneyland/comments/1rto6rh/disney_making_sweeping_ride_closure_plan_changes/>
+- **Toothless sweater at universal studios Hollywood?** (Reddit r/UniversalStudios) — <https://www.reddit.com/r/universalstudios/comments/1rst2tr/toothless_sweater_at_universal_studios_hollywood/>
 
 ## 🔍 HazeyData Mentions
 - No mentions found this week
 
-*Report generated 2026-03-13 13:00 ET*
+*Report generated 2026-03-14 13:00 ET*
