@@ -31,7 +31,7 @@ STATE_FILE = PROJECT_ROOT / "docs" / "analytics-data" / ".mc_discord_state.json"
 
 ENV_FILE = Path.home() / ".env"
 DISCORD_API = "https://discord.com/api/v10"
-MC_CHANNEL_ID = "1479351570121621569"  # #mission-control
+MC_CHANNEL_ID = "1482227277508120576"  # #briefing (forum channel)
 
 def load_env():
     if not ENV_FILE.exists():
@@ -153,15 +153,19 @@ def build_embed(data: dict) -> dict:
 
 
 def send_embed(embed: dict) -> bool:
-    """Send an embed to #mission-control."""
-    url = f"{DISCORD_API}/channels/{MC_CHANNEL_ID}/messages"
-    payload = {"embeds": [embed]}
+    """Send an embed as a forum thread to #briefing."""
+    today = datetime.now(timezone.utc).strftime("%b %d")
+    url = f"{DISCORD_API}/channels/{MC_CHANNEL_ID}/threads"
+    payload = {
+        "name": f"🦴 Mission Control — {today}",
+        "message": {"embeds": [embed]},
+    }
     
     try:
         resp = requests.post(url, headers=HEADERS, json=payload, timeout=10)
         if resp.status_code in (200, 201):
             msg_data = resp.json()
-            print(f"  ✅ Posted to #mission-control (msg: {msg_data.get('id', '?')})")
+            print(f"  ✅ Posted to #briefing forum (thread: {msg_data.get('id', '?')})")
             return True
         else:
             print(f"  ❌ Failed: HTTP {resp.status_code} — {resp.text[:200]}")

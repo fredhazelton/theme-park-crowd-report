@@ -55,22 +55,19 @@ GUILD_ID = "1479350342318690505"
 
 # Key channels to pull recent messages from (most important ones)
 KEY_CHANNELS = {
-    "mission-control": "1479351570121621569",
-    "daily-digest": "1479351571656474756",
+    "briefing": "1482227277508120576",
     "pipeline": "1479351574177513576",
     "alerts": "1479471928262529088",
     "fred-wilma": "1479351572386414675",
     "modeling": "1479351576232591491",
     "wilma": "1479351579185250436",
     "bam-bam": "1479351580347072675",
-    "morning-briefing": "1479351589176082526",
     "gazoo": "1479351587129262232",
 }
 
 # Channel metadata
 CHANNEL_META = {
-    "mission-control": {"emoji": "🎯", "purpose": "Central command — status updates, key decisions, daily priorities"},
-    "daily-digest": {"emoji": "📰", "purpose": "Automated daily summary — pipeline health, accuracy metrics, task progress"},
+    "briefing": {"emoji": "📊", "purpose": "All automated reports — accuracy, park intel, competitor watch, MC status"},
     "fred-wilma": {"emoji": "🦴", "purpose": "Direct line between Fred and Wilma — private strategy and planning"},
     "pipeline": {"emoji": "🔧", "purpose": "Pipeline monitoring — ETL status, forecast runs, data quality checks"},
     "modeling": {"emoji": "🧪", "purpose": "Model experiments — XGBoost tuning, accuracy analysis, feature engineering"},
@@ -91,7 +88,7 @@ CATEGORY_META = {
     "command-center": {
         "display_name": "Command Center", "emoji": "🏛️",
         "description": "Core HQ channels — daily ops, planning, and Fred-Wilma direct line",
-        "channels": ["mission-control", "daily-digest", "fred-wilma"]
+        "channels": ["briefing", "fred-wilma"]
     },
     "operations": {
         "display_name": "Operations", "emoji": "⚙️",
