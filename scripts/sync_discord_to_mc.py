@@ -59,7 +59,6 @@ KEY_CHANNELS = {
     "pipeline": "1479351574177513576",
     "alerts": "1479471928262529088",
     "fred-wilma": "1479351572386414675",
-    "modeling": "1479351576232591491",
     "wilma": "1479351579185250436",
     "bam-bam": "1479351580347072675",
     "gazoo": "1479351587129262232",
@@ -70,7 +69,6 @@ CHANNEL_META = {
     "briefing": {"emoji": "📊", "purpose": "All automated reports — accuracy, park intel, competitor watch, MC status"},
     "fred-wilma": {"emoji": "🦴", "purpose": "Direct line between Fred and Wilma — private strategy and planning"},
     "pipeline": {"emoji": "🔧", "purpose": "Pipeline monitoring — ETL status, forecast runs, data quality checks"},
-    "modeling": {"emoji": "🧪", "purpose": "Model experiments — XGBoost tuning, accuracy analysis, feature engineering"},
     "alerts": {"emoji": "🚨", "purpose": "System alerts — pipeline failures, accuracy drops, infrastructure issues"},
     "wilma": {"emoji": "🦕", "purpose": "Wilma's workspace — task execution, background processing, log output"},
     "bam-bam": {"emoji": "🏏", "purpose": "Bam-Bam's workspace — coding tasks, Discord bot development"},
@@ -79,7 +77,6 @@ CHANNEL_META = {
     "pebbles": {"emoji": "🎀", "purpose": "Pebbles' workspace — creative content, social media, design tasks"},
     "betty": {"emoji": "✍️", "purpose": "Betty's workspace — writing, documentation, content editing"},
     "gazoo": {"emoji": "👽", "purpose": "Gazoo's workspace — nightly reviews, devil's advocate, R&D"},
-    "morning-briefing": {"emoji": "☀️", "purpose": "Automated morning briefings — daily agenda, weather, key metrics"},
     "mr-slate": {"emoji": "🪨", "purpose": "Mr. Slate — CBO, executive oversight"},
 }
 
@@ -93,7 +90,7 @@ CATEGORY_META = {
     "operations": {
         "display_name": "Operations", "emoji": "⚙️",
         "description": "Pipeline monitoring, model training, and system alerts",
-        "channels": ["pipeline", "modeling", "alerts"]
+        "channels": ["pipeline", "alerts"]
     },
     "agents": {
         "display_name": "Agents", "emoji": "🤖",

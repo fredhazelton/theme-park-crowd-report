@@ -89,7 +89,7 @@ STATE_FILE = PROJECT_ROOT / "data" / "reddit_scout_state.json"
 MAX_STATE_URLS = 500        # Trim posted_urls to prevent bloat
 
 # Discord
-DISCORD_CHANNEL_ID = "1479543278176047124"
+DISCORD_CHANNEL_ID = "1481332266729734159"  # #reddit forum channel
 
 # Reddit API
 REDDIT_BASE_URL = "https://www.reddit.com"
