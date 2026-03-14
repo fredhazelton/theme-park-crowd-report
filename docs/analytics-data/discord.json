@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-14T03:30:01Z",
+  "generated_at": "2026-03-14T03:45:01Z",
   "server": {
     "name": "Slate Rock & Gravel Co.",
     "id": "1479350342318690505",
@@ -38,7 +38,7 @@
           "emoji": "\ud83e\uddb4",
           "purpose": "Direct line between Fred and Wilma \u2014 private strategy and planning",
           "url": "https://discord.com/channels/1479350342318690505/1479351572386414675",
-          "last_active": "2026-03-13T15:00:05.488000+00:00"
+          "last_active": "2026-03-14T03:44:51.485000+00:00"
         }
       ]
     },
@@ -159,6 +159,39 @@
   ],
   "recent_activity": [
     {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udd0d Questions for you:\n\n1. **Delete all 6 disabled jobs?** (dead weight)\n2. **Delete the 8 stale one-shots?** (#22-30, all past dates except github token)\n3. **daily-accuracy-report vs daily-wti-accu...",
+      "timestamp": "2026-03-14T03:44:51.485000+00:00",
+      "message_id": "1482222957693632658",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482222957693632658"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "\ud83d\udce3 NUDGES (2)\n\n19. **daily-barney-checkin** \u2014 10 AM \u2192 #fred-wilma\n20. **marketing-sprint-nudge** \u2014 11 AM \u2192 #fred-wilma (sprint ends Mar 21)\n\n\u23f0 ONE-SHOT/STALE REMINDERS (8)\n\n21. **github-token-expiry...",
+      "timestamp": "2026-03-14T03:44:50.904000+00:00",
+      "message_id": "1482222955256872960",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482222955256872960"
+    },
+    {
+      "channel": "fred-wilma",
+      "channel_emoji": "\ud83e\uddb4",
+      "channel_id": "1479351572386414675",
+      "agent": "Theme Park Crowd Report",
+      "is_bot": true,
+      "message": "8. **daily-accuracy-report** \u2014 7:30 AM \u2192 #wilma \u2705\n9. **daily-wti-accuracy-report** \u2014 7:30 AM \u2192 #wilma \u2705 (duplicate with #8?)\n10. **stale-task-daily-check** \u2014 9 AM \u2192 #wilma \u2705\n11. **competitor-watch-...",
+      "timestamp": "2026-03-14T03:44:50.688000+00:00",
+      "message_id": "1482222954350645299",
+      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482222954350645299"
+    },
+    {
       "channel": "wilma",
       "channel_emoji": "\ud83e\udd95",
       "channel_id": "1479351579185250436",
@@ -258,28 +291,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351587129262232/1482106749476671709"
     },
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "Hey \u2014 marketing sprint check-in! Your Reddit targets are in #content-ideas and today's WTI animation is in #content-review. 30 min, that's it. The pipeline stuff can wait \u2014 growth can't. \ud83e\uddb4",
-      "timestamp": "2026-03-13T15:00:05.488000+00:00",
-      "message_id": "1482030497872875693",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482030497872875693"
-    },
-    {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "\ud83e\udea8 **Daily Barney Check-in Reminder**\n\nHey Fred \u2014 time to open claude.ai and check in with Barney. He's Chief of Pipeline and has open pipeline items to prioritize and spec.\n\n**Key items needing dec...",
-      "timestamp": "2026-03-13T14:00:06.011000+00:00",
-      "message_id": "1482015400572092632",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1482015400572092632"
-    },
-    {
       "channel": "mission-control",
       "channel_emoji": "\ud83c\udfaf",
       "channel_id": "1479351570121621569",
@@ -357,17 +368,6 @@
       "url": "https://discord.com/channels/1479350342318690505/1479351570121621569/1481909687359111248"
     },
     {
-      "channel": "fred-wilma",
-      "channel_emoji": "\ud83e\uddb4",
-      "channel_id": "1479351572386414675",
-      "agent": "Theme Park Crowd Report",
-      "is_bot": true,
-      "message": "March 12 is within the sprint window (Mar 8\u201321), so time to nudge.",
-      "timestamp": "2026-03-12T15:00:12.823000+00:00",
-      "message_id": "1481668140772360234",
-      "url": "https://discord.com/channels/1479350342318690505/1479351572386414675/1481668140772360234"
-    },
-    {
       "channel": "morning-briefing",
       "channel_emoji": "\u2600\ufe0f",
       "channel_id": "1479351589176082526",
@@ -381,7 +381,7 @@
   ],
   "stats": {
     "messages_shown": 20,
-    "active_channels_today": 1,
-    "messages_today": 3
+    "active_channels_today": 2,
+    "messages_today": 6
   }
 }
