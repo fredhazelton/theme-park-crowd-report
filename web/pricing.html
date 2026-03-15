@@ -704,6 +704,26 @@
             .faq-section { padding: 30px 16px 40px; }
         }
 
+        /* Skip to content — accessibility */
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 16px;
+            z-index: 200;
+            background: var(--accent);
+            color: var(--bg-primary);
+            padding: 12px 24px;
+            border-radius: 0 0 8px 8px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: top 0.2s;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+
         /* Accessibility: focus-visible outlines */
         a:focus-visible, button:focus-visible, input:focus-visible {
             outline: 2px solid var(--accent);
@@ -721,13 +741,15 @@
 </head>
 <body>
 
+    <a href="#pricing" class="skip-link">Skip to pricing</a>
+
     <!-- HEADER -->
     <header class="header" role="banner">
         <a href="https://hazeydata.ai" class="logo" aria-label="HazeyData home">HAZEYDATA</a>
         <nav class="nav-links" role="navigation" aria-label="Main navigation">
             <a href="https://hazeydata.ai">Home</a>
-            <a href="https://hazeydata.ai/the-quarry" >Dashboard</a>
             <a href="#" class="active">Pricing</a>
+            <a href="https://hazeydata.ai/ssd">SSD</a>
             <a href="https://discord.gg/2Estr7sbP7">Discord</a>
         </nav>
     </header>
@@ -761,7 +783,7 @@
     </section>
 
     <!-- PRICING TOGGLE -->
-    <section class="pricing-section">
+    <section class="pricing-section" id="pricing">
         <div class="toggle-billing">
             <span class="monthly-label active">Monthly</span>
             <div class="toggle-track" id="billingToggle" onclick="toggleBilling()">
