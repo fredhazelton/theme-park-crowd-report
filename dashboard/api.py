@@ -1897,6 +1897,18 @@ def debug_entity_table():
 
 
 # =====================================================================
+# SSD (School Schedule Database) API
+# =====================================================================
+
+try:
+    from ssd_api import ssd_bp
+    app.register_blueprint(ssd_bp)
+    logger.info("SSD API blueprint registered")
+except ImportError as e:
+    logger.warning("SSD API not available: %s", e)
+
+
+# =====================================================================
 # Main
 # =====================================================================
 
