@@ -175,7 +175,7 @@
   <h1>Hazeydata — Business Framework</h1>
   <div class="sub">The other half of the billion-dollar plan</div>
   <div class="tagline">"The Flintstones Framework tells you how to build. This tells you how to survive."</div>
-  <div class="ver">v1.0 · March 2026 · Companion to Flintstones Framework v3.2</div>
+  <div class="ver">v1.0 · March 2026 · 27 sections · Companion to Flintstones Framework v3.2</div>
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -893,30 +893,940 @@
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 13: DOCUMENT MAP -->
+<!-- SECTION 13: DECISION RIGHTS (RACI) -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🔑</span>
+    <h2>Decision Rights Matrix</h2>
+    <span class="desc">Who can decide what — without bottlenecking Fred</span>
+  </div>
+
+  <div class="card-full">
+    <h3>📋 RACI Matrix — Responsibility Assignment</h3>
+    <p style="font-size:11px;color:#aaa;margin-bottom:12px;"><strong>R</strong> = Responsible (does the work) · <strong>A</strong> = Accountable (approves/owns) · <strong>C</strong> = Consulted · <strong>I</strong> = Informed</p>
+    <table class="tbl">
+      <tr><th>Decision Type</th><th>👑 Fred</th><th>🦴 Wilma</th><th>🏏 Bam-Bam</th><th>🪨 Barney</th><th>✍️ Betty</th><th>🎀 Pebbles</th><th>👽 Gazoo</th></tr>
+      <tr><td>Strategic direction / vision</td><td><strong>A/R</strong></td><td>C</td><td>I</td><td>C</td><td>I</td><td>I</td><td>I</td></tr>
+      <tr><td>Idea go/no-go (Phase 1-2)</td><td><strong>A</strong></td><td>R</td><td>C</td><td>C</td><td>I</td><td>I</td><td>I</td></tr>
+      <tr><td>Ship/kill gate (Phase 3)</td><td><strong>A</strong></td><td>R</td><td>C</td><td>C</td><td>I</td><td>I</td><td>C</td></tr>
+      <tr><td>Code merge to production</td><td>I</td><td>I</td><td><strong>A/R</strong></td><td>C</td><td>—</td><td>—</td><td>I</td></tr>
+      <tr><td>Content publish (blog/social)</td><td>I</td><td><strong>A</strong></td><td>—</td><td>—</td><td>R</td><td>C</td><td>I</td></tr>
+      <tr><td>Design asset approval</td><td>I</td><td><strong>A</strong></td><td>—</td><td>—</td><td>C</td><td>R</td><td>I</td></tr>
+      <tr><td>Pricing changes</td><td><strong>A/R</strong></td><td>C</td><td>I</td><td>C</td><td>I</td><td>I</td><td>I</td></tr>
+      <tr><td>Spend &lt; $50</td><td>I</td><td><strong>A</strong></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Spend $50-500</td><td><strong>A</strong></td><td>R</td><td>—</td><td>C</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Spend &gt; $500</td><td><strong>A/R</strong></td><td>C</td><td>—</td><td>C</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>External communications (email, partnerships)</td><td><strong>A</strong></td><td>R (drafts)</td><td>—</td><td>C</td><td>R (copy)</td><td>—</td><td>—</td></tr>
+      <tr><td>Pipeline/data changes</td><td>I</td><td><strong>A</strong></td><td>R</td><td>C</td><td>—</td><td>—</td><td>C</td></tr>
+      <tr><td>Incident response</td><td>I (if major)</td><td><strong>A/R</strong></td><td>R (tech)</td><td>—</td><td>—</td><td>—</td><td>I</td></tr>
+      <tr><td>QA override / veto</td><td><strong>A</strong> (override)</td><td>C</td><td>—</td><td>—</td><td>—</td><td>—</td><td><strong>R</strong></td></tr>
+    </table>
+    <div class="note green-note">🔑 The key principle: Fred decides <strong>what</strong> to build and <strong>where</strong> to go. Wilma decides <strong>how</strong> to execute and <strong>when</strong> to escalate. T3 agents decide <strong>quality</strong> within their domains. T4 executes. This lets Fred focus on the 5% of decisions that actually need him.</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🚦 Autonomy Levels <span class="badge badge-critical">Define These</span></h3>
+      <p>Not every decision needs the same process. Four levels of autonomy:</p>
+      <ul>
+        <li><span class="success">Level 1 — Just Do It:</span> Routine tasks within established patterns. T4 executes, T3 spot-checks per adaptive sampling. No approval needed. <em>Examples: daily scraper runs, routine content drafts, standard QA reviews.</em></li>
+        <li><span class="highlight">Level 2 — Do It and Tell Me:</span> Non-routine but low-risk. Execute, then inform Fred/Wilma. <em>Examples: blog post published, minor pipeline fix, new data source added.</em></li>
+        <li><span class="warn">Level 3 — Ask First:</span> Significant or irreversible. Propose, get approval, then execute. <em>Examples: pricing changes, new feature launches, external outreach, spending over $50.</em></li>
+        <li><span class="danger">Level 4 — Fred Only:</span> Strategic, financial, or reputational risk. Fred decides. Period. <em>Examples: partnerships, hiring, business structure changes, legal matters, go/no-go gates.</em></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>⚡ Speed vs. Control Tradeoff <span class="badge badge-important">Principle</span></h3>
+      <p>The autonomy dial should shift over time as trust builds.</p>
+      <ul>
+        <li><span class="highlight">Early stage (now):</span> More Level 3 and 4. Fred is closely involved. Building trust, calibrating quality.</li>
+        <li><span class="highlight">Established (6+ months):</span> Most work at Level 1-2. Fred reviews weekly summaries, not individual outputs. Intervenes by exception.</li>
+        <li><span class="highlight">Scaled (1+ year):</span> Fred operates at the strategic layer only. Daily operations are fully autonomous. Fred's weekly time commitment: 5-10 hours.</li>
+        <li><span class="warn">Recalibration trigger:</span> If a Level 1 task causes a problem, it moves to Level 2 until trust is rebuilt. Same adaptive principle as QA ratings.</li>
+      </ul>
+      <div class="note">This mirrors how real companies work: new employees get more oversight, trusted veterans get autonomy. The difference is your "employees" can be calibrated with data, not gut feel.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 14: PRODUCT ROADMAP -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🗓️</span>
+    <h2>Product Roadmap & Prioritization</h2>
+    <span class="desc">What to build, in what order, and how to choose</span>
+  </div>
+
+  <div class="card-full">
+    <h3>📊 Prioritization Framework — RICE Scoring</h3>
+    <p style="font-size:11px;color:#aaa;margin-bottom:10px;">Every feature/project gets scored before committing resources. Prevents "shiny object" syndrome.</p>
+    <table class="tbl">
+      <tr><th>Factor</th><th>What It Measures</th><th>Scale</th><th>Example</th></tr>
+      <tr><td><strong>R</strong>each</td><td>How many users does this affect per quarter?</td><td>Estimated number</td><td>School schedule overlay → impacts all users = 5,000</td></tr>
+      <tr><td><strong>I</strong>mpact</td><td>How much does this move the needle per user?</td><td>0.25 (minimal) → 3 (massive)</td><td>Personalized alerts → high impact = 2</td></tr>
+      <tr><td><strong>C</strong>onfidence</td><td>How sure are we about reach and impact estimates?</td><td>50% (low) → 100% (proven)</td><td>New park data → 80% confident</td></tr>
+      <tr><td><strong>E</strong>ffort</td><td>Person-weeks to build (including AI agents)</td><td>Estimated weeks</td><td>API tier → 3 weeks = 3</td></tr>
+    </table>
+    <p style="font-size:11px;color:#60a5fa;margin-top:10px;"><strong>RICE Score = (Reach × Impact × Confidence) ÷ Effort</strong> — Highest score = build first.</p>
+    <div class="note">Barney's role: Challenge the confidence scores. "Are you 80% sure, or hoping you're 80% sure?" This is where domain QA prevents over-investment in low-confidence ideas.</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🗺️ Roadmap Template <span class="badge badge-phase">Quarterly</span></h3>
+      <p>Each quarter has a theme, 2-3 major deliverables, and a success metric.</p>
+      <ul>
+        <li><span class="highlight">Q2 2026 — Foundation:</span> Pipeline production-ready, school schedule corpus complete, website MVP live. <em>Success: 100 organic visitors/week.</em></li>
+        <li><span class="highlight">Q3 2026 — Launch:</span> Free tier public, Discord community seeded, content engine running (2 posts/week). <em>Success: 500 free users, 10 Discord members.</em></li>
+        <li><span class="highlight">Q4 2026 — Monetize:</span> Pro tier launched, email list built, first paid users. <em>Success: $500 MRR, 50 email subscribers.</em></li>
+        <li><span class="highlight">Q1 2027 — Grow:</span> API tier launched, first partnership, content flywheel self-sustaining. <em>Success: $2K MRR, 1 B2B client.</em></li>
+      </ul>
+      <div class="note warn-note">⚠️ This is a template, not a commitment. The actual roadmap gets built in Step 3 (the compressed, current-scale version). These are illustrative targets to show how roadmapping works.</div>
+    </div>
+
+    <div class="card">
+      <h3>🚫 The "Not Now" List <span class="badge badge-important">Equally Important</span></h3>
+      <p>What you're deliberately NOT building yet. This list prevents scope creep.</p>
+      <ul>
+        <li><span class="warn">Mobile app</span> — Responsive web first. Apps are expensive to build and maintain. Wait until 10K+ users demand it.</li>
+        <li><span class="warn">Real-time wait times</span> — Requires live data feeds from parks (legal/technical nightmare). Focus on predictions, not current data.</li>
+        <li><span class="warn">Itinerary builder</span> — Complex feature, lots of competition. Phase 2 at earliest. Predictions alone are the MVP.</li>
+        <li><span class="warn">International parks</span> — US parks first. Prove the model, then expand.</li>
+        <li><span class="warn">Native AI chat interface</span> — "Ask our AI about your trip" sounds cool but adds complexity. Static predictions first.</li>
+      </ul>
+      <div class="note green-note">💡 Every "not now" item gets a trigger condition: "Build mobile app WHEN weekly mobile traffic exceeds 70% AND MRR exceeds $5K." Not a rejection — a deferral with conditions.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 15: REVENUE OPERATIONS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🧾</span>
+    <h2>Revenue Operations</h2>
+    <span class="desc">The boring plumbing that makes money actually flow</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>💳 Payment Infrastructure <span class="badge badge-critical">Pre-Launch</span></h3>
+      <ul>
+        <li><span class="highlight">Payment processor:</span> Stripe. Industry standard, handles subscriptions, supports Canadian merchants selling to US customers, 2.9% + $0.30 per transaction.</li>
+        <li><span class="highlight">Billing:</span> Stripe Billing for recurring subscriptions. Handles upgrades, downgrades, proration, failed payment retries automatically.</li>
+        <li><span class="highlight">Invoicing:</span> Stripe generates invoices. For B2B clients (API tier), may need custom invoicing with PO numbers and net-30 terms.</li>
+        <li><span class="highlight">Refund policy:</span> 30-day money-back guarantee, no questions asked. Reduces purchase anxiety. Refund rate for good SaaS products is typically &lt;5%.</li>
+        <li><span class="highlight">Free trial vs. freemium:</span> Freemium (recommended). Free tier is permanent, not a trial. Reduces friction. Users upgrade when they hit the value ceiling, not when a timer expires.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🏦 Tax & Accounting <span class="badge badge-critical">Don't Ignore</span></h3>
+      <ul>
+        <li><span class="danger">GST/HST:</span> Once revenue exceeds $30K CAD in four consecutive quarters, you MUST register for GST/HST. Register earlier voluntarily to claim input tax credits on business expenses.</li>
+        <li><span class="danger">US Sales Tax:</span> SaaS is taxable in ~20 US states. Stripe Tax can handle calculation and collection automatically. ~$0.50/transaction. Worth it.</li>
+        <li><span class="highlight">Bookkeeping:</span> Wave (free, Canadian) or QuickBooks ($25/mo). Track every expense from day one. Separate business bank account.</li>
+        <li><span class="highlight">Tax filing:</span> Sole proprietorship income reports on personal T1 with T2125 (business income). Track expenses meticulously: server costs, API fees, domain, software subscriptions, home office % — all deductible.</li>
+        <li><span class="warn">When to get an accountant:</span> When revenue exceeds $30K/yr or you incorporate. Until then, self-file with good records.</li>
+      </ul>
+      <div class="note warn-note">⚡ The #1 tax mistake small businesses make: not tracking expenses. Every API charge, every domain renewal, every piece of hardware is a deduction. Start a spreadsheet NOW even if revenue is $0.</div>
+    </div>
+
+    <div class="card">
+      <h3>📊 Revenue Reporting <span class="badge badge-phase">Monthly</span></h3>
+      <p>What to track every month once revenue starts flowing.</p>
+      <ul>
+        <li><span class="highlight">MRR Dashboard:</span> Total MRR, new MRR (new customers), expansion MRR (upgrades), churned MRR (cancellations), net new MRR</li>
+        <li><span class="highlight">Cohort analysis:</span> How does each month's signup cohort retain over time? This is the single most important chart in SaaS.</li>
+        <li><span class="highlight">Revenue by tier:</span> Free (conversion pipeline), Pro (bread and butter), API/Business (whale watching)</li>
+        <li><span class="highlight">Failed payments:</span> Track and recover. Stripe's Smart Retries handle most. For the rest, automated "your payment failed" emails recover 10-20%.</li>
+      </ul>
+      <div class="note">🦕 Dino's role: Compile the monthly revenue dashboard automatically. Wilma reviews and surfaces anomalies to Fred. Fred only sees the summary unless something's off.</div>
+    </div>
+
+    <div class="card">
+      <h3>📋 Revenue Milestones & Unlocks <span class="badge badge-phase">Stage Gates</span></h3>
+      <ul>
+        <li><span class="success">$0 MRR:</span> Free tier live. Focus: product quality + user feedback. Metric: engagement, not revenue.</li>
+        <li><span class="success">$100 MRR (first 15-20 users):</span> Product-market fit signal. Celebrate. Don't change anything drastic — what you're doing is working.</li>
+        <li><span class="highlight">$500 MRR:</span> Covers infrastructure costs. The business is self-sustaining. Unlock: reinvest in content/SEO.</li>
+        <li><span class="highlight">$2K MRR:</span> Real business. Unlock: consider incorporating. Tax advantages kick in.</li>
+        <li><span class="warn">$5K MRR:</span> Unlock: first contractor hire (support or content). Evaluate B2B pipeline.</li>
+        <li><span class="warn">$15K MRR:</span> Unlock: full-time equivalent income from side project. Decision point: stay at day job or go full-time?</li>
+        <li><span class="danger">$50K MRR:</span> Real company. Multiple employees. This is where the full billion-dollar framework starts activating.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 16: CUSTOMER SUPPORT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🎧</span>
+    <h2>Customer Support Plan</h2>
+    <span class="desc">When a paying customer needs help, the clock is ticking</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>📬 Support Channels <span class="badge badge-phase">Staged</span></h3>
+      <ul>
+        <li><span class="success">Stage 1 (0-500 users):</span>
+          <ul>
+            <li><strong>Email only</strong> — support@hazeydata.ai. Wilma triages, Fred responds to complex issues.</li>
+            <li><strong>Discord #help channel</strong> — community support (users help each other, team monitors).</li>
+            <li><strong>FAQ / Knowledge Base</strong> — self-service for common questions. Betty writes, Wilma maintains.</li>
+          </ul>
+        </li>
+        <li><span class="highlight">Stage 2 (500-5K users):</span>
+          <ul>
+            <li>Add <strong>in-app help widget</strong> (Crisp.chat — free tier covers this).</li>
+            <li><strong>AI-powered auto-responses</strong> for common questions (T4 drafts, human reviews before sending).</li>
+            <li>Formalize response time targets (see SLAs below).</li>
+          </ul>
+        </li>
+        <li><span class="warn">Stage 3 (5K+ users):</span>
+          <ul>
+            <li>Hire part-time support contractor.</li>
+            <li>Ticketing system (Linear, Zendesk, or similar).</li>
+            <li>Automated satisfaction surveys post-resolution.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>⏱️ Response Time SLAs <span class="badge badge-important">Commit to These</span></h3>
+      <table class="tbl">
+        <tr><th>Severity</th><th>Description</th><th>Free Tier</th><th>Pro Tier</th><th>API/Business</th></tr>
+        <tr><td><span class="danger">🔴 Critical</span></td><td>Service completely down, data incorrect</td><td>24h</td><td>4h</td><td>1h</td></tr>
+        <tr><td><span class="warn">🟡 High</span></td><td>Major feature broken, billing issue</td><td>48h</td><td>8h</td><td>4h</td></tr>
+        <tr><td><span class="highlight">🔵 Normal</span></td><td>Bug report, feature request, how-to question</td><td>72h</td><td>24h</td><td>8h</td></tr>
+        <tr><td>⚪ Low</td><td>General feedback, suggestions</td><td>Best effort</td><td>48h</td><td>24h</td></tr>
+      </table>
+      <div class="note">These are response times (acknowledge the issue), not resolution times. Acknowledging quickly — even with "we're looking into it" — dramatically improves customer satisfaction.</div>
+    </div>
+
+    <div class="card">
+      <h3>📚 Knowledge Base Structure <span class="badge badge-phase">Pre-Launch</span></h3>
+      <p>Self-service reduces support volume by 60-80%. Build before you launch.</p>
+      <ul>
+        <li><span class="highlight">Getting Started</span> — How to read the crowd calendar, what the numbers mean, how predictions work</li>
+        <li><span class="highlight">Account & Billing</span> — How to upgrade, cancel, update payment, get a refund</li>
+        <li><span class="highlight">Features</span> — How to use alerts, read historical data, interpret school schedule overlays</li>
+        <li><span class="highlight">Data & Accuracy</span> — How predictions are made, accuracy methodology, what "confidence score" means</li>
+        <li><span class="highlight">API Documentation</span> — Endpoints, authentication, rate limits, code examples (auto-generated from OpenAPI spec)</li>
+        <li><span class="highlight">Troubleshooting</span> — Common issues and fixes</li>
+      </ul>
+      <div class="note green-note">💡 Every support ticket becomes a knowledge base article opportunity. Wilma tracks: "We got asked this 3 times → Betty, write an article." The support system feeds itself.</div>
+    </div>
+
+    <div class="card">
+      <h3>🔄 Support → Product Feedback Loop <span class="badge badge-phase">Continuous</span></h3>
+      <p>Support isn't just problem-solving — it's the richest source of product intelligence.</p>
+      <ul>
+        <li><span class="highlight">Tag every ticket:</span> bug, feature-request, confusion, billing, data-quality. Quarterly analysis reveals patterns.</li>
+        <li><span class="highlight">"Confusion" is a product bug:</span> If 10 people ask the same "how do I...?" question, the UI is broken, not the user.</li>
+        <li><span class="highlight">Feature request tracking:</span> Every request logged with user tier and context. When 5+ users request the same thing independently → add to roadmap evaluation.</li>
+        <li><span class="highlight">Churned user interviews:</span> When someone cancels Pro, ask one question: "What would have kept you?" Brutally honest answers = product gold.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 17: INCIDENT RESPONSE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🚨</span>
+    <h2>Incident Response Protocol</h2>
+    <span class="desc">When things break — and they will — here's the playbook</span>
+  </div>
+
+  <div class="card-full">
+    <h3>🔥 Incident Response Flow</h3>
+    <p style="font-size:11px;color:#aaa;margin-bottom:12px;">Five phases, every incident, every time. No exceptions.</p>
+    <table class="tbl">
+      <tr><th>Phase</th><th>Action</th><th>Who</th><th>Timeframe</th></tr>
+      <tr><td><strong>1. DETECT</strong></td><td>Automated monitoring catches the issue OR user reports it. Alert fires.</td><td>Monitoring tools → Wilma</td><td>Within 1 minute (automated) or when reported</td></tr>
+      <tr><td><strong>2. TRIAGE</strong></td><td>Classify severity (critical/high/normal/low). Identify scope (all users? one feature? one user?).</td><td>Wilma (auto-classify) → Bam-Bam (tech assessment)</td><td>Within 15 minutes</td></tr>
+      <tr><td><strong>3. COMMUNICATE</strong></td><td>Update status page. If critical: notify affected users. If prolonged: post to Discord #status.</td><td>Wilma (status page) → Betty (user comms if needed)</td><td>Within 30 minutes of detection</td></tr>
+      <tr><td><strong>4. RESOLVE</strong></td><td>Fix the issue. Deploy fix. Verify fix. Monitor for recurrence.</td><td>Bam-Bam (code fix) → Wilma (deploy) → Gazoo (verify)</td><td>ASAP — target &lt;4h for critical</td></tr>
+      <tr><td><strong>5. POST-MORTEM</strong></td><td>What happened? Why? What prevented earlier detection? What changes prevent recurrence?</td><td>Wilma (drafts) → Barney (reviews) → Fred (approves)</td><td>Within 48 hours</td></tr>
+    </table>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>📊 Severity Classification <span class="badge badge-critical">Standardized</span></h3>
+      <ul>
+        <li><span class="danger">🔴 SEV-1 (Critical):</span> Service completely down. All users affected. Incorrect predictions being served. Data breach. <em>Fred alerted immediately. All hands on deck.</em></li>
+        <li><span class="warn">🟡 SEV-2 (High):</span> Major feature broken. Significant degradation. Billing system issue. Affects &gt;20% of users. <em>Wilma leads response. Fred informed within 1 hour.</em></li>
+        <li><span class="highlight">🔵 SEV-3 (Normal):</span> Minor feature broken. Cosmetic issues. Affects &lt;20% of users. Workaround exists. <em>Normal workflow. Fix in next deploy.</em></li>
+        <li>⚪ SEV-4 (Low): Cosmetic bug. Edge case. No user impact. <em>Log it. Fix when convenient.</em></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📝 Post-Mortem Template <span class="badge badge-phase">Every SEV-1 and SEV-2</span></h3>
+      <ul>
+        <li><span class="highlight">Timeline:</span> Minute-by-minute from detection to resolution</li>
+        <li><span class="highlight">Root cause:</span> What actually broke? (Not "the server crashed" but "the scraper hit an OOM because district #4521 returned a 50MB PDF")</li>
+        <li><span class="highlight">Detection gap:</span> Why didn't we catch this sooner? What monitoring would have caught it?</li>
+        <li><span class="highlight">Impact:</span> Users affected, revenue impact, data quality impact</li>
+        <li><span class="highlight">Action items:</span> Specific changes with owners and deadlines</li>
+        <li><span class="highlight">Blameless:</span> Post-mortems analyze systems, not people. "The process allowed this" not "Fred forgot to check."</li>
+      </ul>
+      <div class="note">Post-mortems are stored in the QA ledger. Patterns across post-mortems reveal systemic issues. Gazoo reviews quarterly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 18: CONTENT & SEO STRATEGY -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">📝</span>
+    <h2>Content & SEO Strategy</h2>
+    <span class="desc">Your #1 free acquisition channel — done systematically</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🎯 Keyword Strategy <span class="badge badge-critical">Foundation</span></h3>
+      <p>Target keywords mapped to user intent and content type.</p>
+      <ul>
+        <li><span class="success">🏆 Head terms (high volume, high competition):</span>
+          <ul>
+            <li>"best time to visit disney world" (~40K/mo)</li>
+            <li>"disney world crowd calendar" (~15K/mo)</li>
+            <li>"when is disney world least crowded" (~8K/mo)</li>
+          </ul>
+        </li>
+        <li><span class="highlight">🎯 Long-tail (lower volume, lower competition — your beachhead):</span>
+          <ul>
+            <li>"disney world crowd predictions [month] 2026" (~2K/mo)</li>
+            <li>"best day to visit epcot this week" (~1K/mo)</li>
+            <li>"universal orlando crowd calendar 2026" (~3K/mo)</li>
+            <li>"school holidays affecting disney crowds" (~500/mo — YOUR unique angle)</li>
+          </ul>
+        </li>
+        <li><span class="warn">🔬 Data-unique (nobody else can write these):</span>
+          <ul>
+            <li>"how school schedules affect theme park crowds"</li>
+            <li>"spring break crowd predictions by state"</li>
+            <li>"which school districts drive disney crowds"</li>
+          </ul>
+        </li>
+      </ul>
+      <div class="note green-note">💡 The data-unique keywords are your SEO moat. Nobody else has the school schedule data to write these articles with authority. Betty writes them, Barney verifies the data claims, Pebbles creates the visualizations.</div>
+    </div>
+
+    <div class="card">
+      <h3>📅 Content Calendar <span class="badge badge-phase">Weekly Rhythm</span></h3>
+      <p>Consistent publishing cadence. Quality over quantity.</p>
+      <ul>
+        <li><span class="highlight">Week 1:</span> Monthly crowd forecast article — "Disney World Crowd Predictions: [Month] 2026." Evergreen, updated monthly. SEO powerhouse.</li>
+        <li><span class="highlight">Week 2:</span> Data deep-dive — "How Spring Break Affects Epcot Wait Times: A 5-Year Analysis." Shows methodology, builds trust.</li>
+        <li><span class="highlight">Week 3:</span> Practical guide — "The Best Days to Visit Universal Orlando This Month." Actionable, shareable.</li>
+        <li><span class="highlight">Week 4:</span> Community/engagement piece — roundup of user trip reports, accuracy review, "were our predictions right last month?"</li>
+      </ul>
+      <div class="note">Start with 1 post/week. Increase to 2 when the content engine is proven. Never sacrifice quality for quantity — one great article outperforms five mediocre ones.</div>
+    </div>
+
+    <div class="card">
+      <h3>📱 Social Distribution <span class="badge badge-phase">Channel Strategy</span></h3>
+      <ul>
+        <li><span class="success">Reddit (highest priority):</span> r/WaltDisneyWorld (500K+), r/UniversalOrlando (100K+), r/DisneyPlanning. Be helpful first, share data second. Build reputation before ever linking your site.</li>
+        <li><span class="highlight">Instagram/TikTok:</span> Visual crowd predictions, "best day this week" carousels, timelapse visualizations of crowd patterns. Pebbles designs, Betty captions.</li>
+        <li><span class="highlight">YouTube:</span> Monthly crowd forecast videos. Data-driven, 3-5 minutes. Can start with screen recordings of the crowd calendar + voiceover. Low effort, high SEO value.</li>
+        <li><span class="highlight">Twitter/X:</span> Daily crowd predictions. "Today's crowd forecast: 🟢 Magic Kingdom 4/10 | 🟡 Epcot 6/10 | 🔴 Hollywood Studios 8/10." Quick, shareable, builds daily habit.</li>
+        <li><span class="warn">Pinterest:</span> Infographics about "best time to visit" rank extremely well. Long shelf life. Pebbles creates, Betty publishes.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📧 Email Strategy <span class="badge badge-important">High-Conversion Channel</span></h3>
+      <ul>
+        <li><span class="highlight">Lead magnet:</span> "Free 90-Day Disney Crowd Calendar" PDF in exchange for email. Classic, effective.</li>
+        <li><span class="highlight">Welcome sequence (5 emails over 2 weeks):</span>
+          <ul>
+            <li>Email 1: Here's your calendar + how to read it</li>
+            <li>Email 2: How our predictions work (build trust)</li>
+            <li>Email 3: Top 3 mistakes trip planners make (value)</li>
+            <li>Email 4: What Pro users get (soft pitch)</li>
+            <li>Email 5: "Any questions about your trip?" (engagement)</li>
+          </ul>
+        </li>
+        <li><span class="highlight">Ongoing newsletter:</span> Weekly "This Week's Crowd Forecast" — free, valuable, keeps you top-of-mind. Include one Pro-only insight per email as a tease.</li>
+        <li><span class="highlight">Tool:</span> Buttondown ($9/mo) or Resend (free tier). Not Mailchimp (expensive for what you get).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 19: COMMUNITY STRATEGY -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🏘️</span>
+    <h2>Community Strategy</h2>
+    <span class="desc">A community is a moat that competitors can't buy</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🏗️ Discord Community Architecture <span class="badge badge-phase">Build Before Launch</span></h3>
+      <ul>
+        <li><span class="highlight">Public channels:</span>
+          <ul>
+            <li>#today-forecast — Daily crowd predictions (automated by Dino)</li>
+            <li>#trip-planning — Users helping users plan trips</li>
+            <li>#trip-reports — "I went Saturday, here's what happened" (user-generated data!)</li>
+            <li>#predictions-accuracy — "Were we right?" Weekly thread</li>
+            <li>#feature-requests — Structured wishlist</li>
+          </ul>
+        </li>
+        <li><span class="highlight">Pro-only channels:</span>
+          <ul>
+            <li>#pro-data — Detailed analytics, historical deep-dives</li>
+            <li>#pro-alerts — Custom notification setup help</li>
+            <li>#ask-fred — Direct access to the founder (limited)</li>
+          </ul>
+        </li>
+        <li><span class="warn">Moderation:</span> Wilma monitors for spam/toxicity. Clear rules posted. Zero tolerance for park employee leaks or insider info (legal risk).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🎉 Engagement Rituals <span class="badge badge-phase">Weekly/Monthly</span></h3>
+      <p>Rituals create habit. Habit creates retention. Retention creates community.</p>
+      <ul>
+        <li><span class="success">Daily:</span> Morning crowd forecast posted automatically. "Good morning! Here's today's outlook: 🟢🟡🔴"</li>
+        <li><span class="highlight">Weekly:</span> "Prediction Report Card" — how accurate were we last week? Builds trust through transparency.</li>
+        <li><span class="highlight">Weekly:</span> "Trip Report Tuesday" — users share their experiences. Best report gets featured.</li>
+        <li><span class="highlight">Monthly:</span> "Founder AMA" — Fred answers questions for 30 minutes. Personal connection at scale.</li>
+        <li><span class="warn">Seasonal:</span> "Spring Break Survival Guide," "Summer Crowd Bingo," "Holiday Crowd Predictions Challenge" — users guess, winner gets free Pro month.</li>
+      </ul>
+      <div class="note green-note">💡 Trip reports are GOLD. Users voluntarily give you ground-truth data that validates your predictions. The community literally improves the product by participating. This is the flywheel's social engine.</div>
+    </div>
+
+    <div class="card">
+      <h3>🏅 Ambassador Program <span class="badge badge-nice">When Community Hits 200+</span></h3>
+      <ul>
+        <li><span class="highlight">Who:</span> Passionate users who are already helping others. Annual passholders, travel bloggers, Disney planners.</li>
+        <li><span class="highlight">What they get:</span> Free Pro access, early feature previews, "Ambassador" Discord role, featured in content.</li>
+        <li><span class="highlight">What they do:</span> Help moderate, answer questions, create content, provide feedback, recruit new users organically.</li>
+        <li><span class="highlight">How many:</span> Start with 5. Never more than 2% of community size.</li>
+        <li><span class="warn">Key rule:</span> Ambassadors are fans, not employees. No quotas, no obligations. If it stops being fun, they should stop.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🌱 Community Growth Phases <span class="badge badge-phase">Staged</span></h3>
+      <div class="timeline">
+        <div class="timeline-item active">
+          <h4>Seed (0-50 members)</h4>
+          <p>Fred is personally active. Every member matters. Welcome each one. The community IS the product feedback mechanism.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Establish (50-200 members)</h4>
+          <p>Rituals formalized. First ambassadors identified. Users start helping each other without prompting. Fred steps back slightly.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Grow (200-1000 members)</h4>
+          <p>Self-sustaining. Ambassadors moderate. Content is partially user-generated. Fred does monthly AMAs. Community drives referrals.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Scale (1000+)</h4>
+          <p>Community is a moat. Competitors can't replicate the relationships. User-generated trip reports are a data source. Consider community manager hire.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 20: EXPERIMENTATION -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🧪</span>
+    <h2>Experimentation Framework</h2>
+    <span class="desc">Test everything, assume nothing, measure what matters</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🔬 Experiment Design <span class="badge badge-phase">Methodology</span></h3>
+      <p>Every change is a hypothesis. Treat it like one.</p>
+      <ul>
+        <li><span class="highlight">Hypothesis format:</span> "We believe [change] will result in [outcome] as measured by [metric] within [timeframe]."</li>
+        <li><span class="highlight">Example:</span> "We believe adding school schedule overlays to the free tier will increase activation rate from 30% to 40% as measured by users who check a prediction within 24 hours of signup, within 30 days."</li>
+        <li><span class="highlight">Minimum viable experiment:</span> Not everything needs an A/B test. For small user counts, before/after comparison is fine. A/B testing requires ~1,000+ users per variant for statistical significance.</li>
+        <li><span class="warn">What to test:</span> Pricing, onboarding flow, email subject lines, content topics, feature presentation, CTA copy. What NOT to test: core data quality (that's always "as accurate as possible").</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🚩 Feature Flags <span class="badge badge-important">Engineering Practice</span></h3>
+      <ul>
+        <li><span class="highlight">What:</span> Toggle features on/off without deploying code. "School schedule overlay" can be on for 10% of users while you monitor.</li>
+        <li><span class="highlight">Why:</span> Ship fast, roll back instantly, test safely. A broken feature flag is a config change, not an emergency deploy.</li>
+        <li><span class="highlight">Tool:</span> PostHog (free, self-hosted) or simple JSON config for early stage. Don't over-engineer this.</li>
+        <li><span class="highlight">Categories:</span>
+          <ul>
+            <li>🚀 Release flags — gradual rollout (10% → 50% → 100%)</li>
+            <li>🧪 Experiment flags — A/B test variants</li>
+            <li>🔧 Ops flags — kill switches for features under load</li>
+            <li>💎 Permission flags — Pro-only features</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📊 Experiment Log <span class="badge badge-phase">Track Everything</span></h3>
+      <p>Every experiment documented. Wins AND losses. Institutional memory.</p>
+      <ul>
+        <li><span class="highlight">Fields:</span> Date, hypothesis, metric, variant A description, variant B description, sample size, duration, result, confidence level, decision, learnings.</li>
+        <li><span class="highlight">Storage:</span> Simple spreadsheet initially. Graduate to PostHog or Amplitude when scale warrants.</li>
+        <li><span class="highlight">Review cadence:</span> Monthly experiment review. "What did we learn? What surprised us? What should we test next?"</li>
+        <li><span class="warn">The cardinal sin:</span> Running an experiment and not reading the results. Every experiment gets a conclusion. "We learned X, and we're doing Y about it."</li>
+      </ul>
+      <div class="note">🪨 Barney's role: Review experiment design before launch. "Is this hypothesis testable? Is the sample size sufficient? Are we measuring the right thing?" Prevents wasted experiments.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 21: KNOWLEDGE MANAGEMENT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">📖</span>
+    <h2>Knowledge Management & Onboarding</h2>
+    <span class="desc">What you know is only valuable if it's accessible</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🗄️ Knowledge Architecture <span class="badge badge-critical">Build Now</span></h3>
+      <p>Where does institutional knowledge live? A system of record.</p>
+      <ul>
+        <li><span class="highlight">📋 QA Ledger</span> — Every QA exchange, every decision, every override. Format: JSON or structured Markdown. Stored in repo. Searchable.
+          <ul>
+            <li>Fields: date, task_id, task_type, maker, checker, rounds, outcome, confidence, time_spent, notes</li>
+            <li>Purpose: Institutional memory. "How did we handle this last time?"</li>
+          </ul>
+        </li>
+        <li><span class="highlight">📊 Capability Map</span> — What each agent/tier can do, quality rating, failure patterns. Updated by Wilma after every QA cycle.
+          <ul>
+            <li>Fields: agent, task_type, success_rate, avg_rounds, common_failures, last_updated</li>
+            <li>Purpose: Delegation intelligence. "Who's best at this type of work?"</li>
+          </ul>
+        </li>
+        <li><span class="highlight">📝 Runbooks</span> — Step-by-step procedures for recurring operations.
+          <ul>
+            <li>Pipeline deployment, scraper recovery, incident response, monthly reporting</li>
+            <li>If Wilma can't follow a runbook autonomously, the runbook is incomplete</li>
+          </ul>
+        </li>
+        <li><span class="highlight">📚 Decision Log</span> — Major decisions with context and rationale.
+          <ul>
+            <li>"We chose Stripe over Paddle because..." / "We killed the mobile app idea because..."</li>
+            <li>Purpose: Prevent revisiting settled decisions. Future-Fred can read why past-Fred decided.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🆕 Agent Onboarding Protocol <span class="badge badge-phase">For New AI Agents</span></h3>
+      <p>When a new agent joins the team (or an existing one is reconfigured).</p>
+      <ul>
+        <li><span class="highlight">Step 1 — Context Load:</span> Agent reads FRAMEWORK.md, BUSINESS-FRAMEWORK.md, their role description, and the capability map for their domain.</li>
+        <li><span class="highlight">Step 2 — QA Calibration:</span> First 20 tasks are 100% reviewed (Yellow rating). No exceptions. This calibrates quality expectations.</li>
+        <li><span class="highlight">Step 3 — Shadow Period:</span> New agent observes an established agent handling their task type. Learns patterns, tone, quality bar.</li>
+        <li><span class="highlight">Step 4 — Supervised Output:</span> Agent produces work, established agent reviews 100%. Feedback loop until quality rating hits Green.</li>
+        <li><span class="highlight">Step 5 — Independent:</span> Agent enters normal adaptive QA cycle. Onboarding complete.</li>
+      </ul>
+      <div class="note">This same protocol applies when onboarding the first human hire. The knowledge base should be comprehensive enough that a new person can be productive within 1 week.</div>
+    </div>
+
+    <div class="card">
+      <h3>📏 Documentation Standards <span class="badge badge-important">Consistency</span></h3>
+      <ul>
+        <li><span class="highlight">Format:</span> Markdown for everything text-based. HTML for visual presentations. JSON for structured data.</li>
+        <li><span class="highlight">Naming convention:</span> UPPERCASE for framework docs (FRAMEWORK.md), lowercase-kebab for operational docs (incident-response.md), YYYY-MM-DD prefix for dated docs.</li>
+        <li><span class="highlight">Freshness:</span> Every document has a "Last reviewed" date. Documents not reviewed in 90 days get flagged by Wilma.</li>
+        <li><span class="highlight">Ownership:</span> Every document has an owner. Owner reviews quarterly. If owner leaves/changes, ownership transfers explicitly.</li>
+        <li><span class="highlight">Templates:</span> Post-mortem template, experiment template, decision record template, meeting notes template. Consistency reduces cognitive load.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 22: EXIT STRATEGY -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🚪</span>
+    <h2>Exit Strategy</h2>
+    <span class="desc">Know the endgame — it shapes every decision from day one</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🛤️ Three Paths <span class="badge badge-critical">Choose One (For Now)</span></h3>
+      <ul>
+        <li><span class="success">Path A — Lifestyle Rocketship 🏆 (Recommended)</span>
+          <ul>
+            <li>Build a profitable $500K-1M/yr business run by Fred + AI</li>
+            <li>No outside investors, no board, no pressure to "exit"</li>
+            <li>Optimize for freedom, income, and intellectual satisfaction</li>
+            <li>Day job optional once MRR covers living expenses</li>
+            <li><em>This is the default path. Everything in this framework supports it.</em></li>
+          </ul>
+        </li>
+        <li><span class="highlight">Path B — Acquisition Target</span>
+          <ul>
+            <li>Build to $1-5M ARR, become attractive to TouringPlans, TripAdvisor, a travel tech company</li>
+            <li>Typical acquisition: 3-8x ARR = $3M-40M payout</li>
+            <li>Requires: clean financials, documented IP, transferable systems (the framework helps here)</li>
+            <li>Timeline: 3-5 years from first dollar</li>
+          </ul>
+        </li>
+        <li><span class="warn">Path C — Venture Scale</span>
+          <ul>
+            <li>Raise capital, hire team, aim for $100M+ valuation</li>
+            <li>Requires: large addressable market, exponential growth, giving up equity and control</li>
+            <li>Not recommended unless the theme park data market proves much larger than expected</li>
+            <li>The framework supports this path but Fred's life would change dramatically</li>
+          </ul>
+        </li>
+      </ul>
+      <div class="note green-note">💡 You don't have to decide forever. Start on Path A. If Path B or C become attractive later, the framework transitions. But knowing your default path prevents accidentally optimizing for the wrong outcome.</div>
+    </div>
+
+    <div class="card">
+      <h3>📊 Exit Readiness Checklist <span class="badge badge-phase">For Path B</span></h3>
+      <p>If acquisition ever becomes interesting, here's what buyers look for:</p>
+      <ul>
+        <li>☐ Clean, auditable financials (2+ years)</li>
+        <li>☐ Documented, transferable codebase</li>
+        <li>☐ IP assignment agreements (all code owned by the company, not Fred personally)</li>
+        <li>☐ Customer contracts / subscription agreements</li>
+        <li>☐ Data rights documentation (legal to use and transfer the data)</li>
+        <li>☐ Low key-person dependency (the business runs without Fred for weeks)</li>
+        <li>☐ Positive growth trend (at least 6 months)</li>
+        <li>☐ Clear competitive moat documentation</li>
+        <li>☐ No outstanding legal issues</li>
+        <li>☐ SOPs and runbooks for all operations</li>
+      </ul>
+      <div class="note">Good news: if you follow this business framework, you'll check most of these boxes naturally. Building a well-documented, systematized business makes it valuable whether you sell it or keep it.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 23: COMMUNICATION RITUALS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">📡</span>
+    <h2>Communication Rituals</h2>
+    <span class="desc">Structured rhythms prevent drift — even with an AI team</span>
+  </div>
+
+  <div class="card-full">
+    <h3>🗓️ Operating Cadence</h3>
+    <table class="tbl">
+      <tr><th>Rhythm</th><th>What</th><th>Who</th><th>Format</th><th>Time</th></tr>
+      <tr><td><strong>Daily</strong></td><td>Morning briefing — overnight alerts, today's priorities, scraper status</td><td>Wilma → Fred</td><td>Discord DM or #briefing</td><td>~2 min to read</td></tr>
+      <tr><td><strong>Weekly</strong></td><td>Week in review — metrics snapshot, completed work, blockers, next week's focus</td><td>Wilma compiles, Dino provides metrics</td><td>Discord thread or Markdown</td><td>~5 min to read</td></tr>
+      <tr><td><strong>Monthly</strong></td><td>Strategic review — MRR, growth trends, experiment results, roadmap check, QA ratings review</td><td>Wilma drafts, Barney reviews strategy sections, Fred reviews</td><td>Full report + 15-min Fred review</td><td>~15 min</td></tr>
+      <tr><td><strong>Quarterly</strong></td><td>Planning session — next quarter roadmap, RICE scoring, framework review, MEMORY.md cleanup</td><td>Fred + Wilma + Barney</td><td>Async over 1-2 days</td><td>~2-3 hours total</td></tr>
+      <tr><td><strong>Annually</strong></td><td>Strategy refresh — review exit path, competitive landscape, annual financials, framework evolution</td><td>Fred + full team</td><td>Full document update cycle</td><td>~1 day</td></tr>
+    </table>
+    <div class="note">Fred's total time commitment: ~30 min/week in steady state. The AI team does the heavy lifting. Fred makes decisions, not reports.</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>📬 Information Flow Rules <span class="badge badge-important">Reduce Noise</span></h3>
+      <ul>
+        <li><span class="success">Push to Fred only when:</span> Decision needed, anomaly detected, milestone reached, incident occurred, or it's a scheduled report.</li>
+        <li><span class="danger">Never push to Fred:</span> Routine status updates, "everything's fine" messages, FYI-only information (put it in the weekly summary instead).</li>
+        <li><span class="highlight">Escalation format:</span> "[SEVERITY] [ONE SENTENCE SUMMARY] [RECOMMENDED ACTION] [CONTEXT IF NEEDED]"</li>
+        <li><span class="highlight">Example:</span> "🟡 Scraper stalled on batch 4200/6685. Recommend restart with --resume. Last successful batch was 30min ago, no data loss."</li>
+        <li><span class="warn">The "3 bullet" rule:</span> If Fred needs to read more than 3 bullets to understand the situation, the communication needs to be rewritten.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🔄 Agent-to-Agent Communication <span class="badge badge-phase">Protocols</span></h3>
+      <ul>
+        <li><span class="highlight">Task handoff format:</span> [TASK ID] [DESCRIPTION] [INPUTS] [EXPECTED OUTPUT] [DEADLINE] [QA ROUTING]. Structured, not conversational.</li>
+        <li><span class="highlight">QA feedback format:</span> [PASS/REVISE/ESCALATE] [SPECIFIC ISSUE] [SUGGESTED FIX]. No vague "this doesn't feel right."</li>
+        <li><span class="highlight">Status updates:</span> Agents report status to Wilma, not to each other. Wilma synthesizes. Prevents information fragmentation.</li>
+        <li><span class="highlight">Cross-domain handoff:</span> When work crosses domains (code that affects design, content that needs data), Wilma coordinates. T3 agents don't freelance into each other's domains.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 24: DATA GOVERNANCE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🗃️</span>
+    <h2>Data Governance</h2>
+    <span class="desc">Know your data: where it comes from, where it lives, who can touch it</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🗺️ Data Catalog <span class="badge badge-critical">Build This</span></h3>
+      <p>Every dataset documented. No "tribal knowledge" about what's in which folder.</p>
+      <ul>
+        <li><span class="highlight">For each dataset, document:</span>
+          <ul>
+            <li><strong>Name & description:</strong> What is it?</li>
+            <li><strong>Source:</strong> Where does it come from? (URL, API, manual, user-generated)</li>
+            <li><strong>Collection method:</strong> Scraper, API pull, user input, manual entry</li>
+            <li><strong>Schema:</strong> Fields, types, constraints</li>
+            <li><strong>Refresh frequency:</strong> Real-time, daily, weekly, annual, one-time</li>
+            <li><strong>Quality score:</strong> Completeness, accuracy, freshness (🟢🟡🔴)</li>
+            <li><strong>Legal status:</strong> Freely available, ToS-restricted, licensed, user-contributed</li>
+            <li><strong>Storage location:</strong> Path, database, cloud bucket</li>
+            <li><strong>Owner:</strong> Who maintains this dataset?</li>
+            <li><strong>Retention policy:</strong> How long do we keep it? When do we purge?</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🔗 Data Lineage <span class="badge badge-important">Traceability</span></h3>
+      <p>Can you trace any prediction back to its source data? You should be able to.</p>
+      <ul>
+        <li><span class="highlight">Forward lineage:</span> Raw school calendar → parsed dates → normalized schedule → crowd factor → prediction model input → published prediction.</li>
+        <li><span class="highlight">Backward lineage:</span> "Why did we predict crowd level 8 for Epcot on March 15?" → trace back through model → school schedule inputs → specific districts on break → original source pages.</li>
+        <li><span class="highlight">Implementation:</span> Version tag every input dataset. Every model run logs which dataset versions it used. Every published prediction references its model run.</li>
+        <li><span class="warn">Why this matters:</span> When a prediction is wrong, lineage tells you WHERE in the chain the error originated. Without it, debugging is guesswork.</li>
+      </ul>
+      <div class="note">This is your "show your work" capability. TouringPlans publishes predictions but not methodology. If you can show users exactly why you predicted what you predicted, transparency becomes a competitive advantage.</div>
+    </div>
+
+    <div class="card">
+      <h3>🔐 Access Control <span class="badge badge-important">Security</span></h3>
+      <ul>
+        <li><span class="highlight">Tier 1 (Fred):</span> Full access to everything. No restrictions.</li>
+        <li><span class="highlight">Tier 2 (Wilma):</span> Full read access. Write access to operational data. No access to financial credentials or payment data.</li>
+        <li><span class="highlight">Tier 3 (Specialists):</span> Read/write access to their domain only. Bam-Bam sees code + pipeline data. Betty sees content + analytics. No cross-domain access without Wilma routing.</li>
+        <li><span class="highlight">Tier 4 (Local LLM):</span> Sandboxed. Reads task inputs, writes task outputs. No persistent access to credentials, user data, or financial data.</li>
+        <li><span class="warn">User data:</span> Anonymized before any agent touches it. Raw user data accessible only by Fred and Wilma for support purposes.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📅 Data Retention Policy <span class="badge badge-phase">Define Now</span></h3>
+      <table class="tbl">
+        <tr><th>Data Type</th><th>Retention</th><th>Reason</th></tr>
+        <tr><td>Raw scraper output</td><td>1 year</td><td>Debugging + reprocessing capability</td></tr>
+        <tr><td>Processed school schedules</td><td>Indefinite</td><td>Crown jewel — historical corpus grows value</td></tr>
+        <tr><td>Crowd predictions (published)</td><td>Indefinite</td><td>Historical accuracy tracking</td></tr>
+        <tr><td>Model parameters + training data</td><td>All versions retained</td><td>Reproducibility + rollback capability</td></tr>
+        <tr><td>User accounts + preferences</td><td>Duration of account + 90 days</td><td>Legal compliance (right to deletion)</td></tr>
+        <tr><td>User behavior / analytics</td><td>2 years (anonymized)</td><td>Product analytics, then purge</td></tr>
+        <tr><td>QA ledger</td><td>Indefinite</td><td>Institutional knowledge, never delete</td></tr>
+        <tr><td>Support tickets</td><td>3 years</td><td>Pattern analysis, then archive</td></tr>
+        <tr><td>Financial records</td><td>7 years</td><td>CRA requirement</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 25: COMPLIANCE & ACCESSIBILITY -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">♿</span>
+    <h2>Compliance, Insurance & Accessibility</h2>
+    <span class="desc">The unglamorous stuff that prevents catastrophic failures</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>♿ Web Accessibility (WCAG 2.1 AA) <span class="badge badge-important">Legal + Ethical</span></h3>
+      <p>15% of potential users have some form of disability. It's also the law in many jurisdictions.</p>
+      <ul>
+        <li><span class="highlight">Color contrast:</span> All text meets 4.5:1 contrast ratio. Crowd levels don't rely on color alone (use numbers + labels + color).</li>
+        <li><span class="highlight">Screen reader compatible:</span> Semantic HTML, ARIA labels, alt text on all images and charts.</li>
+        <li><span class="highlight">Keyboard navigation:</span> Every feature accessible without a mouse.</li>
+        <li><span class="highlight">Text alternatives:</span> Data visualizations have text summaries. "Epcot crowd calendar: the least crowded days this month are March 4, 11, and 18."</li>
+        <li><span class="highlight">Testing:</span> Run axe-core or Lighthouse accessibility audit before every major release. Target: zero critical violations.</li>
+      </ul>
+      <div class="note">Pebbles should design with accessibility from day one. Retrofitting accessibility is 10x harder than building it in. Use a checklist on every design review.</div>
+    </div>
+
+    <div class="card">
+      <h3>🛡️ Insurance <span class="badge badge-important">When Revenue Starts</span></h3>
+      <ul>
+        <li><span class="highlight">Professional Liability (E&O):</span> Covers claims that your data/predictions caused someone financial harm. "Your prediction said it would be uncrowded and my family had a terrible time." Unlikely to be sued, but one claim without insurance could be devastating.
+          <ul><li>Cost: ~$500-1,000 CAD/year for a solo consultancy</li></ul>
+        </li>
+        <li><span class="highlight">Cyber Liability:</span> Covers data breach costs — notification, credit monitoring, legal fees, regulatory fines. Essential if you store any user data.
+          <ul><li>Cost: ~$500-800 CAD/year</li></ul>
+        </li>
+        <li><span class="highlight">General Commercial Liability:</span> Probably not needed until you have physical interactions (conferences, meetups).
+          <ul><li>Defer until revenue exceeds $50K/yr</li></ul>
+        </li>
+        <li><span class="warn">Trigger:</span> Get E&O + Cyber insurance before accepting your first paid customer. It's the cost of 2 monthly subscriptions and protects against catastrophic loss.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📜 Regulatory Compliance Checklist <span class="badge badge-phase">Pre-Launch</span></h3>
+      <ul>
+        <li>☐ <span class="highlight">PIPEDA (Canada):</span> Privacy policy, consent for data collection, right to access/delete personal info</li>
+        <li>☐ <span class="highlight">COPPA (US):</span> If any user could be under 13, either verify age or don't collect personal info from children. Safest: don't require accounts for free tier.</li>
+        <li>☐ <span class="highlight">GDPR (EU):</span> If EU visitors use your site — cookie consent, right to deletion, data processing agreements. Applies even if you're not in the EU.</li>
+        <li>☐ <span class="highlight">CAN-SPAM / CASL:</span> Email marketing compliance. Unsubscribe link in every email, no purchased lists, consent required (CASL is stricter than CAN-SPAM).</li>
+        <li>☐ <span class="highlight">AODA (Ontario):</span> Accessibility for Ontarians with Disabilities Act. Website must meet WCAG 2.0 Level AA.</li>
+        <li>☐ <span class="highlight">Consumer protection:</span> Refund policy must be clearly stated before purchase. No hidden fees. Advertised features must actually work.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>⚔️ IP Offense Strategy <span class="badge badge-nice">Long-Term Moat</span></h3>
+      <p>Not just defending your IP — creating legal barriers for competitors.</p>
+      <ul>
+        <li><span class="highlight">Patent candidates:</span>
+          <ul>
+            <li>"Method for predicting theme park crowd levels using school schedule correlation analysis" — novel, non-obvious, specific</li>
+            <li>"AI orchestration framework with adaptive quality assurance sampling" — the Flintstones Framework itself</li>
+            <li>"System for automated collection and normalization of school calendar data across heterogeneous sources"</li>
+          </ul>
+        </li>
+        <li><span class="warn">Patent reality check:</span> ~$10-15K per patent. 2-3 year process. Provisional patent ($1,500) buys you 12 months of "patent pending" status while you evaluate.</li>
+        <li><span class="highlight">Trade secrets (free):</span> Keep ACCORD engine methodology, model training recipes, and scraper configurations confidential. Document them as trade secrets formally.</li>
+        <li><span class="highlight">Trademark:</span> "Hazeydata" word mark + logo. ~$250-330 per jurisdiction. File in Canada first, US when revenue warrants.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 26: STAGE GATES -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🚦</span>
+    <h2>Stage Gates — The Stepping Stones</h2>
+    <span class="desc">Clear, measurable triggers for activating each part of this framework</span>
+  </div>
+
+  <div class="card-full">
+    <h3>🪜 Framework Activation Ladder</h3>
+    <p style="font-size:11px;color:#aaa;margin-bottom:12px;">Not everything in this document is needed today. Each section activates when you hit its trigger. This IS Step 4 of Fred's strategy.</p>
+    <table class="tbl">
+      <tr><th>Gate</th><th>Trigger</th><th>Framework Sections That Activate</th><th>Key Actions</th></tr>
+      <tr><td><strong>🌱 Gate 0<br>Pre-Revenue</strong></td><td>NOW</td><td>Legal basics, data catalog, documentation standards, content strategy, community seed, RACI matrix, knowledge base, experimentation framework</td><td>Register business, start content, seed Discord, set up QA ledger, build runbooks</td></tr>
+      <tr><td><strong>🚀 Gate 1<br>First Dollar</strong></td><td>First paid customer</td><td>Payment infrastructure, support plan (Stage 1), refund policy, insurance (E&O + cyber), privacy policy live, COPPA compliance</td><td>Stripe setup, support email, knowledge base live, insurance purchased</td></tr>
+      <tr><td><strong>📈 Gate 2<br>Traction</strong></td><td>$500 MRR<br>OR 500 free users</td><td>Revenue reporting, cohort analysis, full content calendar, email strategy, SEO analytics, community engagement rituals</td><td>Monthly revenue dashboard, email list building, weekly content cadence</td></tr>
+      <tr><td><strong>💰 Gate 3<br>Real Business</strong></td><td>$2K MRR<br>OR 2,000 free users</td><td>Incorporation, tax strategy, partnership outreach (Tier 1), incident response formalized, feature flags, experiment log</td><td>Incorporate, get accountant, start BD outreach, formalize ops</td></tr>
+      <tr><td><strong>🏢 Gate 4<br>Scaling</strong></td><td>$5K MRR<br>OR 5,000 free users</td><td>First hire trigger, support Stage 2, API tier launch, B2B pricing, ambassador program, architecture Phase 2</td><td>Hire contractor, split infrastructure, launch API tier</td></tr>
+      <tr><td><strong>🚄 Gate 5<br>Momentum</strong></td><td>$15K MRR<br>OR 15,000 free users</td><td>Full RACI enforcement, partnership Tier 2, international expansion planning, exit strategy review, advisory board</td><td>Decision point: day job vs full-time. Formal advisory relationships.</td></tr>
+      <tr><td><strong>🏰 Gate 6<br>Enterprise</strong></td><td>$50K+ MRR</td><td>EVERYTHING. Full framework activated. Multiple hires, formal governance, patent filing, architecture Phase 3-4</td><td>You've earned it. The cathedral is now the right size for the congregation.</td></tr>
+    </table>
+    <div class="note green-note">🔑 The whole point: you don't need a billion-dollar framework at $0 revenue. You need the PLAN for a billion-dollar framework so you know what to activate when. This table is the bridge between the aspiration and the reality.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- DOCUMENT MAP (UPDATED) -->
 <!-- ═══════════════════════════════════════════ -->
 <div class="section">
   <div class="section-head">
     <span class="icon">🗺️</span>
-    <h2>How This Connects to the Flintstones Framework</h2>
-    <span class="desc">Two halves of the same plan</span>
+    <h2>How This All Connects</h2>
+    <span class="desc">The complete operating system for Hazeydata</span>
   </div>
 
   <div class="card-full">
     <h3>📋 Document Architecture</h3>
     <table class="tbl">
-      <tr><th>Document</th><th>Purpose</th><th>Covers</th></tr>
+      <tr><th>Document</th><th>Purpose</th><th>Sections</th></tr>
       <tr><td><strong>Flintstones Framework v3.2</strong></td><td>How to BUILD</td><td>Org structure, QA system, idea cycle, team roles, metrics framework, hardware spec</td></tr>
-      <tr><td><strong>Business Framework v1.0</strong> (this document)</td><td>How to SURVIVE</td><td>Legal, financial, competitive, continuity, research, partnerships, scaling, culture</td></tr>
-      <tr><td><strong>TPCR-FRAMEWORK.md</strong> (next)</td><td>How to APPLY</td><td>Project-specific mapping of both frameworks to Theme Park Crowd Report's current state</td></tr>
+      <tr><td><strong>Business Framework v1.0</strong> (this document)</td><td>How to SURVIVE & GROW</td><td>Legal, financial, competitive moat, continuity, user research, partnerships, architecture, risk, team scaling, culture, brand, advisory, RACI, roadmap, RevOps, support, incidents, content/SEO, community, experiments, knowledge management, exit strategy, communication rituals, data governance, compliance, accessibility, IP offense, stage gates</td></tr>
+      <tr><td><strong>TPCR-FRAMEWORK.md</strong> (Step 3)</td><td>How to APPLY</td><td>Project-specific mapping: where TPCR is today, what to activate now, what to defer, current-scale workflow</td></tr>
     </table>
-    <div class="note">Together, these three documents form the complete operating system for Hazeydata. The first two are the principles; the third is the practice.</div>
+    <div class="note">The Flintstones Framework is the engine. The Business Framework is the chassis, fuel system, and road map. TPCR-FRAMEWORK is the first trip. Together: the complete vehicle.</div>
+  </div>
+
+  <div class="card-full">
+    <h3>✅ Framework Completeness Check</h3>
+    <p style="font-size:11px;color:#aaa;margin-bottom:10px;">Every area a billion-dollar company needs — accounted for.</p>
+    <table class="tbl">
+      <tr><th>Domain</th><th>Document</th><th>Status</th></tr>
+      <tr><td>Vision & Strategy</td><td>Flintstones Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Org Structure & Roles</td><td>Flintstones Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>QA & Quality System</td><td>Flintstones Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Idea → Product Cycle</td><td>Flintstones Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Metrics & Measurement</td><td>Flintstones Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Hardware & Infrastructure</td><td>Both</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Legal & IP</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Financial Model</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Competitive Analysis</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Business Continuity</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>User Research</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Partnerships & BD</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Team Scaling</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Culture & Values</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Brand Guidelines</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Advisory Board</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Decision Rights (RACI)</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Product Roadmap & Prioritization</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Revenue Operations</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Customer Support</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Incident Response</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Content & SEO</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Community Strategy</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Experimentation</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Knowledge Management</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Exit Strategy</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Communication Rituals</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Data Governance</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Compliance & Accessibility</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Insurance</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>IP Offense</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Stage Gates</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>International Expansion</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+      <tr><td>Data Ethics</td><td>Business Framework</td><td><span class="success">✅ Complete</span></td></tr>
+    </table>
+    <div class="note green-note">🏁 <strong>Steps 1-2: COMPLETE.</strong> Every domain a billion-dollar company needs is documented with detail, staged for current scale, and connected to measurable activation triggers. Time for Step 3: compress it down to TPCR's current reality.</div>
   </div>
 </div>
 
 <!-- Footer -->
 <div class="footer">
-  hazeydata.ai · Business Framework v1.0 · March 2026 · Design document — not yet implemented
+  hazeydata.ai · Business Framework v1.0 · March 2026 · 27 sections · Design document — not yet implemented<br>
+  Companion to Flintstones Framework v3.2 · Next: TPCR-FRAMEWORK.md (Step 3)
 </div>
 
 </div><!-- /page -->
