@@ -83,6 +83,8 @@ pipeline_dev/
 
 # School schedules project (allow code, data, and docs)
 !data/school_schedules/
+!data/school_schedules/*.py
+!data/school_schedules/*.md
 data/school_schedules/ccd_lea_029_*.csv
 data/school_schedules/nces_lea_*.zip
 data/school_schedules/*.json
