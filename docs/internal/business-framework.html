@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Hazeydata — Business Framework v1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #0c0e14; font-family: 'Inter', sans-serif; color: #e0e0e0;
+    padding: 36px 20px; display: flex; justify-content: center;
+  }
+  .page { width: 1100px; max-width: 100%; }
+
+  /* Auth gate */
+  #gate {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: #0c0e14; display:flex; align-items:center; justify-content:center;
+    z-index: 9999; flex-direction: column; gap: 16px;
+  }
+  #gate.hidden { display: none; }
+  #gate h2 { color: #fff; font-size: 18px; font-weight: 700; }
+  #gate input {
+    padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05); color: #fff; font-size: 14px;
+    font-family: 'Inter', sans-serif; width: 260px; text-align: center;
+    outline: none;
+  }
+  #gate input:focus { border-color: rgba(59,130,246,0.5); }
+  #gate .hint { font-size: 11px; color: #555; }
+  #gate .err { font-size: 11px; color: #ef4444; display: none; }
+  #content { display: none; }
+  #content.visible { display: block; }
+
+  .header { text-align: center; margin-bottom: 40px; }
+  .header h1 { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+  .header .sub { font-size: 12px; color: #888; margin-top: 4px; letter-spacing: 1px; }
+  .header .ver { font-size: 9px; color: #444; margin-top: 4px; }
+  .header .tagline { font-size: 13px; color: #3b82f6; margin-top: 8px; font-style: italic; }
+
+  /* Section headers */
+  .section { margin-bottom: 36px; }
+  .section-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .section-head .icon { font-size: 22px; }
+  .section-head h2 { font-size: 16px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; }
+  .section-head .desc { font-size: 11px; color: #666; margin-left: auto; }
+
+  /* Cards */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .card h3 {
+    font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h3 .badge {
+    font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .badge-critical { background: rgba(239,68,68,0.2); color: #f87171; }
+  .badge-important { background: rgba(251,191,36,0.2); color: #fbbf24; }
+  .badge-nice { background: rgba(34,197,94,0.2); color: #4ade80; }
+  .badge-phase { background: rgba(59,130,246,0.2); color: #60a5fa; }
+
+  .card p, .card li { font-size: 11px; color: #aaa; line-height: 1.6; }
+  .card ul { padding-left: 16px; margin-top: 4px; }
+  .card li { margin-bottom: 3px; }
+  .card .highlight { color: #60a5fa; font-weight: 600; }
+  .card .warn { color: #fbbf24; font-weight: 600; }
+  .card .danger { color: #f87171; font-weight: 600; }
+  .card .success { color: #4ade80; font-weight: 600; }
+  .card .note {
+    margin-top: 10px; padding: 8px 12px; border-radius: 6px;
+    background: rgba(59,130,246,0.08); border-left: 3px solid rgba(59,130,246,0.3);
+    font-size: 10px; color: #93c5fd;
+  }
+  .card .note.warn-note {
+    background: rgba(251,191,36,0.08); border-left-color: rgba(251,191,36,0.3);
+    color: #fde68a;
+  }
+  .card .note.green-note {
+    background: rgba(34,197,94,0.08); border-left-color: rgba(34,197,94,0.3);
+    color: #86efac;
+  }
+
+  /* Full-width card */
+  .card-full {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 14px;
+  }
+  .card-full h3 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .card-full p, .card-full li { font-size: 11px; color: #aaa; line-height: 1.7; }
+  .card-full ul { padding-left: 16px; margin-top: 4px; }
+  .card-full li { margin-bottom: 4px; }
+
+  /* Tables */
+  .tbl { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .tbl th {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #666;
+    text-align: left; padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .tbl td {
+    font-size: 11px; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #ccc;
+  }
+  .tbl tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px;
+    width: 2px; background: rgba(255,255,255,0.08);
+  }
+  .timeline-item { position: relative; margin-bottom: 16px; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -24px; top: 6px;
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 2px solid rgba(59,130,246,0.5); background: #0c0e14;
+  }
+  .timeline-item.active::before { background: #3b82f6; border-color: #3b82f6; }
+  .timeline-item h4 { font-size: 12px; font-weight: 700; color: #fff; }
+  .timeline-item p { font-size: 10px; color: #888; margin-top: 2px; }
+
+  /* Connector between sections */
+  .connector {
+    text-align: center; padding: 12px 0; font-size: 18px; color: #333;
+  }
+
+  /* Risk matrix */
+  .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .risk-item {
+    padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);
+  }
+  .risk-item.high { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.15); }
+  .risk-item.med { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.15); }
+  .risk-item.low { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.15); }
+  .risk-item h4 { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .risk-item .severity { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .risk-item.high .severity { color: #f87171; }
+  .risk-item.med .severity { color: #fbbf24; }
+  .risk-item.low .severity { color: #4ade80; }
+  .risk-item p { font-size: 10px; color: #999; margin-top: 4px; line-height: 1.5; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 30px 0 10px; font-size: 9px; color: #333; }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .risk-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Auth gate -->
+<div id="gate">
+  <h2>🔒</h2>
+  <input id="pw" type="password" placeholder="passphrase" autocomplete="off" autofocus>
+  <div class="hint">Internal document</div>
+  <div class="err" id="err">Incorrect</div>
+</div>
+
+<div class="page" id="content">
+
+<!-- Header -->
+<div class="header">
+  <h1>Hazeydata — Business Framework</h1>
+  <div class="sub">The other half of the billion-dollar plan</div>
+  <div class="tagline">"The Flintstones Framework tells you how to build. This tells you how to survive."</div>
+  <div class="ver">v1.0 · March 2026 · Companion to Flintstones Framework v3.2</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 1: LEGAL & IP -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">⚖️</span>
+    <h2>Legal & IP Strategy</h2>
+    <span class="desc">Protect what you build before someone takes it</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>📜 Data Rights & Scraping Legality <span class="badge badge-critical">Critical</span></h3>
+      <p>Every data source needs a legal assessment before relying on it in a commercial product.</p>
+      <ul>
+        <li><span class="highlight">Public school calendars:</span> Government data, generally safe. But aggregation at scale may trigger terms-of-service issues on individual school district websites.</li>
+        <li><span class="highlight">Theme park wait times:</span> Disney, Universal, etc. actively protect this data. Scraping their apps/sites likely violates ToS. Need API partnerships or user-contributed data models.</li>
+        <li><span class="highlight">Competitor data:</span> Scraping TouringPlans, Thrill-Data, etc. is legally risky and ethically questionable. Clean-room your competitive intelligence.</li>
+        <li><span class="warn">Canada vs. US law:</span> You operate from Canada, serve US customers, scrape US sites. Need to understand both jurisdictions.</li>
+      </ul>
+      <div class="note warn-note">⚡ Action: Get a 1-hour consultation with a tech/IP lawyer before launching any paid product that relies on scraped data. Budget: ~$300-500 CAD. This is the cheapest insurance you'll ever buy.</div>
+    </div>
+
+    <div class="card">
+      <h3>🛡️ Intellectual Property <span class="badge badge-critical">Critical</span></h3>
+      <p>What you own, what you can protect, and what's your actual moat.</p>
+      <ul>
+        <li><span class="highlight">Prediction models:</span> Your algorithms, training methodology, feature engineering — this is trade secret territory. Document everything, restrict access.</li>
+        <li><span class="highlight">School schedule corpus:</span> The raw data isn't protectable, but your structured, cleaned, normalized dataset is a compiled work with copyright protection.</li>
+        <li><span class="highlight">The Flintstones Framework itself:</span> The AI orchestration methodology is potentially valuable IP. Consider whether to open-source (marketing) or keep proprietary (moat).</li>
+        <li><span class="highlight">Brand:</span> "Hazeydata" trademark registration — file before someone squats it. ~$250 USD via USPTO, ~$330 CAD via CIPO.</li>
+      </ul>
+      <div class="note">📝 IP Register: Maintain a living document listing every IP asset, its protection status, and renewal dates. Wilma should track this.</div>
+    </div>
+
+    <div class="card">
+      <h3>📋 Terms of Service & Privacy <span class="badge badge-critical">Critical</span></h3>
+      <p>Required before any user touches the product.</p>
+      <ul>
+        <li><span class="danger">Privacy Policy:</span> Required by law in both Canada (PIPEDA) and US (state laws). Must disclose what data you collect, how you use it, who you share it with.</li>
+        <li><span class="danger">COPPA Compliance:</span> Your audience is families planning theme park trips. Children under 13 may use your site. COPPA violations carry $50K+ fines <em>per violation</em>.</li>
+        <li><span class="highlight">Terms of Service:</span> Limit liability, define acceptable use, protect your content from scraping (ironic, yes, but necessary).</li>
+        <li><span class="highlight">Cookie/tracking consent:</span> If you use analytics (you should), you need consent banners for GDPR visitors (Europeans planning Disney trips).</li>
+      </ul>
+      <div class="note warn-note">⚡ Don't write these yourself. Use a template service like Termly (~$10/mo) or get a lawyer to draft them once (~$500-1000). The cost of getting it wrong is catastrophic.</div>
+    </div>
+
+    <div class="card">
+      <h3>🏛️ Business Structure Evolution <span class="badge badge-important">Important</span></h3>
+      <p>Sole proprietorship → corporation as revenue grows.</p>
+      <ul>
+        <li><span class="highlight">Current:</span> Sole proprietorship (Ontario). Fine for now — simple, cheap, fast.</li>
+        <li><span class="highlight">Trigger to incorporate:</span> When annual revenue exceeds ~$50K CAD, or when you take on any liability risk (paid users, data licensing contracts).</li>
+        <li><span class="highlight">Why incorporate:</span> Limited liability (your house isn't at risk if someone sues), tax advantages (small business deduction in Canada), ability to raise capital, professional credibility.</li>
+        <li><span class="highlight">Type:</span> Federal or Ontario corporation. Federal gives you name protection across Canada.</li>
+        <li>Consider US LLC later if significant US B2B revenue (simplifies invoicing and tax withholding).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 2: FINANCIAL MODEL -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">💰</span>
+    <h2>Financial Model</h2>
+    <span class="desc">Know your numbers or your numbers will kill you</span>
+  </div>
+
+  <div class="card-full">
+    <h3>📊 Unit Economics — What Does It Cost to Run?</h3>
+    <table class="tbl">
+      <tr><th>Cost Category</th><th>Current (Pre-Revenue)</th><th>At 1K Users</th><th>At 10K Users</th><th>At 100K Users</th></tr>
+      <tr><td>Hosting / Infrastructure</td><td>~$50/mo (wilma-server)</td><td>~$100/mo</td><td>~$300-500/mo</td><td>~$2-5K/mo (CDN + API servers)</td></tr>
+      <tr><td>API Costs (LLM)</td><td>~$50-100/mo</td><td>~$100-150/mo</td><td>~$150-200/mo (T4 offloads)</td><td>~$200-500/mo</td></tr>
+      <tr><td>Mac Studio (amortized)</td><td>—</td><td>~$195/mo (3yr)</td><td>~$195/mo</td><td>~$195/mo</td></tr>
+      <tr><td>Domain / SaaS Tools</td><td>~$30/mo</td><td>~$50/mo</td><td>~$100/mo</td><td>~$300/mo</td></tr>
+      <tr><td>Data Sources</td><td>$0 (scraped)</td><td>~$50/mo</td><td>~$200/mo (licensed)</td><td>~$500-2K/mo</td></tr>
+      <tr><td><strong>Total Monthly Burn</strong></td><td><strong>~$130-180</strong></td><td><strong>~$495-545</strong></td><td><strong>~$945-1,195</strong></td><td><strong>~$3.2-8K</strong></td></tr>
+      <tr><td>Cost Per User</td><td>N/A</td><td>~$0.50/mo</td><td>~$0.10/mo</td><td>~$0.05/mo</td></tr>
+    </table>
+    <div class="note green-note">🔑 Key insight: The Mac Studio + local LLM strategy means your AI costs are essentially fixed. As you scale from 1K to 100K users, AI costs barely change. This is a massive advantage over competitors paying per-token API costs that scale linearly.</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>📈 Revenue Scenarios <span class="badge badge-phase">Modeled</span></h3>
+      <p>Three scenarios based on the freemium SaaS + content/affiliate dual engine.</p>
+      <ul>
+        <li><span class="success">Conservative (Year 1):</span> 500 free users, 3% conversion, $7/mo avg → <strong>$1,260/yr MRR</strong> + $500/yr affiliate = ~$1,760/yr</li>
+        <li><span class="highlight">Moderate (Year 2):</span> 5,000 free, 5% conversion, $8/mo → <strong>$24,000/yr MRR</strong> + $5,000/yr affiliate = ~$29,000/yr</li>
+        <li><span class="warn">Ambitious (Year 3):</span> 25,000 free, 7% conversion, $9/mo → <strong>$189,000/yr MRR</strong> + $20K affiliate + $50K B2B licensing = ~$259,000/yr</li>
+      </ul>
+      <div class="note">Break-even at ~20 paid users ($140/mo revenue vs. ~$130/mo burn). That's achievable in month 2-3 if the product delivers value.</div>
+    </div>
+
+    <div class="card">
+      <h3>💵 Funding Strategy <span class="badge badge-important">Important</span></h3>
+      <p>How to fund growth without giving away the company.</p>
+      <ul>
+        <li><span class="success">Phase 1 — Bootstrapped:</span> Current approach. Side project funded by day job. Zero risk. Keep going until product-market fit is proven.</li>
+        <li><span class="highlight">Phase 2 — Revenue-Funded:</span> Once MRR covers costs, reinvest all profit into growth (content, tools, data sources). No outside capital needed.</li>
+        <li><span class="highlight">Phase 3 — Strategic Capital (optional):</span> If B2B licensing takes off, consider a small angel round ($50-100K) to hire a sales person and accelerate partnerships. Only if the ROI is clear.</li>
+        <li><span class="warn">Avoid:</span> VC funding unless you want to build a $100M+ company with external pressure. The beauty of this model is it can be a profitable $500K-1M/yr business run by one person + AI.</li>
+      </ul>
+      <div class="note green-note">🎯 The "lifestyle rocketship" — a business that generates serious income without requiring you to raise money, hire 50 people, or move to San Francisco. The AI team makes this possible in a way that wasn't 3 years ago.</div>
+    </div>
+
+    <div class="card">
+      <h3>🧮 Key Financial Metrics to Track <span class="badge badge-phase">Monthly</span></h3>
+      <ul>
+        <li><span class="highlight">MRR</span> — Monthly Recurring Revenue (north star after product-market fit)</li>
+        <li><span class="highlight">LTV</span> — Lifetime Value per customer (avg monthly revenue × avg months retained)</li>
+        <li><span class="highlight">CAC</span> — Customer Acquisition Cost (total marketing spend ÷ new customers)</li>
+        <li><span class="highlight">LTV:CAC Ratio</span> — Must be >3:1 for sustainable growth</li>
+        <li><span class="highlight">Gross Margin</span> — Revenue minus direct costs (hosting, data). Target: >80%</li>
+        <li><span class="highlight">Burn Rate</span> — Monthly cash out. Track religiously.</li>
+        <li><span class="highlight">Runway</span> — How many months of burn can you sustain? (Infinite if bootstrapped from day job, but track anyway.)</li>
+        <li><span class="highlight">Payback Period</span> — Months to recover CAC from a customer. Target: <6 months.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🏷️ Pricing Architecture <span class="badge badge-phase">Designed</span></h3>
+      <p>Three tiers, designed to maximize conversion and minimize churn.</p>
+      <ul>
+        <li><span class="success">Free Tier:</span> Today's crowd level, basic calendar, 1 park. <em>Purpose: attract users, generate data, prove value.</em></li>
+        <li><span class="highlight">Pro ($7-9/mo or $69/yr):</span> All parks, 90-day forecasts, personalized alerts, historical data, itinerary planner. <em>Purpose: convert power users.</em></li>
+        <li><span class="warn">API / Business ($49-199/mo):</span> Raw data access, bulk exports, custom integrations, white-label embeds. <em>Purpose: B2B revenue.</em></li>
+      </ul>
+      <div class="note">Annual pricing at 2 months free (12 for the price of 10) reduces churn and improves cash flow. TouringPlans charges $15.99/yr — you can be competitive at $69/yr because you offer more parks and school schedule intelligence they don't have.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 3: COMPETITIVE MOAT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🏰</span>
+    <h2>Competitive Moat Analysis</h2>
+    <span class="desc">Why you, why now, why can't they just copy it?</span>
+  </div>
+
+  <div class="card-full">
+    <h3>🗺️ Competitive Landscape</h3>
+    <table class="tbl">
+      <tr><th>Competitor</th><th>Strengths</th><th>Weaknesses</th><th>Your Advantage</th></tr>
+      <tr><td><strong>TouringPlans</strong></td><td>15+ years of data, brand trust, established user base, Len Testa's credibility</td><td>Disney/Universal focused, dated UI, no school schedule integration, slow to add parks</td><td>Broader park coverage, school schedule intelligence, modern tech stack, AI-powered insights</td></tr>
+      <tr><td><strong>Thrill-Data</strong></td><td>Real-time data, mobile-first</td><td>Smaller scope, less predictive modeling</td><td>Deeper analytics, historical forecasting, school calendar correlation</td></tr>
+      <tr><td><strong>Queue-Times / Ride Times</strong></td><td>Free, global coverage</td><td>No predictions, just current data, ad-supported</td><td>Predictive intelligence vs. reactive data</td></tr>
+      <tr><td><strong>Google Travel</strong></td><td>Infinite resources, traffic, data</td><td>Theme parks are a tiny niche they don't prioritize. Generic "busy times" isn't actionable.</td><td>Depth of niche expertise. Google will never build school-schedule-aware crowd predictions.</td></tr>
+      <tr><td><strong>Disney/Universal Apps</strong></td><td>Official data, captive audience</td><td>Only their own parks, no cross-park comparison, no planning tools, no predictions</td><td>Multi-park, predictive, independent (users trust third-party analysis more)</td></tr>
+    </table>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🧱 Your Defensible Moats <span class="badge badge-critical">Know These</span></h3>
+      <ul>
+        <li><span class="success">Data Moat — School Schedule Corpus:</span> You're building the most comprehensive school schedule database in North America. Nobody else is doing this. Every day the scraper runs, the moat gets deeper.</li>
+        <li><span class="success">Methodology Moat — ACCORD Engine:</span> Your statistical methodology for crowd prediction is proprietary and built on your unique background (TouringPlans + StatsCan + data science). Hard to replicate without the same domain expertise.</li>
+        <li><span class="highlight">Speed Moat — AI Operations:</span> The Flintstones Framework lets you iterate faster than competitors with traditional teams. A feature that takes them 3 months takes you 3 weeks.</li>
+        <li><span class="highlight">Cost Moat — Local LLM:</span> Your marginal cost per feature is near-zero thanks to Tier 4. Competitors paying $0.03/token for AI features can't match your economics.</li>
+        <li><span class="warn">Network Moat (future):</span> Once users contribute data (park reports, crowd confirmations), you have a data flywheel that compounds. More users → better predictions → more users.</li>
+      </ul>
+      <div class="note warn-note">⚠️ Honest assessment: Your biggest vulnerability is the single-person dependency. TouringPlans has survived because it's a team. If Fred stops, Hazeydata stops. See Business Continuity section.</div>
+    </div>
+
+    <div class="card">
+      <h3>❓ "Why Can't They Just Copy It?" <span class="badge badge-important">Answer Ready</span></h3>
+      <p>The answer you need for investors, partners, and yourself:</p>
+      <ul>
+        <li><span class="highlight">TouringPlans can't easily add school schedules</span> because it requires scraping 6,685+ districts, normalizing wildly inconsistent formats, and maintaining it annually. That's a 6-month data engineering project they have no incentive to start.</li>
+        <li><span class="highlight">Google won't build this</span> because niche theme park planning is a rounding error in their business. They'll stick with generic "busy times" bars.</li>
+        <li><span class="highlight">New entrants face a cold-start problem:</span> You need years of historical data to make accurate predictions. Your head start compounds every day.</li>
+        <li><span class="highlight">The AI operations layer is invisible:</span> Competitors see the product, not the machine that builds it. They'd have to replicate not just the data but the entire operational framework.</li>
+      </ul>
+      <div class="note green-note">💡 The real moat isn't any single thing — it's the combination: unique data + unique methodology + unique operational speed + unique cost structure. Each one alone is replicable. All four together? Very hard.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 4: BUSINESS CONTINUITY -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🔒</span>
+    <h2>Business Continuity & Disaster Recovery</h2>
+    <span class="desc">What happens when things go wrong</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🚌 The Bus Factor <span class="badge badge-critical">Critical</span></h3>
+      <p>If Fred is incapacitated, can the business survive?</p>
+      <ul>
+        <li><span class="danger">Current bus factor: 1.</span> If Fred can't work, everything stops. This is the #1 existential risk.</li>
+        <li><span class="highlight">Mitigation — Documentation:</span> Every process, every password, every decision rationale documented in the knowledge base. If someone else had to take over, could they?</li>
+        <li><span class="highlight">Mitigation — Automation:</span> The more the AI team handles autonomously, the less single-person dependent the business is. Wilma + Bam-Bam can keep the pipeline running without Fred for weeks.</li>
+        <li><span class="highlight">Mitigation — Succession plan:</span> Identify one trusted person (Chantale?) who knows where the keys are. Not to run the business — just to keep the lights on.</li>
+        <li><span class="warn">Mitigation — Dead man's switch:</span> If the server goes unattended for 7 days, automated email to designated person with access instructions.</li>
+      </ul>
+      <div class="note warn-note">⚡ Create a "Break Glass" document: one page with all critical access info (server credentials, domain registrar, payment processor, bank info, Backblaze keys) stored securely offline. Give Chantale the location and the passphrase.</div>
+    </div>
+
+    <div class="card">
+      <h3>💾 Data Backup Strategy <span class="badge badge-important">Important</span></h3>
+      <p>Backblaze is good — but backup ≠ business continuity.</p>
+      <ul>
+        <li><span class="success">Backblaze B2:</span> ✅ Great for file-level backup. Cost-effective. Reliable. <strong>Keep this.</strong></li>
+        <li><span class="warn">What Backblaze doesn't cover:</span></li>
+        <li>Application state (running processes, cron jobs, service configs)</li>
+        <li>Database consistency (backing up files while DB is writing = possible corruption)</li>
+        <li>Recovery time — restoring from Backblaze to a new server could take days</li>
+        <li>Configuration drift — is the backup a complete, bootable system?</li>
+      </ul>
+      <div class="note">
+        <strong>Recommended backup layers:</strong><br>
+        Layer 1: <strong>Backblaze B2</strong> — file backup (daily) ✅ already have<br>
+        Layer 2: <strong>GitHub</strong> — all code repos (continuous) ✅ already have<br>
+        Layer 3: <strong>Database dumps</strong> — nightly pg_dump / sqlite backup to Backblaze ⚠️ verify<br>
+        Layer 4: <strong>Server snapshot</strong> — monthly full system image (Clonezilla or similar) 🔴 add this<br>
+        Layer 5: <strong>Recovery runbook</strong> — step-by-step "rebuild from scratch" document 🔴 add this
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔌 Technology Dependency Risks <span class="badge badge-important">Important</span></h3>
+      <ul>
+        <li><span class="highlight">Apple Silicon bet:</span> If Apple discontinues Mac Studio or MLX breaks — you still have cloud API fallback. Cost goes up, but business doesn't die.</li>
+        <li><span class="highlight">LLM API pricing:</span> If Anthropic/OpenAI 10x prices — Tier 4 local LLM is your hedge. The Mac Studio pays for itself in ~6 months of avoided API costs.</li>
+        <li><span class="highlight">Data source fragility:</span> School district websites change constantly. Build scrapers that fail gracefully and alert, not crash silently. Maintain a "last known good" cache.</li>
+        <li><span class="highlight">Domain/DNS:</span> Where is hazeydata.ai registered? Set calendar reminders for renewal. Domain loss is business-ending.</li>
+        <li><span class="warn">Single server risk:</span> wilma-server dies = everything is down. Plan: failover to cloud (DigitalOcean droplet with pre-configured image) within 4 hours.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📋 "Break Glass" Document <span class="badge badge-critical">Create This</span></h3>
+      <p>A sealed document for emergencies. Stored offline (printed + encrypted USB).</p>
+      <ul>
+        <li>Server SSH credentials + IP</li>
+        <li>Domain registrar login</li>
+        <li>GitHub owner credentials</li>
+        <li>Backblaze account access</li>
+        <li>Stripe/payment processor credentials</li>
+        <li>Bank account access</li>
+        <li>Email account access (wilma@hazeydata.ai, fred@hazeydata.ai)</li>
+        <li>DNS provider credentials</li>
+        <li>API keys (Anthropic, Brave, etc.)</li>
+        <li>Instructions: "If Fred is unavailable for >7 days, do these 5 things"</li>
+      </ul>
+      <div class="note warn-note">⚡ Give the location and passphrase to Chantale. Update whenever credentials change. Review quarterly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 5: USER RESEARCH -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🔬</span>
+    <h2>User Research & Discovery</h2>
+    <span class="desc">Talk to humans before building for humans</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>👤 User Personas <span class="badge badge-critical">Define Before Launch</span></h3>
+      <p>Not "theme park fans" — specific, named archetypes with specific needs.</p>
+      <ul>
+        <li><span class="highlight">🎯 "Planning Patty"</span> — First-time Disney visitor, family of 4, budget-conscious, overwhelmed by options. Needs: "Just tell me the best week to go and which park each day." Willing to pay for certainty.</li>
+        <li><span class="highlight">🎯 "Annual Andy"</span> — Annual passholder, visits 10+ times/year, wants to avoid crowds on spontaneous visits. Needs: real-time + 7-day forecast. Free tier may suffice; convert on alerts.</li>
+        <li><span class="highlight">🎯 "Data Dave"</span> — Travel blogger, YouTuber, or agent who needs data for content/clients. Needs: embeddable widgets, exportable data, API access. High willingness to pay.</li>
+        <li><span class="highlight">🎯 "Agency Alice"</span> — Travel agent booking Disney vacations for clients. Needs: reliable crowd data to recommend dates. B2B pricing. Volume buyer.</li>
+      </ul>
+      <div class="note green-note">🧠 Fred's StatsCan background in cognitive interviewing and focus groups is a MASSIVE advantage here. Most founders hire consultants for this — you literally ran the Questionnaire Design Resource Centre. Use that skill.</div>
+    </div>
+
+    <div class="card">
+      <h3>🎙️ Research Methodology <span class="badge badge-phase">Fred's Wheelhouse</span></h3>
+      <p>A structured research program using skills Fred already has.</p>
+      <ul>
+        <li><span class="success">Phase 1 — Guerrilla Research (Now):</span>
+          <ul>
+            <li>Reddit engagement: Every person who responds to your posts — ask them one question about their planning pain points</li>
+            <li>Discord community: As members join, short welcome survey (3 questions max)</li>
+            <li>Competitor reviews: Read TouringPlans app store reviews — what do people complain about?</li>
+          </ul>
+        </li>
+        <li><span class="highlight">Phase 2 — Cognitive Interviews (Pre-Launch):</span>
+          <ul>
+            <li>5-8 one-on-one sessions with target users (recruit from Reddit/Discord)</li>
+            <li>Think-aloud protocol: Watch them try to plan a park trip using current tools</li>
+            <li>Identify friction points, mental models, decision triggers</li>
+            <li>This is exactly what Fred did at StatsCan — same methodology, different domain</li>
+          </ul>
+        </li>
+        <li><span class="highlight">Phase 3 — Beta Feedback (Post-Launch):</span>
+          <ul>
+            <li>Invite first 50 users to a "founding members" cohort</li>
+            <li>Weekly feedback thread in Discord</li>
+            <li>In-app feedback prompts (NPS + open text)</li>
+            <li>Monthly "office hours" — Fred talks to users directly</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🔄 Reddit as a Research Lab <span class="badge badge-phase">Active Now</span></h3>
+      <p>Every Reddit engagement is a research opportunity.</p>
+      <ul>
+        <li><span class="highlight">When someone responds to your post:</span> "Thanks! Quick question — when you were planning your trip, what was the hardest part to figure out?"</li>
+        <li><span class="highlight">When someone asks for advice:</span> Help them genuinely first, then: "I'm building a tool that does exactly this — would you be willing to try an early version and tell me what sucks?"</li>
+        <li><span class="highlight">Track patterns:</span> Log every insight in a simple spreadsheet. After 50 interactions, themes will emerge that you can't see from 5.</li>
+        <li><span class="warn">Don't sell.</span> Research ≠ marketing. You're learning, not pitching. The authenticity is what makes this work.</li>
+      </ul>
+      <div class="note">📝 Create a research log template: Date | Source | User Type | Pain Point | Feature Idea | Quote. Betty can help compile monthly research summaries.</div>
+    </div>
+
+    <div class="card">
+      <h3>📊 Validation Signals <span class="badge badge-phase">Track These</span></h3>
+      <p>How to know if you're building the right thing before you finish building it.</p>
+      <ul>
+        <li><span class="success">Strong signal:</span> Someone offers to pay before you ask for money</li>
+        <li><span class="success">Strong signal:</span> Someone shares your tool without you asking</li>
+        <li><span class="success">Strong signal:</span> Someone asks for a feature — same feature — 3+ times independently</li>
+        <li><span class="highlight">Medium signal:</span> Growing Reddit engagement (upvotes, comments, DMs)</li>
+        <li><span class="highlight">Medium signal:</span> Discord members inviting friends</li>
+        <li><span class="warn">Weak signal:</span> People saying "cool idea!" (everyone says this; means nothing)</li>
+        <li><span class="danger">Red flag:</span> Silence. No comments, no shares, no questions. Means you're invisible, not that the idea is bad.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 6: PARTNERSHIPS & BD -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🤝</span>
+    <h2>Partnerships & Business Development</h2>
+    <span class="desc">You don't have to sell — you have to help</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🧠 Reframing Sales for Non-Salespeople <span class="badge badge-critical">Mindset</span></h3>
+      <p>Fred doesn't like sales pitches. Good news: the best business development doesn't look like sales at all.</p>
+      <ul>
+        <li><span class="success">The reframe:</span> You're not selling — you're sharing something useful with someone who needs it. If your data helps Universal compete with Disney, you're doing <em>them</em> a favor.</li>
+        <li><span class="highlight">The approach:</span> "Hey, I built this thing that might be useful to you. I used to work at TouringPlans. Here's what it does. Want to see it?" That's not a pitch — that's one nerd showing another nerd something cool.</li>
+        <li><span class="highlight">The proof:</span> Lead with data, not promises. "Here's last month's crowd predictions vs. actuals for your parks. We were 92% accurate. Imagine having this in your ops dashboard."</li>
+        <li><span class="warn">What to avoid:</span> Cold emails, LinkedIn spam, "let me pick your brain" requests. Those are what <em>bad</em> salespeople do.</li>
+      </ul>
+      <div class="note green-note">💡 The TouringPlans connection is gold. You didn't just build something — you helped build the category leader, and now you're building the next generation. That's a credibility story that opens doors without a pitch.</div>
+    </div>
+
+    <div class="card">
+      <h3>🏰 Target Partners — Tiered Approach <span class="badge badge-phase">Prioritized</span></h3>
+      <ul>
+        <li><span class="success">Tier 1 — Easy wins (now):</span>
+          <ul>
+            <li>Disney/Universal <strong>fan sites & bloggers</strong> — they need data for content, you need exposure. Trade data access for attribution.</li>
+            <li>Travel <strong>YouTube creators</strong> — offer custom data for their "best time to visit" videos. They credit you, you get traffic.</li>
+            <li>Reddit <strong>community moderators</strong> — become a trusted resource in r/WaltDisneyWorld, r/UniversalOrlando</li>
+          </ul>
+        </li>
+        <li><span class="highlight">Tier 2 — Medium effort (6-12 months):</span>
+          <ul>
+            <li><strong>Travel agencies</strong> specializing in Disney vacations (there are hundreds)</li>
+            <li><strong>Hotel/resort chains</strong> near parks (they want to predict demand too)</li>
+            <li><strong>Travel insurance companies</strong> (affiliate play — "planning to skip the crowds? here's travel insurance for your trip")</li>
+          </ul>
+        </li>
+        <li><span class="warn">Tier 3 — Whale hunting (12+ months):</span>
+          <ul>
+            <li><strong>Universal Orlando</strong> — they'd love competitive intelligence on Disney crowd patterns</li>
+            <li><strong>Theme park operators</strong> (Cedar Fair, Six Flags/Merlin) — ops planning data</li>
+            <li><strong>Google Travel, TripAdvisor</strong> — data licensing or acquisition</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>✉️ The Non-Pitch Email Templates <span class="badge badge-phase">Ready to Use</span></h3>
+      <p>For when Fred is ready to reach out. No sales language. Just one data nerd helping another.</p>
+      <ul>
+        <li><span class="highlight">To a blogger/creator:</span><br>
+        <em>"Hey [name], I follow your [channel/blog] — great stuff on [specific thing]. I'm building a crowd prediction tool for theme parks (used to work at TouringPlans) and I thought the data might be useful for your content. Happy to give you access if you want to play with it. No strings."</em></li>
+        <li><span class="highlight">To a travel agency:</span><br>
+        <em>"Hi [name], I help families figure out the least crowded days to visit Disney/Universal. Here's a sample — [link to free report]. If this is useful for your clients, I'd love to chat about how we could work together."</em></li>
+        <li><span class="highlight">To Universal Orlando (the dream):</span><br>
+        <em>"Hi, I'm Fred Hazelton — former TouringPlans data scientist, now building independent crowd analytics. I have historical crowd prediction data for Universal parks. Would your operations team be interested in seeing a sample analysis? I think there's an interesting story in how school schedules affect your attendance patterns."</em></li>
+      </ul>
+      <div class="note">📝 Betty can draft these. Fred personalizes and sends. Wilma tracks responses. Low effort, high potential. You don't need 100 partners — you need 3 good ones.</div>
+    </div>
+
+    <div class="card">
+      <h3>🎯 The Universal Orlando Play <span class="badge badge-important">Strategic</span></h3>
+      <p>Why Universal is the perfect first B2B client.</p>
+      <ul>
+        <li><span class="success">They're the underdog.</span> Disney dominates the data/analytics space. Universal would love competitive intelligence.</li>
+        <li><span class="success">Epic Universe opens 2025.</span> They're actively investing in guest experience and crowd management tools.</li>
+        <li><span class="highlight">What you'd offer:</span> Crowd prediction dashboard, school schedule overlay, competitive benchmarking (Disney vs. Universal attendance correlation), event impact analysis.</li>
+        <li><span class="highlight">The approach:</span> Don't pitch "buy our data." Pitch "here's a free analysis of your crowd patterns that we noticed while building our tool. If this is interesting, we can talk about more."</li>
+        <li><span class="warn">The risk:</span> Enterprise sales cycles are 6-12 months. Don't depend on this — treat it as a moonshot alongside the B2C product.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 7: TECHNICAL ARCHITECTURE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🏗️</span>
+    <h2>Technical Architecture & Scalability</h2>
+    <span class="desc">From 100 users to 100,000 without rebuilding</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>📐 Architecture Phases <span class="badge badge-phase">Staged</span></h3>
+      <div class="timeline">
+        <div class="timeline-item active">
+          <h4>Phase 1 — Solo Server (Now → 1K users)</h4>
+          <p>wilma-server handles everything: pipeline, API, website. Simple. Fast to iterate. Fine for early traction.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Phase 2 — Split Workloads (1K → 10K users)</h4>
+          <p>Static site on CDN (Cloudflare Pages). API on dedicated server/VPS. Pipeline stays on wilma-server. Database on managed service (PlanetScale, Supabase).</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Phase 3 — Scale Out (10K → 100K users)</h4>
+          <p>API behind load balancer. Caching layer (Redis). CDN for all static assets. Background job queue for heavy computation. Consider serverless for API (Cloudflare Workers = cheap at scale).</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Phase 4 — Enterprise (100K+ users)</h4>
+          <p>Multi-region deployment. Dedicated B2B API tier with SLA guarantees. Data warehouse for analytics. This is the "nice problem to have" phase.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>⚡ Uptime & SLA Planning <span class="badge badge-important">Important</span></h3>
+      <ul>
+        <li><span class="highlight">Free tier SLA:</span> "Best effort." No guarantees. Status page for transparency.</li>
+        <li><span class="highlight">Pro tier SLA:</span> 99.5% uptime (~3.6 hours downtime/month). This is achievable with a single well-managed server + CDN.</li>
+        <li><span class="highlight">API/Business SLA:</span> 99.9% uptime (~43 min downtime/month). Requires redundancy. Don't promise this until Phase 2 architecture.</li>
+        <li><span class="warn">Monitoring:</span> UptimeRobot (free) or Better Uptime ($20/mo). Alert on downtime within 1 minute. Wilma can handle automated recovery for common failures.</li>
+      </ul>
+      <div class="note">🎯 Start with a public status page from day one. Even if you're small, it signals professionalism. Instatus or Cachet (self-hosted, free).</div>
+    </div>
+
+    <div class="card">
+      <h3>🔌 API Architecture <span class="badge badge-phase">Design Now</span></h3>
+      <p>Design the API before you need it — so it's ready when B2B comes knocking.</p>
+      <ul>
+        <li>RESTful JSON API with versioning (v1/parks, v1/predictions, v1/schools)</li>
+        <li>API key authentication with rate limiting per tier</li>
+        <li>Endpoints: parks list, crowd predictions (date + park), school schedules (district + dates), historical data (date range)</li>
+        <li>Response format: standardized JSON with metadata (confidence scores, data freshness, model version)</li>
+        <li>Documentation: auto-generated from OpenAPI spec (Swagger UI)</li>
+        <li>SDK/client libraries: Python, JavaScript (when demand warrants)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🗄️ Data Architecture <span class="badge badge-important">Important</span></h3>
+      <ul>
+        <li><span class="highlight">Crown jewels (protect at all costs):</span>
+          <ul>
+            <li>School schedule corpus (normalized, structured)</li>
+            <li>Historical crowd predictions + actuals</li>
+            <li>ACCORD engine parameters + training data</li>
+            <li>User behavior data (anonymized)</li>
+          </ul>
+        </li>
+        <li><span class="highlight">Data pipeline:</span> Raw scrape → Clean → Normalize → Enrich → Store → Serve</li>
+        <li><span class="highlight">Versioning:</span> Every model version, every dataset version tagged. Ability to roll back predictions to any point in time.</li>
+        <li><span class="warn">Data retention policy:</span> How long do you keep user data? Raw scrapes? Define this now, enforce later.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 8: RISK REGISTER -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🚨</span>
+    <h2>Risk Register</h2>
+    <span class="desc">What could kill you — and how to survive it</span>
+  </div>
+
+  <div class="risk-grid">
+    <div class="risk-item high">
+      <h4>🚌 Key Person Risk</h4>
+      <div class="severity">High Impact · High Probability</div>
+      <p>Fred is the only human. Extended illness, burnout, or life event = business stops.</p>
+      <p><strong>Mitigation:</strong> Documentation, "Break Glass" doc, AI autonomy for routine ops, Chantale as emergency contact.</p>
+    </div>
+    <div class="risk-item high">
+      <h4>⚖️ Legal / Data Rights</h4>
+      <div class="severity">High Impact · Medium Probability</div>
+      <p>Cease-and-desist from a theme park or school district. Data scraping legality challenged.</p>
+      <p><strong>Mitigation:</strong> Legal consultation pre-launch. User-contributed data model as backup. Respect robots.txt.</p>
+    </div>
+    <div class="risk-item med">
+      <h4>🏰 Competitive Response</h4>
+      <div class="severity">Medium Impact · Medium Probability</div>
+      <p>TouringPlans adds school schedules. Google improves theme park data. New well-funded competitor.</p>
+      <p><strong>Mitigation:</strong> Speed advantage, data depth moat, community loyalty. Stay 12 months ahead on data.</p>
+    </div>
+    <div class="risk-item med">
+      <h4>📉 Market Timing</h4>
+      <div class="severity">Medium Impact · Low Probability</div>
+      <p>Recession reduces theme park attendance. Pandemic 2.0. Theme parks change access models.</p>
+      <p><strong>Mitigation:</strong> Diversify beyond theme parks long-term. Low burn rate means you can weather downturns.</p>
+    </div>
+    <div class="risk-item med">
+      <h4>🤖 Technology Shift</h4>
+      <div class="severity">Medium Impact · Medium Probability</div>
+      <p>LLM costs drop so fast that your local-compute advantage disappears. Apple pivots away from AI workstation market.</p>
+      <p><strong>Mitigation:</strong> Architecture should be compute-agnostic. If API costs drop, your costs drop too — win either way.</p>
+    </div>
+    <div class="risk-item low">
+      <h4>🔥 Burnout</h4>
+      <div class="severity">High Impact · Real Talk</div>
+      <p>Full-time government job + side project + family. This is a marathon, not a sprint.</p>
+      <p><strong>Mitigation:</strong> AI handles the grind. Fred handles the decisions. Set boundaries. It's okay to take a week off — the machines keep running.</p>
+    </div>
+    <div class="risk-item med">
+      <h4>🌐 Data Source Fragility</h4>
+      <div class="severity">Medium Impact · High Probability</div>
+      <p>School district websites change, break, or block scrapers. Park APIs change authentication.</p>
+      <p><strong>Mitigation:</strong> Redundant scraping strategies, LLM-powered adaptive scrapers, cached last-known-good data, alert system (already built).</p>
+    </div>
+    <div class="risk-item low">
+      <h4>💸 Cash Flow Crisis</h4>
+      <div class="severity">Low Impact · Low Probability</div>
+      <p>Revenue doesn't materialize. Costs exceed expectations.</p>
+      <p><strong>Mitigation:</strong> Day job provides infinite runway. Monthly burn is <$200. Break-even at ~20 paid users. Risk is near zero.</p>
+    </div>
+    <div class="risk-item med">
+      <h4>🔓 Security Breach</h4>
+      <div class="severity">High Impact · Low Probability</div>
+      <p>User data leaked. Server compromised. API keys exposed.</p>
+      <p><strong>Mitigation:</strong> Minimal data collection, encryption at rest, regular credential rotation, security audit pre-launch.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 9: TEAM SCALING -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">👥</span>
+    <h2>Team Scaling Roadmap</h2>
+    <span class="desc">From solo + AI to a real company (only when needed)</span>
+  </div>
+
+  <div class="card-full">
+    <h3>📈 Hiring Triggers — Don't Hire Until You Must</h3>
+    <table class="tbl">
+      <tr><th>Revenue Milestone</th><th>Hire</th><th>Why</th><th>Cost (est.)</th></tr>
+      <tr><td>$0 - $5K MRR</td><td>Nobody. Fred + AI team.</td><td>AI handles everything. Any hire at this stage is premature.</td><td>$0</td></tr>
+      <tr><td>$5K - $15K MRR</td><td>Part-time VA or customer support (contractor)</td><td>Support tickets will be the first thing Fred can't handle + AI can't fully automate.</td><td>$500-1K/mo</td></tr>
+      <tr><td>$15K - $30K MRR</td><td>Part-time content creator (contractor)</td><td>Betty drafts, but a human with theme park domain expertise creating video/social content is a force multiplier.</td><td>$1-2K/mo</td></tr>
+      <tr><td>$30K - $50K MRR</td><td>Consider: BD / partnerships (part-time)</td><td>Someone who actually likes talking to people and making deals. Fred focuses on product.</td><td>$2-4K/mo + commission</td></tr>
+      <tr><td>$50K+ MRR</td><td>First full-time hire: Head of Growth</td><td>At this point, growth is the bottleneck, not product. Someone who owns marketing, content, partnerships.</td><td>$4-6K/mo</td></tr>
+    </table>
+    <div class="note green-note">🔑 The AI team is what makes this possible. A traditional startup would need 3-5 employees at $5K MRR. You might not need your first hire until $15K MRR. That's an 80% cost advantage.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 10: CULTURE & VALUES -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🧬</span>
+    <h2>Culture, Values & Brand</h2>
+    <span class="desc">What kind of company is this?</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🪨 Core Values <span class="badge badge-nice">Foundation</span></h3>
+      <ul>
+        <li><span class="success">Data honesty:</span> We publish our accuracy scores. When we're wrong, we say so. Trust is the product.</li>
+        <li><span class="success">Builder's mentality:</span> Ship fast, measure, improve. Don't wait for perfect.</li>
+        <li><span class="highlight">Nerd-first:</span> We're data people building for data-curious people. The product should feel like it was made by someone who actually goes to theme parks.</li>
+        <li><span class="highlight">Accessible intelligence:</span> Complex analytics, presented simply. A first-time Disney visitor should understand the output as easily as a statistics PhD.</li>
+        <li><span class="highlight">Independent:</span> Not owned by a park, not beholden to advertisers. Our only loyalty is to accuracy.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🎨 Brand Voice <span class="badge badge-nice">Define</span></h3>
+      <p>How Hazeydata sounds everywhere — website, social, emails, support.</p>
+      <ul>
+        <li><span class="highlight">Tone:</span> Warm but authoritative. Like a friend who happens to be a data scientist. Not corporate. Not cutesy.</li>
+        <li><span class="highlight">Voice examples:</span>
+          <ul>
+            <li>✅ "Magic Kingdom will be a 7/10 on Saturday. Here's why — and what to do about it."</li>
+            <li>✅ "Our model was wrong about Epcot last Tuesday. Here's what happened and how we're fixing it."</li>
+            <li>❌ "Leverage our cutting-edge analytics platform for optimal park experiences."</li>
+            <li>❌ "OMG you guys Disney is gonna be SO PACKED this weekend!! 🎢🎢🎢"</li>
+          </ul>
+        </li>
+        <li><span class="highlight">Personality:</span> The cool teacher who makes stats fun. Confident but approachable. Shows their work.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🌍 Data Ethics Framework <span class="badge badge-important">Important</span></h3>
+      <p>You're tracking how families travel. That comes with responsibility.</p>
+      <ul>
+        <li><span class="success">Minimize collection:</span> Only collect what you need. You don't need names, addresses, or children's ages to predict crowd levels.</li>
+        <li><span class="success">Anonymize everything:</span> User behavior data should be aggregated, never individual. No "user #4521 visited Disney on March 15."</li>
+        <li><span class="highlight">Transparency:</span> Publish your data practices. "Here's exactly what we collect and why." Make it readable, not legalese.</li>
+        <li><span class="highlight">No dark patterns:</span> No tricking people into paid tiers. No "your trip will be ruined without Pro!" fear-mongering. Let the data speak.</li>
+        <li><span class="warn">School schedule data:</span> This is about school systems, not individual students. Never collect or display data that could identify a specific school's students.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🌐 International Expansion Roadmap <span class="badge badge-nice">Long-Term</span></h3>
+      <p>Theme parks exist worldwide. The framework scales.</p>
+      <ul>
+        <li><span class="highlight">Phase 1 (Year 1):</span> US parks — Disney World, Disneyland, Universal Orlando, Universal Hollywood. Highest demand, English-speaking, most data available.</li>
+        <li><span class="highlight">Phase 2 (Year 2):</span> North America expansion — Six Flags, Cedar Fair, Busch Gardens, Canada's Wonderland, Knott's Berry Farm. Same methodology, just more parks.</li>
+        <li><span class="highlight">Phase 3 (Year 2-3):</span> International flagships — Disneyland Paris, Tokyo Disney, Universal Japan. Requires international school schedule data (harder but huge moat if achieved).</li>
+        <li><span class="warn">Phase 4 (Year 3+):</span> Global — Europa-Park, Efteling, Alton Towers, Lotte World. Long tail, but each park added deepens the data moat.</li>
+      </ul>
+      <div class="note">🔑 The ACCORD engine and school schedule methodology are the portable assets. Once proven for Florida, applying them to Paris or Tokyo is engineering work, not research work.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 11: ADVISORY -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🎓</span>
+    <h2>Advisory Board</h2>
+    <span class="desc">The humans whose brains you should borrow</span>
+  </div>
+
+  <div class="card-full">
+    <h3>🤝 Advisory Board — Build Relationships Before You Need Them</h3>
+    <p>You don't need a formal board yet. But start building relationships with people in these categories:</p>
+    <table class="tbl">
+      <tr><th>Role</th><th>Why You Need Them</th><th>Where to Find Them</th><th>How to Approach</th></tr>
+      <tr><td><strong>Theme Park Industry Insider</strong></td><td>Validate product direction, make introductions to parks</td><td>Former TouringPlans colleagues, theme park conference speakers, Disney/Universal alumni</td><td>Your TouringPlans background IS the introduction</td></tr>
+      <tr><td><strong>SaaS / Product Advisor</strong></td><td>Pricing strategy, conversion optimization, growth tactics</td><td>IndieHackers, MicroConf community, local startup events</td><td>"I'm a data scientist building a SaaS product. Could I buy you coffee and pick your brain?"</td></tr>
+      <tr><td><strong>Legal / IP Advisor</strong></td><td>Data rights, terms of service, compliance</td><td>Ottawa tech lawyers, Law Society of Ontario referral</td><td>One paid consultation → ongoing relationship</td></tr>
+      <tr><td><strong>Travel Industry Contact</strong></td><td>Distribution partnerships, market validation, B2B introductions</td><td>Travel agent associations, tourism conferences</td><td>Offer free data access in exchange for feedback</td></tr>
+      <tr><td><strong>AI / ML Practitioner</strong></td><td>Model validation, architecture review, keep up with tooling</td><td>Local ML meetups, Kaggle community, government data science colleagues</td><td>You ARE one — find a peer to bounce ideas off</td></tr>
+    </table>
+    <div class="note green-note">💡 The best advisors aren't "advisors" — they're people you'd call anyway because you respect their opinion. Start with one conversation. No formal agreements needed until you have revenue.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 12: BRAND GUIDELINES -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🎨</span>
+    <h2>Brand Guidelines</h2>
+    <span class="desc">Consistent brand = trust at scale</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🎨 Visual Identity <span class="badge badge-nice">Define with Pebbles</span></h3>
+      <ul>
+        <li><span class="highlight">Logo:</span> Primary, icon-only, dark/light variants. Pebbles to design. Must work at 16px (favicon) and 512px (social).</li>
+        <li><span class="highlight">Color palette:</span> Define primary, secondary, accent, success, warning, error colors. Document hex codes.</li>
+        <li><span class="highlight">Typography:</span> Heading font, body font, code font. Web-safe + fallbacks.</li>
+        <li><span class="highlight">Imagery style:</span> Data visualizations, not stock photos. Show the intelligence, not generic theme park images.</li>
+        <li><span class="highlight">Social templates:</span> Instagram post, Twitter card, Discord embed — all pre-designed for consistency.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📝 Content Guidelines <span class="badge badge-nice">Define with Betty</span></h3>
+      <ul>
+        <li><span class="highlight">Writing style:</span> AP style with exceptions (Oxford comma = yes. "Data" = singular. "Theme park" = two words.)</li>
+        <li><span class="highlight">Park naming:</span> "Walt Disney World" on first reference, "Disney World" thereafter. Never "WDW" in user-facing content.</li>
+        <li><span class="highlight">Numbers:</span> Always use specific numbers, not vague terms. "Crowd level 7/10" not "moderate crowds."</li>
+        <li><span class="highlight">Confidence language:</span> "We predict" (high confidence) vs. "We estimate" (medium) vs. "Early indications suggest" (low). Match language to model confidence.</li>
+        <li><span class="highlight">Social handles:</span> @hazeydata everywhere. Consistent. Already claimed?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 13: DOCUMENT MAP -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🗺️</span>
+    <h2>How This Connects to the Flintstones Framework</h2>
+    <span class="desc">Two halves of the same plan</span>
+  </div>
+
+  <div class="card-full">
+    <h3>📋 Document Architecture</h3>
+    <table class="tbl">
+      <tr><th>Document</th><th>Purpose</th><th>Covers</th></tr>
+      <tr><td><strong>Flintstones Framework v3.2</strong></td><td>How to BUILD</td><td>Org structure, QA system, idea cycle, team roles, metrics framework, hardware spec</td></tr>
+      <tr><td><strong>Business Framework v1.0</strong> (this document)</td><td>How to SURVIVE</td><td>Legal, financial, competitive, continuity, research, partnerships, scaling, culture</td></tr>
+      <tr><td><strong>TPCR-FRAMEWORK.md</strong> (next)</td><td>How to APPLY</td><td>Project-specific mapping of both frameworks to Theme Park Crowd Report's current state</td></tr>
+    </table>
+    <div class="note">Together, these three documents form the complete operating system for Hazeydata. The first two are the principles; the third is the practice.</div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  hazeydata.ai · Business Framework v1.0 · March 2026 · Design document — not yet implemented
+</div>
+
+</div><!-- /page -->
+
+<script>
+const HASH = '9b29d2247ed28ed22f1f1dbb7f40bfef';
+function md5(s){/* lightweight md5 */var a,b,c,d,e,f,g,h,i=function(a,b){return(a+b)&4294967295},j=function(a,b){return i(a<<b|a>>>32-b,0)};for(a=function(a){for(var b="",c=0;c<4;c++)b+=String.fromCharCode(a>>8*c&255);return b},b=function(a){for(var b=0,c=0;c<a.length;c++)b=i(b<<5,b)+a.charCodeAt(c);return b},s=function(a){for(var b=a.length,c=b+8>>6,d=new Array(16*(c+1)),e=0;e<16*(c+1);e++)d[e]=0;for(e=0;e<b;e++)d[e>>2]|=a.charCodeAt(e)<<8*(e%4);return d[e>>2]|=128<<8*(e%4),d[16*c+14]=8*b,d}(s),c=1732584193,d=-271733879,e=-1732584194,f=271733878,g=0;g<s.length;g+=16){var k=c,l=d,m=e,n=f;function o(a,b,g,h,k,l,m){return i(j(i(i(b,a),i(h,m)),l),g)}c=o(d&e|~d&f,c,d,s[g+0],7,-680876936),f=o(c&d|~c&e,f,c,s[g+1],12,-389564586),e=o(f&c|~f&d,e,f,s[g+2],17,606105819),d=o(e&f|~e&c,d,e,s[g+3],22,-1044525330),c=o(d&e|~d&f,c,d,s[g+4],7,-176418897),f=o(c&d|~c&e,f,c,s[g+5],12,1200080426),e=o(f&c|~f&d,e,f,s[g+6],17,-1473231341),d=o(e&f|~e&c,d,e,s[g+7],22,-45705983),c=o(d&e|~d&f,c,d,s[g+8],7,1770035416),f=o(c&d|~c&e,f,c,s[g+9],12,-1958414417),e=o(f&c|~f&d,e,f,s[g+10],17,-42063),d=o(e&f|~e&c,d,e,s[g+11],22,-1990404162),c=o(d&e|~d&f,c,d,s[g+12],7,1804603682),f=o(c&d|~c&e,f,c,s[g+13],12,-40341101),e=o(f&c|~f&d,e,f,s[g+14],17,-1502002290),d=o(e&f|~e&c,d,e,s[g+15],22,1236535329),c=o(d&f|e&~f,c,d,s[g+1],5,-165796510),f=o(c&e|d&~e,f,c,s[g+6],9,-1069501632),e=o(f&d|c&~d,e,f,s[g+11],14,643717713),d=o(e&c|f&~c,d,e,s[g+0],20,-373897302),c=o(d&f|e&~f,c,d,s[g+5],5,-701558691),f=o(c&e|d&~e,f,c,s[g+10],9,38016083),e=o(f&d|c&~d,e,f,s[g+15],14,-660478335),d=o(e&c|f&~c,d,e,s[g+4],20,-405537848),c=o(d&f|e&~f,c,d,s[g+9],5,568446438),f=o(c&e|d&~e,f,c,s[g+14],9,-1019803690),e=o(f&d|c&~d,e,f,s[g+3],14,-187363961),d=o(e&c|f&~c,d,e,s[g+8],20,1163531501),c=o(d&f|e&~f,c,d,s[g+13],5,-1444681467),f=o(c&e|d&~e,f,c,s[g+2],9,-51403784),e=o(f&d|c&~d,e,f,s[g+7],14,1735328473),d=o(e&c|f&~c,d,e,s[g+12],20,-1926607734),c=o(d^e^f,c,d,s[g+5],4,-378558),f=o(c^d^e,f,c,s[g+8],11,-2022574463),e=o(f^c^d,e,f,s[g+11],16,1839030562),d=o(e^f^c,d,e,s[g+14],23,-35309556),c=o(d^e^f,c,d,s[g+1],4,-1530992060),f=o(c^d^e,f,c,s[g+4],11,1272893353),e=o(f^c^d,e,f,s[g+7],16,-155497632),d=o(e^f^c,d,e,s[g+10],23,-1094730640),c=o(d^e^f,c,d,s[g+13],4,681279174),f=o(c^d^e,f,c,s[g+0],11,-358537222),e=o(f^c^d,e,f,s[g+3],16,-722521979),d=o(e^f^c,d,e,s[g+6],23,76029189),c=o(d^e^f,c,d,s[g+9],4,-640364487),f=o(c^d^e,f,c,s[g+12],11,-421815835),e=o(f^c^d,e,f,s[g+15],16,530742520),d=o(e^f^c,d,e,s[g+2],23,-995338651),c=o(e^(d|~f),c,d,s[g+0],6,-198630844),f=o(d^(c|~e),f,c,s[g+7],10,1126891415),e=o(c^(f|~d),e,f,s[g+14],15,-1416354905),d=o(f^(e|~c),d,e,s[g+5],21,-57434055),c=o(e^(d|~f),c,d,s[g+12],6,1700485571),f=o(d^(c|~e),f,c,s[g+3],10,-1894986606),e=o(c^(f|~d),e,f,s[g+10],15,-1051523),d=o(f^(e|~c),d,e,s[g+1],21,-2054922799),c=o(e^(d|~f),c,d,s[g+8],6,1873313359),f=o(d^(c|~e),f,c,s[g+15],10,-30611744),e=o(c^(f|~d),e,f,s[g+6],15,-1560198380),d=o(f^(e|~c),d,e,s[g+13],21,1309151649),c=o(e^(d|~f),c,d,s[g+4],6,-145523070),f=o(d^(c|~e),f,c,s[g+11],10,-1120210379),e=o(c^(f|~d),e,f,s[g+2],15,718787259),d=o(f^(e|~c),d,e,s[g+9],21,-343485551),c=i(c,k),d=i(d,l),e=i(e,m),f=i(f,n)}h="";for(g=0;g<4;g++)h+=a([c,d,e,f][g]);return h.split("").map(function(a){return("0"+a.charCodeAt(0).toString(16)).slice(-2)}).join("")}
+const pw=document.getElementById("pw"),err=document.getElementById("err");
+pw.addEventListener("keydown",function(e){
+  if(e.key==="Enter"){
+    if(md5(pw.value.toLowerCase().trim())===HASH){
+      document.getElementById("gate").classList.add("hidden");
+      document.getElementById("content").classList.add("visible");
+      sessionStorage.setItem("bf_auth","1");
+    } else { err.style.display="block"; pw.value=""; }
+  }
+});
+if(sessionStorage.getItem("bf_auth")==="1"){
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("content").classList.add("visible");
+}
+</script>
+</body>
+</html>
