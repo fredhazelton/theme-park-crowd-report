@@ -1,0 +1,12 @@
+[
+  {
+    "task_id": "test_fixture_fix_2026_03_16",
+    "date": "2026-03-16",
+    "description": "Fixed pytest fixture naming in test_entity_index.py - changed tmp_dir to tmp_path to match pytest conventions",
+    "files_changed": ["tests/test_entity_index.py"],
+    "maker": "bam-bam",
+    "checker": "pending",
+    "verdict": "pending_review",
+    "notes": "All 7 tests now pass. Fixed fixture naming issue that was preventing test execution."
+  }
+]

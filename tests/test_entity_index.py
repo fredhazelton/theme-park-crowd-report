@@ -87,12 +87,12 @@ def assert_true(condition, msg: str = ""):
 # TESTS
 # =============================================================================
 
-def test_index_creation(tmp_dir: Path, verbose: bool) -> bool:
+def test_index_creation(tmp_path: Path, verbose: bool = False) -> bool:
     """Test that index database is created with correct schema."""
     if verbose:
         print("Test 1: Index creation and schema")
     
-    index_db = tmp_dir / "entity_index.sqlite"
+    index_db = tmp_path / "entity_index.sqlite"
     
     # Ensure parent directory exists and is writable
     index_db.parent.mkdir(parents=True, exist_ok=True)
@@ -123,12 +123,12 @@ def test_index_creation(tmp_dir: Path, verbose: bool) -> bool:
     return True
 
 
-def test_index_update(tmp_dir: Path, verbose: bool) -> bool:
+def test_index_update(tmp_path: Path, verbose: bool = False) -> bool:
     """Test updating index from DataFrame."""
     if verbose:
         print("Test 2: Index update from DataFrame")
     
-    index_db = tmp_dir / "entity_index.sqlite"
+    index_db = tmp_path / "entity_index.sqlite"
     ensure_index_db(index_db)
     
     # Create test DataFrame
@@ -164,12 +164,12 @@ def test_index_update(tmp_dir: Path, verbose: bool) -> bool:
     return True
 
 
-def test_incremental_update(tmp_dir: Path, verbose: bool) -> bool:
+def test_incremental_update(tmp_path: Path, verbose: bool = False) -> bool:
     """Test that incremental updates work (updating existing entities)."""
     if verbose:
         print("Test 3: Incremental updates")
     
-    index_db = tmp_dir / "entity_index.sqlite"
+    index_db = tmp_path / "entity_index.sqlite"
     ensure_index_db(index_db)
     
     now = datetime.now(ZoneInfo("UTC"))
@@ -205,12 +205,12 @@ def test_incremental_update(tmp_dir: Path, verbose: bool) -> bool:
     return True
 
 
-def test_query_entities_needing_modeling(tmp_dir: Path, verbose: bool) -> bool:
+def test_query_entities_needing_modeling(tmp_path: Path, verbose: bool = False) -> bool:
     """Test querying entities that need re-modeling."""
     if verbose:
         print("Test 4: Query entities needing modeling")
     
-    index_db = tmp_dir / "entity_index.sqlite"
+    index_db = tmp_path / "entity_index.sqlite"
     ensure_index_db(index_db)
     
     now = datetime.now(ZoneInfo("UTC"))
@@ -246,14 +246,14 @@ def test_query_entities_needing_modeling(tmp_dir: Path, verbose: bool) -> bool:
     return True
 
 
-def test_load_entity_data(tmp_dir: Path, verbose: bool) -> bool:
+def test_load_entity_data(tmp_path: Path, verbose: bool = False) -> bool:
     """Test loading entity data from CSVs (selective reading)."""
     if verbose:
         print("Test 5: Load entity data (selective CSV reading)")
     
-    output_base = tmp_dir / "output"
+    output_base = tmp_path / "output"
     clean_dir = output_base / "fact_tables" / "clean"
-    index_db = tmp_dir / "entity_index.sqlite"
+    index_db = tmp_path / "entity_index.sqlite"
     ensure_index_db(index_db)
     
     # Create test CSVs for different parks
@@ -295,12 +295,12 @@ def test_load_entity_data(tmp_dir: Path, verbose: bool) -> bool:
     return True
 
 
-def test_mark_entity_modeled(tmp_dir: Path, verbose: bool) -> bool:
+def test_mark_entity_modeled(tmp_path: Path, verbose: bool = False) -> bool:
     """Test marking entity as modeled."""
     if verbose:
         print("Test 6: Mark entity as modeled")
     
-    index_db = tmp_dir / "entity_index.sqlite"
+    index_db = tmp_path / "entity_index.sqlite"
     ensure_index_db(index_db)
     
     now = datetime.now(ZoneInfo("UTC"))
@@ -334,12 +334,12 @@ def test_mark_entity_modeled(tmp_dir: Path, verbose: bool) -> bool:
     return True
 
 
-def test_min_age_hours_filter(tmp_dir: Path, verbose: bool) -> bool:
+def test_min_age_hours_filter(tmp_path: Path, verbose: bool = False) -> bool:
     """Test min_age_hours filter in query."""
     if verbose:
         print("Test 7: min_age_hours filter")
     
-    index_db = tmp_dir / "entity_index.sqlite"
+    index_db = tmp_path / "entity_index.sqlite"
     ensure_index_db(index_db)
     
     now = datetime.now(ZoneInfo("UTC"))
@@ -381,14 +381,14 @@ def main() -> None:
     if workspace_tmp.exists():
         shutil.rmtree(workspace_tmp, ignore_errors=True)
     workspace_tmp.mkdir(parents=True, exist_ok=True)
-    tmp_dir = workspace_tmp
+    tmp_path = workspace_tmp
     
     try:
         
         print("=" * 70)
         print("Entity Metadata Index Tests")
         print("=" * 70)
-        print(f"Temp directory: {tmp_dir}")
+        print(f"Temp directory: {tmp_path}")
         print()
         
         tests = [
@@ -408,7 +408,7 @@ def main() -> None:
             try:
                 if args.verbose:
                     print()
-                test_func(tmp_dir, args.verbose)
+                test_func(tmp_path, args.verbose)
                 passed += 1
                 if not args.verbose:
                     print(f"PASS: {test_name}")
