@@ -47,8 +47,20 @@ def add_utm(url: str, source: str = "twitter", medium: str = "social",
     separator = "&" if "?" in url else "?"
     return f"{url}{separator}{urlencode(params)}"
 
-# Articles to never ICYMI (too old, not evergreen, etc.)
-EXCLUDE_SLUGS = set()
+# Articles to never promote on @DisneyStatsWhiz (off-topic for theme parks)
+EXCLUDE_SLUGS = {
+    "why-canada-needs-a-digital-railway.html",
+}
+
+# Only promote articles that match theme park topics.
+# If an article slug contains any of these keywords, it's eligible.
+# Articles not matching are silently skipped.
+TPCR_KEYWORDS = {
+    "disney", "orlando", "epcot", "hollywood-studios", "animal-kingdom",
+    "magic-kingdom", "disneyland", "tokyo", "universal", "epic-universe",
+    "theme-park", "crowd", "wti", "wait-time", "spring-break", "memorial",
+    "thanksgiving", "christmas", "new-metric", "best-time", "survival",
+}
 
 # ── State Management ─────────────────────────────────────────────
 
@@ -109,6 +121,13 @@ def discover_articles() -> list[dict]:
             region = "general"
 
         is_weekly = "this-week" in html_file.name
+
+        # Skip non-TPCR articles (government, personal, etc.)
+        slug_lower = html_file.name.lower()
+        if slug_lower in EXCLUDE_SLUGS:
+            continue
+        if not any(kw in slug_lower for kw in TPCR_KEYWORDS):
+            continue
 
         articles.append({
             "filename": html_file.name,
