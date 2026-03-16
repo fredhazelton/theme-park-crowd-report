@@ -1,32 +1,88 @@
 {
-  "generated_at": "2026-03-14T17:00:46.338326-04:00",
-  "date": "2026-03-14",
+  "generated_at": "2026-03-15T13:00:04.588517-04:00",
+  "date": "2026-03-15",
   "categories": {
     "touringplans": {
-      "count": 4,
+      "count": 10,
       "items": [
+        {
+          "title": "It\u2019s Time to Raise the Curtain on the Muppet Show.. Eggs",
+          "url": "https://touringplans.com/blog/its-time-to-raise-the-curtain-on-the-muppet-show-eggs/",
+          "source": "TouringPlans",
+          "snippet": "Arguably the best Easter egg creation in the history of Walt Disney World is currently on display at the Contemporary...",
+          "published": "2026-03-15",
+          "relevant": true
+        },
+        {
+          "title": "Getting to Know \u2013 Halloween Horror Nights Premium Scream Night",
+          "url": "https://touringplans.com/blog/getting-to-know-halloween-horror-nights-premium-scream-night-draft/",
+          "source": "TouringPlans",
+          "snippet": "Happy Friday the 13th. What better way to celebrate this superstitious holiday than looking at Halloween Horror Nights&#8217; Premium Scream...",
+          "published": "2026-03-13",
+          "relevant": true
+        },
         {
           "title": "The Best Food from 2026 Disney California Adventure Food & Wine Festival",
           "url": "https://touringplans.com/blog/the-best-food-from-2026-disney-california-adventure-food-wine-festival/",
           "source": "TouringPlans",
+          "snippet": "Disney California Adventure&#8217;s Food &#38; Wine Festival 2026 is here, and with it comes eight food booths and several food...",
+          "published": "2026-03-13",
           "relevant": true
         },
         {
-          "title": "Vacation Planning Guide",
-          "url": "https://touringplans.com/blog/disney-world-vacation-trip-planning-guide/",
+          "title": "Disney Dining Plan Tips & Current Meal Photos",
+          "url": "https://touringplans.com/blog/disney-dining-plan-tips-current-meal-photos/",
           "source": "TouringPlans",
+          "snippet": "Now that Disney has released Free Dining for everyone, we&#8217;d like to share a few of our favorite tips for...",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Disney World Opening Dates Announced!",
+          "url": "https://touringplans.com/blog/disney-world-opening-dates-announced/",
+          "source": "TouringPlans",
+          "snippet": "Disney just announced SEVEN opening dates for new and refurbished attractions across all 4 parks! Hopefully you were planning a...",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Free Dining is Back!",
+          "url": "https://touringplans.com/blog/free-dining-is-back/",
+          "source": "TouringPlans",
+          "snippet": "Disney just released a new Free Dining Offer ! This time it&#8217;s for everyone! Offer Overview Enjoy a free dining...",
+          "published": "2026-03-12",
+          "relevant": true
+        },
+        {
+          "title": "Five \u201cFree\u201d Flower & Garden Festival Activities",
+          "url": "https://touringplans.com/blog/five-free-flower-garden-festival-activities/",
+          "source": "TouringPlans",
+          "snippet": "We still have 82 days of EPCOT&#8217;s Flower and Garden Festival left- lots of time to plan a visit! If...",
+          "published": "2026-03-11",
+          "relevant": true
+        },
+        {
+          "title": "Disney Data Dump March 11 2026",
+          "url": "https://touringplans.com/blog/disney-data-dump-march-11-2026/",
+          "source": "TouringPlans",
+          "snippet": "After a few weeks of winter wait time whiplash (holiday mash-ups, lingering long-weekend crowds, and the brief runDisney bump) the...",
+          "published": "2026-03-11",
+          "relevant": true
+        },
+        {
+          "title": "The SATURDAY SIX spends a day at SeaWorld\u2019s DISCOVERY COVE (and explains why YOU need to go!)",
+          "url": "https://touringplans.com/blog/the-saturday-six-spends-a-day-at-seaworlds-discovery-cove-and-explains-why-you-need-to-go/",
+          "source": "TouringPlans",
+          "snippet": "This week&#8217;s SATURDAY SIX checks off a major item on our theme park bucket list with a long awaited trip...",
+          "published": "2026-03-14",
           "relevant": false
         },
         {
-          "title": "Vacation Planning Guide",
-          "url": "https://touringplans.com/blog/universal-orlando-trip-planning-timeline/",
+          "title": "2026 Guide to Volcano Bay Nights",
+          "url": "https://touringplans.com/blog/2025-volcano-bay-nights-tickets-now-on-sale/",
           "source": "TouringPlans",
-          "relevant": false
-        },
-        {
-          "title": "Tips for Plus Size Guests",
-          "url": "https://touringplans.com/blog/tips-for-plus-size-guests-at-universal-orlando-resort/",
-          "source": "TouringPlans",
+          "snippet": "Enjoy exclusive Volcano Bay time under the stars with DJs and characters at Volcano Bay Nights! Find out all the...",
+          "published": "2026-03-10",
           "relevant": false
         }
       ]
@@ -40,27 +96,167 @@
       "items": []
     },
     "theme_park_news": {
-      "count": 4,
+      "count": 20,
       "items": [
         {
-          "title": "All Hallows Eve: The Lost Emporium Store Now Open in Universal Orlando, Includes DINOSAUR Reference",
-          "url": "https://wdwnt.com/2026/03/all-hallows-eve-the-lost-emporium-store-now-open-in-universal-orlando-includes-dinosaur-reference/",
-          "source": "WDWNT"
+          "title": "Chenille Figment Character Sweatshirt Arrives at EPCOT",
+          "url": "https://wdwnt.com/2026/03/new-figment-character-sweatshirt-arrives-at-epcot/",
+          "source": "WDWNT",
+          "snippet": " Figment fans rejoice \u2013 a brand new sweatshirt featuring our favorite purple dragon has dropped at Walt Disney World Resort. Figment Character Portrait Sweatershirt \u2013 $64.99 This new top, starring Fig",
+          "published": "2026-03-15",
+          "relevant": true
         },
         {
-          "title": "\u2018Monsters, Inc.\u2019 Coaster Construction Continues with More Concrete & Conduits at Walt Disney World",
-          "url": "https://wdwnt.com/2026/03/monsters-inc-coaster-construction-continues-with-more-concrete-conduits-at-walt-disney-world/",
-          "source": "WDWNT"
+          "title": "Disney World Teases Muppets Rock \u2018n\u2019 Roller Coaster Announcement Coming Soon",
+          "url": "https://blogmickey.com/2026/03/disney-world-teases-muppets-rock-n-roller-coaster-announcement-coming-soon/",
+          "source": "BlogMickey",
+          "snippet": "As part of the recent Cool Kids Summer promotional push, Walt Disney World announced a number of opening dates for attractions and experiences. Most notable was the announcement that Buzz Lightyear&#8",
+          "published": "2026-03-14",
+          "relevant": true
         },
         {
-          "title": "Garden Grove Launches Disneyland Resort Shuttle Service to Replace ART Buses",
-          "url": "https://wdwnt.com/2026/03/garden-grove-launches-disneyland-resort-shuttle-service-to-replace-art-buses/",
-          "source": "WDWNT"
+          "title": "Disneyland Hosts Annual Cast Service Celebration",
+          "url": "https://www.laughingplace.com/disney-parks/disneyland-cast-service-celebration-2025/",
+          "source": "Laughing Place",
+          "snippet": "Disneyland recently honored some of their Cast Members, thanking them for their lengthy terms of service across the Disneyland Resort. What's Happening: Each year, both Walt Disney World and the Disne",
+          "published": "2026-03-14",
+          "relevant": true
         },
         {
-          "title": "Princess Cavalcade Debuting at Disney Adventure World in Disneyland Paris",
-          "url": "https://wdwnt.com/2026/03/princess-cavalcade-debuting-at-disney-adventure-world-in-disneyland-paris/",
-          "source": "WDWNT"
+          "title": "Disneyland Paris Hits Capacity 14 Days Before 2nd Park Closure",
+          "url": "https://insidethemagic.net/2026/03/disneyland-paris-hits-capacity-14-days-before-2nd-park-closure-ad1/",
+          "source": "Inside the Magic",
+          "snippet": " There is a particular kind of anticipation that builds around a theme park opening that has been years in the making. Construction walls go up, concept art gets released, social media accounts post p",
+          "published": "2026-03-15",
+          "relevant": true
+        },
+        {
+          "title": "\u2018Sesame Street\u2019 owner sues to end SeaWorld contract",
+          "url": "https://www.themeparktribune.com/sesame-street-owner-sues-to-end-seaworld-contract/",
+          "source": "Theme Park Tribune",
+          "snippet": "    Sesame Workshop alleges that SeaWorld's parent company has violated their contract by refusing to pay outstanding royalties.  \n The post  \u2018Sesame Street\u2019 owner sues to end SeaWorld contract  appea",
+          "published": "2026-03-13",
+          "relevant": true
+        },
+        {
+          "title": "Best & Worst Weeks to Visit Disney World in 2026 & 2027",
+          "url": "https://www.disneytouristblog.com/best-worst-weeks-disney-world-crowd-calendar/",
+          "source": "Disney Tourist Blog",
+          "snippet": " Picking the best week for your Walt Disney World trip is challenging, especially when dates are limited due to school breaks or work schedules. This guide shares our favorite times to visit and worst",
+          "published": "2026-03-14",
+          "relevant": true
+        },
+        {
+          "title": "It\u2019s Time to Raise the Curtain on the Muppet Show.. Eggs",
+          "url": "https://touringplans.com/blog/its-time-to-raise-the-curtain-on-the-muppet-show-eggs/",
+          "source": "TouringPlans Blog",
+          "snippet": "Arguably the best Easter egg creation in the history of Walt Disney World is currently on display at the Contemporary...",
+          "published": "2026-03-15",
+          "relevant": true
+        },
+        {
+          "title": "Natacha Rafalski, President of Disneyland Paris Talks Emotion and Storytelling in Disney Adventure World Interview",
+          "url": "https://wdwnt.com/2026/03/natacha-rafalski-president-of-disneyland-paris-talks-emotion-and-storytelling-in-disney-adventure-world-interview/",
+          "source": "WDWNT",
+          "snippet": " Walt Disney Studios Park is set to become Disney Adventure World on March 29 at Disneyland Paris. With it, comes the opening of World of Frozen, a walk, talking Olaf animatronic, a Rapunzel Spin Ride",
+          "published": "2026-03-15",
+          "relevant": true
+        },
+        {
+          "title": "Universal Creates Permanent Fireworks Launch Site for Epic Universe",
+          "url": "https://blogmickey.com/2026/03/permanent-fireworks-launch-site-epic-universe/",
+          "source": "BlogMickey",
+          "snippet": "Over the last year or so, Universal has been constructing a permanent fireworks launch site for its Epic Universe theme park. While Epic Universe doesn&#8217;t currently have a nightly fireworks show,",
+          "published": "2026-03-14",
+          "relevant": true
+        },
+        {
+          "title": "Marvel Games' Danny Koo on Choosing the Next Characters for \"Marvel Rivals\" and Navigating Different Power Sets",
+          "url": "https://www.laughingplace.com/entertainment/marvel-rivals-interview-danny-koo-characters/",
+          "source": "Laughing Place",
+          "snippet": "Recently in Hollywood, a jam-packed event was held at the El Capitan Theatre to celebrate Marvel Rivals, with the fans in attendance proving just how much they have embraced this game in the two years",
+          "published": "2026-03-14",
+          "relevant": true
+        },
+        {
+          "title": "Two Fires Reported at Disney World\u2019s Outdoor Mall on March 15",
+          "url": "https://insidethemagic.net/2026/03/disney-springs-fires-sunday-march-15-2026-jc1/",
+          "source": "Inside the Magic",
+          "snippet": " On Sunday morning, law enforcement responded to two separate reports of a fire at Disney Springs, Walt Disney World Resort&#8216;s shopping, dining, and entertainment complex. Here&#8217;s everything",
+          "published": "2026-03-15",
+          "relevant": true
+        },
+        {
+          "title": "\u2018Sailor Moon\u2019 coming to Universal Fan Fest Nights",
+          "url": "https://www.themeparktribune.com/sailor-moon-coming-to-universal-fan-fest-nights/",
+          "source": "Theme Park Tribune",
+          "snippet": "    Universal Hollywood's Fan Fest Nights is importing a \"Sailor Moon\" short film first shown at Universal Japan.  \n The post  \u2018Sailor Moon\u2019 coming to Universal Fan Fest Nights  appeared first on  The",
+          "published": "2026-03-13",
+          "relevant": true
+        },
+        {
+          "title": "Hotels to Disneyland Parks Bus Shuttle Shutting Down",
+          "url": "https://www.disneytouristblog.com/disneyland-parks-hotel-bus-shuttle-ending-service/",
+          "source": "Disney Tourist Blog",
+          "snippet": " Stop me if you&#8217;ve heard this one before: a bus service that offers convenient transportation for millions of riders each year between the Disney Parks and area hotels in will abruptly end servi",
+          "published": "2026-03-14",
+          "relevant": true
+        },
+        {
+          "title": "The SATURDAY SIX spends a day at SeaWorld\u2019s DISCOVERY COVE (and explains why YOU need to go!)",
+          "url": "https://touringplans.com/blog/the-saturday-six-spends-a-day-at-seaworlds-discovery-cove-and-explains-why-you-need-to-go/",
+          "source": "TouringPlans Blog",
+          "snippet": "This week&#8217;s SATURDAY SIX checks off a major item on our theme park bucket list with a long awaited trip...",
+          "published": "2026-03-14",
+          "relevant": true
+        },
+        {
+          "title": "Disney Ducks Now Available as Keychains at Walt Disney World Resort",
+          "url": "https://wdwnt.com/2026/03/disney-ducks-now-available-as-keychains-at-walt-disney-world-resort/",
+          "source": "WDWNT",
+          "snippet": " The popular Disney rubber ducks inspired Mickey, Pooh, Stitch, and more now come in a portable plush keychain form. Disney Duck Favorites Now Available as Keychains Collectors of the ever-popular Dis",
+          "published": "2026-03-15",
+          "relevant": true
+        },
+        {
+          "title": "Disney Princesses Cavalcade Coming to Disney Adventure World This Summer",
+          "url": "https://blogmickey.com/2026/03/disney-princesses-cavalcade-coming-to-disney-adventure-world-this-summer/",
+          "source": "BlogMickey",
+          "snippet": "Disneyland Paris has announced a new cavalcade will be rolling down Adventure Way this Summer as part of the Disney Adventure World expansion. As you may know, the Walt Disney Studios Park is being re",
+          "published": "2026-03-14",
+          "relevant": true
+        },
+        {
+          "title": "Disney Consumer Products on Fandom, Gaming, and the Future of Cultural Relevance at SXSW",
+          "url": "https://www.laughingplace.com/disney-merchandise/disney-consumer-products-sxsw-2026/",
+          "source": "Laughing Place",
+          "snippet": "\"Long after the details fade, those feelings are still with you,\" said Tasia Filippatos, President of Disney Consumer Products, opening her featured session at SXSW in Austin, Texas. \"Disney is person",
+          "published": "2026-03-13",
+          "relevant": true
+        },
+        {
+          "title": "Disney Vacations Could Cost $3,000+ More as Flight Prices Surge 58%",
+          "url": "https://insidethemagic.net/2026/03/disney-vacations-could-cost-3000-more-as-flight-prices-surge-58-ad1/",
+          "source": "Inside the Magic",
+          "snippet": " Planning a Walt Disney World trip has always required a spreadsheet and a little courage. Between park tickets, hotel rooms, Lightning Lane passes, food, and souvenirs, families have long understood ",
+          "published": "2026-03-15",
+          "relevant": true
+        },
+        {
+          "title": "Florida Reports Record 143 Million Visitors & Orlando Airport Hits 58 Million, as Disney World Drops",
+          "url": "https://www.disneytouristblog.com/florida-reports-record-143-million-visitors-orlando-airport-hits-58-million-as-disney-world-drops/",
+          "source": "Disney Tourist Blog",
+          "snippet": " Orlando Airport and Visit Florida recently published their stats for the last calendar year, with both reporting strong despite decreases in international travelers and at Walt Disney World. Here&#82",
+          "published": "2026-03-14",
+          "relevant": true
+        },
+        {
+          "title": "The Best Food from 2026 Disney California Adventure Food & Wine Festival",
+          "url": "https://touringplans.com/blog/the-best-food-from-2026-disney-california-adventure-food-wine-festival/",
+          "source": "TouringPlans Blog",
+          "snippet": "Disney California Adventure&#8217;s Food &#38; Wine Festival 2026 is here, and with it comes eight food booths and several food...",
+          "published": "2026-03-13",
+          "relevant": true
         }
       ]
     },
@@ -72,17 +268,17 @@
           "url": "https://www.reddit.com/r/Disneyland/comments/1rtc19o/is_disneyland_breaking_down/",
           "source": "Reddit r/Disneyland",
           "query": "subreddit_browse",
-          "score": 330,
-          "comments": 170,
+          "score": 486,
+          "comments": 222,
           "relevant": true
         },
         {
-          "title": "All of this for a 60 second ride?! No thanks. Tron is awesome but not work a 2 Hour and 15 minute wait\u2026",
-          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rt7lxu/all_of_this_for_a_60_second_ride_no_thanks_tron/",
+          "title": "Bad experiences as a single rider on Ratatouille?",
+          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rubjw4/bad_experiences_as_a_single_rider_on_ratatouille/",
           "source": "Reddit r/WaltDisneyWorld",
           "query": "subreddit_browse",
-          "score": 205,
-          "comments": 90,
+          "score": 314,
+          "comments": 273,
           "relevant": true
         },
         {
@@ -90,8 +286,8 @@
           "url": "https://www.reddit.com/r/Disneyland/comments/1rto6rh/disney_making_sweeping_ride_closure_plan_changes/",
           "source": "Reddit r/Disneyland",
           "query": "subreddit_browse",
-          "score": 156,
-          "comments": 38,
+          "score": 246,
+          "comments": 54,
           "relevant": true
         },
         {
@@ -99,17 +295,8 @@
           "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rtiowj/spring_break_at_ioa/",
           "source": "Reddit r/UniversalOrlando",
           "query": "subreddit_browse",
-          "score": 50,
-          "comments": 27,
-          "relevant": true
-        },
-        {
-          "title": "Update: I stopped doomscrolling the breakdown posts, and had one of my smoothest Disneyland days in a while",
-          "url": "https://www.reddit.com/r/Disneyland/comments/1rtjafv/update_i_stopped_doomscrolling_the_breakdown/",
-          "source": "Reddit r/Disneyland",
-          "query": "subreddit_browse",
-          "score": 47,
-          "comments": 4,
+          "score": 73,
+          "comments": 29,
           "relevant": true
         },
         {
@@ -117,8 +304,8 @@
           "url": "https://www.reddit.com/r/universalstudios/comments/1rst2tr/toothless_sweater_at_universal_studios_hollywood/",
           "source": "Reddit r/UniversalStudios",
           "query": "subreddit_browse",
-          "score": 16,
-          "comments": 0,
+          "score": 19,
+          "comments": 2,
           "relevant": true
         },
         {
@@ -126,8 +313,26 @@
           "url": "https://www.reddit.com/r/universalstudios/comments/1rts8ap/looking_for_a_buddy_to_go_to_epic_universe_in/",
           "source": "Reddit r/UniversalStudios",
           "query": "subreddit_browse",
-          "score": 4,
+          "score": 10,
           "comments": 0,
+          "relevant": true
+        },
+        {
+          "title": "It happened again! Single rider in Ministry",
+          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1ruhpg6/it_happened_again_single_rider_in_ministry/",
+          "source": "Reddit r/UniversalOrlando",
+          "query": "subreddit_browse",
+          "score": 2,
+          "comments": 2,
+          "relevant": true
+        },
+        {
+          "title": "Frustrated but Staying Positive",
+          "url": "https://www.reddit.com/r/UniversalOrlando/comments/1rugi3y/frustrated_but_staying_positive/",
+          "source": "Reddit r/UniversalOrlando",
+          "query": "subreddit_browse",
+          "score": 1,
+          "comments": 27,
           "relevant": true
         },
         {
@@ -140,21 +345,21 @@
           "relevant": true
         },
         {
-          "title": "Prices",
-          "url": "https://www.reddit.com/r/universalstudios/comments/1rt390x/prices/",
-          "source": "Reddit r/UniversalStudios",
+          "title": "Arriving post rope drop",
+          "url": "https://www.reddit.com/r/DisneyPlanning/comments/1ruick6/arriving_post_rope_drop/",
+          "source": "Reddit r/DisneyPlanning",
           "query": "subreddit_browse",
           "score": 0,
-          "comments": 8,
+          "comments": 4,
           "relevant": true
         },
         {
-          "title": "6 years ago today. What a crazy time.",
-          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rt1qyd/6_years_ago_today_what_a_crazy_time/",
-          "source": "Reddit r/WaltDisneyWorld",
+          "title": "It was also the last day we could visit Disneyland without a reservation",
+          "url": "https://www.reddit.com/r/Disneyland/comments/1rta68o/it_was_also_the_last_day_we_could_visit/",
+          "source": "Reddit r/Disneyland",
           "query": "subreddit_browse",
-          "score": 2133,
-          "comments": 172,
+          "score": 1985,
+          "comments": 62,
           "relevant": false
         },
         {
@@ -162,7 +367,7 @@
           "url": "https://www.reddit.com/r/Conservative/comments/1ro4c85/two_men_throw_incendiary_devices_into_nyc_crowd/",
           "source": "Reddit r/Conservative",
           "query": "hazeydata",
-          "score": 1588,
+          "score": 1596,
           "comments": 217
         },
         {
@@ -170,17 +375,17 @@
           "url": "https://www.reddit.com/r/Disneyland/comments/1rt54xt/pop_culture_landfill/",
           "source": "Reddit r/Disneyland",
           "query": "subreddit_browse",
-          "score": 1126,
-          "comments": 100,
+          "score": 1357,
+          "comments": 118,
           "relevant": false
         },
         {
-          "title": "It was also the last day we could visit Disneyland without a reservation",
-          "url": "https://www.reddit.com/r/Disneyland/comments/1rta68o/it_was_also_the_last_day_we_could_visit/",
-          "source": "Reddit r/Disneyland",
+          "title": "Norway is such an awesome pavilion \ud83c\uddf3\ud83c\uddf4",
+          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rtoyeo/norway_is_such_an_awesome_pavilion/",
+          "source": "Reddit r/WaltDisneyWorld",
           "query": "subreddit_browse",
-          "score": 1041,
-          "comments": 44,
+          "score": 861,
+          "comments": 19,
           "relevant": false
         },
         {
@@ -188,17 +393,8 @@
           "url": "https://www.reddit.com/r/disneyparks/comments/1rs9xuj/so_excited_for_this/",
           "source": "Reddit r/disneyparks",
           "query": "subreddit_browse",
-          "score": 786,
-          "comments": 27,
-          "relevant": false
-        },
-        {
-          "title": "Lights of the Boardwalk reflecting off Crescent Lake",
-          "url": "https://www.reddit.com/r/WaltDisneyWorld/comments/1rsqlgs/lights_of_the_boardwalk_reflecting_off_crescent/",
-          "source": "Reddit r/WaltDisneyWorld",
-          "query": "subreddit_browse",
-          "score": 739,
-          "comments": 15,
+          "score": 847,
+          "comments": 29,
           "relevant": false
         }
       ]
@@ -208,5 +404,5 @@
       "items": []
     }
   },
-  "total_items": 23
+  "total_items": 45
 }

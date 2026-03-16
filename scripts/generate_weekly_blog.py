@@ -23,7 +23,7 @@ import duckdb
 # ── Config ────────────────────────────────────────────────────────────────────
 
 DUCKDB_PATH = "/home/wilma/hazeydata/pipeline/tpcr_live.duckdb"
-BLOG_DIR = Path("/home/wilma/hazeydata.ai/blog")
+BLOG_DIR = Path("/home/wilma/hazeydata.ai/theme-park-crowd-report/blog")
 BLOG_INDEX = BLOG_DIR / "index.html"
 HAZEYDATA_REPO = Path("/home/wilma/hazeydata.ai")
 
@@ -66,7 +66,7 @@ REGION_CONFIG = {
         "meta_tags": ["Weekly Outlook", "WTI"],
         "region_tags": ["Orlando"],
         "description_template": "Your data-driven guide to Orlando theme park crowds for {date_range}. Park-by-park WTI forecasts, best days to visit, and practical advice.",
-        "author_sig": 'Written by the <a href="https://hazeydata.ai">Theme Park Crowd Report</a> team — data-driven crowd forecasts for 12 parks across Walt Disney World, Universal Orlando, and more.',
+        "author_sig": 'Written by the <a href="https://hazeydata.ai/theme-park-crowd-report/">Theme Park Crowd Report</a> team — data-driven crowd forecasts for 12 parks across Walt Disney World, Universal Orlando, and more.',
     },
     "disneyland": {
         "parks": ["DL", "CA", "UH"],
@@ -75,7 +75,7 @@ REGION_CONFIG = {
         "meta_tags": ["Weekly Outlook", "WTI"],
         "region_tags": ["Disneyland", "Southern California"],
         "description_template": "Your data-driven guide to Disneyland and Southern California theme park crowds for {date_range}. Park-by-park WTI forecasts, best days to visit, and practical advice.",
-        "author_sig": 'Written by the <a href="https://hazeydata.ai">Theme Park Crowd Report</a> team — data-driven crowd forecasts covering Disneyland Resort and Universal Studios Hollywood.',
+        "author_sig": 'Written by the <a href="https://hazeydata.ai/theme-park-crowd-report/">Theme Park Crowd Report</a> team — data-driven crowd forecasts covering Disneyland Resort and Universal Studios Hollywood.',
     },
     "tokyo": {
         "parks": ["TDL", "TDS"],
@@ -84,7 +84,7 @@ REGION_CONFIG = {
         "meta_tags": ["Weekly Outlook", "WTI"],
         "region_tags": ["Tokyo Disney Resort", "Japan"],
         "description_template": "Your data-driven guide to Tokyo Disney Resort crowds for {date_range}. Park-by-park WTI forecasts, best days to visit, and practical advice.",
-        "author_sig": 'Written by the <a href="https://hazeydata.ai">Theme Park Crowd Report</a> team — data-driven crowd forecasts for 12 parks worldwide, including Tokyo Disney Resort.',
+        "author_sig": 'Written by the <a href="https://hazeydata.ai/theme-park-crowd-report/">Theme Park Crowd Report</a> team — data-driven crowd forecasts for 12 parks worldwide, including Tokyo Disney Resort.',
     },
 }
 
@@ -763,7 +763,7 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
     meta_date = format_date_short(start_date)
     slug = f"{region}-this-week-{slug_date(start_date)}"
     filename = f"{slug}.html"
-    url = f"https://hazeydata.ai/blog/{filename}"
+    url = f"https://hazeydata.ai/theme-park-crowd-report/blog/{filename}"
     description = config["description_template"].format(date_range=date_range)
     cache_bust = start_date.strftime("%Y%m%d")
 
@@ -865,7 +865,7 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
             </button>
             <div class="nav-links">
                 <a href="/">Home</a>
-                <a href="/blog/">Blog</a>
+                <a href="/theme-park-crowd-report/blog/">Blog</a>
                 <a href="https://discord.gg/2Estr7sbP7" class="btn btn-sm" target="_blank">Join Discord</a>
             </div>
         </nav>
@@ -876,7 +876,7 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
     </section>
 
     <div class="blog-container">
-        <a href="/blog/" class="blog-back">← All posts</a>
+        <a href="/theme-park-crowd-report/blog/" class="blog-back">← All posts</a>
 
         <article class="blog-post">
             <div class="blog-post-meta">
@@ -899,8 +899,8 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
             </div>
             <div class="footer-links">
                 <a href="/">Home</a>
-                <a href="/blog/">Blog</a>
-                <a href="/bio.html">About</a>
+                <a href="/theme-park-crowd-report/blog/">Blog</a>
+                <a href="/theme-park-crowd-report/bio.html">About</a>
                 <a href="https://discord.gg/2Estr7sbP7" target="_blank">Discord</a>
                 <a href="https://twitter.com/disneystatswhiz" target="_blank">Twitter</a>
                 <a href="mailto:fred@hazeydata.ai">Contact</a>
@@ -918,7 +918,7 @@ def _generate_nav_html(prev_post: dict = None, next_post: dict = None) -> str:
     parts.append('        <div class="blog-nav-arrows">')
 
     if prev_post:
-        parts.append(f"""            <a href="/blog/{prev_post['filename']}" class="blog-nav-prev">
+        parts.append(f"""            <a href="/theme-park-crowd-report/blog/{prev_post['filename']}" class="blog-nav-prev">
                 <span class="blog-nav-label">Previous</span>
                 <span class="blog-nav-title">← {prev_post['short_title']}</span>
             </a>""")
@@ -926,7 +926,7 @@ def _generate_nav_html(prev_post: dict = None, next_post: dict = None) -> str:
         parts.append("            <div></div>")
 
     if next_post:
-        parts.append(f"""            <a href="/blog/{next_post['filename']}" class="blog-nav-next">
+        parts.append(f"""            <a href="/theme-park-crowd-report/blog/{next_post['filename']}" class="blog-nav-next">
                 <span class="blog-nav-label">Next</span>
                 <span class="blog-nav-title">{next_post['short_title']} →</span>
             </a>""")
@@ -947,7 +947,7 @@ def find_previous_post() -> dict:
     content = BLOG_INDEX.read_text()
 
     # Find the first blog-card link
-    match = re.search(r'<a href="/blog/([^"]+)" class="blog-card">', content)
+    match = re.search(r'<a href="/theme-park-crowd-report/blog/([^"]+)" class="blog-card">', content)
     if not match:
         return None
 
@@ -955,7 +955,7 @@ def find_previous_post() -> dict:
 
     # Extract the title from the h3 inside that card
     card_match = re.search(
-        r'<a href="/blog/' + re.escape(filename) + r'"[^>]*>.*?<h3>(.*?)</h3>',
+        r'<a href="/theme-park-crowd-report/blog/' + re.escape(filename) + r'"[^>]*>.*?<h3>(.*?)</h3>',
         content,
         re.DOTALL,
     )
@@ -993,7 +993,7 @@ def update_blog_index(region: str, start_date: datetime.date, end_date: datetime
     tags_html = "\n                    ".join(f'<span class="tag">{t}</span>' for t in all_tags)
 
     new_card = f"""            <!-- Article — {title} -->
-            <a href="/blog/{filename}" class="blog-card">
+            <a href="/theme-park-crowd-report/blog/{filename}" class="blog-card">
                 <div class="blog-card-meta">
                     <span>{meta_date}</span>
                     {tags_html}
@@ -1050,7 +1050,7 @@ def update_previous_post_nav(prev_filename: str, new_filename: str, new_short_ti
         return content
 
     # Replace the empty <div></div> at the end with a next link
-    next_link = f"""<a href="/blog/{new_filename}" class="blog-nav-next">
+    next_link = f"""<a href="/theme-park-crowd-report/blog/{new_filename}" class="blog-nav-next">
                 <span class="blog-nav-label">Next</span>
                 <span class="blog-nav-title">{new_short_title} →</span>
             </a>"""

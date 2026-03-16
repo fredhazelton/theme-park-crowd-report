@@ -862,7 +862,7 @@ async def crowd_command(interaction: discord.Interaction, park: str, date: str =
     
     embed = discord.Embed(
         title=f"{wti_emoji(wti_score)} {park_full} — {target_date.strftime('%b %d')}",
-        url=f"https://hazeydata.ai/year-view?park={park_code}",
+        url=f"https://hazeydata.ai/theme-park-crowd-report/year-view?park={park_code}",
         description=f"**{wti_label(wti_score, park_code)}.** WTI {wti_score:.0f} — expect {int(wti_score*0.7)}-{int(wti_score*1.2)} min on headliners.",
         color=get_embed_color(wti_score),
     )
@@ -1118,7 +1118,7 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
             tip = f"💡 Best day: {best['date'].strftime('%A %b %d')} — {wti_label(best['wti_avg'], park_code).lower()}"
             embed = discord.Embed(
                 title=f"📅 {park_full} — Next {timeframe} Days",
-                url=f"https://hazeydata.ai/year-view?park={park_code}",
+                url=f"https://hazeydata.ai/theme-park-crowd-report/year-view?park={park_code}",
                 color=get_embed_color(best["wti_avg"]),
             )
             embed.set_image(url="attachment://calendar.png")
@@ -1157,7 +1157,7 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
     if timeframe < 90:
         embed = discord.Embed(
             title=f"📅 {park_full} — Next {timeframe} Days",
-            url=f"https://hazeydata.ai/year-view?park={park_code}",
+            url=f"https://hazeydata.ai/theme-park-crowd-report/year-view?park={park_code}",
             description=description,
             color=get_embed_color(best["wti_avg"]),
         )
@@ -1241,7 +1241,7 @@ async def today_command(interaction: discord.Interaction):
 
     embed = discord.Embed(
         title=f"\U0001f3f0 All Parks \u2014 {date_display}",
-        url="https://hazeydata.ai",
+        url="https://hazeydata.ai/theme-park-crowd-report/",
         description="\n\n".join(desc_parts),
         color=0x0A2F8F,
     )
@@ -1299,7 +1299,7 @@ async def now_command(interaction: discord.Interaction, park: str):
 
     embed = discord.Embed(
         title=f"\u23f1\ufe0f {park_full}{wti_str}",
-        url=f"https://hazeydata.ai/year-view?park={park_code}",
+        url=f"https://hazeydata.ai/theme-park-crowd-report/year-view?park={park_code}",
         color=0x0A2F8F,
     )
 
@@ -1494,7 +1494,7 @@ async def about_command(interaction: discord.Interaction):
             "[Thrill-Data](https://www.thrill-data.com)!\n\n"
             f"{THIN_LINE}\n\n"
             "\n"
-            "🌐 [hazeydata.ai](https://hazeydata.ai) — year-view heatmaps, park forecasts, everything in one place"
+            "🌐 [hazeydata.ai](https://hazeydata.ai/theme-park-crowd-report/) — year-view heatmaps, park forecasts, everything in one place"
         ),
         color=0x0A2F8F,
     )

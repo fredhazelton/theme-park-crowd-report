@@ -26,7 +26,7 @@ Examples for Fred's Reddit comments:
 import sys
 from urllib.parse import urlencode
 
-BASE = "https://hazeydata.ai"
+BASE = "https://hazeydata.ai/theme-park-crowd-report"
 
 PRESETS = {
     "reddit": {"source": "reddit", "medium": "organic", "campaign": "disneystatswhiz"},

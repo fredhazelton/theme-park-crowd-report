@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 WTI_PATH = "/home/wilma/hazeydata/pipeline/wti/wti.parquet"
 FORECAST_PATH = "/mnt/data/pipeline/curves/forecast_parquet/all_forecasts.parquet"
 DIMENTITY_PATH = "/mnt/data/pipeline/dimension_tables/dimentity.csv"
-OUTPUT_DIR = Path("/home/wilma/hazeydata.ai/year-view-data")
+OUTPUT_DIR = Path("/home/wilma/hazeydata.ai/theme-park-crowd-report/year-view-data")
 
 PARK_NAMES = {
     "MK": "Magic Kingdom",
