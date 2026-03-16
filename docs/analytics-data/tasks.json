@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-03-15T14:40:17",
+  "generated_at": "2026-03-16T11:30:52",
   "summary": {
-    "total": 96,
-    "this_week": 96,
+    "total": 97,
+    "this_week": 97,
     "in_progress": 4,
     "completed_this_week": 0,
     "pct_complete": 0
@@ -630,13 +630,13 @@
       "description": "Add a /heatmap slash command that generates an actual image showing WTI heat map for custom date ranges. Users already asking for this via /ask.",
       "status": "todo",
       "column": "backlog",
-      "priority": "low",
-      "owner": "Bam-Bam",
+      "priority": "medium",
+      "owner": "Wilma",
       "project": "Discord Bot",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-12T02:30:00",
-      "notes": "Fred noticed users requesting heat maps via /ask. More shareable than text tables. Source: #discord-bot. [Dino 2026-03-12] User-requested feature \u2014 good for engagement. Due date added."
+      "updated": "2026-03-16T11:30:00",
+      "notes": "Fred noticed users requesting heat maps via /ask. More shareable than text tables. [Dino 2026-03-16] REASSIGNED: Bam-Bam\u2192Wilma after 6 days inactive. Priority bumped medium for user engagement value."
     },
     {
       "id": "task-046",
@@ -978,15 +978,15 @@
       "id": "task-062",
       "title": "CDR User-Facing Slide Deck \u2014 simple explainer for end users",
       "description": "",
-      "status": "todo",
+      "status": "backlog",
       "column": "backlog",
       "priority": "medium",
       "owner": "Betty",
       "project": "CDR",
       "is_recurring": false,
       "created": "2026-03-14T14:57:00",
-      "updated": "2026-03-14T15:00:00",
-      "notes": "Create a simplified, user-friendly slide deck about the Canadian Digital Railway \u2014 what it is, how it works, and what a user/community would actually do. Target audience: non-technical (municipal leaders, hospital admins, Indigenous community leaders, university deans).\n\nCONTEXT & INSPIRATION:\n- Existing pitch deck (full technical/vision): ~/clawd/projects/cdr-scripts/cdr-pitch.html (1712-line HTML slide deck, bilingual EN/FR, railway-inspired design system)\n- Presenter script: ~/clawd/projects/cdr-scripts/script-en.md (slide-by-slide talking points)\n- Vision document: ~/clawd/memory/canadian-digital-railway.md (architecture, pricing, governance, competitive landscape)\n\nTECH HEADSTART:\n- Reuse the design system from cdr-pitch.html (CSS variables, fonts, railway palette: --rail-charcoal, --maple-red, --accent-gold, etc.)\n- Same HTML slide format works well \u2014 single-file, self-contained, presentable in browser\n- Bilingual toggle pattern already built in the existing deck\n\nKEY DIFFERENCE from the pitch deck:\n- The pitch deck sells the VISION to funders/government. This deck explains the EXPERIENCE to end users.\n- Focus on: What is a \"station\"? What does it look like in my building? What can I do with it? How do I get started?\n- Keep it to ~8-10 slides max. Plain language. Visual. No jargon.\n\nSource: Fred idea in #canadian-digital-railway (Mar 14)."
+      "updated": "2026-03-16T15:30:42.015219+00:00",
+      "notes": "Create a simplified, user-friendly slide deck about the Canadian Digital Railway \u2014 what it is, how it works, and what a user/community would actually do. Target audience: non-technical (municipal leaders, hospital admins, Indigenous community leaders, university deans).\n\nCONTEXT & INSPIRATION:\n- Existing pitch deck (full technical/vision): ~/clawd/projects/cdr-scripts/cdr-pitch.html (1712-line HTML slide deck, bilingual EN/FR, railway-inspired design system)\n- Presenter script: ~/clawd/projects/cdr-scripts/script-en.md (slide-by-slide talking points)\n- Vision document: ~/clawd/memory/canadian-digital-railway.md (architecture, pricing, governance, competitive landscape)\n\nTECH HEADSTART:\n- Reuse the design system from cdr-pitch.html (CSS variables, fonts, railway palette: --rail-charcoal, --maple-red, --accent-gold, etc.)\n- Same HTML slide format works well \u2014 single-file, self-contained, presentable in browser\n- Bilingual toggle pattern already built in the existing deck\n\nKEY DIFFERENCE from the pitch deck:\n- The pitch deck sells the VISION to funders/government. This deck explains the EXPERIENCE to end users.\n- Focus on: What is a \"station\"? What does it look like in my building? What can I do with it? How do I get started?\n- Keep it to ~8-10 slides max. Plain language. Visual. No jargon.\n\nSource: Fred idea in #canadian-digital-railway (Mar 14). [Dino AM 2026-03-16] Moved to backlog due to CDR WIP limit violation. Will revisit after core business deliverables."
     },
     {
       "id": "task-063",
@@ -1160,15 +1160,15 @@
       "id": "task-075",
       "title": "CDR: Research programming languages for VAP type system implementation",
       "description": "",
-      "status": "todo",
+      "status": "backlog",
       "column": "backlog",
       "priority": "low",
       "owner": "Barney",
       "project": "CDR",
       "is_recurring": false,
       "created": "2026-03-14T15:40:00",
-      "updated": "2026-03-14T19:00:00",
-      "notes": "Evaluate programming languages for implementing the CDR VAP type system. Julia was raised as inspiration for its excellent type system (parametric types, multiple dispatch, user-defined structures). But don't default to Python either \u2014 evaluate properly. Languages to consider: Julia (rich types, scientific ecosystem), Rust (trait system, safety guarantees), TypeScript (branded types, web-native), Haskell (typeclasses, formal verification), Scala (JVM ecosystem), and yes Python (ecosystem size, accessibility). Criteria: expressiveness of type definitions, ease of auto-generating adapters for other languages, Apple Silicon performance, data science ecosystem quality, learning curve for target audience (researchers, data scientists, GC analysts). Output: recommendation doc with pros/cons matrix. [Wilma PM audit] Assigned to Barney."
+      "updated": "2026-03-16T15:30:42.015201+00:00",
+      "notes": "Evaluate programming languages for implementing the CDR VAP type system. Julia was raised as inspiration for its excellent type system (parametric types, multiple dispatch, user-defined structures). But don't default to Python either \u2014 evaluate properly. Languages to consider: Julia (rich types, scientific ecosystem), Rust (trait system, safety guarantees), TypeScript (branded types, web-native), Haskell (typeclasses, formal verification), Scala (JVM ecosystem), and yes Python (ecosystem size, accessibility). Criteria: expressiveness of type definitions, ease of auto-generating adapters for other languages, Apple Silicon performance, data science ecosystem quality, learning curve for target audience (researchers, data scientists, GC analysts). Output: recommendation doc with pros/cons matrix. [Wilma PM audit] Assigned to Barney. [Dino AM 2026-03-16] Moved to backlog due to CDR WIP limit violation. Will revisit after core business deliverables."
     },
     {
       "id": "task-076",
@@ -1328,15 +1328,15 @@
       "id": "task-087",
       "title": "Workflow: Cursor Pro semi-automated coding workflow",
       "description": "",
-      "status": "todo",
-      "column": "backlog",
+      "status": "done",
+      "column": "done",
       "priority": "high",
       "owner": "Wilma",
       "project": "Hazeydata",
       "is_recurring": false,
       "created": "2026-03-15T14:40:13",
-      "updated": "2026-03-15T14:40:13",
-      "notes": "Design a workflow where Bam-Bam (or a sub-agent) can leverage Cursor Pro for coding tasks semi-automatically. Options: (1) Cursor has a CLI mode or API we can invoke from server, (2) Use Claude Code CLI (already available) as the coding agent with Cursor Pro subscription covering the API costs, (3) SSH into Fred's Mac Mini and drive Cursor remotely. Research what Cursor Pro actually provides (API access? CLI? Just the IDE?). The goal: Fred assigns a coding task, it gets done without manual IDE interaction."
+      "updated": "2026-03-15T15:04:32",
+      "notes": "DONE. Bam-Bam redefined as Option C workflow: (1) Simple fixes \u2014 Wilma does inline, (2) Big refactors \u2014 spawn Claude Code CLI on Sonnet (--model sonnet). Claude Code v2.1.73 confirmed working with Sonnet on wilma-server. Cursor Pro subscription status TBD \u2014 Fred to decide if we keep it."
     },
     {
       "id": "task-088",
@@ -1351,6 +1351,20 @@
       "created": "2026-03-15T14:40:13",
       "updated": "2026-03-15T14:40:13",
       "notes": "Fred needs to provide a complete list of all active paid subscriptions for Hazeydata operations. Check credit card statements, email receipts, and subscription management. Include: service name, monthly/annual cost, billing email, what it's used for. Services to check: GitHub, Firecrawl, Brave Search API, data backup (Backblaze? Wasabi?), Claude Pro, Cursor Pro, Canva, Figma, Adobe, domain registrars, Cloudflare, hosting, any others. This feeds into task-085 (Mr. Slate's expense ledger)."
+    },
+    {
+      "id": "task-089",
+      "title": "ACCORD: Build curated test suite of ~200 CA edge-case scenarios",
+      "description": "",
+      "status": "todo",
+      "column": "backlog",
+      "priority": "high",
+      "owner": "Wilma",
+      "project": "ACCORD",
+      "is_recurring": false,
+      "created": "2026-03-16T02:02:00",
+      "updated": "2026-03-16T02:02:00",
+      "notes": "Build a benchmark suite of ~200 edge-case pay scenarios drawn from CA knowledge. Categories: overtime stacking, acting pay vs reclassification thresholds, leave accrual edge cases (part-time/term/mid-cycle transfers), bilingual bonus interactions, retroactive pay across CA expiry/renewal gaps, shift scheduling conflicts (min rest vs mandatory OT), severance/transition provisions. Self-test against ACCORD engine before external evaluation. Goal: hand evaluators the hard cases and show we handle them."
     }
   ],
   "live_activity": []
