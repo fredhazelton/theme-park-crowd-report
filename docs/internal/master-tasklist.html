@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Hazeydata — Master Task List</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #0c0e14; font-family: 'Inter', sans-serif; color: #e0e0e0;
+    padding: 36px 20px; display: flex; justify-content: center;
+  }
+  .page { width: 1100px; max-width: 100%; }
+
+  /* Auth gate */
+  #gate {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: #0c0e14; display:flex; align-items:center; justify-content:center;
+    z-index: 9999; flex-direction: column; gap: 16px;
+  }
+  #gate.hidden { display: none; }
+  #gate h2 { color: #fff; font-size: 18px; font-weight: 700; }
+  #gate input {
+    padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05); color: #fff; font-size: 14px;
+    font-family: 'Inter', sans-serif; width: 260px; text-align: center; outline: none;
+  }
+  #gate input:focus { border-color: rgba(59,130,246,0.5); }
+  #gate .hint { font-size: 11px; color: #555; }
+  #gate .err { font-size: 11px; color: #ef4444; display: none; }
+  #content { display: none; }
+  #content.visible { display: block; }
+
+  .header { text-align: center; margin-bottom: 30px; }
+  .header h1 { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+  .header .sub { font-size: 12px; color: #888; margin-top: 4px; }
+  .header .tagline { font-size: 13px; color: #3b82f6; margin-top: 8px; font-style: italic; }
+  .header .ver { font-size: 9px; color: #444; margin-top: 4px; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    padding: 14px 20px; margin-bottom: 24px; border-radius: 12px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat { text-align: center; }
+  .stat .num { font-size: 20px; font-weight: 800; color: #fff; }
+  .stat .label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+  .stat.green .num { color: #4ade80; }
+  .stat.blue .num { color: #60a5fa; }
+  .stat.yellow .num { color: #fbbf24; }
+  .stat.gray .num { color: #666; }
+  .stat.purple .num { color: #a78bfa; }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 24px; }
+  .progress-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #4ade80, #3b82f6); transition: width 0.3s; }
+  .progress-label { font-size: 9px; color: #555; text-align: center; margin-top: 4px; }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; justify-content: center;
+  }
+  .filter-btn {
+    padding: 6px 14px; border-radius: 6px; font-size: 10px; font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);
+    color: #888; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .filter-btn:hover { border-color: rgba(255,255,255,0.2); color: #ccc; }
+  .filter-btn.active { border-color: rgba(59,130,246,0.5); background: rgba(59,130,246,0.1); color: #60a5fa; }
+
+  /* Gate sections */
+  .gate { margin-bottom: 28px; }
+  .gate-head {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    border-radius: 10px 10px 0 0; cursor: pointer; user-select: none;
+  }
+  .gate-head:hover { filter: brightness(1.1); }
+  .gate-head .icon { font-size: 20px; }
+  .gate-head h2 { font-size: 14px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+  .gate-head .trigger { font-size: 10px; color: #aaa; margin-left: auto; font-weight: 500; }
+  .gate-head .count { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 8px; }
+  .gate-head .chevron { font-size: 12px; color: #555; margin-left: 4px; transition: transform 0.2s; }
+  .gate-head.collapsed .chevron { transform: rotate(-90deg); }
+
+  .gate-0 .gate-head { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); }
+  .gate-0 .gate-head .count { background: rgba(74,222,128,0.2); color: #4ade80; }
+  .gate-1 .gate-head { background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.2); }
+  .gate-1 .gate-head .count { background: rgba(96,165,250,0.2); color: #60a5fa; }
+  .gate-2 .gate-head { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.15); }
+  .gate-2 .gate-head .count { background: rgba(251,191,36,0.2); color: #fbbf24; }
+  .gate-3 .gate-head { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.15); }
+  .gate-3 .gate-head .count { background: rgba(251,146,60,0.2); color: #fb923c; }
+  .gate-4 .gate-head { background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.15); }
+  .gate-4 .gate-head .count { background: rgba(168,85,247,0.2); color: #a78bfa; }
+  .gate-5 .gate-head { background: rgba(236,72,153,0.08); border: 1px solid rgba(236,72,153,0.15); }
+  .gate-5 .gate-head .count { background: rgba(236,72,153,0.2); color: #ec4899; }
+  .gate-6 .gate-head { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+  .gate-6 .gate-head .count { background: rgba(255,255,255,0.1); color: #fff; }
+
+  .gate-body {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+    border-top: none; border-radius: 0 0 10px 10px; padding: 12px 16px;
+  }
+  .gate-body.hidden { display: none; }
+
+  /* Domain groups */
+  .domain { margin-bottom: 14px; }
+  .domain:last-child { margin-bottom: 0; }
+  .domain-label {
+    font-size: 9px; font-weight: 700; color: #555; text-transform: uppercase;
+    letter-spacing: 1.5px; padding: 4px 0; margin-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* Task items */
+  .task {
+    display: flex; align-items: flex-start; gap: 10px; padding: 6px 4px;
+    border-radius: 6px; transition: background 0.15s;
+  }
+  .task:hover { background: rgba(255,255,255,0.03); }
+  .task input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none; width: 16px; height: 16px; min-width: 16px;
+    border: 2px solid rgba(255,255,255,0.15); border-radius: 4px; cursor: pointer;
+    position: relative; top: 1px; transition: all 0.15s;
+  }
+  .task input[type="checkbox"]:checked {
+    background: #4ade80; border-color: #4ade80;
+  }
+  .task input[type="checkbox"]:checked::after {
+    content: '✓'; position: absolute; top: -2px; left: 2px;
+    font-size: 11px; font-weight: 800; color: #0c0e14;
+  }
+  .task .text { font-size: 11px; color: #ccc; line-height: 1.5; flex: 1; }
+  .task.done .text { color: #555; text-decoration: line-through; }
+  .task .source {
+    font-size: 8px; color: #444; padding: 2px 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.04); white-space: nowrap; margin-top: 2px;
+  }
+
+  /* Footer */
+  .footer { text-align: center; padding: 30px 0 10px; font-size: 9px; color: #333; }
+
+  @media (max-width: 720px) {
+    .stats-bar { gap: 10px; }
+    .gate-head .trigger { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h2>🔒</h2>
+  <input id="pw" type="password" placeholder="passphrase" autocomplete="off" autofocus>
+  <div class="hint">Internal document</div>
+  <div class="err" id="err">Incorrect</div>
+</div>
+
+<div class="page" id="content">
+
+<div class="header">
+  <h1>Hazeydata — Master Task List</h1>
+  <div class="sub">The billion-dollar plan, as a checklist</div>
+  <div class="tagline">"Aim big. Start small. Check boxes along the way."</div>
+  <div class="ver">v1.0 · March 2026 · Generated from Flintstones Framework v3.2 + Business Framework v1.0</div>
+</div>
+
+<div class="stats-bar" id="statsBar">
+  <div class="stat green"><div class="num" id="statDone">0</div><div class="label">Done</div></div>
+  <div class="stat blue"><div class="num" id="statActive">0</div><div class="label">Active</div></div>
+  <div class="stat yellow"><div class="num" id="statNext">0</div><div class="label">Next Up</div></div>
+  <div class="stat gray"><div class="num" id="statDormant">0</div><div class="label">Dormant</div></div>
+  <div class="stat purple"><div class="num" id="statTotal">0</div><div class="label">Total</div></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="progress-label" id="progressLabel">0% complete</div>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="active">🟢 Active</button>
+  <button class="filter-btn" data-filter="done">✅ Done</button>
+  <button class="filter-btn" data-filter="dormant">💤 Dormant</button>
+</div>
+
+<!-- ════════════════════════════ -->
+<!-- GATE 0: PRE-REVENUE (NOW) -->
+<!-- ════════════════════════════ -->
+<div class="gate gate-0" data-gate="0">
+  <div class="gate-head" onclick="toggleGate(this)">
+    <span class="icon">🌱</span>
+    <h2>Gate 0 — Pre-Revenue</h2>
+    <span class="trigger">Trigger: NOW</span>
+    <span class="count" data-gate-count="0"></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="gate-body">
+
+    <div class="domain">
+      <div class="domain-label">⚖️ Legal & Business Setup</div>
+      <div class="task" data-id="g0-legal-1"><input type="checkbox"><span class="text">Register "Hazeydata" as business name with Ontario (~$60)</span><span class="source">Business Framework</span></div>
+      <div class="task" data-id="g0-legal-2"><input type="checkbox"><span class="text">Register for CRA Business Number (BN)</span><span class="source">Business Framework</span></div>
+      <div class="task" data-id="g0-legal-3"><input type="checkbox"><span class="text">Open dedicated business bank account</span><span class="source">Business Framework</span></div>
+      <div class="task" data-id="g0-legal-4"><input type="checkbox"><span class="text">1-hour consultation with tech/IP lawyer re: data scraping legality (~$300-500)</span><span class="source">Business Framework</span></div>
+      <div class="task" data-id="g0-legal-5"><input type="checkbox"><span class="text">Begin trademark search for "Hazeydata" in Canada (CIPO) and US (USPTO)</span><span class="source">Business Framework</span></div>
+      <div class="task" data-id="g0-legal-6"><input type="checkbox"><span class="text">Start expense tracking spreadsheet — every business cost from day one</span><span class="source">Revenue Ops</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🏗️ Technical Foundation</div>
+      <div class="task" data-id="g0-tech-1"><input type="checkbox"><span class="text">Pipeline production-ready: ACCORD engine running, outputting crowd predictions</span><span class="source">Flintstones Framework</span></div>
+      <div class="task" data-id="g0-tech-2"><input type="checkbox"><span class="text">School schedule corpus: complete LLM scraper run, normalize all data</span><span class="source">Flintstones Framework</span></div>
+      <div class="task" data-id="g0-tech-3"><input type="checkbox"><span class="text">Website MVP live — free crowd calendar for at least 4 major parks</span><span class="source">Flintstones Framework</span></div>
+      <div class="task" data-id="g0-tech-4"><input type="checkbox"><span class="text">Set up monitoring: UptimeRobot or equivalent, alerts within 1 minute</span><span class="source">Business Framework</span></div>
+      <div class="task" data-id="g0-tech-5"><input type="checkbox"><span class="text">Verify database backup routine — nightly dumps to Backblaze</span><span class="source">Business Continuity</span></div>
+      <div class="task" data-id="g0-tech-6"><input type="checkbox"><span class="text">Create server recovery runbook — step-by-step "rebuild from scratch" doc</span><span class="source">Business Continuity</span></div>
+      <div class="task" data-id="g0-tech-7"><input type="checkbox"><span class="text">Design API schema (OpenAPI spec) — v1 endpoints even if not exposed yet</span><span class="source">Tech Architecture</span></div>
+      <div class="task" data-id="g0-tech-8"><input type="checkbox"><span class="text">Set up public status page (Instatus or self-hosted)</span><span class="source">Tech Architecture</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">📋 Framework & Documentation</div>
+      <div class="task" data-id="g0-doc-1"><input type="checkbox"><span class="text">QA Ledger: define schema (JSON), create initial file, start logging</span><span class="source">Knowledge Mgmt</span></div>
+      <div class="task" data-id="g0-doc-2"><input type="checkbox"><span class="text">Capability Map: document each agent's strengths, quality ratings, failure patterns</span><span class="source">Knowledge Mgmt</span></div>
+      <div class="task" data-id="g0-doc-3"><input type="checkbox"><span class="text">Decision Log: start recording major decisions with rationale</span><span class="source">Knowledge Mgmt</span></div>
+      <div class="task" data-id="g0-doc-4"><input type="checkbox"><span class="text">Runbooks: pipeline deployment, scraper recovery, incident response basics</span><span class="source">Knowledge Mgmt</span></div>
+      <div class="task" data-id="g0-doc-5"><input type="checkbox"><span class="text">Data Catalog: document every dataset (source, schema, refresh rate, legal status)</span><span class="source">Data Governance</span></div>
+      <div class="task" data-id="g0-doc-6"><input type="checkbox"><span class="text">RACI matrix: finalize decision rights, communicate to all agents</span><span class="source">Decision Rights</span></div>
+      <div class="task" data-id="g0-doc-7"><input type="checkbox"><span class="text">TPCR-FRAMEWORK.md: compressed, current-scale workflow for this project</span><span class="source">Step 3</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🔬 User Research</div>
+      <div class="task" data-id="g0-research-1"><input type="checkbox"><span class="text">Create research log template (Date, Source, User Type, Pain Point, Feature Idea, Quote)</span><span class="source">User Research</span></div>
+      <div class="task" data-id="g0-research-2"><input type="checkbox"><span class="text">Start Reddit guerrilla research — ask one question to every commenter on your posts</span><span class="source">User Research</span></div>
+      <div class="task" data-id="g0-research-3"><input type="checkbox"><span class="text">Read TouringPlans app store reviews — catalog common complaints</span><span class="source">User Research</span></div>
+      <div class="task" data-id="g0-research-4"><input type="checkbox"><span class="text">Define user personas: Planning Patty, Annual Andy, Data Dave, Agency Alice (or revise)</span><span class="source">User Research</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">📝 Content & SEO</div>
+      <div class="task" data-id="g0-content-1"><input type="checkbox"><span class="text">Keyword research: identify top 20 target keywords with volume estimates</span><span class="source">Content Strategy</span></div>
+      <div class="task" data-id="g0-content-2"><input type="checkbox"><span class="text">Write first blog post: "Disney World Crowd Predictions: [Next Month]"</span><span class="source">Content Strategy</span></div>
+      <div class="task" data-id="g0-content-3"><input type="checkbox"><span class="text">Create content calendar template (4 posts/month rotating themes)</span><span class="source">Content Strategy</span></div>
+      <div class="task" data-id="g0-content-4"><input type="checkbox"><span class="text">Claim @hazeydata on all major social platforms</span><span class="source">Brand Guidelines</span></div>
+      <div class="task" data-id="g0-content-5"><input type="checkbox"><span class="text">Set up Google Search Console + Analytics on the site</span><span class="source">Content Strategy</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🏘️ Community</div>
+      <div class="task" data-id="g0-comm-1"><input type="checkbox"><span class="text">Design Discord public channel structure (#today-forecast, #trip-planning, #trip-reports, etc.)</span><span class="source">Community Strategy</span></div>
+      <div class="task" data-id="g0-comm-2"><input type="checkbox"><span class="text">Write Discord welcome message + rules</span><span class="source">Community Strategy</span></div>
+      <div class="task" data-id="g0-comm-3"><input type="checkbox"><span class="text">Set up automated daily crowd forecast posting (Dino)</span><span class="source">Community Strategy</span></div>
+      <div class="task" data-id="g0-comm-4"><input type="checkbox"><span class="text">Create 3-question welcome survey for new Discord members</span><span class="source">User Research</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🎨 Brand & Design</div>
+      <div class="task" data-id="g0-brand-1"><input type="checkbox"><span class="text">Define color palette, typography, and basic design system with Pebbles</span><span class="source">Brand Guidelines</span></div>
+      <div class="task" data-id="g0-brand-2"><input type="checkbox"><span class="text">Logo: primary, icon-only, dark/light variants (Pebbles)</span><span class="source">Brand Guidelines</span></div>
+      <div class="task" data-id="g0-brand-3"><input type="checkbox"><span class="text">Define brand voice guidelines document (tone, examples, do/don't)</span><span class="source">Brand Guidelines</span></div>
+      <div class="task" data-id="g0-brand-4"><input type="checkbox"><span class="text">Social media templates: post, story, Twitter card (Pebbles)</span><span class="source">Brand Guidelines</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🔒 Business Continuity</div>
+      <div class="task" data-id="g0-bc-1"><input type="checkbox"><span class="text">Create "Break Glass" document — all critical credentials, printed + encrypted USB</span><span class="source">Business Continuity</span></div>
+      <div class="task" data-id="g0-bc-2"><input type="checkbox"><span class="text">Give Chantale the Break Glass location and passphrase</span><span class="source">Business Continuity</span></div>
+      <div class="task" data-id="g0-bc-3"><input type="checkbox"><span class="text">Set domain renewal calendar reminders (hazeydata.ai)</span><span class="source">Business Continuity</span></div>
+      <div class="task" data-id="g0-bc-4"><input type="checkbox"><span class="text">Create monthly system snapshot routine (Clonezilla or equivalent)</span><span class="source">Business Continuity</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🧬 Culture & Strategy</div>
+      <div class="task" data-id="g0-culture-1"><input type="checkbox"><span class="text">Finalize core values document</span><span class="source">Culture</span></div>
+      <div class="task" data-id="g0-culture-2"><input type="checkbox"><span class="text">Choose default exit path (Path A: Lifestyle Rocketship recommended)</span><span class="source">Exit Strategy</span></div>
+      <div class="task" data-id="g0-culture-3"><input type="checkbox"><span class="text">Set up operating cadence: daily briefing, weekly review (Wilma compiles)</span><span class="source">Communication Rituals</span></div>
+      <div class="task" data-id="g0-culture-4"><input type="checkbox"><span class="text">Define data ethics principles and publish</span><span class="source">Data Ethics</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🧪 Experimentation</div>
+      <div class="task" data-id="g0-exp-1"><input type="checkbox"><span class="text">Create experiment log template (hypothesis, metric, result, learnings)</span><span class="source">Experimentation</span></div>
+      <div class="task" data-id="g0-exp-2"><input type="checkbox"><span class="text">Define first 3 experiments to run at launch</span><span class="source">Experimentation</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════ -->
+<!-- GATE 1: FIRST DOLLAR -->
+<!-- ════════════════════════════ -->
+<div class="gate gate-1" data-gate="1">
+  <div class="gate-head" onclick="toggleGate(this)">
+    <span class="icon">🚀</span>
+    <h2>Gate 1 — First Dollar</h2>
+    <span class="trigger">Trigger: First paid customer</span>
+    <span class="count" data-gate-count="1"></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="gate-body hidden">
+
+    <div class="domain">
+      <div class="domain-label">💳 Payment & Revenue</div>
+      <div class="task" data-id="g1-pay-1"><input type="checkbox"><span class="text">Set up Stripe account (Canadian merchant)</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g1-pay-2"><input type="checkbox"><span class="text">Configure Stripe Billing for recurring subscriptions (Pro tier: $7-9/mo or $69/yr)</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g1-pay-3"><input type="checkbox"><span class="text">Build upgrade/downgrade flow in the product</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g1-pay-4"><input type="checkbox"><span class="text">Write and publish refund policy (30-day money-back guarantee)</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g1-pay-5"><input type="checkbox"><span class="text">Set up failed payment retry logic + automated recovery emails</span><span class="source">Revenue Ops</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">📜 Legal Compliance</div>
+      <div class="task" data-id="g1-legal-1"><input type="checkbox"><span class="text">Privacy Policy live on website (Termly or lawyer-drafted)</span><span class="source">Legal</span></div>
+      <div class="task" data-id="g1-legal-2"><input type="checkbox"><span class="text">Terms of Service live on website</span><span class="source">Legal</span></div>
+      <div class="task" data-id="g1-legal-3"><input type="checkbox"><span class="text">Cookie consent banner implemented (for GDPR visitors)</span><span class="source">Compliance</span></div>
+      <div class="task" data-id="g1-legal-4"><input type="checkbox"><span class="text">COPPA compliance: verify no personal data collected from children, or implement age gate</span><span class="source">Compliance</span></div>
+      <div class="task" data-id="g1-legal-5"><input type="checkbox"><span class="text">CASL compliance for email: consent mechanism, unsubscribe in every email</span><span class="source">Compliance</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🛡️ Insurance</div>
+      <div class="task" data-id="g1-ins-1"><input type="checkbox"><span class="text">Purchase Professional Liability (E&O) insurance (~$500-1K/yr)</span><span class="source">Insurance</span></div>
+      <div class="task" data-id="g1-ins-2"><input type="checkbox"><span class="text">Purchase Cyber Liability insurance (~$500-800/yr)</span><span class="source">Insurance</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🎧 Customer Support</div>
+      <div class="task" data-id="g1-support-1"><input type="checkbox"><span class="text">Set up support@hazeydata.ai with triage workflow (Wilma triages → Fred resolves)</span><span class="source">Support Plan</span></div>
+      <div class="task" data-id="g1-support-2"><input type="checkbox"><span class="text">Create Discord #help channel with pinned FAQ</span><span class="source">Support Plan</span></div>
+      <div class="task" data-id="g1-support-3"><input type="checkbox"><span class="text">Build Knowledge Base: Getting Started, Account & Billing, Features, Data & Accuracy</span><span class="source">Support Plan</span></div>
+      <div class="task" data-id="g1-support-4"><input type="checkbox"><span class="text">Define internal response time targets (even if not published yet)</span><span class="source">Support Plan</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🚨 Incident Response</div>
+      <div class="task" data-id="g1-ir-1"><input type="checkbox"><span class="text">Finalize severity classification (SEV-1 through SEV-4)</span><span class="source">Incident Response</span></div>
+      <div class="task" data-id="g1-ir-2"><input type="checkbox"><span class="text">Create post-mortem template</span><span class="source">Incident Response</span></div>
+      <div class="task" data-id="g1-ir-3"><input type="checkbox"><span class="text">Test incident response flow with a simulated outage</span><span class="source">Incident Response</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">♿ Accessibility</div>
+      <div class="task" data-id="g1-a11y-1"><input type="checkbox"><span class="text">Run Lighthouse accessibility audit — fix all critical violations</span><span class="source">Accessibility</span></div>
+      <div class="task" data-id="g1-a11y-2"><input type="checkbox"><span class="text">Ensure crowd levels don't rely on color alone (numbers + labels + color)</span><span class="source">Accessibility</span></div>
+      <div class="task" data-id="g1-a11y-3"><input type="checkbox"><span class="text">Keyboard navigation test — every feature accessible without mouse</span><span class="source">Accessibility</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🔬 User Research</div>
+      <div class="task" data-id="g1-research-1"><input type="checkbox"><span class="text">Conduct 5-8 cognitive interviews with target users (recruit from Reddit/Discord)</span><span class="source">User Research</span></div>
+      <div class="task" data-id="g1-research-2"><input type="checkbox"><span class="text">Build "Founding Members" cohort from first 50 users — weekly feedback thread</span><span class="source">User Research</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">📧 Email</div>
+      <div class="task" data-id="g1-email-1"><input type="checkbox"><span class="text">Set up email provider (Buttondown or Resend)</span><span class="source">Content Strategy</span></div>
+      <div class="task" data-id="g1-email-2"><input type="checkbox"><span class="text">Create lead magnet: "Free 90-Day Disney Crowd Calendar" PDF</span><span class="source">Content Strategy</span></div>
+      <div class="task" data-id="g1-email-3"><input type="checkbox"><span class="text">Write 5-email welcome sequence</span><span class="source">Content Strategy</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════ -->
+<!-- GATE 2: TRACTION -->
+<!-- ════════════════════════════ -->
+<div class="gate gate-2" data-gate="2">
+  <div class="gate-head" onclick="toggleGate(this)">
+    <span class="icon">📈</span>
+    <h2>Gate 2 — Traction</h2>
+    <span class="trigger">Trigger: $500 MRR or 500 free users</span>
+    <span class="count" data-gate-count="2"></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="gate-body hidden">
+
+    <div class="domain">
+      <div class="domain-label">📊 Revenue & Analytics</div>
+      <div class="task" data-id="g2-rev-1"><input type="checkbox"><span class="text">Build monthly MRR dashboard (new, expansion, churned, net new)</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g2-rev-2"><input type="checkbox"><span class="text">Set up cohort analysis — track retention by signup month</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g2-rev-3"><input type="checkbox"><span class="text">Calculate first real LTV, CAC, and LTV:CAC ratio</span><span class="source">Financial Model</span></div>
+      <div class="task" data-id="g2-rev-4"><input type="checkbox"><span class="text">SEO analytics: track keyword rankings, organic traffic growth weekly</span><span class="source">Content Strategy</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">📝 Content Machine</div>
+      <div class="task" data-id="g2-content-1"><input type="checkbox"><span class="text">Hit consistent 1 post/week cadence for 4+ consecutive weeks</span><span class="source">Content Strategy</span></div>
+      <div class="task" data-id="g2-content-2"><input type="checkbox"><span class="text">Launch weekly email newsletter: "This Week's Crowd Forecast"</span><span class="source">Content Strategy</span></div>
+      <div class="task" data-id="g2-content-3"><input type="checkbox"><span class="text">Create first data-unique article: "How School Schedules Affect Theme Park Crowds"</span><span class="source">Content Strategy</span></div>
+      <div class="task" data-id="g2-content-4"><input type="checkbox"><span class="text">Start daily Twitter/X crowd predictions: "Today's forecast: 🟢🟡🔴"</span><span class="source">Content Strategy</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🏘️ Community Growth</div>
+      <div class="task" data-id="g2-comm-1"><input type="checkbox"><span class="text">Launch engagement rituals: weekly "Prediction Report Card," "Trip Report Tuesday"</span><span class="source">Community Strategy</span></div>
+      <div class="task" data-id="g2-comm-2"><input type="checkbox"><span class="text">First seasonal event: crowd prediction challenge (winner gets free Pro month)</span><span class="source">Community Strategy</span></div>
+      <div class="task" data-id="g2-comm-3"><input type="checkbox"><span class="text">Identify first 3-5 potential ambassadors from active community members</span><span class="source">Community Strategy</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🤝 Partnerships (Tier 1)</div>
+      <div class="task" data-id="g2-bd-1"><input type="checkbox"><span class="text">Reach out to 5 Disney/Universal fan bloggers — offer free data access for attribution</span><span class="source">Partnerships</span></div>
+      <div class="task" data-id="g2-bd-2"><input type="checkbox"><span class="text">Become a trusted resource in r/WaltDisneyWorld (helpful posts, not self-promotion)</span><span class="source">Partnerships</span></div>
+      <div class="task" data-id="g2-bd-3"><input type="checkbox"><span class="text">Reach out to 2 travel YouTube creators — offer custom data for their videos</span><span class="source">Partnerships</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🧪 Experimentation</div>
+      <div class="task" data-id="g2-exp-1"><input type="checkbox"><span class="text">Run first formal experiment with documented hypothesis, results, and learnings</span><span class="source">Experimentation</span></div>
+      <div class="task" data-id="g2-exp-2"><input type="checkbox"><span class="text">Monthly experiment review: what worked, what didn't, what's next</span><span class="source">Experimentation</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">📡 Operating Cadence</div>
+      <div class="task" data-id="g2-ops-1"><input type="checkbox"><span class="text">Monthly strategic review formalized (Wilma drafts, Barney reviews, Fred approves)</span><span class="source">Communication</span></div>
+      <div class="task" data-id="g2-ops-2"><input type="checkbox"><span class="text">Implement data lineage: trace any published prediction back to source data</span><span class="source">Data Governance</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════ -->
+<!-- GATE 3: REAL BUSINESS -->
+<!-- ════════════════════════════ -->
+<div class="gate gate-3" data-gate="3">
+  <div class="gate-head" onclick="toggleGate(this)">
+    <span class="icon">💰</span>
+    <h2>Gate 3 — Real Business</h2>
+    <span class="trigger">Trigger: $2K MRR or 2,000 free users</span>
+    <span class="count" data-gate-count="3"></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="gate-body hidden">
+
+    <div class="domain">
+      <div class="domain-label">🏛️ Business Structure</div>
+      <div class="task" data-id="g3-biz-1"><input type="checkbox"><span class="text">Incorporate (Federal or Ontario corporation)</span><span class="source">Legal</span></div>
+      <div class="task" data-id="g3-biz-2"><input type="checkbox"><span class="text">Hire accountant for tax planning and annual filing</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g3-biz-3"><input type="checkbox"><span class="text">Register for GST/HST (mandatory if >$30K/4 quarters, voluntary before)</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g3-biz-4"><input type="checkbox"><span class="text">Set up Stripe Tax for automatic US sales tax calculation</span><span class="source">Revenue Ops</span></div>
+      <div class="task" data-id="g3-biz-5"><input type="checkbox"><span class="text">Migrate bookkeeping to Wave or QuickBooks</span><span class="source">Revenue Ops</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🤝 Partnerships (Tier 1-2)</div>
+      <div class="task" data-id="g3-bd-1"><input type="checkbox"><span class="text">Send first outreach email to travel agencies (use non-pitch template from framework)</span><span class="source">Partnerships</span></div>
+      <div class="task" data-id="g3-bd-2"><input type="checkbox"><span class="text">Explore affiliate partnerships (hotel booking, travel insurance)</span><span class="source">Partnerships</span></div>
+      <div class="task" data-id="g3-bd-3"><input type="checkbox"><span class="text">First content partnership: co-branded report with a blogger or creator</span><span class="source">Partnerships</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🚨 Operations</div>
+      <div class="task" data-id="g3-ops-1"><input type="checkbox"><span class="text">Incident response fully formalized — all team members know the playbook</span><span class="source">Incident Response</span></div>
+      <div class="task" data-id="g3-ops-2"><input type="checkbox"><span class="text">Implement feature flags (PostHog or simple JSON config)</span><span class="source">Experimentation</span></div>
+      <div class="task" data-id="g3-ops-3"><input type="checkbox"><span class="text">Quarterly planning session formalized (roadmap, RICE scoring, framework review)</span><span class="source">Communication</span></div>
+      <div class="task" data-id="g3-ops-4"><input type="checkbox"><span class="text">QA ledger review: analyze patterns, calibrate adaptive sampling rates</span><span class="source">Flintstones Framework</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🎓 Advisory</div>
+      <div class="task" data-id="g3-adv-1"><input type="checkbox"><span class="text">Have first informal advisory conversation with a SaaS/product expert</span><span class="source">Advisory Board</span></div>
+      <div class="task" data-id="g3-adv-2"><input type="checkbox"><span class="text">Have first informal advisory conversation with a theme park industry contact</span><span class="source">Advisory Board</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">⚔️ IP</div>
+      <div class="task" data-id="g3-ip-1"><input type="checkbox"><span class="text">File "Hazeydata" trademark in Canada (CIPO, ~$330)</span><span class="source">IP Offense</span></div>
+      <div class="task" data-id="g3-ip-2"><input type="checkbox"><span class="text">Formally document ACCORD engine methodology as trade secret</span><span class="source">IP Offense</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════ -->
+<!-- GATE 4: SCALING -->
+<!-- ════════════════════════════ -->
+<div class="gate gate-4" data-gate="4">
+  <div class="gate-head" onclick="toggleGate(this)">
+    <span class="icon">🏢</span>
+    <h2>Gate 4 — Scaling</h2>
+    <span class="trigger">Trigger: $5K MRR or 5,000 free users</span>
+    <span class="count" data-gate-count="4"></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="gate-body hidden">
+
+    <div class="domain">
+      <div class="domain-label">👥 First Hires</div>
+      <div class="task" data-id="g4-hire-1"><input type="checkbox"><span class="text">Hire part-time customer support contractor</span><span class="source">Team Scaling</span></div>
+      <div class="task" data-id="g4-hire-2"><input type="checkbox"><span class="text">Consider part-time content creator with theme park domain expertise</span><span class="source">Team Scaling</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🏗️ Architecture Phase 2</div>
+      <div class="task" data-id="g4-arch-1"><input type="checkbox"><span class="text">Move static site to CDN (Cloudflare Pages)</span><span class="source">Tech Architecture</span></div>
+      <div class="task" data-id="g4-arch-2"><input type="checkbox"><span class="text">Split API to dedicated server/VPS</span><span class="source">Tech Architecture</span></div>
+      <div class="task" data-id="g4-arch-3"><input type="checkbox"><span class="text">Migrate database to managed service (PlanetScale, Supabase)</span><span class="source">Tech Architecture</span></div>
+      <div class="task" data-id="g4-arch-4"><input type="checkbox"><span class="text">Launch API tier ($49-199/mo) with documentation and rate limiting</span><span class="source">Revenue Ops</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🎧 Support Stage 2</div>
+      <div class="task" data-id="g4-support-1"><input type="checkbox"><span class="text">Add in-app help widget (Crisp.chat or equivalent)</span><span class="source">Support Plan</span></div>
+      <div class="task" data-id="g4-support-2"><input type="checkbox"><span class="text">Implement AI-powered auto-responses for common questions</span><span class="source">Support Plan</span></div>
+      <div class="task" data-id="g4-support-3"><input type="checkbox"><span class="text">Publish response time SLAs by tier</span><span class="source">Support Plan</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🏘️ Community Scale</div>
+      <div class="task" data-id="g4-comm-1"><input type="checkbox"><span class="text">Launch ambassador program (5 initial ambassadors, free Pro access)</span><span class="source">Community Strategy</span></div>
+      <div class="task" data-id="g4-comm-2"><input type="checkbox"><span class="text">Add Pro-only Discord channels (#pro-data, #pro-alerts, #ask-fred)</span><span class="source">Community Strategy</span></div>
+      <div class="task" data-id="g4-comm-3"><input type="checkbox"><span class="text">First monthly "Founder AMA" session</span><span class="source">Community Strategy</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🌍 Expansion</div>
+      <div class="task" data-id="g4-exp-1"><input type="checkbox"><span class="text">Add Phase 2 parks: Six Flags, Cedar Fair, Busch Gardens, Canada's Wonderland</span><span class="source">International</span></div>
+      <div class="task" data-id="g4-exp-2"><input type="checkbox"><span class="text">Explore B2B licensing pilot with one travel agency or hotel chain</span><span class="source">Partnerships</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════ -->
+<!-- GATE 5: MOMENTUM -->
+<!-- ════════════════════════════ -->
+<div class="gate gate-5" data-gate="5">
+  <div class="gate-head" onclick="toggleGate(this)">
+    <span class="icon">🚄</span>
+    <h2>Gate 5 — Momentum</h2>
+    <span class="trigger">Trigger: $15K MRR or 15,000 free users</span>
+    <span class="count" data-gate-count="5"></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="gate-body hidden">
+
+    <div class="domain">
+      <div class="domain-label">🧭 Strategic Decisions</div>
+      <div class="task" data-id="g5-strat-1"><input type="checkbox"><span class="text">DECISION POINT: Stay at day job or go full-time on Hazeydata?</span><span class="source">Exit Strategy</span></div>
+      <div class="task" data-id="g5-strat-2"><input type="checkbox"><span class="text">Review exit strategy: still Path A? Acquisition conversations happening?</span><span class="source">Exit Strategy</span></div>
+      <div class="task" data-id="g5-strat-3"><input type="checkbox"><span class="text">Full RACI enforcement across all team operations</span><span class="source">Decision Rights</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🤝 Partnerships (Tier 2-3)</div>
+      <div class="task" data-id="g5-bd-1"><input type="checkbox"><span class="text">Active outreach to travel agencies specializing in Disney vacations</span><span class="source">Partnerships</span></div>
+      <div class="task" data-id="g5-bd-2"><input type="checkbox"><span class="text">Explore hotel/resort data partnerships near major parks</span><span class="source">Partnerships</span></div>
+      <div class="task" data-id="g5-bd-3"><input type="checkbox"><span class="text">First contact with Universal Orlando (the dream pitch)</span><span class="source">Partnerships</span></div>
+      <div class="task" data-id="g5-bd-4"><input type="checkbox"><span class="text">Consider BD/partnerships hire (part-time + commission)</span><span class="source">Team Scaling</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🌍 International Planning</div>
+      <div class="task" data-id="g5-intl-1"><input type="checkbox"><span class="text">Research international school schedule data availability (UK, France, Japan)</span><span class="source">International</span></div>
+      <div class="task" data-id="g5-intl-2"><input type="checkbox"><span class="text">Evaluate adding Disneyland Paris or Tokyo Disney as first international park</span><span class="source">International</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🎓 Advisory Board</div>
+      <div class="task" data-id="g5-adv-1"><input type="checkbox"><span class="text">Formalize 2-3 advisory relationships (theme park, SaaS, legal)</span><span class="source">Advisory Board</span></div>
+      <div class="task" data-id="g5-adv-2"><input type="checkbox"><span class="text">Quarterly advisory check-ins established</span><span class="source">Advisory Board</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">⚔️ IP Offense</div>
+      <div class="task" data-id="g5-ip-1"><input type="checkbox"><span class="text">File "Hazeydata" trademark in US (USPTO, ~$250)</span><span class="source">IP Offense</span></div>
+      <div class="task" data-id="g5-ip-2"><input type="checkbox"><span class="text">Evaluate provisional patent for school-schedule-to-crowd-prediction methodology</span><span class="source">IP Offense</span></div>
+      <div class="task" data-id="g5-ip-3"><input type="checkbox"><span class="text">Consider US LLC for B2B invoicing simplification</span><span class="source">Legal</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════ -->
+<!-- GATE 6: ENTERPRISE -->
+<!-- ════════════════════════════ -->
+<div class="gate gate-6" data-gate="6">
+  <div class="gate-head" onclick="toggleGate(this)">
+    <span class="icon">🏰</span>
+    <h2>Gate 6 — Enterprise</h2>
+    <span class="trigger">Trigger: $50K+ MRR</span>
+    <span class="count" data-gate-count="6"></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="gate-body hidden">
+
+    <div class="domain">
+      <div class="domain-label">👥 Team</div>
+      <div class="task" data-id="g6-team-1"><input type="checkbox"><span class="text">Hire Head of Growth (first full-time employee)</span><span class="source">Team Scaling</span></div>
+      <div class="task" data-id="g6-team-2"><input type="checkbox"><span class="text">Hire dedicated customer support (full-time)</span><span class="source">Team Scaling</span></div>
+      <div class="task" data-id="g6-team-3"><input type="checkbox"><span class="text">Consider community manager hire</span><span class="source">Community Strategy</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🏗️ Architecture Phase 3-4</div>
+      <div class="task" data-id="g6-arch-1"><input type="checkbox"><span class="text">API behind load balancer with caching layer (Redis)</span><span class="source">Tech Architecture</span></div>
+      <div class="task" data-id="g6-arch-2"><input type="checkbox"><span class="text">CDN for all static assets</span><span class="source">Tech Architecture</span></div>
+      <div class="task" data-id="g6-arch-3"><input type="checkbox"><span class="text">Dedicated B2B API tier with SLA guarantees (99.9% uptime)</span><span class="source">Tech Architecture</span></div>
+      <div class="task" data-id="g6-arch-4"><input type="checkbox"><span class="text">Data warehouse for analytics</span><span class="source">Tech Architecture</span></div>
+      <div class="task" data-id="g6-arch-5"><input type="checkbox"><span class="text">Evaluate multi-region deployment</span><span class="source">Tech Architecture</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">⚔️ IP & Legal</div>
+      <div class="task" data-id="g6-ip-1"><input type="checkbox"><span class="text">File full patent(s) — crowd prediction methodology, AI orchestration framework</span><span class="source">IP Offense</span></div>
+      <div class="task" data-id="g6-ip-2"><input type="checkbox"><span class="text">Formal IP assignment agreements (all IP owned by corporation, not Fred personally)</span><span class="source">Exit Readiness</span></div>
+      <div class="task" data-id="g6-ip-3"><input type="checkbox"><span class="text">Annual framework review and strategy refresh</span><span class="source">Communication</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🌍 Global Expansion</div>
+      <div class="task" data-id="g6-global-1"><input type="checkbox"><span class="text">International parks live: Disneyland Paris, Tokyo Disney, Universal Japan</span><span class="source">International</span></div>
+      <div class="task" data-id="g6-global-2"><input type="checkbox"><span class="text">International school schedule corpus started</span><span class="source">International</span></div>
+      <div class="task" data-id="g6-global-3"><input type="checkbox"><span class="text">Evaluate mobile app development (if mobile traffic >70%)</span><span class="source">Product Roadmap</span></div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-label">🚪 Exit Readiness</div>
+      <div class="task" data-id="g6-exit-1"><input type="checkbox"><span class="text">Clean, auditable financials (2+ years)</span><span class="source">Exit Strategy</span></div>
+      <div class="task" data-id="g6-exit-2"><input type="checkbox"><span class="text">Low key-person dependency (business runs without Fred for weeks)</span><span class="source">Exit Strategy</span></div>
+      <div class="task" data-id="g6-exit-3"><input type="checkbox"><span class="text">All SOPs and runbooks complete and current</span><span class="source">Exit Strategy</span></div>
+      <div class="task" data-id="g6-exit-4"><input type="checkbox"><span class="text">Positive growth trend documented (6+ months)</span><span class="source">Exit Strategy</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  hazeydata.ai · Master Task List v1.0 · March 2026 · Generated from Flintstones Framework v3.2 + Business Framework v1.0<br>
+  Checkboxes save to your browser (localStorage). Your progress is yours.
+</div>
+
+</div><!-- /page -->
+
+<script>
+// Auth
+var gate = document.getElementById('gate');
+var content = document.getElementById('content');
+var pw = document.getElementById('pw');
+var err = document.getElementById('err');
+
+if (localStorage.getItem('mtl_auth') === 'yabbadabbadoo') {
+  gate.classList.add('hidden');
+  content.classList.add('visible');
+  initTasks();
+}
+
+pw.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    var val = pw.value.trim().toLowerCase();
+    if (val === 'yabbadabbadoo' || val === 'yabba dabba doo') {
+      localStorage.setItem('mtl_auth', 'yabbadabbadoo');
+      gate.classList.add('hidden');
+      content.classList.add('visible');
+      initTasks();
+    } else {
+      err.style.display = 'block';
+      pw.value = '';
+      pw.focus();
+    }
+  }
+});
+
+// Gate collapse/expand
+function toggleGate(el) {
+  var body = el.nextElementSibling;
+  body.classList.toggle('hidden');
+  el.classList.toggle('collapsed');
+}
+
+// Task persistence + stats
+function initTasks() {
+  var saved = JSON.parse(localStorage.getItem('mtl_tasks') || '{}');
+  var tasks = document.querySelectorAll('.task');
+
+  tasks.forEach(function(task) {
+    var id = task.getAttribute('data-id');
+    var cb = task.querySelector('input[type="checkbox"]');
+    if (saved[id]) {
+      cb.checked = true;
+      task.classList.add('done');
+    }
+    cb.addEventListener('change', function() {
+      var s = JSON.parse(localStorage.getItem('mtl_tasks') || '{}');
+      if (cb.checked) {
+        s[id] = true;
+        task.classList.add('done');
+      } else {
+        delete s[id];
+        task.classList.remove('done');
+      }
+      localStorage.setItem('mtl_tasks', JSON.stringify(s));
+      updateStats();
+    });
+  });
+
+  // Filters
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var filter = btn.getAttribute('data-filter');
+      applyFilter(filter);
+    });
+  });
+
+  updateStats();
+}
+
+function applyFilter(filter) {
+  var gates = document.querySelectorAll('.gate');
+  gates.forEach(function(gate) {
+    var gateNum = parseInt(gate.getAttribute('data-gate'));
+    var tasks = gate.querySelectorAll('.task');
+    var visibleCount = 0;
+
+    tasks.forEach(function(task) {
+      var cb = task.querySelector('input[type="checkbox"]');
+      var show = false;
+      if (filter === 'all') show = true;
+      else if (filter === 'active' && gateNum === 0 && !cb.checked) show = true;
+      else if (filter === 'done' && cb.checked) show = true;
+      else if (filter === 'dormant' && gateNum > 0 && !cb.checked) show = true;
+      task.style.display = show ? 'flex' : 'none';
+      if (show) visibleCount++;
+    });
+
+    // Hide empty gates
+    if (filter !== 'all') {
+      gate.style.display = visibleCount > 0 ? 'block' : 'none';
+    } else {
+      gate.style.display = 'block';
+    }
+  });
+}
+
+function updateStats() {
+  var tasks = document.querySelectorAll('.task');
+  var total = tasks.length;
+  var done = document.querySelectorAll('.task.done').length;
+  var gate0Tasks = document.querySelectorAll('.gate-0 .task');
+  var gate0Done = document.querySelectorAll('.gate-0 .task.done').length;
+  var active = gate0Tasks.length - gate0Done;
+  var dormant = total - gate0Tasks.length - (done - gate0Done);
+
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statActive').textContent = active;
+  document.getElementById('statNext').textContent = document.querySelectorAll('.gate-1 .task').length - document.querySelectorAll('.gate-1 .task.done').length;
+  document.getElementById('statDormant').textContent = dormant > 0 ? dormant : 0;
+  document.getElementById('statTotal').textContent = total;
+
+  var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = done + '/' + total + ' tasks · ' + pct + '% complete';
+
+  // Update gate counts
+  for (var i = 0; i <= 6; i++) {
+    var gateEl = document.querySelector('.gate[data-gate="' + i + '"]');
+    if (!gateEl) continue;
+    var gTasks = gateEl.querySelectorAll('.task').length;
+    var gDone = gateEl.querySelectorAll('.task.done').length;
+    var countEl = gateEl.querySelector('[data-gate-count="' + i + '"]');
+    if (countEl) countEl.textContent = gDone + '/' + gTasks;
+  }
+}
+</script>
+</body>
+</html>
