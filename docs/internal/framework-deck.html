@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Flintstones Framework — Slide Deck</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#0c0e14;font-family:'Inter',sans-serif;color:#e0e0e0;overflow:hidden;height:100vh;width:100vw;}
+
+  /* Auth gate */
+  #gate{position:fixed;top:0;left:0;width:100%;height:100%;background:#0c0e14;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px;}
+  #gate.hidden{display:none;}
+  #gate h2{color:#fff;font-size:18px;font-weight:700;}
+  #gate input{padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:'Inter',sans-serif;width:260px;text-align:center;outline:none;}
+  #gate input:focus{border-color:rgba(236,72,153,0.5);}
+  #gate .hint{font-size:11px;color:#555;}
+  #gate .err{font-size:11px;color:#ef4444;display:none;}
+
+  /* Slide container */
+  #deck{display:none;width:100vw;height:100vh;position:relative;}
+  #deck.visible{display:block;}
+
+  .slide{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    display:none;flex-direction:column;justify-content:center;align-items:center;
+    padding:60px 80px;text-align:center;
+    opacity:0;transition:opacity 0.4s ease;
+  }
+  .slide.active{display:flex;opacity:1;}
+
+  /* Slide styles */
+  .slide h1{font-size:42px;font-weight:800;color:#fff;letter-spacing:2px;text-transform:uppercase;line-height:1.2;}
+  .slide h2{font-size:30px;font-weight:800;color:#fff;letter-spacing:1px;margin-bottom:20px;}
+  .slide h3{font-size:18px;font-weight:700;color:#999;margin-top:8px;letter-spacing:0.5px;}
+  .slide p{font-size:16px;color:#aaa;line-height:1.7;max-width:800px;}
+  .slide .big-emoji{font-size:60px;margin-bottom:16px;}
+  .slide .sub{font-size:13px;color:#666;margin-top:8px;letter-spacing:1px;}
+  .slide .brand{font-size:14px;color:#555;margin-top:12px;letter-spacing:2px;}
+
+  /* Accent colors */
+  .c-gold{color:#fbbf24;} .c-pink{color:#f472b6;} .c-blue{color:#818cf8;}
+  .c-cyan{color:#22d3ee;} .c-green{color:#34d399;} .c-red{color:#ef4444;}
+
+  /* Content slides */
+  .content-left{text-align:left;align-items:flex-start;padding:60px 100px;}
+  .content-left h2{margin-bottom:24px;}
+
+  .bullet-list{list-style:none;padding:0;text-align:left;}
+  .bullet-list li{font-size:15px;color:#ccc;padding:8px 0;line-height:1.5;display:flex;align-items:flex-start;gap:10px;}
+  .bullet-list li .icon{font-size:18px;min-width:24px;text-align:center;margin-top:1px;}
+  .bullet-list li strong{color:#fff;}
+
+  /* Tier cards */
+  .tier-row{display:flex;gap:16px;margin-top:20px;flex-wrap:wrap;justify-content:center;}
+  .tier-card{
+    padding:16px 20px;border-radius:12px;
+    background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+    text-align:center;min-width:130px;
+  }
+  .tier-card .emoji{font-size:28px;margin-bottom:6px;}
+  .tier-card .name{font-size:13px;font-weight:700;color:#fff;}
+  .tier-card .role{font-size:10px;color:#888;margin-top:2px;}
+
+  /* Grid layout */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;max-width:900px;text-align:left;}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;width:100%;max-width:900px;text-align:left;}
+  .g-card{
+    padding:18px;border-radius:10px;
+    background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);
+  }
+  .g-card .title{font-size:12px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+  .g-card .body{font-size:11px;color:#888;line-height:1.6;}
+  .g-card .body strong{color:#bbb;}
+
+  /* Flow steps */
+  .flow-steps{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:20px;}
+  .flow-step{
+    padding:10px 14px;border-radius:8px;
+    background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+    text-align:center;min-width:80px;
+  }
+  .flow-step .num{font-size:10px;font-weight:800;opacity:0.5;}
+  .flow-step .label{font-size:11px;font-weight:700;color:#fff;margin-top:2px;}
+  .flow-arrow{font-size:16px;color:#fff;opacity:0.15;}
+
+  /* Navigation */
+  .nav{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    display:flex;gap:12px;align-items:center;z-index:100;
+  }
+  .nav button{
+    padding:8px 20px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.05);color:#fff;font-size:12px;
+    font-family:'Inter',sans-serif;cursor:pointer;font-weight:600;
+    transition:all 0.2s;
+  }
+  .nav button:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);}
+  .nav .counter{font-size:11px;color:#555;min-width:60px;text-align:center;}
+
+  /* HW table */
+  .hw-mini{border-collapse:collapse;margin-top:16px;text-align:left;}
+  .hw-mini th{font-size:10px;color:#888;padding:6px 14px;border-bottom:1px solid rgba(255,255,255,0.08);text-transform:uppercase;letter-spacing:0.5px;}
+  .hw-mini td{font-size:12px;color:#ccc;padding:6px 14px;border-bottom:1px solid rgba(255,255,255,0.03);}
+  .hw-mini .rec{background:rgba(16,185,129,0.06);}
+  .hw-mini .price{color:#fbbf24;font-weight:700;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h2>🔒 Internal Document</h2>
+  <input type="password" id="pw" placeholder="Enter passphrase" autofocus>
+  <div class="hint">hazeydata.ai internal access only</div>
+  <div class="err" id="err">Incorrect passphrase</div>
+</div>
+
+<div id="deck">
+
+  <!-- SLIDE 1: Title -->
+  <div class="slide active">
+    <div class="big-emoji">🏗️</div>
+    <h1>The Flintstones<br>Framework</h1>
+    <h3>An AI-Powered Innovation Operating System</h3>
+    <div class="brand">hazeydata.ai · v3.0 · March 2026</div>
+  </div>
+
+  <!-- SLIDE 2: The Vision -->
+  <div class="slide">
+    <div class="big-emoji">💡</div>
+    <h2>The Vision</h2>
+    <p>Build a <strong style="color:#fff;">factory that builds products</strong>, not just one product.<br><br>
+    A 4-tier AI organization with built-in quality control at every level — designed to take ideas from napkin sketch to market in weeks, not months.</p>
+    <div class="sub">One human. One AI executive. Six specialist agents. One local compute engine.</div>
+  </div>
+
+  <!-- SLIDE 3: Org Structure -->
+  <div class="slide">
+    <h2>📋 Organizational Structure</h2>
+    <div class="tier-row">
+      <div class="tier-card"><div class="emoji">👑</div><div class="name c-gold">Fred</div><div class="role">CEO / Founder</div></div>
+    </div>
+    <div style="font-size:11px;color:#fbbf24;opacity:0.4;margin:8px 0;">🔄 Strategic QA Loop 🔄</div>
+    <div class="tier-row">
+      <div class="tier-card"><div class="emoji">🦴</div><div class="name c-pink">Wilma</div><div class="role">CTO / Always-On</div></div>
+    </div>
+    <div style="font-size:11px;color:#f472b6;opacity:0.4;margin:8px 0;">⬇️ Delegates work → T4 · QA → T3 ⬇️</div>
+    <div class="tier-row">
+      <div class="tier-card"><div class="emoji">🪨</div><div class="name">Barney</div><div class="role">Advisor + QA</div></div>
+      <div class="tier-card"><div class="emoji">🏏</div><div class="name">Bam-Bam</div><div class="role">Lead Dev + QA</div></div>
+      <div class="tier-card"><div class="emoji">🎀</div><div class="name">Pebbles</div><div class="role">Designer + QA</div></div>
+      <div class="tier-card"><div class="emoji">✍️</div><div class="name">Betty</div><div class="role">Content + QA</div></div>
+      <div class="tier-card"><div class="emoji">🦕</div><div class="name">Dino</div><div class="role">PM</div></div>
+      <div class="tier-card"><div class="emoji">👽</div><div class="name">Gazoo</div><div class="role">QA Inspector</div></div>
+    </div>
+    <div style="font-size:11px;color:#818cf8;opacity:0.4;margin:8px 0;">🔄 QA Loop · Max 3 rounds 🔄</div>
+    <div class="tier-row">
+      <div class="tier-card" style="min-width:200px;"><div class="emoji">🖥️</div><div class="name c-green">Mac Studio LLM</div><div class="role">Execution Engine (local, near-zero cost)</div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: The Key Insight -->
+  <div class="slide">
+    <div class="big-emoji">⚡</div>
+    <h2>The Key Insight</h2>
+    <p style="font-size:20px;color:#fff;"><strong>Tier 4 does the work. Tier 3 checks the work.</strong></p>
+    <p style="margin-top:16px;">Expensive AI brains (Claude API) are reserved for <em>judgment</em>, not grunt work.<br>
+    A local LLM handles code generation, data processing, drafting, and analysis at near-zero cost.<br>
+    Specialist agents only activate to verify quality — review is cheaper than creation.</p>
+    <div class="sub">Result: Same quality output at a fraction of the cost</div>
+  </div>
+
+  <!-- SLIDE 5: The Idea Cycle -->
+  <div class="slide">
+    <h2>🔬 The Idea Cycle</h2>
+    <h3>5 Phases · 10 Steps · Continuous Loop</h3>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="num" style="color:#818cf8;">PHASE 1</div><div class="label">Discover</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="num" style="color:#22d3ee;">PHASE 2</div><div class="label">Validate</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="num" style="color:#fbbf24;">PHASE 3</div><div class="label">Build & Test</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="num" style="color:#34d399;">PHASE 4</div><div class="label">Launch</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="num" style="color:#f472b6;">PHASE 5</div><div class="label">Grow</div></div>
+      <div class="flow-arrow">↩</div>
+    </div>
+    <div style="margin-top:24px;">
+      <div class="flow-steps" style="gap:4px;">
+        <div class="flow-step" style="min-width:65px;"><div class="num">1</div><div class="label" style="font-size:9px;">Spot Gap</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px;"><div class="num">2</div><div class="label" style="font-size:9px;">Screen</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px;"><div class="num">3</div><div class="label" style="font-size:9px;">Research</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px;"><div class="num">4</div><div class="label" style="font-size:9px;">Prototype</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px;"><div class="num">5</div><div class="label" style="font-size:9px;">Pilot</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px;"><div class="num">6</div><div class="label" style="font-size:9px;">Evaluate</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px; border-color:rgba(239,68,68,0.2);"><div class="num" style="color:#ef4444;">7</div><div class="label" style="font-size:9px;">Ship/Kill</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px;"><div class="num">8</div><div class="label" style="font-size:9px;">Market</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px;"><div class="num">9</div><div class="label" style="font-size:9px;">Monitor</div></div>
+        <div class="flow-arrow" style="font-size:12px;">→</div>
+        <div class="flow-step" style="min-width:65px;"><div class="num">10</div><div class="label" style="font-size:9px;">Evolve</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Phase 1 - Discover -->
+  <div class="slide content-left">
+    <h2><span class="c-blue">Phase 1 · Discover</span></h2>
+    <ul class="bullet-list">
+      <li><span class="icon">🔍</span><strong>Step 1 — Spot the Gap:</strong> Market intel, trend analysis, competitor scanning. Arnold (T4) runs automated scans. Barney verifies quality.</li>
+      <li><span class="icon">🎯</span><strong>Step 2 — Screen & Prioritize:</strong> Rank ideas by impact × feasibility × strategic fit. Kill weak ideas before spending resources.</li>
+      <li><span class="icon">👥</span><strong>Team:</strong> Fred + Wilma brainstorm · Arnold scans (T4 role) · Barney verifies intel</li>
+      <li><span class="icon">🔄</span><strong>QA Loop:</strong> Fred ↔ Wilma strategic back-and-forth. Always active — every idea gets reviewed.</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 7: Phase 2 - Validate -->
+  <div class="slide content-left">
+    <h2><span class="c-cyan">Phase 2 · Validate</span></h2>
+    <ul class="bullet-list">
+      <li><span class="icon">🧪</span><strong>Step 3 — Research & Design:</strong> Deep feasibility study, solution architecture, data source identification. T4 does the heavy lifting.</li>
+      <li><span class="icon">🛠️</span><strong>Step 4 — Prototype:</strong> Build MVP / proof-of-concept. T4 writes the code. Senior agent verifies approach.</li>
+      <li><span class="icon">👥</span><strong>Team:</strong> T4 builds · Bam-Bam QAs code · Barney QAs strategy</li>
+      <li><span class="icon">🔄</span><strong>QA Loop:</strong> T3 ↔ T4 exchange, max 3 rounds. Adaptive sampling based on failure rate.</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 8: Phase 3 - Build & Test -->
+  <div class="slide content-left">
+    <h2><span class="c-gold">Phase 3 · Build & Test</span></h2>
+    <ul class="bullet-list">
+      <li><span class="icon">🚀</span><strong>Step 5 — Run Pilot:</strong> Deploy to limited audience, collect real-world data. T4 executes deployment.</li>
+      <li><span class="icon">📊</span><strong>Step 6 — Evaluate:</strong> Measure KPIs against hypothesis. Assess product-market fit.</li>
+      <li><span class="icon">⚖️</span><strong>Step 7 — Ship or Kill:</strong> The gate. Go to market, pivot, or dump. Gazoo has veto power.</li>
+      <li><span class="icon">👥</span><strong>Team:</strong> T4 deploys · Gazoo audits independently · Wilma compiles · Fred decides</li>
+      <li><span class="icon">🔄</span><strong>QA Loop:</strong> Always 100% review. Shipping decisions are never sampled.</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 9: Phase 4 & 5 -->
+  <div class="slide content-left">
+    <h2><span class="c-green">Phase 4 · Launch</span> + <span class="c-pink">Phase 5 · Grow</span></h2>
+    <ul class="bullet-list">
+      <li><span class="icon">📢</span><strong>Step 8 — Go to Market:</strong> Launch strategy, positioning, pricing. T4 drafts content & assets.</li>
+      <li><span class="icon">📡</span><strong>Step 9 — Monitor & Feedback:</strong> Track KPIs, gather user feedback. Dino tracks metrics.</li>
+      <li><span class="icon">🔄</span><strong>Step 10 — Evolve:</strong> Iterate on feedback, optimize, expand. Then loop back to Step 1.</li>
+      <li><span class="icon">👥</span><strong>Launch team:</strong> Betty QAs content · Pebbles QAs design · Cross-verified</li>
+      <li><span class="icon">👥</span><strong>Grow team:</strong> Wilma aggregates everything · Fred makes strategic call on next cycle</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 10: Adaptive QA -->
+  <div class="slide">
+    <h2>📊 Adaptive QA Rating System</h2>
+    <h3>Quality-driven sampling that self-tunes over time</h3>
+    <div class="grid-3" style="margin-top:24px;">
+      <div class="g-card" style="border-color:rgba(16,185,129,0.2);">
+        <div class="title c-green">🟢 Green — Trusted</div>
+        <div class="body"><strong>&lt;5% failure rate</strong><br>10-20% spot checks<br>Fast & cheap. Cruise mode.</div>
+      </div>
+      <div class="g-card" style="border-color:rgba(245,158,11,0.2);">
+        <div class="title c-gold">🟡 Yellow — Elevated</div>
+        <div class="body"><strong>5-15% failure rate</strong><br>50% review<br>Something's off. Cold start default.</div>
+      </div>
+      <div class="g-card" style="border-color:rgba(239,68,68,0.2);">
+        <div class="title c-red">🔴 Red — Full Review</div>
+        <div class="body"><strong>&gt;15% failure rate</strong><br>100% review<br>Consider task reclassification.</div>
+      </div>
+    </div>
+    <p style="margin-top:20px;font-size:13px;">Per task type · Applies to all tiers including Wilma<br>
+    <strong style="color:#fff;">Always 100%:</strong> Customer-facing · Ship/kill gates · Financial claims · First 20 tasks</p>
+  </div>
+
+  <!-- SLIDE 11: Escalation -->
+  <div class="slide">
+    <h2>🚨 Escalation & Authority</h2>
+    <div class="flow-steps" style="margin-top:24px;">
+      <div class="flow-step" style="min-width:140px;"><div class="num">ROUND 1-3</div><div class="label">T3 ↔ T4 QA Loop</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="min-width:140px;"><div class="num">UNRESOLVED</div><div class="label">🦴 Wilma Decides</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="min-width:140px;"><div class="num">STILL STUCK</div><div class="label">👑 Fred Decides</div></div>
+    </div>
+    <ul class="bullet-list" style="margin-top:24px;max-width:700px;">
+      <li><span class="icon">👽</span><strong>Gazoo veto:</strong> Can block any shipment until Fred explicitly overrides</li>
+      <li><span class="icon">🦴</span><strong>Wilma:</strong> Resolves T3 peer disagreements · Reclassifies tasks</li>
+      <li><span class="icon">🪨🏏</span><strong>Senior delegation:</strong> Barney & Bam-Bam can pair directly for routine tasks</li>
+      <li><span class="icon">📊</span><strong>Task reclassification:</strong> If T4 fails 3× on same type → moves to T3 execution</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 12: Hardware -->
+  <div class="slide">
+    <h2>🖥️ Tier 4 Hardware</h2>
+    <h3>Mac Studio + Local LLM = Near-Zero Marginal Cost</h3>
+    <table class="hw-mini" style="margin-top:24px;">
+      <tr><th>Config</th><th>Chip</th><th>Memory</th><th>Models</th><th>Speed</th><th>Price</th></tr>
+      <tr><td>Budget</td><td>M4 Max</td><td>128GB</td><td>70B Q8</td><td>~15-20 tok/s</td><td class="price">~$3,500</td></tr>
+      <tr class="rec"><td><strong>★ Recommended</strong></td><td>M3 Ultra</td><td>256GB</td><td>235B MoE Q8</td><td>~18-20 tok/s</td><td class="price">~$7,000</td></tr>
+      <tr><td>Maximum</td><td>M3 Ultra</td><td>512GB</td><td>671B MoE Q4</td><td>~16-19 tok/s</td><td class="price">~$9,500</td></tr>
+    </table>
+    <p style="margin-top:16px;font-size:13px;"><strong class="c-green">★ Recommended:</strong> Qwen3-235B-A22B (8-bit MLX)<br>
+    22B active params per token → fast despite 235B total · PhD-level reasoning quality</p>
+  </div>
+
+  <!-- SLIDE 13: The Compounding Effect -->
+  <div class="slide">
+    <div class="big-emoji">📈</div>
+    <h2>The Compounding Effect</h2>
+    <p>Every cycle through the framework produces more than just a product:</p>
+    <div class="grid-2" style="margin-top:20px;">
+      <div class="g-card"><div class="title c-gold">📦 Product</div><div class="body">Revenue potential from each validated idea that ships</div></div>
+      <div class="g-card"><div class="title c-blue">📋 QA Ledger</div><div class="body">Institutional knowledge — what works, what doesn't, why</div></div>
+      <div class="g-card"><div class="title c-green">🗺️ Capability Map</div><div class="body">Better future delegation — know what T4 can and can't do</div></div>
+      <div class="g-card"><div class="title c-pink">📊 QA Ratings</div><div class="body">Cheaper future operations — system self-tunes toward efficiency</div></div>
+    </div>
+    <p style="margin-top:16px;font-size:14px;"><strong style="color:#fff;">Product #5 will be dramatically cheaper and faster than Product #1.</strong></p>
+  </div>
+
+  <!-- SLIDE 14: Summary -->
+  <div class="slide">
+    <div class="big-emoji">🏗️</div>
+    <h2>You're Not Building a Product.<br>You're Building the Machine<br>That Builds Products.</h2>
+    <p style="margin-top:16px;">Point it at any data science market gap.<br>Crank out a validated product in weeks.<br>The machine gets better every time.</p>
+    <div class="brand" style="margin-top:24px;">hazeydata.ai · The Flintstones Framework · v3.0</div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav" id="nav" style="display:none;">
+  <button onclick="prev()">← Prev</button>
+  <div class="counter"><span id="current">1</span> / <span id="total"></span></div>
+  <button onclick="next()">Next →</button>
+</div>
+
+<script>
+// Auth
+const gate=document.getElementById('gate'),deck=document.getElementById('deck'),pw=document.getElementById('pw'),err=document.getElementById('err'),nav=document.getElementById('nav');
+if(localStorage.getItem('ff_auth')==='yabbadabbadoo'){gate.classList.add('hidden');deck.classList.add('visible');nav.style.display='flex';}
+pw.addEventListener('keydown',function(e){if(e.key==='Enter'){const v=pw.value.trim().toLowerCase();if(v==='yabbadabbadoo'||v==='yabba dabba doo'){localStorage.setItem('ff_auth','yabbadabbadoo');gate.classList.add('hidden');deck.classList.add('visible');nav.style.display='flex';}else{err.style.display='block';pw.value='';pw.focus();}}});
+
+// Slides
+const slides=document.querySelectorAll('.slide');
+let idx=0;
+document.getElementById('total').textContent=slides.length;
+
+function show(n){
+  slides.forEach(s=>{s.classList.remove('active');});
+  idx=Math.max(0,Math.min(n,slides.length-1));
+  slides[idx].classList.add('active');
+  document.getElementById('current').textContent=idx+1;
+}
+function next(){show(idx+1);}
+function prev(){show(idx-1);}
+
+// Keyboard nav
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' ')next();
+  if(e.key==='ArrowLeft')prev();
+});
+</script>
+</body>
+</html>
