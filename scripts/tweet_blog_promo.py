@@ -27,9 +27,9 @@ import tweepy
 from urllib.parse import urlencode
 
 # ── Paths ────────────────────────────────────────────────────────
-BLOG_DIR = Path.home() / "hazeydata.ai" / "blog"
+BLOG_DIR = Path.home() / "hazeydata.ai" / "theme-park-crowd-report" / "blog"
 STATE_FILE = Path.home() / "hazeydata" / "pipeline" / "state" / "blog_promo_state.json"
-BASE_URL = "https://hazeydata.ai/blog"
+BASE_URL = "https://hazeydata.ai/theme-park-crowd-report/blog"
 
 
 # ── UTM Helpers ──────────────────────────────────────────────────
