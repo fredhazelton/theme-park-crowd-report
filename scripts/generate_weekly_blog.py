@@ -805,15 +805,185 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css?v={cache_bust}">
     <link rel="stylesheet" href="blog.css?v={cache_bust}">
     <style>
+        /* Blog post ambient + sticky nav overrides */
+        .blog-ambient {{
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }}
+        .blog-ambient .orb {{
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.08;
+            animation: orb-drift 20s ease-in-out infinite alternate;
+        }}
+        .blog-ambient .orb-1 {{
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #EB427B 0%, transparent 70%);
+            top: -10%; left: -10%;
+        }}
+        .blog-ambient .orb-2 {{
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #ff6b9d 0%, transparent 70%);
+            bottom: 10%; right: -10%;
+            animation-delay: -10s;
+            animation-duration: 28s;
+        }}
+        @keyframes orb-drift {{
+            0% {{ transform: translate(0, 0) scale(1); }}
+            33% {{ transform: translate(30px, -20px) scale(1.05); }}
+            66% {{ transform: translate(-20px, 15px) scale(0.95); }}
+            100% {{ transform: translate(10px, -10px) scale(1.02); }}
+        }}
+
+        .blog-sticky-nav {{
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            transition: all 0.3s ease;
+        }}
+        .blog-sticky-nav.scrolled {{
+            background: rgba(10, 22, 40, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+        }}
+        .blog-sticky-nav .nav-inner {{
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }}
+        .blog-sticky-nav .nav-brand {{
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }}
+        .blog-sticky-nav .nav-back {{
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            transition: color 0.2s;
+            margin-right: 0.5rem;
+        }}
+        .blog-sticky-nav .nav-back:hover {{ color: var(--text-secondary); }}
+        .blog-sticky-nav .nav-logo-link {{
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }}
+        .blog-sticky-nav .nav-logo-link img {{
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }}
+        .blog-sticky-nav .nav-logo-link span {{
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.04em;
+            color: var(--text-primary);
+        }}
+        .blog-sticky-nav .blog-nav-links {{
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }}
+        .blog-sticky-nav .blog-nav-links a {{
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }}
+        .blog-sticky-nav .blog-nav-links a:hover {{ color: #FFB1C9; }}
+        .blog-sticky-nav .blog-nav-links .btn {{
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #EB427B 0%, #c93566 100%);
+        }}
+        .blog-sticky-nav .blog-nav-links .btn:hover {{
+            background: linear-gradient(135deg, #ff6b9d 0%, #EB427B 100%);
+            box-shadow: 0 8px 30px rgba(235, 66, 123, 0.3);
+        }}
+        .blog-hamburger {{
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 20;
+        }}
+        .blog-hamburger span {{
+            display: block; width: 22px; height: 2px;
+            background: var(--text-secondary); margin: 5px 0;
+            transition: all 0.3s; border-radius: 2px;
+        }}
+        .blog-hamburger.open span:nth-child(1) {{ transform: rotate(45deg) translate(5px, 5px); }}
+        .blog-hamburger.open span:nth-child(2) {{ opacity: 0; }}
+        .blog-hamburger.open span:nth-child(3) {{ transform: rotate(-45deg) translate(5px, -5px); }}
+
+        /* Blog post hero — adjusted for sticky nav */
+        .blog-post-hero {{
+            position: relative;
+            z-index: 1;
+            padding: 8rem 2rem 3rem;
+            text-align: center;
+        }}
+        .blog-post-hero h1 {{
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.85) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }}
+        .blog-post-hero p {{
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }}
+
+        /* Blog container with z-index */
+        .blog-container {{
+            position: relative;
+            z-index: 1;
+        }}
+
+        /* Footer z-index */
+        .blog-footer {{
+            position: relative;
+            z-index: 1;
+        }}
+
+        /* WTI Table styling */
         .wti-table {{
             width: 100%;
             border-collapse: collapse;
             margin: 1.5rem 0;
             font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
         }}
         .wti-table th {{
             background: rgba(60, 120, 210, 0.15);
@@ -842,7 +1012,35 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
             color: #22c55e;
             font-weight: 600;
         }}
+
         @media (max-width: 768px) {{
+            .blog-sticky-nav {{ padding: 0.75rem 1.25rem; }}
+            .blog-hamburger {{ display: block; }}
+            .blog-sticky-nav .nav-logo-link span {{ display: none; }}
+            .blog-sticky-nav .blog-nav-links {{
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 1rem;
+                background: rgba(10, 22, 40, 0.95);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 0.75rem 1rem;
+                min-width: 180px;
+                flex-direction: column;
+                gap: 0.25rem;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+                backdrop-filter: blur(16px);
+            }}
+            .blog-sticky-nav .blog-nav-links.open {{ display: flex; }}
+            .blog-sticky-nav .blog-nav-links a {{
+                display: block;
+                padding: 0.5rem 0.25rem;
+                font-size: 0.9rem;
+            }}
+            .blog-post-hero {{
+                padding: 7rem 1.5rem 2rem;
+            }}
             .wti-table {{
                 font-size: 0.8rem;
             }}
@@ -853,37 +1051,46 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
     </style>
 </head>
 <body>
-    <section class="hero blog-hero">
-        <div class="hero-bg"></div>
-        <nav class="nav">
-            <div class="nav-logo">
-                <a href="/"><img src="../assets/icon.jpg" alt="TPCR" class="nav-icon"></a>
-                <a href="/" class="nav-title">Theme Park Crowd Report</a>
+    <!-- Ambient orbs -->
+    <div class="blog-ambient" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <!-- Sticky Navigation -->
+    <nav class="blog-sticky-nav" id="blogNav">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <a href="/theme-park-crowd-report/blog/" class="nav-back">← All posts</a>
+                <a href="/theme-park-crowd-report/" class="nav-logo-link">
+                    <img src="../assets/icon.jpg" alt="Theme Park Crowd Report">
+                    <span>Theme Park Crowd Report</span>
+                </a>
             </div>
-            <button class="nav-hamburger" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')" aria-label="Menu">
+            <button class="blog-hamburger" id="blogHamburger" aria-label="Menu">
                 <span></span><span></span><span></span>
             </button>
-            <div class="nav-links">
-                <a href="/">Home</a>
+            <div class="blog-nav-links" id="blogNavLinks">
+                <a href="/theme-park-crowd-report/">Home</a>
                 <a href="/theme-park-crowd-report/blog/">Blog</a>
+                <a href="/theme-park-crowd-report/pricing.html">Pricing</a>
                 <a href="https://discord.gg/2Estr7sbP7" class="btn btn-sm" target="_blank">Join Discord</a>
             </div>
-        </nav>
-        <div class="hero-content">
-            <h1>Blog</h1>
-            <p>Data-driven insights on theme park crowds, wait times, and trip planning.</p>
         </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="blog-post-hero">
+        <div class="blog-post-meta" style="margin-bottom: 1rem;">
+            <span>{meta_date}</span>
+            {tags_html}
+        </div>
+        <h1>{title}</h1>
+        <p>{description}</p>
     </section>
 
     <div class="blog-container">
-        <a href="/theme-park-crowd-report/blog/" class="blog-back">← All posts</a>
-
         <article class="blog-post">
-            <div class="blog-post-meta">
-                <span>{meta_date}</span>
-                {tags_html}
-            </div>
-            <h2>{title}</h2>
 {body}
         </article>
 
@@ -899,6 +1106,7 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
             </div>
             <div class="footer-links">
                 <a href="/">Home</a>
+                <a href="/theme-park-crowd-report/">TPCR Home</a>
                 <a href="/theme-park-crowd-report/blog/">Blog</a>
                 <a href="/theme-park-crowd-report/bio.html">About</a>
                 <a href="https://discord.gg/2Estr7sbP7" target="_blank">Discord</a>
@@ -908,6 +1116,27 @@ def generate_full_html(region: str, analysis: dict, start_date: datetime.date, e
             <p class="footer-copy">© {start_date.year} hazeydata.ai</p>
         </div>
     </footer>
+
+    <script>
+        // Sticky nav
+        const nav = document.getElementById('blogNav');
+        window.addEventListener('scroll', () => {{
+            nav.classList.toggle('scrolled', window.scrollY > 40);
+        }});
+        // Hamburger
+        const hamburger = document.getElementById('blogHamburger');
+        const navLinks = document.getElementById('blogNavLinks');
+        hamburger.addEventListener('click', () => {{
+            hamburger.classList.toggle('open');
+            navLinks.classList.toggle('open');
+        }});
+        navLinks.querySelectorAll('a').forEach(a => {{
+            a.addEventListener('click', () => {{
+                hamburger.classList.remove('open');
+                navLinks.classList.remove('open');
+            }});
+        }});
+    </script>
 </body>
 </html>"""
 
