@@ -358,6 +358,34 @@
     border-color: var(--orange);
   }
 
+  .nav button:focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 2px;
+    background: rgba(255,255,255,0.15);
+    border-color: var(--orange);
+    transform: translateY(-1px);
+  }
+
+  .nav button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+  }
+
+  .nav button:disabled:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+    transform: none;
+  }
+
+  .nav button:active:not(:disabled) {
+    transform: translateY(0px) scale(0.98);
+    background: rgba(255,255,255,0.25);
+    border-color: var(--orange);
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   .progress {
     position: fixed;
     top: 0;
@@ -468,9 +496,9 @@
 </head>
 <body>
 
-<div class="progress" id="progress"></div>
+<div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Presentation progress"></div>
 <div class="tagline-bar">hazeydata.ai</div>
-<div class="slide-counter" id="counter"></div>
+<div class="slide-counter" id="counter" aria-live="polite" aria-label="Current slide number"></div>
 
 <div class="deck" id="deck">
 
@@ -745,9 +773,9 @@
 </div>
 
 <!-- Navigation -->
-<div class="nav">
-  <button onclick="prevSlide()" id="prevBtn">← Back</button>
-  <button onclick="nextSlide()" id="nextBtn">Next →</button>
+<div class="nav" role="navigation" aria-label="Slide navigation">
+  <button onclick="prevSlide()" id="prevBtn" aria-label="Go to previous slide">← Back</button>
+  <button onclick="nextSlide()" id="nextBtn" aria-label="Go to next slide">Next →</button>
 </div>
 
 <script>
@@ -763,10 +791,24 @@
       if (i === current) s.classList.add('active');
       else if (i < current) s.classList.add('exit');
     });
-    progress.style.width = ((current + 1) / total * 100) + '%';
+    const progressPercent = ((current + 1) / total * 100);
+    progress.style.width = progressPercent + '%';
+    progress.setAttribute('aria-valuenow', Math.round(progressPercent));
     counter.textContent = `${current + 1} / ${total}`;
-    document.getElementById('prevBtn').style.opacity = current === 0 ? 0.3 : 1;
-    document.getElementById('nextBtn').style.opacity = current === total - 1 ? 0.3 : 1;
+    
+    // Enhanced accessibility: proper disabled states
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+    
+    // Update aria labels for screen readers
+    prevBtn.setAttribute('aria-label', `Go to slide ${current}, ${current === 0 ? 'disabled' : 'enabled'}`);
+    nextBtn.setAttribute('aria-label', `Go to slide ${current + 2}, ${current === total - 1 ? 'disabled' : 'enabled'}`);
+    
+    // Update document title with current slide info for screen readers
+    document.title = `Building Smarter — AI for Construction (Slide ${current + 1} of ${total})`;
   }
 
   function nextSlide() {
@@ -777,10 +819,34 @@
     if (current > 0) { current--; updateSlide(); }
   }
 
-  // Keyboard navigation
+  // Enhanced keyboard navigation
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+    switch(e.key) {
+      case 'ArrowRight':
+      case ' ':
+        e.preventDefault();
+        nextSlide();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        prevSlide();
+        break;
+      case 'Home':
+        e.preventDefault();
+        current = 0;
+        updateSlide();
+        break;
+      case 'End':
+        e.preventDefault();
+        current = total - 1;
+        updateSlide();
+        break;
+      case 'Escape':
+        e.preventDefault();
+        // Optional: Could add fullscreen exit or focus management
+        document.activeElement.blur();
+        break;
+    }
   });
 
   // Touch navigation
