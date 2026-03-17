@@ -1,8 +1,19 @@
 # HEARTBEAT.md
 
+## 🟣 #1 PRIORITY: #chantale-wilma
+- **ALWAYS check first**, before anything else in this file
+- Channel: 1482052653902069760
+- Read latest messages — if Chantale has sent anything unanswered, respond immediately
+- This takes priority over scraper monitoring, content review, email, everything
+- Be warm, careful, and thoughtful — she's going through a stressful career decision
+
 ## Content Review Check
-- Scan #content-review (channel:1479351605051654215) for posts with ✅ reactions that haven't been actioned
-- If found: execute the pending action (publish, set avatar, send tweet, etc.)
+- Scan #content-review (channel:1479351605051654215) for posts with ✅ reactions that do NOT also have a 🏁 reaction
+- ✅ = "Fred approved" · 🏁 = "agent already processed this"
+- If ✅ found without 🏁: execute the pending action (publish, set avatar, send tweet, etc.)
+- **After completing the action**, react 🏁 on that message to mark it done
+- Messages with ❌ = rejected, skip them
+- Messages with both ✅ and 🏁 = already handled, skip them
 
 ## 🔴 #1 PRIORITY: LLM Scraper Monitor
 - Check if llm_scraper.py is running: `ps aux | grep llm_scraper | grep -v grep`

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "DL-001",
+    "timestamp": "2026-03-16T21:45:00-04:00",
+    "domain": "tpcr",
+    "problem": "No TikTok presence. Existing Remotion video pipeline for X could be extended to TikTok with new vertical templates and TikTok-native content.",
+    "source": "fred_ideation",
+    "options_presented": [
+      {
+        "id": "A",
+        "description": "Full TikTok content pipeline using existing Remotion infrastructure with new vertical templates, TikTok API integration, and TikTok-native content strategy",
+        "pros": ["Leverages existing video infra", "New audience channel", "Tests the full Flintstones Framework on a micro-project"],
+        "cons": ["New platform to manage", "Vertical templates need design work", "TikTok API approval needed"]
+      }
+    ],
+    "fred_choice": "A",
+    "fred_reasoning": "Good test for new business framework with QA loop. Micro project within TPCR.",
+    "outcome": null,
+    "outcome_timestamp": null,
+    "tags": ["content", "distribution", "tiktok", "video", "remotion"]
+  },
+  {
+    "id": "DL-002",
+    "timestamp": "2026-03-16T21:52:00-04:00",
+    "domain": "tpcr",
+    "problem": "TikTok visual style direction — need to choose the look and feel for vertical content templates",
+    "source": "phase2_design_review",
+    "options_presented": [
+      {
+        "id": "A",
+        "description": "TikTok Energy — fast, snappy, neon accent pops, glitch transitions, screen shake on reveals. 15-20s max. High-energy, appeals to 18-25.",
+        "pros": ["Matches platform energy", "Younger demographic appeal", "Trending format compatibility"],
+        "cons": ["May feel generic", "Brand dilution risk", "Less distinctive"]
+      },
+      {
+        "id": "B",
+        "description": "Premium Minimalist — smooth, sophisticated motion, gold accents, glass morphism. 20-25s. Calm, premium feel. Appeals to 25-40 planners.",
+        "pros": ["Stands out from typical TikTok", "Premium brand perception", "Trust-building"],
+        "cons": ["May not grab attention fast enough", "Could feel slow for platform", "Niche appeal"]
+      },
+      {
+        "id": "C",
+        "description": "Cozy Data Storytelling — bouncy, playful spring animations, warmer pastels, theme park iconography. 18-22s. Family-friendly, approachable data. Disney Adult alignment.",
+        "pros": ["Emotional connection to theme parks", "Family-friendly broadens audience", "Approachable data presentation"],
+        "cons": ["May seem less 'professional'", "Requires more custom assets", "Pastel colors less punchy"]
+      }
+    ],
+    "fred_choice": "C",
+    "fred_reasoning": "Feels more like the style he's looking for. Warm, approachable, on-brand.",
+    "outcome": null,
+    "outcome_timestamp": null,
+    "tags": ["design", "visual", "tiktok", "brand"]
+  },
+  {
+    "id": "DL-003",
+    "timestamp": "2026-03-16T21:52:00-04:00",
+    "domain": "tpcr",
+    "problem": "TikTok posting cadence — how often to post on the new platform",
+    "source": "phase2_content_strategy",
+    "options_presented": [
+      {
+        "id": "A",
+        "description": "Conservative — 3-4 posts/week. Mon prediction, Wed educational, Fri weekend forecast.",
+        "pros": ["Manageable load", "Quality focus", "Lower risk"],
+        "cons": ["Slower growth", "Less algorithm exposure"]
+      },
+      {
+        "id": "B",
+        "description": "Moderate — 5-7 posts/week. Daily crowd predictions + 2x weekly educational/entertainment. Betty's recommendation.",
+        "pros": ["Strong algorithm presence", "Good balance utility + entertainment", "Sufficient for growth"],
+        "cons": ["Higher production demands", "More automation complexity"]
+      },
+      {
+        "id": "C",
+        "description": "Aggressive — 10-14 posts/week. Multiple posts daily, real-time trending content.",
+        "pros": ["Maximum algorithm exposure", "Fastest growth potential"],
+        "cons": ["Heavy production load", "Quality risk", "Burnout risk"]
+      }
+    ],
+    "fred_choice": "B",
+    "fred_reasoning": "Deferred to Betty's recommendation. Trusts specialist judgment on content cadence.",
+    "outcome": null,
+    "outcome_timestamp": null,
+    "tags": ["content", "cadence", "tiktok", "strategy"]
+  }
+]

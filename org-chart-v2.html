@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hazeydata — Org Structure v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #0c0e14;
+    font-family: 'Inter', sans-serif;
+    color: #e0e0e0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .page { width: 1100px; max-width: 100%; }
+
+  .header { text-align: center; margin-bottom: 36px; }
+  .header h1 { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+  .header .sub { font-size: 11px; color: #555; margin-top: 4px; letter-spacing: 1px; }
+  .header .ver { font-size: 9px; color: #444; margin-top: 2px; }
+
+  /* Tier rows */
+  .tier {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    min-height: 100px;
+  }
+  .tier-label {
+    width: 105px; min-width: 105px;
+    padding-top: 16px; text-align: right; padding-right: 16px;
+  }
+  .tier-label .name { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; }
+  .tier-label .desc { font-size: 8px; color: #555; margin-top: 2px; }
+  .tier-content {
+    flex: 1;
+    display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+    padding: 6px 0;
+  }
+
+  /* Agent cards */
+  .agent {
+    display: flex; flex-direction: column; align-items: center;
+    width: 115px; padding: 10px 6px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.2s; cursor: default;
+  }
+  .agent:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); transform: translateY(-2px); }
+  .agent.wide { width: 155px; }
+  .agent .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 5px;
+  }
+  .agent .name { font-size: 10.5px; font-weight: 700; color: #fff; text-align: center; }
+  .agent .role { font-size: 8.5px; color: #888; text-align: center; margin-top: 2px; line-height: 1.3; }
+  .agent .badge {
+    font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    padding: 2px 7px; border-radius: 3px; margin-top: 4px;
+  }
+
+  .t-human .avatar { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+  .t-human .badge { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .t-cto .avatar { background: linear-gradient(135deg, #ec4899, #f472b6); }
+  .t-cto .badge { background: rgba(236,72,153,0.15); color: #f472b6; }
+  .t-team .avatar { background: linear-gradient(135deg, #6366f1, #818cf8); }
+  .t-team .badge { background: rgba(99,102,241,0.15); color: #818cf8; }
+  .t-res .avatar { background: linear-gradient(135deg, #10b981, #34d399); }
+  .t-res .badge { background: rgba(16,185,129,0.15); color: #34d399; }
+
+  /* Loop indicators */
+  .loop-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; margin: 4px 0; padding: 4px 14px;
+  }
+  .loop-row .line { flex: 1; max-width: 100px; height: 1px; opacity: 0.12; }
+  .loop-row .icon { font-size: 12px; opacity: 0.4; }
+  .loop-row .text { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.35; }
+  .l-gold .text, .l-gold .icon { color: #fbbf24; } .l-gold .line { background: #fbbf24; }
+  .l-pink .text, .l-pink .icon { color: #f472b6; } .l-pink .line { background: #f472b6; }
+  .l-blue .text, .l-blue .icon { color: #818cf8; } .l-blue .line { background: #818cf8; }
+  .l-green .text, .l-green .icon { color: #34d399; } .l-green .line { background: #34d399; }
+
+  /* Section headers */
+  .section { margin: 40px 0 28px; text-align: center; }
+  .section h2 { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; }
+  .section .sub { font-size: 10px; color: #555; margin-top: 3px; }
+
+  /* Flow integration table */
+  .flow-row {
+    display: flex; align-items: stretch; margin-bottom: 3px;
+    border-radius: 10px; background: rgba(255,255,255,0.015);
+    border: 1px solid rgba(255,255,255,0.03); overflow: hidden;
+  }
+  .flow-phase-col {
+    width: 155px; min-width: 155px; padding: 12px 14px;
+    display: flex; flex-direction: column; justify-content: center;
+    border-right: 1px solid rgba(255,255,255,0.04);
+  }
+  .flow-phase-col .ph-name { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  .flow-phase-col .ph-steps { font-size: 8px; color: #777; margin-top: 2px; line-height: 1.4; }
+
+  .flow-work-col {
+    flex: 1; padding: 12px 16px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .flow-work-col .who { font-size: 9.5px; font-weight: 600; color: #ccc; }
+  .flow-work-col .how { font-size: 8.5px; color: #777; margin-top: 2px; line-height: 1.4; }
+
+  .flow-qa-col {
+    width: 210px; min-width: 210px; padding: 10px 12px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    border-left: 1px solid rgba(255,255,255,0.04);
+  }
+  .flow-qa-col .qa-badge {
+    font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 3px 8px; border-radius: 3px; margin-bottom: 3px;
+  }
+  .flow-qa-col .qa-desc { font-size: 8px; color: #777; text-align: center; line-height: 1.3; }
+  .flow-qa-col .qa-level { font-size: 7px; color: #555; text-align: center; margin-top: 2px; font-style: italic; }
+
+  .ph-disc .ph-name { color: #818cf8; } .ph-disc .qa-badge { background: rgba(99,102,241,0.15); color: #818cf8; }
+  .ph-val .ph-name { color: #22d3ee; } .ph-val .qa-badge { background: rgba(6,182,212,0.15); color: #22d3ee; }
+  .ph-bld .ph-name { color: #fbbf24; } .ph-bld .qa-badge { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .ph-lnch .ph-name { color: #34d399; } .ph-lnch .qa-badge { background: rgba(16,185,129,0.15); color: #34d399; }
+  .ph-grow .ph-name { color: #f472b6; } .ph-grow .qa-badge { background: rgba(236,72,153,0.15); color: #f472b6; }
+
+  .flow-arrow { text-align: center; padding: 1px 0; font-size: 11px; opacity: 0.15; color: #fff; }
+
+  /* QA system box */
+  .qa-system {
+    margin: 32px 0;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 24px;
+    background: rgba(255,255,255,0.015);
+  }
+  .qa-system h3 {
+    font-size: 13px; font-weight: 800; color: #fff;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
+    text-align: center;
+  }
+  .qa-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .qa-card {
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .qa-card .title {
+    font-size: 10px; font-weight: 700; color: #fff;
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .qa-card .body { font-size: 8.5px; color: #888; line-height: 1.5; }
+  .qa-card .body strong { color: #bbb; }
+
+  /* Escalation flow */
+  .esc-flow {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; margin: 20px 0 8px;
+    flex-wrap: wrap;
+  }
+  .esc-step {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 14px; border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .esc-step .num { font-size: 8px; font-weight: 800; color: #f59e0b; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+  .esc-step .desc { font-size: 9px; color: #ccc; margin-top: 2px; text-align: center; }
+  .esc-arrow { font-size: 14px; color: #fff; opacity: 0.15; }
+
+  .footnote { text-align: center; margin-top: 20px; font-size: 8px; color: #444; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ============ ORG CHART ============ -->
+  <div class="header">
+    <h1>🏗️ Organizational Structure</h1>
+    <div class="sub">hazeydata.ai — The Flintstones Framework</div>
+    <div class="ver">v2.0 — Cost-optimized with adaptive QA</div>
+  </div>
+
+  <!-- TIER 1 -->
+  <div class="tier">
+    <div class="tier-label"><div class="name" style="color:#fbbf24;">Tier 1</div><div class="desc">Human</div></div>
+    <div class="tier-content">
+      <div class="agent wide t-human">
+        <div class="avatar">👑</div>
+        <div class="name">Fred</div>
+        <div class="role">Vision, strategy, final override</div>
+        <div class="badge">CEO / Founder</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loop-row l-gold">
+    <div class="line"></div><div class="icon">🔄</div>
+    <div class="text">Strategic Loop — Ideas, direction, go/no-go gates</div>
+    <div class="icon">🔄</div><div class="line"></div>
+  </div>
+
+  <!-- TIER 2 -->
+  <div class="tier">
+    <div class="tier-label"><div class="name" style="color:#f472b6;">Tier 2</div><div class="desc">Executive AI</div></div>
+    <div class="tier-content">
+      <div class="agent wide t-cto">
+        <div class="avatar">🦴</div>
+        <div class="name">Wilma</div>
+        <div class="role">Orchestration, delegation to Tier 3 & 4, QA oversight, escalation handler</div>
+        <div class="badge">CTO / Always-On</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loop-row l-pink">
+    <div class="line"></div><div class="icon">⬇️</div>
+    <div class="text">Wilma delegates work ↓ to Tier 4 (heavy lifting) · QA ↓ to Tier 3</div>
+    <div class="icon">⬇️</div><div class="line"></div>
+  </div>
+
+  <!-- TIER 3 -->
+  <div class="tier">
+    <div class="tier-label"><div class="name" style="color:#818cf8;">Tier 3</div><div class="desc">QA & Specialist<br>Agents</div></div>
+    <div class="tier-content">
+      <div class="agent t-team">
+        <div class="avatar">🪨</div>
+        <div class="name">Barney</div>
+        <div class="role">Strategy, research, QA verification</div>
+        <div class="badge">Advisor + QA</div>
+      </div>
+      <div class="agent t-team">
+        <div class="avatar">🏏</div>
+        <div class="name">Bam-Bam</div>
+        <div class="role">Deep coding review, architecture QA</div>
+        <div class="badge">Lead Dev + QA</div>
+      </div>
+      <div class="agent t-team">
+        <div class="avatar">🎀</div>
+        <div class="name">Pebbles</div>
+        <div class="role">Design review, visual QA</div>
+        <div class="badge">Designer + QA</div>
+      </div>
+      <div class="agent t-team">
+        <div class="avatar">✍️</div>
+        <div class="name">Betty</div>
+        <div class="role">Content review, copy QA</div>
+        <div class="badge">Content + QA</div>
+      </div>
+      <div class="agent t-team">
+        <div class="avatar">🦕</div>
+        <div class="name">Dino</div>
+        <div class="role">Task tracking, metrics</div>
+        <div class="badge">PM</div>
+      </div>
+      <div class="agent t-team">
+        <div class="avatar">👽</div>
+        <div class="name">Gazoo</div>
+        <div class="role">Independent audits, veto power on quality</div>
+        <div class="badge">QA Inspector</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loop-row l-blue">
+    <div class="line"></div><div class="icon">🔄</div>
+    <div class="text">QA Loop — Tier 3 agents verify Tier 4 output · Max 3 rounds</div>
+    <div class="icon">🔄</div><div class="line"></div>
+  </div>
+
+  <!-- TIER 4 -->
+  <div class="tier">
+    <div class="tier-label"><div class="name" style="color:#34d399;">Tier 4</div><div class="desc">Local Compute</div></div>
+    <div class="tier-content">
+      <div class="agent wide t-res" style="width:280px;">
+        <div class="avatar">🖥️</div>
+        <div class="name">Mac Studio LLM</div>
+        <div class="role">Primary workhorse — code generation, data processing, bulk transforms, drafting, embeddings, heavy lifting at near-zero marginal cost</div>
+        <div class="badge">Execution Engine</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ NEW DELEGATION MODEL ============ -->
+  <div class="section">
+    <h2>⚡ Delegation & Work Model</h2>
+    <div class="sub">Tier 4 does the work · Tier 3 verifies the work · Cost-optimized</div>
+  </div>
+
+  <div class="qa-system" style="margin-top: 8px;">
+    <h3>How Work Flows</h3>
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="title" style="color:#f472b6;">① Wilma Delegates</div>
+        <div class="body">
+          Wilma breaks tasks into units and sends them <strong>directly to Tier 4</strong> (local LLM) for execution. Tier 4 does the heavy lifting — code, data processing, drafts, analysis — at <strong>near-zero cost</strong>.
+        </div>
+      </div>
+      <div class="qa-card">
+        <div class="title" style="color:#818cf8;">② Tier 3 QA Reviews</div>
+        <div class="body">
+          A <strong>senior Tier 3 agent</strong> (paired by domain) reviews Tier 4's output. They verify quality, catch errors, and either <strong>approve</strong>, <strong>request revision</strong> (back to Tier 4), or <strong>escalate</strong> (to Wilma).
+        </div>
+      </div>
+      <div class="qa-card">
+        <div class="title" style="color:#fbbf24;">③ Adaptive Sampling</div>
+        <div class="body">
+          Not every task gets full QA. System uses <strong>random sampling</strong> based on historical failure rate. Low failures → spot checks. Rising failures → increased QA. Threshold breach → <strong>100% review</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADAPTIVE QA SYSTEM ============ -->
+  <div class="section">
+    <h2>📊 Adaptive QA Rating System</h2>
+    <div class="sub">Quality-driven sampling that scales review intensity with failure rates</div>
+  </div>
+
+  <div class="qa-system" style="margin-top: 8px;">
+    <h3>QA Levels by Failure Rate</h3>
+    <div class="qa-grid">
+      <div class="qa-card" style="border-color: rgba(16,185,129,0.15);">
+        <div class="title" style="color:#34d399;">🟢 Green — Trusted</div>
+        <div class="body">
+          <strong>Failure rate: &lt;5%</strong><br>
+          QA sampling: <strong>10-20%</strong> of tasks<br>
+          Random spot-checks only. Tier 4 output ships with light verification. Fastest, cheapest mode.
+        </div>
+      </div>
+      <div class="qa-card" style="border-color: rgba(245,158,11,0.15);">
+        <div class="title" style="color:#fbbf24;">🟡 Yellow — Elevated</div>
+        <div class="body">
+          <strong>Failure rate: 5-15%</strong><br>
+          QA sampling: <strong>50%</strong> of tasks<br>
+          Something's off. Half the work gets reviewed. Track what's causing failures to find systemic issues.
+        </div>
+      </div>
+      <div class="qa-card" style="border-color: rgba(239,68,68,0.15);">
+        <div class="title" style="color:#ef4444;">🔴 Red — Full Review</div>
+        <div class="body">
+          <strong>Failure rate: &gt;15%</strong><br>
+          QA sampling: <strong>100%</strong> of tasks<br>
+          Every output gets verified. Consider switching models, adjusting prompts, or escalating to Wilma for the entire workstream.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ESCALATION ============ -->
+  <div class="section">
+    <h2>🚨 Escalation Protocol</h2>
+    <div class="sub">Clear chain when QA loops don't resolve</div>
+  </div>
+
+  <div class="esc-flow">
+    <div class="esc-step">
+      <div class="num">Round 1-3</div>
+      <div class="desc">Tier 3 ↔ Tier 4<br>QA exchange</div>
+    </div>
+    <div class="esc-arrow">→</div>
+    <div class="esc-step">
+      <div class="num">Unresolved</div>
+      <div class="desc">Escalate to<br>🦴 Wilma</div>
+    </div>
+    <div class="esc-arrow">→</div>
+    <div class="esc-step">
+      <div class="num">Still stuck</div>
+      <div class="desc">Escalate to<br>👑 Fred</div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:8px;">
+    <div style="font-size:8.5px; color:#666; line-height:1.5;">
+      👽 <strong style="color:#aaa;">Gazoo veto:</strong> Can block any shipment on quality grounds until Fred explicitly overrides<br>
+      🦴 <strong style="color:#aaa;">Wilma authority:</strong> Can resolve Tier 3 peer disagreements without escalating to Fred<br>
+      🪨🏏 <strong style="color:#aaa;">Senior delegation:</strong> Barney & Bam-Bam can pair directly for routine tasks without Wilma approval
+    </div>
+  </div>
+
+  <!-- ============ IDEA CYCLE INTEGRATION ============ -->
+  <div class="section">
+    <h2>🔬 Idea Cycle × Team Integration</h2>
+    <div class="sub">Who does what, at which phase, with which QA model</div>
+  </div>
+
+  <!-- DISCOVER -->
+  <div class="flow-row ph-disc">
+    <div class="flow-phase-col"><div class="ph-name">1 · Discover</div><div class="ph-steps">Spot Gap → Screen & Prioritize</div></div>
+    <div class="flow-work-col">
+      <div class="who">👑 Fred + 🦴 Wilma · Tier 4 for trend scanning</div>
+      <div class="how">Tier 4 runs market scans, data pulls, trend analysis · Wilma synthesizes · Fred + Wilma brainstorm and filter</div>
+    </div>
+    <div class="flow-qa-col">
+      <div class="qa-badge">Fred ↔ Wilma Loop</div>
+      <div class="qa-desc">Strategic back-and-forth to rank & kill ideas</div>
+      <div class="qa-level">Always active — all ideas get reviewed</div>
+    </div>
+  </div>
+  <div class="flow-arrow">▼</div>
+
+  <!-- VALIDATE -->
+  <div class="flow-row ph-val">
+    <div class="flow-phase-col"><div class="ph-name">2 · Validate</div><div class="ph-steps">Research & Design → Prototype</div></div>
+    <div class="flow-work-col">
+      <div class="who">🖥️ Tier 4 builds · 🪨 Barney or 🏏 Bam-Bam verify</div>
+      <div class="how">Tier 4 does feasibility research, writes prototype code, sources data · Senior agent verifies approach & output quality</div>
+    </div>
+    <div class="flow-qa-col">
+      <div class="qa-badge">Tier 3 ↔ Tier 4 Loop</div>
+      <div class="qa-desc">Senior agent reviews Tier 4 output, max 3 rounds</div>
+      <div class="qa-level">Adaptive — rate based on QA rating</div>
+    </div>
+  </div>
+  <div class="flow-arrow">▼</div>
+
+  <!-- BUILD -->
+  <div class="flow-row ph-bld">
+    <div class="flow-phase-col"><div class="ph-name">3 · Build & Test</div><div class="ph-steps">Pilot → Evaluate → Ship/Kill</div></div>
+    <div class="flow-work-col">
+      <div class="who">🖥️ Tier 4 executes · 👽 Gazoo audits · 🦴 Wilma evaluates</div>
+      <div class="how">Tier 4 deploys pilot, collects data · Gazoo runs independent audit · Wilma compiles results · Fred makes go/no-go call</div>
+    </div>
+    <div class="flow-qa-col">
+      <div class="qa-badge">Gazoo Audit + Fred Gate</div>
+      <div class="qa-desc">Independent QA + veto power. Ship/kill = Fred's call</div>
+      <div class="qa-level">Always 100% — shipping decisions are never sampled</div>
+    </div>
+  </div>
+  <div class="flow-arrow">▼</div>
+
+  <!-- LAUNCH -->
+  <div class="flow-row ph-lnch">
+    <div class="flow-phase-col"><div class="ph-name">4 · Launch</div><div class="ph-steps">Go to Market → Monitor</div></div>
+    <div class="flow-work-col">
+      <div class="who">🖥️ Tier 4 drafts · ✍️ Betty + 🎀 Pebbles QA · 🦕 Dino tracks</div>
+      <div class="how">Tier 4 generates launch content, assets, copy · Betty reviews content · Pebbles reviews visuals · Dino monitors metrics</div>
+    </div>
+    <div class="flow-qa-col">
+      <div class="qa-badge">Betty ↔ Pebbles Cross-QA</div>
+      <div class="qa-desc">Content + design consistency check</div>
+      <div class="qa-level">Adaptive — sampled unless customer-facing (then 100%)</div>
+    </div>
+  </div>
+  <div class="flow-arrow">▼</div>
+
+  <!-- GROW -->
+  <div class="flow-row ph-grow">
+    <div class="flow-phase-col"><div class="ph-name">5 · Grow</div><div class="ph-steps">Evolve → Loop to Discover</div></div>
+    <div class="flow-work-col">
+      <div class="who">🦴 Wilma + 👑 Fred</div>
+      <div class="how">Wilma aggregates feedback, metrics, QA scores · Presents to Fred · Together decide: iterate, expand, or seed new idea cycle</div>
+    </div>
+    <div class="flow-qa-col">
+      <div class="qa-badge">Fred ↔ Wilma Loop</div>
+      <div class="qa-desc">Strategic review — QA ratings inform next cycle</div>
+      <div class="qa-level">Always active — drives the continuous loop</div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:14px; font-size:9px; color:#f472b6; opacity:0.4; letter-spacing:2px; font-weight:700; text-transform:uppercase;">
+    ↩ Continuous loop — learnings + QA scores feed back into Discover ↩
+  </div>
+
+  <div class="footnote">hazeydata.ai · Flintstones Framework v2.0 · Cost-optimized, adaptive QA</div>
+
+</div>
+</body>
+</html>

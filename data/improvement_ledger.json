@@ -1,0 +1,119 @@
+{
+  "_meta": {
+    "version": 1,
+    "created": "2026-03-17",
+    "description": "Recursive improvement tracking. Gazoo raises issues, Wilma tracks patterns, prompts evolve.",
+    "schema": {
+      "issues": "Individual problems raised by Gazoo, tracked until fixed",
+      "scores": "Daily grades from Gazoo reviews (last 14 days)",
+      "trend": "calculated: improving | flat | declining",
+      "prompt_patches": "Modifications applied to agent prompts based on recurring issues",
+      "cycles_to_fix": "Average number of review cycles before issues get resolved"
+    }
+  },
+  "agents": {
+    "dino": {
+      "role": "Task Management & Project Coordination",
+      "issues": [],
+      "scores": [],
+      "trend": "new",
+      "prompt_patches": [],
+      "stats": {
+        "total_issues": 0,
+        "fixed": 0,
+        "avg_cycles_to_fix": null
+      }
+    },
+    "arnold": {
+      "role": "News & Intelligence",
+      "issues": [],
+      "scores": [],
+      "trend": "new",
+      "prompt_patches": [],
+      "stats": {
+        "total_issues": 0,
+        "fixed": 0,
+        "avg_cycles_to_fix": null
+      }
+    },
+    "betty": {
+      "role": "Content & SEO",
+      "issues": [],
+      "scores": [],
+      "trend": "new",
+      "prompt_patches": [],
+      "stats": {
+        "total_issues": 0,
+        "fixed": 0,
+        "avg_cycles_to_fix": null
+      }
+    },
+    "pebbles": {
+      "role": "Visual Design & CSS",
+      "issues": [],
+      "scores": [],
+      "trend": "new",
+      "prompt_patches": [],
+      "stats": {
+        "total_issues": 0,
+        "fixed": 0,
+        "avg_cycles_to_fix": null
+      }
+    },
+    "mr-slate": {
+      "role": "Business Strategy & Revenue",
+      "issues": [],
+      "scores": [],
+      "trend": "new",
+      "prompt_patches": [],
+      "stats": {
+        "total_issues": 0,
+        "fixed": 0,
+        "avg_cycles_to_fix": null
+      }
+    },
+    "bam-bam": {
+      "role": "Lead Engineer & Code",
+      "issues": [],
+      "scores": [],
+      "trend": "new",
+      "prompt_patches": [],
+      "stats": {
+        "total_issues": 0,
+        "fixed": 0,
+        "avg_cycles_to_fix": null
+      }
+    },
+    "gazoo": {
+      "role": "QA & Review",
+      "issues": [],
+      "scores": [],
+      "trend": "new",
+      "prompt_patches": [],
+      "stats": {
+        "total_issues": 0,
+        "fixed": 0,
+        "avg_cycles_to_fix": null
+      }
+    },
+    "wilma": {
+      "role": "Orchestration & Coordination",
+      "issues": [],
+      "scores": [],
+      "trend": "new",
+      "prompt_patches": [],
+      "stats": {
+        "total_issues": 0,
+        "fixed": 0,
+        "avg_cycles_to_fix": null
+      }
+    }
+  },
+  "system": {
+    "total_cycles": 0,
+    "prompt_patches_applied": 0,
+    "prompt_patches_pending_review": 0,
+    "escalations_to_fred": 0,
+    "rubric_revisions": 0
+  }
+}

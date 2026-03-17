@@ -1,6 +1,6 @@
 # MEMORY.md - Wilma's Long-Term Memory
 
-*Last updated: 2026-01-28*
+*Last updated: 2026-03-16*
 
 ---
 
@@ -102,18 +102,83 @@ Also have:
 
 ---
 
+## Flintstones Framework (codified 2026-03-16)
+
+**Location:** `/home/wilma/clawd/FRAMEWORK.md` + `/home/wilma/clawd/GUARDRAILS.md`
+**Business Framework:** `/home/wilma/theme-park-crowd-report/docs/internal/business-framework.html`
+
+ALL projects go through the Idea Cycle: Discover → Validate → Build & Test → Position → Launch → Monitor → Grow (7 phases, 14 steps). Every output gets Maker→Checker→Approve/Revise/Escalate. Three Ideas Rule on every escalation. Adaptive QA starts at Yellow. Fred at ship/kill gate. See FRAMEWORK.md for full details.
+
+---
+
 ## Active Projects
 
-1. **Stream Overlay** (`/home/wilma/stream-overlay/`)
+1. **Canadian Digital Railway (CDR)** — See dedicated section above 🚂
+
+2. **Theme Park Crowd Report** — Main hazeydata.ai product
+   - Repo: github.com/hazeydata/theme-park-crowd-report
+   - Pipeline on wilma-server
+   - SSD (School Schedule Data) scraper running
+
+3. **Stream Overlay** (`/home/wilma/stream-overlay/`)
    - Built HTML/CSS/JS overlay for Twitch/YouTube
-   - Animated borders, slide-ins, glows
-   - Control panel for toggling elements
    - Ready for Mac Mini + Streamlabs
 
-2. **Pipeline Linux Support**
+4. **Pipeline Linux Support**
    - Bash scripts for ETL, dimensions, queue-times
    - Cron installer, systemd service
    - Pushed to repo
+
+---
+
+## The Canadian Digital Railway (CDR) — ACTIVE PROJECT 🚂
+
+**Repo:** github.com/hazeydata/cdr
+**Status:** Phase 2 (Validate) — building prototype
+**North Star:** "One working tool from one published schema deployed at one organization"
+
+### What CDR Is
+A network of sovereign AI agents ("terrys") that help Canadian organizations build compliant software tools without compromising data security. Each node runs locally, respects institutional security boundaries, and shares knowledge through the Railway network.
+
+### NemoClaw Integration (decided 2026-03-16)
+NVIDIA announced NemoClaw at GTC 2026 — it's essentially the CDR architecture built as enterprise infrastructure. **CDR positions as the Canadian institutional distribution of NemoClaw** (like Red Hat to Linux). NemoClaw provides the runtime/security/hardware foundation. CDR provides Canadian compliance intelligence, schema workflow, bootstrap protocol, and the Railway network.
+
+### The Four Buildable Items (APPROVED 2026-03-16)
+Fred approved this plan and ordered execution via the Flintstones Framework:
+
+**🥇 #1 PRIORITY: Schema Workflow (Phase 2 → Step 4: Prototype)**
+- CDR's original invention. Schemas in → compliant tools out → deploy on-network
+- HICC org chart tool is the proof of concept
+- Blocker: schema publication approval OR use public PeopleSoft vendor docs to prove concept
+- Recommendation: Prototype with public schema-like data NOW, HICC approval in parallel
+
+**🥈 #2: Canadian Compliance Engine (Phase 2 → Step 3: Research)**
+- Translate ITSG-33/PHIPA/WCAG/OLA into machine-enforceable OpenShell policies
+- CDR profiles already drafted in repo. Need OpenShell policy syntax docs (just launched)
+- Maker: Bam-Bam | Checker: Barney | Audit: Gazoo
+
+**🥉 #3: Railway Network (Phase 2 → Step 4: Prototype)**
+- Architecture designed. Bootstrap protocol exists. HQ (Wilma) operational
+- Next milestone: first external node deployment
+- Depends on Items 1 & 2 being further along
+
+**4th: Canadian Model Fine-Tuning (Phase 1 → Step 1: Discover)**
+- Fine-tune Nemotron on bilingual GC corpus for institutional specialization
+- PARKED until Items 1-3 prove the model. Activates when we have real usage data
+- Fred's domain (data science). Needs compute resources (SCIP/Access Fund)
+
+### Sovereignty Score
+NemoClaw alone: ~60% of Canada's sovereignty requirements
+NemoClaw + CDR (all 4 items): ~80%
+Remaining 20%: supply chain (chip fab) — national policy, not our problem
+
+### Key Documents in Repo
+- `nemoclaw-impact-analysis.md` — Full NemoClaw analysis
+- `sovereignty-gap-analysis.md` — Canada's requirements vs what exists
+- `gc-code-audit.md` — GC open-source code catalogue
+- `BOOTSTRAP.md` — Node initialization protocol
+- `principles.md` — CDR's six core principles
+- `profiles/gc-federal/` — GC compliance profile drafts
 
 ---
 

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hazeydata — Idea Cycle Flow</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #0c0e14;
+    font-family: 'Inter', sans-serif;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 30px;
+  }
+
+  .page {
+    width: 1100px;
+    max-width: 100%;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header .sub {
+    font-size: 13px;
+    color: #555;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+  .header .tagline {
+    font-size: 11px;
+    color: #666;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  /* Phase row */
+  .phase-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  /* Phase label (left sidebar) */
+  .phase-label {
+    width: 120px;
+    min-width: 120px;
+    padding-right: 16px;
+    padding-top: 18px;
+    text-align: right;
+  }
+  .phase-label .name {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    line-height: 1.3;
+  }
+  .phase-label .num {
+    font-size: 9px;
+    color: #555;
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+
+  /* Steps container */
+  .steps {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    flex: 1;
+    position: relative;
+  }
+
+  /* Individual step */
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding: 8px 4px;
+  }
+
+  .step .icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    margin-bottom: 8px;
+    transition: transform 0.2s;
+  }
+  .step:hover .icon-wrap { transform: scale(1.08); }
+
+  .step .step-num {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1a1d28;
+    border: 2px solid;
+    font-size: 9px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .step .title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    line-height: 1.3;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .step .desc {
+    font-size: 9.5px;
+    color: #777;
+    text-align: center;
+    margin-top: 3px;
+    line-height: 1.3;
+    max-width: 130px;
+  }
+
+  /* Arrow between steps */
+  .arrow {
+    display: flex;
+    align-items: center;
+    padding-top: 22px;
+    color: #333;
+    font-size: 18px;
+    min-width: 20px;
+  }
+  .arrow svg { width: 24px; height: 16px; }
+
+  /* Decision diamond */
+  .step.decision .icon-wrap {
+    border-radius: 6px;
+    transform: rotate(45deg);
+  }
+  .step.decision .icon-wrap .emoji { transform: rotate(-45deg); }
+  .step.decision:hover .icon-wrap { transform: rotate(45deg) scale(1.08); }
+  .step.decision .icon-wrap .step-num { transform: rotate(-45deg); top: -8px; right: -8px; }
+
+  /* Gate markers */
+  .gate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 16px;
+    min-width: 28px;
+  }
+  .gate .diamond {
+    width: 14px; height: 14px;
+    border: 2px solid;
+    border-radius: 3px;
+    transform: rotate(45deg);
+    margin-bottom: 4px;
+  }
+  .gate .label {
+    font-size: 7px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.4;
+    white-space: nowrap;
+  }
+
+  /* Phase colors */
+  .p-discover .icon-wrap { background: linear-gradient(135deg, #6366f1, #818cf8); }
+  .p-discover .step-num  { border-color: #818cf8; }
+  .p-validate .icon-wrap { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
+  .p-validate .step-num  { border-color: #22d3ee; }
+  .p-build .icon-wrap    { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+  .p-build .step-num     { border-color: #fbbf24; }
+  .p-launch .icon-wrap   { background: linear-gradient(135deg, #10b981, #34d399); }
+  .p-launch .step-num    { border-color: #34d399; }
+  .p-grow .icon-wrap     { background: linear-gradient(135deg, #ec4899, #f472b6); }
+  .p-grow .step-num      { border-color: #f472b6; }
+
+  .p-disc-c  { color: #818cf8; }
+  .p-val-c   { color: #22d3ee; }
+  .p-bld-c   { color: #fbbf24; }
+  .p-lnch-c  { color: #34d399; }
+  .p-grow-c  { color: #f472b6; }
+
+  /* Decision special */
+  .step.decision .icon-wrap { background: linear-gradient(135deg, #ef4444, #f97316); }
+  .step.decision .step-num  { border-color: #f97316; }
+
+  /* Connector line (horizontal) */
+  .connector {
+    display: flex;
+    align-items: center;
+    padding-top: 22px;
+  }
+  .connector svg { overflow: visible; width: 36px; height: 20px; }
+
+  /* Feedback loop at bottom */
+  .feedback-loop {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .feedback-loop .loop-line {
+    height: 2px;
+    flex: 1;
+    max-width: 600px;
+    background: linear-gradient(90deg, #f472b6 0%, #818cf8 100%);
+    opacity: 0.15;
+    border-radius: 1px;
+  }
+  .feedback-loop .loop-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+  .feedback-loop .loop-arrow {
+    font-size: 16px;
+    color: #f472b6;
+    opacity: 0.4;
+  }
+
+  /* Kill branch */
+  .kill-branch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    margin-left: 120px;
+    padding-left: 4px;
+  }
+  .kill-branch .kill-line {
+    width: 30px;
+    height: 2px;
+    background: #ef4444;
+    opacity: 0.2;
+    border-radius: 1px;
+  }
+  .kill-branch .kill-text {
+    font-size: 9px;
+    font-weight: 700;
+    color: #ef4444;
+    opacity: 0.35;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Row divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 20%, rgba(255,255,255,0.04) 80%, transparent 100%);
+    margin: 4px 0 4px 120px;
+  }
+
+  /* Lean + Stage-Gate reference */
+  .ref {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 9px;
+    color: #444;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>🔬 Idea Cycle</h1>
+    <div class="sub">hazeydata.ai</div>
+    <div class="tagline">Inspired by Stage-Gate®, Lean Startup, and Design Thinking</div>
+  </div>
+
+  <!-- ========== PHASE 1: DISCOVER ========== -->
+  <div class="phase-row">
+    <div class="phase-label">
+      <div class="name p-disc-c">Discover</div>
+      <div class="num">PHASE 1</div>
+    </div>
+    <div class="steps">
+      <div class="step p-discover">
+        <div class="icon-wrap">
+          🔍
+          <div class="step-num">1</div>
+        </div>
+        <div class="title">Spot the Gap</div>
+        <div class="desc">Scan for market gaps, unmet needs & emerging trends</div>
+      </div>
+
+      <div class="connector"><svg viewBox="0 0 36 20"><line x1="2" y1="10" x2="28" y2="10" stroke="#818cf8" stroke-width="2" opacity="0.5"/><polygon points="26,5 34,10 26,15" fill="#818cf8" opacity="0.5"/></svg></div>
+
+      <div class="step p-discover">
+        <div class="icon-wrap">
+          🎯
+          <div class="step-num">2</div>
+        </div>
+        <div class="title">Screen &<br>Prioritize</div>
+        <div class="desc">Rank ideas by impact, feasibility & strategic fit</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ========== PHASE 2: VALIDATE ========== -->
+  <div class="phase-row">
+    <div class="phase-label">
+      <div class="name p-val-c">Validate</div>
+      <div class="num">PHASE 2</div>
+    </div>
+    <div class="steps">
+      <div class="step p-validate">
+        <div class="icon-wrap">
+          🧪
+          <div class="step-num">3</div>
+        </div>
+        <div class="title">Research &<br>Design</div>
+        <div class="desc">Deep feasibility study, solution architecture & data sourcing</div>
+      </div>
+
+      <div class="connector"><svg viewBox="0 0 36 20"><line x1="2" y1="10" x2="28" y2="10" stroke="#22d3ee" stroke-width="2" opacity="0.5"/><polygon points="26,5 34,10 26,15" fill="#22d3ee" opacity="0.5"/></svg></div>
+
+      <div class="step p-validate">
+        <div class="icon-wrap">
+          🛠️
+          <div class="step-num">4</div>
+        </div>
+        <div class="title">Prototype</div>
+        <div class="desc">Build MVP or proof-of-concept to test core hypothesis</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ========== PHASE 3: BUILD & TEST ========== -->
+  <div class="phase-row">
+    <div class="phase-label">
+      <div class="name p-bld-c">Build &<br>Test</div>
+      <div class="num">PHASE 3</div>
+    </div>
+    <div class="steps">
+      <div class="step p-build">
+        <div class="icon-wrap">
+          🚀
+          <div class="step-num">5</div>
+        </div>
+        <div class="title">Run Pilot</div>
+        <div class="desc">Deploy to limited audience, collect real-world data</div>
+      </div>
+
+      <div class="connector"><svg viewBox="0 0 36 20"><line x1="2" y1="10" x2="28" y2="10" stroke="#fbbf24" stroke-width="2" opacity="0.5"/><polygon points="26,5 34,10 26,15" fill="#fbbf24" opacity="0.5"/></svg></div>
+
+      <div class="step p-build">
+        <div class="icon-wrap">
+          📊
+          <div class="step-num">6</div>
+        </div>
+        <div class="title">Evaluate</div>
+        <div class="desc">Measure KPIs, validate hypothesis, assess product-market fit</div>
+      </div>
+
+      <div class="connector"><svg viewBox="0 0 36 20"><line x1="2" y1="10" x2="28" y2="10" stroke="#fbbf24" stroke-width="2" opacity="0.5"/><polygon points="26,5 34,10 26,15" fill="#fbbf24" opacity="0.5"/></svg></div>
+
+      <!-- Decision gate -->
+      <div class="step decision">
+        <div class="icon-wrap">
+          <span class="emoji">⚖️</span>
+          <div class="step-num">7</div>
+        </div>
+        <div class="title">Ship or Kill</div>
+        <div class="desc">Go/no-go gate — launch, pivot, or dump</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kill branch -->
+  <div class="kill-branch" style="margin-left: 730px;">
+    <div class="kill-line"></div>
+    <div class="kill-text">↓ Kill / Pivot — learnings feed back to Step 1</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ========== PHASE 4: LAUNCH ========== -->
+  <div class="phase-row">
+    <div class="phase-label">
+      <div class="name p-lnch-c">Launch</div>
+      <div class="num">PHASE 4</div>
+    </div>
+    <div class="steps">
+      <div class="step p-launch">
+        <div class="icon-wrap">
+          📢
+          <div class="step-num">8</div>
+        </div>
+        <div class="title">Go to Market</div>
+        <div class="desc">Launch, position, pricing & distribution strategy</div>
+      </div>
+
+      <div class="connector"><svg viewBox="0 0 36 20"><line x1="2" y1="10" x2="28" y2="10" stroke="#34d399" stroke-width="2" opacity="0.5"/><polygon points="26,5 34,10 26,15" fill="#34d399" opacity="0.5"/></svg></div>
+
+      <div class="step p-launch">
+        <div class="icon-wrap">
+          📡
+          <div class="step-num">9</div>
+        </div>
+        <div class="title">Monitor &<br>Feedback</div>
+        <div class="desc">Track metrics, gather user feedback & support data</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ========== PHASE 5: GROW ========== -->
+  <div class="phase-row">
+    <div class="phase-label">
+      <div class="name p-grow-c">Grow</div>
+      <div class="num">PHASE 5</div>
+    </div>
+    <div class="steps">
+      <div class="step p-grow">
+        <div class="icon-wrap">
+          🔄
+          <div class="step-num">10</div>
+        </div>
+        <div class="title">Evolve</div>
+        <div class="desc">Iterate on feedback, optimize, expand features & scale</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback loop -->
+  <div class="feedback-loop">
+    <div class="loop-arrow">↩</div>
+    <div class="loop-line"></div>
+    <div class="loop-label">Continuous loop → back to Step 1</div>
+    <div class="loop-line"></div>
+    <div class="loop-arrow">↪</div>
+  </div>
+
+  <div class="ref">
+    Combines Stage-Gate® (Cooper) · Lean Startup Build-Measure-Learn (Ries) · Design Thinking (IDEO)
+  </div>
+
+</div>
+</body>
+</html>

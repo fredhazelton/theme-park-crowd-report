@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hazeydata — Organizational Structure & QA/QC System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #0c0e14;
+    font-family: 'Inter', sans-serif;
+    color: #e0e0e0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page { width: 1100px; max-width: 100%; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 40px; }
+  .header h1 { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+  .header .sub { font-size: 12px; color: #555; margin-top: 4px; letter-spacing: 1px; }
+
+  /* === ORG CHART === */
+  .org { position: relative; }
+
+  /* Tier labels */
+  .tier {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    position: relative;
+    min-height: 110px;
+  }
+
+  .tier-label {
+    width: 100px;
+    min-width: 100px;
+    padding-top: 20px;
+    text-align: right;
+    padding-right: 16px;
+  }
+  .tier-label .name {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.35;
+  }
+  .tier-label .desc {
+    font-size: 8px;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  .tier-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 8px 0;
+  }
+
+  /* Agent card */
+  .agent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
+    padding: 12px 8px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .agent:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
+    transform: translateY(-2px);
+  }
+
+  .agent .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .agent .name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+  }
+  .agent .role {
+    font-size: 9px;
+    color: #888;
+    text-align: center;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .agent .title-badge {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 5px;
+  }
+
+  /* Tier-specific colors */
+  .t-human .avatar { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+  .t-human .title-badge { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
+  .t-cto .avatar { background: linear-gradient(135deg, #ec4899, #f472b6); }
+  .t-cto .title-badge { background: rgba(236,72,153,0.15); color: #f472b6; }
+
+  .t-team .avatar { background: linear-gradient(135deg, #6366f1, #818cf8); }
+  .t-team .title-badge { background: rgba(99,102,241,0.15); color: #818cf8; }
+
+  .t-resource .avatar { background: linear-gradient(135deg, #10b981, #34d399); }
+  .t-resource .title-badge { background: rgba(16,185,129,0.15); color: #34d399; }
+
+  /* Wide card for Fred */
+  .agent.wide { width: 160px; }
+
+  /* QA Loop indicators */
+  .qa-loop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 6px 0;
+    padding: 6px 14px;
+    position: relative;
+  }
+  .qa-loop .loop-icon {
+    font-size: 14px;
+    opacity: 0.5;
+  }
+  .qa-loop .loop-text {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.4;
+  }
+  .qa-loop .loop-line {
+    flex: 1;
+    max-width: 100px;
+    height: 1px;
+    opacity: 0.15;
+  }
+
+  .qa-loop.l1 .loop-text { color: #fbbf24; }
+  .qa-loop.l1 .loop-line { background: #fbbf24; }
+  .qa-loop.l2 .loop-text { color: #f472b6; }
+  .qa-loop.l2 .loop-line { background: #f472b6; }
+  .qa-loop.l3 .loop-text { color: #818cf8; }
+  .qa-loop.l3 .loop-line { background: #818cf8; }
+  .qa-loop.l4 .loop-text { color: #34d399; }
+  .qa-loop.l4 .loop-line { background: #34d399; }
+
+  /* Vertical connector */
+  .vline {
+    display: flex;
+    justify-content: center;
+    padding: 2px 0;
+  }
+  .vline svg { width: 2px; height: 24px; }
+
+  /* Section separator */
+  .section-break {
+    margin: 48px 0 36px;
+    text-align: center;
+  }
+  .section-break h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .section-break .sub {
+    font-size: 11px;
+    color: #555;
+    margin-top: 4px;
+  }
+
+  /* === INTEGRATED FLOW === */
+  .flow-phase {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 3px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.015);
+    border: 1px solid rgba(255,255,255,0.03);
+    overflow: hidden;
+  }
+
+  .flow-left {
+    width: 200px;
+    min-width: 200px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid rgba(255,255,255,0.04);
+  }
+  .flow-left .phase-name {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .flow-left .phase-steps {
+    font-size: 9px;
+    color: #777;
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .flow-mid {
+    flex: 1;
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .flow-mid .who {
+    font-size: 10px;
+    font-weight: 600;
+    color: #ccc;
+  }
+  .flow-mid .how {
+    font-size: 9px;
+    color: #777;
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .flow-right {
+    width: 180px;
+    min-width: 180px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-left: 1px solid rgba(255,255,255,0.04);
+  }
+  .flow-right .qa-tag {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  .flow-right .qa-desc {
+    font-size: 8.5px;
+    color: #777;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* Phase-specific */
+  .ph-disc .flow-left .phase-name { color: #818cf8; }
+  .ph-disc .flow-right .qa-tag { background: rgba(99,102,241,0.15); color: #818cf8; }
+
+  .ph-val .flow-left .phase-name { color: #22d3ee; }
+  .ph-val .flow-right .qa-tag { background: rgba(6,182,212,0.15); color: #22d3ee; }
+
+  .ph-bld .flow-left .phase-name { color: #fbbf24; }
+  .ph-bld .flow-right .qa-tag { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
+  .ph-lnch .flow-left .phase-name { color: #34d399; }
+  .ph-lnch .flow-right .qa-tag { background: rgba(16,185,129,0.15); color: #34d399; }
+
+  .ph-grow .flow-left .phase-name { color: #f472b6; }
+  .ph-grow .flow-right .qa-tag { background: rgba(236,72,153,0.15); color: #f472b6; }
+
+  /* Flow arrow between phases */
+  .flow-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px 0;
+  }
+  .flow-arrow .arr {
+    font-size: 12px;
+    opacity: 0.2;
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ==================== PART 1: ORG CHART ==================== -->
+  <div class="header">
+    <h1>🏗️ Organizational Structure</h1>
+    <div class="sub">hazeydata.ai — The Flintstones Framework</div>
+  </div>
+
+  <div class="org">
+
+    <!-- TIER 1: Human -->
+    <div class="tier">
+      <div class="tier-label">
+        <div class="name" style="color:#fbbf24;">Tier 1</div>
+        <div class="desc">Human Layer</div>
+      </div>
+      <div class="tier-content">
+        <div class="agent wide t-human">
+          <div class="avatar">👑</div>
+          <div class="name">Fred</div>
+          <div class="role">Vision, strategy, final decisions</div>
+          <div class="title-badge">CEO / Founder</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QA Loop 1: Fred ↔ Wilma -->
+    <div class="qa-loop l1">
+      <div class="loop-line"></div>
+      <div class="loop-icon">🔄</div>
+      <div class="loop-text">Strategic QA Loop — Ideas, direction, go/no-go</div>
+      <div class="loop-icon">🔄</div>
+      <div class="loop-line"></div>
+    </div>
+
+    <!-- TIER 2: CTO -->
+    <div class="tier">
+      <div class="tier-label">
+        <div class="name" style="color:#f472b6;">Tier 2</div>
+        <div class="desc">Executive AI</div>
+      </div>
+      <div class="tier-content">
+        <div class="agent wide t-cto">
+          <div class="avatar">🦴</div>
+          <div class="name">Wilma</div>
+          <div class="role">Orchestration, delegation, ops, QA oversight</div>
+          <div class="title-badge">CTO / Always-On</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QA Loop 2: Wilma ↔ Team -->
+    <div class="qa-loop l2">
+      <div class="loop-line"></div>
+      <div class="loop-icon">🔄</div>
+      <div class="loop-text">Delegation QA Loop — Task assignment, review, approval</div>
+      <div class="loop-icon">🔄</div>
+      <div class="loop-line"></div>
+    </div>
+
+    <!-- TIER 3: Team -->
+    <div class="tier">
+      <div class="tier-label">
+        <div class="name" style="color:#818cf8;">Tier 3</div>
+        <div class="desc">Specialist Agents</div>
+      </div>
+      <div class="tier-content">
+        <div class="agent t-team">
+          <div class="avatar">🪨</div>
+          <div class="name">Barney</div>
+          <div class="role">Strategy, research, QA verification</div>
+          <div class="title-badge">Advisor</div>
+        </div>
+        <div class="agent t-team">
+          <div class="avatar">🏏</div>
+          <div class="name">Bam-Bam</div>
+          <div class="role">Deep coding, Python, data pipelines</div>
+          <div class="title-badge">Lead Dev</div>
+        </div>
+        <div class="agent t-team">
+          <div class="avatar">🎀</div>
+          <div class="name">Pebbles</div>
+          <div class="role">Visual design, Figma, brand assets</div>
+          <div class="title-badge">Designer</div>
+        </div>
+        <div class="agent t-team">
+          <div class="avatar">✍️</div>
+          <div class="name">Betty</div>
+          <div class="role">Content strategy, copy, social</div>
+          <div class="title-badge">Content</div>
+        </div>
+        <div class="agent t-team">
+          <div class="avatar">🦕</div>
+          <div class="name">Dino</div>
+          <div class="role">Task tracking, project board mgmt</div>
+          <div class="title-badge">PM</div>
+        </div>
+        <div class="agent t-team">
+          <div class="avatar">👽</div>
+          <div class="name">Gazoo</div>
+          <div class="role">Independent QA, audits, fact-checking</div>
+          <div class="title-badge">QA Inspector</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QA Loop 3: Peer-to-Peer -->
+    <div class="qa-loop l3">
+      <div class="loop-line"></div>
+      <div class="loop-icon">🔄</div>
+      <div class="loop-text">Peer QA Loop — Paired agents cross-check each other's work</div>
+      <div class="loop-icon">🔄</div>
+      <div class="loop-line"></div>
+    </div>
+
+    <!-- Tier 3 pairs note -->
+    <div style="text-align:center; margin-bottom:16px;">
+      <div style="font-size:9px; color:#666; letter-spacing:0.5px; line-height:1.6;">
+        <span style="color:#818cf8;">Barney ↔ Bam-Bam</span> (code review) &nbsp;·&nbsp;
+        <span style="color:#818cf8;">Betty ↔ Pebbles</span> (content + design) &nbsp;·&nbsp;
+        <span style="color:#818cf8;">Gazoo ↔ Anyone</span> (independent audit)
+      </div>
+    </div>
+
+    <!-- QA Loop 4: Team ↔ Resource -->
+    <div class="qa-loop l4">
+      <div class="loop-line"></div>
+      <div class="loop-icon">🔄</div>
+      <div class="loop-text">Resource QA Loop — Compute tasks, validation, bulk ops</div>
+      <div class="loop-icon">🔄</div>
+      <div class="loop-line"></div>
+    </div>
+
+    <!-- TIER 4: Local Resource -->
+    <div class="tier">
+      <div class="tier-label">
+        <div class="name" style="color:#34d399;">Tier 4</div>
+        <div class="desc">Local Compute<br><span style="font-style:italic;">(Future)</span></div>
+      </div>
+      <div class="tier-content">
+        <div class="agent t-resource" style="width:200px;">
+          <div class="avatar">🖥️</div>
+          <div class="name">Mac Studio LLM</div>
+          <div class="role">Local model — bulk processing, embeddings, data grinding, cheap inference</div>
+          <div class="title-badge">Shared Resource</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== PART 2: INTEGRATED FLOW ==================== -->
+  <div class="section-break">
+    <h2>🔬 Idea Cycle × Team Integration</h2>
+    <div class="sub">How each phase flows through the org structure with QA/QC loops</div>
+  </div>
+
+  <!-- DISCOVER -->
+  <div class="flow-phase ph-disc">
+    <div class="flow-left">
+      <div class="phase-name">1 · Discover</div>
+      <div class="phase-steps">Spot the Gap → Screen & Prioritize</div>
+    </div>
+    <div class="flow-mid">
+      <div class="who">👑 Fred + 🦴 Wilma + 🪨 Barney</div>
+      <div class="how">Fred surfaces ideas from industry knowledge · Wilma scans data/trends · Barney researches feasibility · Ideas ranked by strategic fit</div>
+    </div>
+    <div class="flow-right">
+      <div class="qa-tag">Fred ↔ Wilma Loop</div>
+      <div class="qa-desc">Back-and-forth to refine ideas, kill weak ones early</div>
+    </div>
+  </div>
+
+  <div class="flow-arrow"><div class="arr">▼</div></div>
+
+  <!-- VALIDATE -->
+  <div class="flow-phase ph-val">
+    <div class="flow-left">
+      <div class="phase-name">2 · Validate</div>
+      <div class="phase-steps">Research & Design → Prototype</div>
+    </div>
+    <div class="flow-mid">
+      <div class="who">🦴 Wilma delegates → 🏏 Bam-Bam + 🪨 Barney</div>
+      <div class="how">Bam-Bam builds MVP/prototype · Barney independently verifies approach & data sources · Pebbles designs mockups if needed</div>
+    </div>
+    <div class="flow-right">
+      <div class="qa-tag">Barney ↔ Bam-Bam Loop</div>
+      <div class="qa-desc">Code review + independent verification (the Accord pattern)</div>
+    </div>
+  </div>
+
+  <div class="flow-arrow"><div class="arr">▼</div></div>
+
+  <!-- BUILD & TEST -->
+  <div class="flow-phase ph-bld">
+    <div class="flow-left">
+      <div class="phase-name">3 · Build & Test</div>
+      <div class="phase-steps">Run Pilot → Evaluate → Ship or Kill</div>
+    </div>
+    <div class="flow-mid">
+      <div class="who">🏏 Bam-Bam builds · 👽 Gazoo audits · 🦴 Wilma evaluates</div>
+      <div class="how">Bam-Bam deploys pilot · Gazoo runs independent QA audit · Wilma compiles results · Fred makes go/no-go call</div>
+    </div>
+    <div class="flow-right">
+      <div class="qa-tag">Gazoo ↔ Builder Loop</div>
+      <div class="qa-desc">Independent audit — Gazoo catches what the builder missed</div>
+    </div>
+  </div>
+
+  <div class="flow-arrow"><div class="arr">▼</div></div>
+
+  <!-- LAUNCH -->
+  <div class="flow-phase ph-lnch">
+    <div class="flow-left">
+      <div class="phase-name">4 · Launch</div>
+      <div class="phase-steps">Go to Market → Monitor & Feedback</div>
+    </div>
+    <div class="flow-mid">
+      <div class="who">✍️ Betty + 🎀 Pebbles + 🦕 Dino</div>
+      <div class="how">Betty writes launch content · Pebbles creates assets · Dino tracks tasks & metrics · Wilma monitors post-launch KPIs</div>
+    </div>
+    <div class="flow-right">
+      <div class="qa-tag">Betty ↔ Pebbles Loop</div>
+      <div class="qa-desc">Content + design QA — copy matches visuals, brand consistency</div>
+    </div>
+  </div>
+
+  <div class="flow-arrow"><div class="arr">▼</div></div>
+
+  <!-- GROW -->
+  <div class="flow-phase ph-grow">
+    <div class="flow-left">
+      <div class="phase-name">5 · Grow</div>
+      <div class="phase-steps">Evolve → back to Discover</div>
+    </div>
+    <div class="flow-mid">
+      <div class="who">🦴 Wilma + 👑 Fred</div>
+      <div class="how">Wilma compiles user feedback & metrics · Fred reviews learnings · Together decide: iterate, expand, or start new cycle</div>
+    </div>
+    <div class="flow-right">
+      <div class="qa-tag">Fred ↔ Wilma Loop</div>
+      <div class="qa-desc">Strategic review — lessons learned feed next cycle</div>
+    </div>
+  </div>
+
+  <!-- Loop back indicator -->
+  <div style="text-align:center; margin-top:16px; margin-bottom:8px;">
+    <div style="font-size:10px; color:#f472b6; opacity:0.4; letter-spacing:2px; font-weight:700; text-transform:uppercase;">
+      ↩ Continuous loop — learnings feed back into Discover ↩
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:24px;">
+    <div style="font-size:9px; color:#444; letter-spacing:0.5px;">
+      hazeydata.ai · Flintstones Framework v1.0
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
