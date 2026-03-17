@@ -31,6 +31,14 @@ ET = ZoneInfo("America/Toronto")
 
 SYNTHETIC_FIRST_FORECAST_DATE = "2026-02-18"
 
+def extract_archive_date(filename: str) -> str:
+    """Extract the date from archive filenames like wti_2026-03-11.parquet or wti_v3_2026-03-13.parquet."""
+    import re
+    stem = Path(filename).stem
+    match = re.search(r'(\d{4}-\d{2}-\d{2})', stem)
+    return match.group(1) if match else stem.replace("wti_", "")
+
+
 PARK_NAMES = {
     "AK": "Animal Kingdom",
     "CA": "DCA",
@@ -63,7 +71,7 @@ def load_yesterday_comparison(eval_date: str, archive_dir: Path, wti_actual: pd.
     best_made_date = None
 
     for f in sorted(archive_dir.glob("wti_*.parquet")):
-        made_date = f.stem.replace("wti_", "")
+        made_date = extract_archive_date(f.name)
         if made_date >= eval_date:
             continue
         fdf = pd.read_parquet(f)
@@ -206,7 +214,10 @@ def main():
         eval_date = (datetime.now(ET) - timedelta(days=1)).strftime("%Y-%m-%d")
 
     pipeline_dir = Path("/home/wilma/hazeydata/pipeline")
-    wti_file = pipeline_dir / "wti" / "wti.parquet"
+    # Prefer v3 WTI file (v3 pipeline), fall back to legacy
+    wti_v3 = pipeline_dir / "wti" / "wti_v3.parquet"
+    wti_legacy = pipeline_dir / "wti" / "wti.parquet"
+    wti_file = wti_v3 if wti_v3.exists() else wti_legacy
     archive_dir = pipeline_dir / "accuracy" / "archive"
 
     if not wti_file.exists():
