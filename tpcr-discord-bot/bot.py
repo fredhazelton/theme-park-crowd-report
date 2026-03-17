@@ -322,16 +322,22 @@ def get_wti_score(park_code: str, target_date: date_type) -> float:
         wti_code = WTI_CODE_MAP.get(park_code, park_code)
 
         if _USE_DUCKDB:
-            con = get_db()
-            result = con.execute("""
-                SELECT wti FROM wti
-                WHERE park_code = ? AND park_date = ?
-                LIMIT 1
-            """, [wti_code, target_date]).fetchone()
-            con.close()
-            return float(result[0]) if result else None
+            try:
+                con = get_db()
+                result = con.execute("""
+                    SELECT wti FROM wti
+                    WHERE park_code = ? AND park_date = ?
+                    LIMIT 1
+                """, [wti_code, target_date]).fetchone()
+                con.close()
+                return float(result[0]) if result else None
+            except Exception as e:
+                if "lock" in str(e).lower():
+                    logger.warning(f"⚠️ DuckDB locked for get_wti_score({park_code}), falling back to parquet")
+                else:
+                    raise
 
-        # Fallback: parquet
+        # Fallback: parquet (also used when DuckDB is locked)
         query = f"""
             SELECT wti 
             FROM read_parquet('{WTI_PATH}')
@@ -513,36 +519,42 @@ def get_live_waits(park_code: str, target_date: date_type):
 
 def get_current_waits(park_code: str, target_date: date_type):
     """Get most recent posted wait times (not daily averages) for live display.
-    DuckDB primary, CSV/parquet fallback."""
+    DuckDB primary, CSV/parquet fallback. Falls back to CSV if DuckDB is locked."""
     try:
         entity_filter = _entity_filter_sql(park_code)
 
         if _USE_DUCKDB:
-            con = get_db()
-            result = con.execute(f"""
-                WITH latest AS (
-                    SELECT entity_code, MAX(observed_at) as max_obs
-                    FROM live_waits
-                    WHERE {entity_filter}
-                      AND park_date = ?
-                      AND wait_time_type = 'POSTED'
-                      AND wait_time_minutes > 0
-                    GROUP BY entity_code
-                )
-                SELECT w.entity_code,
-                       w.wait_time_minutes as current_wait,
-                       w.observed_at as latest_obs
-                FROM live_waits w
-                JOIN latest l ON w.entity_code = l.entity_code
-                             AND w.observed_at = l.max_obs
-                WHERE w.wait_time_type = 'POSTED'
-                  AND w.wait_time_minutes > 0
-                ORDER BY w.wait_time_minutes DESC
-            """, [target_date]).fetchdf()
-            con.close()
-            return result
+            try:
+                con = get_db()
+                result = con.execute(f"""
+                    WITH latest AS (
+                        SELECT entity_code, MAX(observed_at) as max_obs
+                        FROM live_waits
+                        WHERE {entity_filter}
+                          AND park_date = ?
+                          AND wait_time_type = 'POSTED'
+                          AND wait_time_minutes > 0
+                        GROUP BY entity_code
+                    )
+                    SELECT w.entity_code,
+                           w.wait_time_minutes as current_wait,
+                           w.observed_at as latest_obs
+                    FROM live_waits w
+                    JOIN latest l ON w.entity_code = l.entity_code
+                                 AND w.observed_at = l.max_obs
+                    WHERE w.wait_time_type = 'POSTED'
+                      AND w.wait_time_minutes > 0
+                    ORDER BY w.wait_time_minutes DESC
+                """, [target_date]).fetchdf()
+                con.close()
+                return result
+            except Exception as e:
+                if "lock" in str(e).lower():
+                    logger.warning(f"⚠️ DuckDB locked for get_current_waits({park_code}), falling back to CSV")
+                else:
+                    raise
 
-        # Fallback: CSV/parquet file scanning
+        # Fallback: CSV/parquet file scanning (also used when DuckDB is locked)
         month_str = target_date.strftime("%Y-%m")
         staging_month = os.path.join(STAGING_DIR, month_str)
         sources = []
@@ -1262,6 +1274,89 @@ def _wait_dot(minutes: int) -> str:
     return "\U0001f7e2"
 
 
+# ── Park hours lookup for smarter "no data" messages ──
+DIMPARKHOURS_PATH = "/mnt/data/pipeline/dimension_tables/dimparkhours.csv"
+
+# Park code → dimparkhours park code mapping
+_PARK_HOURS_CODE = {
+    "MK": "MK", "EP": "EP", "HS": "HS", "AK": "AK",
+    "DL": "DL", "CA": "CA",
+    "TDL": "TDL", "TDS": "TDS",
+    "UF": "UF", "UH": "UH",
+}
+
+# Park code → IANA timezone
+_PARK_TZ = {
+    "MK": "America/New_York", "EP": "America/New_York",
+    "HS": "America/New_York", "AK": "America/New_York",
+    "UF": "America/New_York",
+    "DL": "America/Los_Angeles", "CA": "America/Los_Angeles",
+    "UH": "America/Los_Angeles",
+    "TDL": "Asia/Tokyo", "TDS": "Asia/Tokyo",
+}
+
+
+def _get_park_hours(park_code: str, target_date: date_type):
+    """Get opening/closing time for a park on a given date from dimparkhours.csv.
+    Returns (open_time, close_time) as datetime objects in park local tz, or (None, None)."""
+    try:
+        import csv as _csv
+        from zoneinfo import ZoneInfo
+        hours_code = _PARK_HOURS_CODE.get(park_code, park_code)
+        date_str = str(target_date)
+        with open(DIMPARKHOURS_PATH) as f:
+            for row in _csv.DictReader(f):
+                if row['park'] == hours_code and row['date'] == date_str and row.get('is_official') == 'True':
+                    open_str = row.get('opening_time', '')
+                    close_str = row.get('closing_time', '')
+                    if open_str and close_str:
+                        open_dt = parser.parse(open_str)
+                        close_dt = parser.parse(close_str)
+                        return open_dt, close_dt
+    except Exception as e:
+        logger.warning(f"⚠️ Could not load park hours for {park_code}: {e}")
+    return None, None
+
+
+def _get_no_data_message(park_code: str, park_full: str, target_date: date_type, wti_str: str) -> str:
+    """Generate a smart 'no data' message based on park hours instead of 'park may be closed'."""
+    from zoneinfo import ZoneInfo
+    open_time, close_time = _get_park_hours(park_code, target_date)
+    tz_name = _PARK_TZ.get(park_code, "America/New_York")
+    now_local = datetime.now(ZoneInfo(tz_name))
+
+    if open_time and close_time:
+        open_local = open_time.astimezone(ZoneInfo(tz_name))
+        close_local = close_time.astimezone(ZoneInfo(tz_name))
+        open_fmt = open_local.strftime("%-I:%M %p")
+        close_fmt = close_local.strftime("%-I:%M %p")
+
+        if now_local < open_local:
+            # Before park opens
+            return (
+                f"⏰ **{park_full}**{wti_str} hasn't opened yet today. "
+                f"Hours: {open_fmt} – {close_fmt}. Live data will appear once the park opens."
+            )
+        elif now_local > close_local:
+            # After park closes
+            return (
+                f"🌙 **{park_full}**{wti_str} has closed for the day "
+                f"(hours were {open_fmt} – {close_fmt})."
+            )
+        else:
+            # Park should be open — data issue
+            return (
+                f"⚠️ No live wait time data for **{park_full}**{wti_str} right now, "
+                f"but the park is open ({open_fmt} – {close_fmt}). Data may be temporarily delayed."
+            )
+    else:
+        # No hours data — generic but no "may be closed" guess
+        return (
+            f"😴 No live wait time data for **{park_full}**{wti_str} right now. "
+            f"Data may be temporarily unavailable."
+        )
+
+
 @tree.command(name="now", description="Live wait times right now for a park")
 @app_commands.describe(park="Which park?")
 @app_commands.choices(park=PARK_CHOICES)
@@ -1286,9 +1381,9 @@ async def now_command(interaction: discord.Interaction, park: str):
     if current_waits.empty:
         wti = get_wti_score(park_code, target_date)
         wti_str = f" (WTI {wti:.0f})" if wti is not None else ""
+        no_data_msg = _get_no_data_message(park_code, park_full, target_date, wti_str)
         await interaction.followup.send(
-            f"\U0001f634 No live wait time data for **{park_full}**{wti_str} right now. "
-            f"The park may be closed.\n\n\U0001f4a1 Try `/crowd {park}` for today's forecast.",
+            f"{no_data_msg}\n\n\U0001f4a1 Try `/crowd {park}` for today's forecast.",
             ephemeral=True
         )
         return
