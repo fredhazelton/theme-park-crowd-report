@@ -33,6 +33,10 @@ if str(Path(__file__).parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from utils.park_code import park_code_sql, entity_code_to_park_code
 
+# Import pipeline config for min_training_year
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from pipeline_v3.config import PipelineConfig
+
 DEFAULT_OUTPUT_BASE = Path("/home/wilma/hazeydata/pipeline")
 
 
@@ -184,6 +188,13 @@ def build_actuals_training_data(logger, output_base: Path) -> int:
         entity_filter = f"AND s.entity_code IN ('{entity_list}')"
         entity_filter_actual = f"AND a.entity_code IN ('{entity_list}')"
 
+        # Training data year cutoff (Issue #48: remove contaminated pre-2016 data)
+        pipeline_cfg = PipelineConfig()
+        min_year = pipeline_cfg.get_min_training_year(park_code)
+        year_filter_actual = f"AND EXTRACT(YEAR FROM a.park_date::DATE) >= {min_year}" if min_year > 0 else ""
+        if min_year > 0:
+            logger.info(f"  [{park_idx}/{len(parks)}] {park_code}: applying min_training_year={min_year}")
+
         query = f"""
         WITH {operating_filter}
         {valid_entities}
@@ -233,6 +244,7 @@ def build_actuals_training_data(logger, output_base: Path) -> int:
               AND a.wait_time_minutes IS NOT NULL
               AND a.wait_time_minutes > 0
               {entity_filter_actual}
+              {year_filter_actual}
               {actual_filter}
         ),
         combined AS (

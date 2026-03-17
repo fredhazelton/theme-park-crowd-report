@@ -50,6 +50,16 @@ class PipelineConfig:
     training_rounds: int = 2000
     training_early_stopping: int = 20
     geo_decay_halflife_days: int = 730
+    min_training_year: int = 0  # Global default: no cutoff
+    min_training_year_per_park: dict = field(default_factory=lambda: {
+        # 2014-2015 Disney actual-time API data contamination: high-frequency
+        # sampling (45 obs/entity/day vs ~2 modern) with poor-quality actuals
+        # overwhelms geo-decay weighting. See Issue #48.
+        "AK": 2016,
+        "MK": 2016,
+        "EP": 2016,
+        "HS": 2016,
+    })
 
     # === WTI ===
     real_actual_weight: float = 3.5  # TODO: switch to inverse_freq when validated
@@ -91,6 +101,12 @@ class PipelineConfig:
         "TDL", "TDS",             # Tokyo
     ])
     ignore_parks: list[str] = field(default_factory=lambda: ["BB"])  # Blizzard Beach
+
+    def get_min_training_year(self, park_code: str) -> int:
+        """Get minimum training year for a park (0 = no cutoff)."""
+        return self.min_training_year_per_park.get(
+            park_code, self.min_training_year
+        )
 
     def get_park_stretch(self, park_code: str) -> float:
         """Get quantile mapping stretch factor for a park."""
