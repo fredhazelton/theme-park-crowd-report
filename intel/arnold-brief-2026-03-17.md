@@ -1,0 +1,117 @@
+# Arnold Intelligence Brief — March 17, 2026
+
+**Session:** Arnold AM Work Session  
+**Focus:** Multi-project intel gathering  
+**Projects:** ACCORD, CDR, SSD  
+
+## 🇨🇦 ACCORD Intelligence 
+
+### GoC Procurement Opportunities for AI Tools
+
+**Key Findings:**
+- **PSPC AI Supplier List**: Active "List of interested Artificial Intelligence (AI) suppliers" program run by PSPC + TBS for government AI procurement
+- **SAP Ariba Transition**: Government moving to new electronic procurement solution (SAP Ariba + Fieldglass), multi-year initiative, $17.4M funding
+- **Professional Services Framework**: PASS (Professional audit support services) and SBIPS (Solutions-based informatics professional services) standing offers active
+- **CanadaBuys Launch**: New procurement services suite launched to simplify supplier registration
+
+**ACCORD Positioning:**
+- Rules engine/collective agreement management fits SBIPS framework perfectly
+- AI supplier list registration could fast-track procurement opportunities  
+- Professional services standing offers provide entry path for pilot projects
+
+**Action Items:**
+- Register for PSPC AI supplier list 
+- Monitor SAP Ariba portal for relevant RFPs
+- Target ESDC specifically - they have 2023-2026 Data Strategy mentioning AI
+
+---
+
+## 🚂 CDR (Sovereign AI) Intelligence
+
+**CRITICAL CORRECTION**: CDR is about **sovereign AI infrastructure**, NOT physical railways!
+
+### Federal Funding Landscape
+
+**Budget 2025 Commitments:**
+- **$925.6M over 5 years** for sovereign AI infrastructure development
+- **$705M** specifically for AI supercomputing system (AI Sovereign Compute Infrastructure Program)
+- **AI Compute Access Fund** to support SME access to compute resources
+
+**Recent Developments:**
+- **Call for proposals closed Feb 15, 2026** for large-scale sovereign AI data centres (just closed 1 month ago!)
+- **Canadian Sovereign AI Compute Strategy** actively being implemented
+- Focus on data residency, CLOUD Act mitigation, Canadian-hosted infrastructure
+
+### Competitive Landscape
+
+**Bell Canada + Hypertec Partnership** (Announced Feb 25, 2026):
+- Strategic partnership for "end-to-end sovereign AI infrastructure built, hosted and operated in Canada"
+- Combines Hypertec's Canadian-built GPU infrastructure with Bell AI Fabric
+- Targeting public sector, enterprise clients
+- **Key Differentiator vs CDR**: Centralized enterprise approach vs CDR's distributed edge vision
+
+**Market Positioning:**
+- CDR targets distributed/edge deployment (Mac Studios, local ownership)
+- Bell-Hypertec targets traditional data center approach
+- Both address same sovereignty concerns but different deployment models
+
+### Open-Weight Model Ecosystem
+
+**2026 Developments:**
+- Continued advancement in open-source models (Llama 3+, Mistral Large 3, DeepSeek)
+- **gpt-oss-120b** can run on single 80GB GPU (H100/MI300X) - supports CDR edge vision
+- Strong community ecosystem around GGUF quantization, llama.cpp, vLLM for local inference
+- **Key advantage**: Open models enable true sovereignty vs API dependencies
+
+---
+
+## 🏫 SSD Competitive Intelligence
+
+### School Calendar Data Providers
+
+**Direct Competitors:**
+1. **PredictHQ** - Closest competitor with "School Holidays API"
+   - Global coverage but appears to be state/country level, not district-level
+   - Event data company serving tourism/retail industries
+   
+2. **SchedJoules** - Calendar API covering 13 countries
+   - Includes school break schedules for holiday planning
+   - Tourism-focused positioning
+
+3. **SchoolDigger** - US school data APIs since 2006
+   - Focus on performance data, not calendar/schedule data
+   - Developer API available
+
+4. **Urban Institute Education Data Portal** - Government education APIs
+   - Academic performance focus, not operational schedules
+
+**Market Gap Confirmed:**
+- **No provider offers district-level US school calendar data** at the granularity SSD provides
+- Existing providers are either state-level or focused on different data types
+- SSD's enrollment-weighted, district-specific approach appears genuinely unique
+
+**Differentiation Strategy:**
+- Emphasize district-level granularity (13,418 districts vs state-level competitors)
+- Enrollment weighting for tourism impact modeling
+- Direct tourism/hospitality industry positioning
+- API-first modern delivery vs legacy providers
+
+---
+
+## 📊 Session Metrics
+
+- **TASK-4 (GoC Procurement)**: ✅ Completed  
+- **TASK-7 (CDR Intel)**: ✅ Completed (task description corrected)
+- **SSD Competitive Intel**: ✅ Completed
+- **Intelligence Sources**: 8 web searches, 30+ sources reviewed
+- **Key Actionable Insights**: 7 identified across 3 projects
+
+## 🎯 Strategic Recommendations
+
+1. **ACCORD**: Fast-track PSPC AI supplier registration
+2. **CDR**: Monitor for next sovereign AI funding round (post-Feb 2026 call)  
+3. **SSD**: Leverage confirmed market gap in marketing messaging
+4. **Cross-project**: All three align with Canadian government AI priorities
+
+---
+*Generated by Arnold during AM work session, March 17, 2026*

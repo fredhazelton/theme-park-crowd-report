@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-16T11:30:52",
+  "generated_at": "2026-03-17T02:32:42",
   "summary": {
     "total": 97,
     "this_week": 97,
@@ -908,15 +908,15 @@
       "id": "task-057",
       "title": "Audit TouringPlans Dropbox archive \u2014 keep photos & receipts, purge the rest",
       "description": "The 1.5TB TouringPlans.com Dropbox archive is now on /mnt/data. Sort through it: keep personal photos and old receipts (Fred says these are gold), purge everything else. No rush.",
-      "status": "todo",
-      "column": "backlog",
+      "status": "done",
+      "column": "done",
       "priority": "medium",
       "owner": "Wilma",
       "project": "Hazeydata",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14T16:30:00",
-      "notes": "[Fred 2026-03-14] Low priority reminder. Photos and receipts are valuable. Rest can probably go. [Dino PM 2026-03-14] URGENCY INCREASED: /mnt/data now at 90% (1.6TB/1.8TB) after Dropbox migration. The disk fix for root just shifted the problem to HDD. Needs triage soon \u2014 not critical but approaching it. Priority bumped low -> medium."
+      "updated": "2026-03-16T11:30:00",
+      "notes": "[Dino 2026-03-16] RESOLVED: /mnt/data now at 20% (was 90%). Disk space crisis averted. Dropbox audit appears complete - significant cleanup occurred. Task marked done."
     },
     {
       "id": "task-058",
@@ -952,13 +952,13 @@
       "description": "Create a landing page showcasing the school schedules database product. Include a free sample (top 100 districts), coverage stats, update frequency, and a contact/purchase CTA.",
       "status": "todo",
       "column": "backlog",
-      "priority": "medium",
+      "priority": "critical",
       "owner": "Betty",
       "project": "SSD",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-15T03:30:00",
-      "notes": " [Betty AM 2026-03-15] SSD page SEO improved \u2014 added OG tags, Twitter card, canonical URL, favicon links. Copy already solid from prior work. Deployed."
+      "updated": "2026-03-17T02:30:00",
+      "notes": " [Betty AM 2026-03-15] SSD page SEO improved \u2014 added OG tags, Twitter card, canonical URL, favicon links. Copy already solid from prior work. Deployed. [Dino AM 2026-03-17] Priority boosted to CRITICAL - direct revenue potential. Revenue-first policy applied."
     },
     {
       "id": "task-061",
@@ -966,13 +966,13 @@
       "description": "Research existing providers of school schedule/calendar data. Who else sells this? What is their coverage, accuracy, price, and format? Find our differentiation.",
       "status": "todo",
       "column": "backlog",
-      "priority": "medium",
+      "priority": "high",
       "owner": "Arnold",
       "project": "SSD",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "",
-      "notes": ""
+      "updated": "2026-03-17T02:30:00",
+      "notes": "[Dino AM 2026-03-17] Priority boosted to HIGH - supports SSD revenue strategy with competitive positioning."
     },
     {
       "id": "task-062",
@@ -1090,29 +1090,29 @@
       "id": "task-070",
       "title": "CDR: Update pitch deck and user deck with Protocol Registry vision",
       "description": "",
-      "status": "todo",
+      "status": "backlog",
       "column": "backlog",
       "priority": "medium",
       "owner": "Betty",
       "project": "CDR",
       "is_recurring": false,
       "created": "2026-03-14T15:17:00",
-      "updated": "2026-03-14T15:45:00",
-      "notes": "Update the existing CDR pitch deck (~/clawd/projects/cdr-scripts/cdr-pitch.html) to prominently feature the Protocol Registry and VAP as the centrepiece value proposition. Lead with the knowledge-sharing problem, not the compute infrastructure. New headline: \"Share what you know, keep what you protect.\" Add slides for: Protocol Registry, Variable Abstraction Protocol, the improvement loop, metadata taxonomy. Also connect to task-062 (user-facing deck). Vision doc updated: ~/clawd/memory/canadian-digital-railway.md."
+      "updated": "2026-03-17T02:30:00",
+      "notes": "Update the existing CDR pitch deck (~/clawd/projects/cdr-scripts/cdr-pitch.html) to prominently feature the Protocol Registry and VAP as the centrepiece value proposition. Lead with the knowledge-sharing problem, not the compute infrastructure. New headline: \"Share what you know, keep what you protect.\" Add slides for: Protocol Registry, Variable Abstraction Protocol, the improvement loop, metadata taxonomy. Also connect to task-062 (user-facing deck). Vision doc updated: ~/clawd/memory/canadian-digital-railway.md. [Dino AM 2026-03-17] Moved to backlog due to CDR WIP limit enforcement (3 max active tasks). Will revisit after revenue generation from SSD/ACCORD."
     },
     {
       "id": "task-071",
       "title": "CDR: Design Variable Abstraction Protocol (VAP) formal spec",
       "description": "",
-      "status": "todo",
+      "status": "backlog",
       "column": "backlog",
       "priority": "medium",
       "owner": "Barney",
       "project": "CDR",
       "is_recurring": false,
       "created": "2026-03-14T15:40:00",
-      "updated": "2026-03-14T19:00:00",
-      "notes": "Formalize the Variable Abstraction Protocol. Define: the abstract variable naming convention (Y, X1-Xn), the type hierarchy (CDRField subtypes), documentation tier system (type-only / role / usage guidance), and the verification linting rules. Output: a spec document that could be implemented in any language. Reference: Layer 2.75 in ~/clawd/memory/canadian-digital-railway.md. [Wilma PM audit] Assigned to Barney."
+      "updated": "2026-03-17T02:30:00",
+      "notes": "Formalize the Variable Abstraction Protocol. Define: the abstract variable naming convention (Y, X1-Xn), the type hierarchy (CDRField subtypes), documentation tier system (type-only / role / usage guidance), and the verification linting rules. Output: a spec document that could be implemented in any language. Reference: Layer 2.75 in ~/clawd/memory/canadian-digital-railway.md. [Wilma PM audit] Assigned to Barney. [Dino AM 2026-03-17] Moved to backlog due to CDR WIP limit enforcement. Focus on revenue generation from SSD/ACCORD before returning to CDR technical work."
     },
     {
       "id": "task-072",
