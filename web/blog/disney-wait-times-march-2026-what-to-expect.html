@@ -148,6 +148,111 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
+        
+        /* 2026 Accessibility Enhancements */
+        *:focus-visible {
+            outline: 3px solid #ff6900;
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        
+        .cta-button:focus-visible {
+            outline: 3px solid #ff6900;
+            outline-offset: 3px;
+        }
+        
+        .cta-button:active {
+            transform: translateY(1px);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Enhanced table accessibility */
+        table:focus-within {
+            box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.3);
+        }
+        
+        th, td {
+            position: relative;
+        }
+        
+        tr:hover {
+            background-color: rgba(0, 123, 255, 0.04);
+            transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        tr:focus-within {
+            background-color: rgba(255, 105, 0, 0.05);
+            box-shadow: inset 3px 0 0 #ff6900;
+        }
+        
+        /* Loading state shimmer */
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+        
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .article-container {
+                border: 2px solid #000;
+            }
+            
+            .wti-highlight, .park-section, .tips-section {
+                border-width: 3px;
+            }
+            
+            .cta-section {
+                background: #000;
+                color: #fff;
+                border: 2px solid #fff;
+            }
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .cta-button {
+                transition: none;
+            }
+            
+            .cta-button:hover {
+                transform: none;
+                box-shadow: 0 0 0 3px #007bff;
+            }
+            
+            .shimmer {
+                animation: none;
+                background: #f0f0f0;
+            }
+        }
+        
+        /* Skip link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 1000;
+            border-radius: 0 0 4px 4px;
+            font-weight: 600;
+            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .skip-link:focus {
+            top: 0;
+        }
         .current-status {
             background: #d4edda;
             border: 1px solid #c3e6cb;
@@ -169,7 +274,8 @@
     </style>
 </head>
 <body>
-    <div class="article-container">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div class="article-container" id="main-content" role="main">
         <div class="article-header">
             <div class="article-meta">By Fred Hazelton | hazeydata.ai | Published: March 16, 2026 | Updated with live data</div>
             <h1>Disney World Wait Times March 2026: What to Expect This Spring</h1>
@@ -266,13 +372,13 @@
 
         <h2>Week-by-Week March Breakdown</h2>
 
-        <table>
+        <table role="table" aria-label="March 2026 Weekly Disney World Wait Time Breakdown">
             <thead>
                 <tr>
-                    <th>Week</th>
-                    <th>Crowd Level</th>
-                    <th>Avg WTI</th>
-                    <th>What's Happening</th>
+                    <th scope="col">Week</th>
+                    <th scope="col">Crowd Level</th>
+                    <th scope="col">Average WTI</th>
+                    <th scope="col">What's Happening</th>
                 </tr>
             </thead>
             <tbody>
@@ -365,11 +471,17 @@
             <li><strong>Early Morning Entry:</strong> Resort guests get 30 minutes early access, affecting rope drop strategies</li>
         </ul>
 
-        <div class="cta-section">
-            <h3>Get Live WTI Predictions for Your Disney Trip</h3>
+        <div class="cta-section" role="region" aria-label="Get personalized Disney wait time predictions">
+            <h3 id="cta-heading">Get Live WTI Predictions for Your Disney Trip</h3>
             <p>Don't guess at wait times. Get precise WTI forecasts updated daily with real crowd data and weather factors.</p>
-            <a href="https://hazeydata.ai?utm_source=blog&utm_medium=cta&utm_campaign=march-wait-times-2026" class="cta-button">Check Your Dates</a>
-            <a href="https://discord.gg/2Estr7sbP7?utm_source=blog&utm_medium=cta&utm_campaign=march-wait-times-2026" class="cta-button">Join Discord Community</a>
+            <a href="https://hazeydata.ai?utm_source=blog&utm_medium=cta&utm_campaign=march-wait-times-2026" 
+               class="cta-button" 
+               aria-describedby="cta-heading"
+               role="button">Check Your Dates</a>
+            <a href="https://discord.gg/2Estr7sbP7?utm_source=blog&utm_medium=cta&utm_campaign=march-wait-times-2026" 
+               class="cta-button" 
+               aria-describedby="cta-heading"
+               role="button">Join Discord Community</a>
         </div>
 
         <h2>The Bottom Line</h2>
