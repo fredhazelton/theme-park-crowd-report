@@ -1415,7 +1415,56 @@ def verify_article(html: str, wti_data: dict, analysis: dict) -> tuple[bool, lis
     # Verify Discord CTA exists
     if 'discord.gg' not in html:
         issues.append("Missing Discord CTA link")
-    
+
+    # ── Region-text consistency check ──
+    # Verify that prose text doesn't mention parks from OTHER regions.
+    # Extract body text (strip HTML tags) for checking.
+    body_match = re.search(r'<article[^>]*>(.*?)</article>', html, re.DOTALL)
+    if body_match:
+        body_text = re.sub(r'<[^>]+>', ' ', body_match.group(1)).lower()
+
+        # Define park names/phrases unique to each region
+        region_markers = {
+            "orlando": [
+                "magic kingdom", "epcot", "hollywood studios", "animal kingdom",
+                "universal studios florida", "islands of adventure", "epic universe",
+                "walt disney world", "universal orlando",
+            ],
+            "disneyland": [
+                "california adventure", "universal studios hollywood",
+                "disneyland resort",
+            ],
+            "tokyo": [
+                "tokyo disneyland", "tokyo disneysea", "tokyo disney resort",
+            ],
+        }
+
+        # Determine which region this article is for from the <title> tag
+        article_region = None
+        title_text = ""
+        title_tag = re.search(r'<title>(.*?)</title>', html, re.IGNORECASE)
+        if title_tag:
+            title_text = title_tag.group(1).lower()
+        for rname, rcfg in REGION_CONFIG.items():
+            if rcfg["title_prefix"].lower() in title_text:
+                article_region = rname
+                break
+
+        if article_region:
+            for other_region, markers in region_markers.items():
+                if other_region == article_region:
+                    continue
+                for marker in markers:
+                    # "disneyland" alone is ambiguous (could be generic), skip it
+                    # Only flag multi-word markers or unique names
+                    if marker == "disneyland":
+                        continue
+                    if marker in body_text:
+                        issues.append(
+                            f"Region mismatch: '{marker}' (from {other_region}) "
+                            f"found in {article_region} article body text"
+                        )
+
     passed = len(issues) == 0
     return passed, issues
 
