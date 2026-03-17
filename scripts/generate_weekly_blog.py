@@ -394,6 +394,11 @@ def _generate_opening(region: str, analysis: dict, start_date: datetime.date, en
             <p>{season_hook} But not all parks are created equal — the gap between the lightest and busiest park in Orlando this week is {spread:.0f} WTI points. That's the difference between walking onto rides and waiting over an hour.</p>
 
             <p>Here's your park-by-park breakdown for the week of {date_range}, based on our Wait Time Index forecasts.</p>"""
+    elif region == "tokyo":
+        opening = f"""
+            <p>{season_hook} Here's what the data says about crowds at Tokyo Disneyland and Tokyo DisneySea for {date_range}.</p>
+
+            <p>The short version: {lightest["name"]} is your best bet this week (avg WTI {lightest["avg_wti"]:.1f}), while {busiest["name"]} runs the busiest. But the day you go matters almost as much as which park.</p>"""
     else:  # disneyland
         opening = f"""
             <p>{season_hook} Here's what the data says about crowds at Disneyland, California Adventure, and Universal Studios Hollywood for {date_range}.</p>
@@ -462,6 +467,10 @@ def _generate_overview_paragraph(region: str, analysis: dict) -> str:
     if region == "orlando":
         return f"""
             <p>If you're in Orlando this week and have any flexibility, the WTI data makes the choice pretty clear:</p>
+"""
+    elif region == "tokyo":
+        return f"""
+            <p>Here's how the two parks stack up this week:</p>
 """
     else:
         return f"""
