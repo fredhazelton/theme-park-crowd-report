@@ -144,10 +144,69 @@
             margin-top: 36px;
             font-family: var(--font-mono);
         }
-        .hero-stat .val { font-size: 28px; font-weight: 700; color: var(--accent); }
+        .hero-stat .val { 
+            font-size: 28px; font-weight: 700; color: var(--accent);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .hero-stat .lbl {
             font-size: 10px; color: var(--text-muted);
             text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           ENHANCED LOADING & MICRO-INTERACTIONS (2026)
+           ═══════════════════════════════════════════════════ */
+        .hero-stat.loading .val {
+            background: linear-gradient(90deg, var(--accent) 25%, var(--accent-light) 50%, var(--accent) 75%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Enhanced hover states for cards */
+        .quality-card, .use-case, .price-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quality-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .use-case:hover {
+            border-color: rgba(74,144,164,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(74,144,164,0.1);
+        }
+
+        /* Subtle content reveal animations */
+        .hero, .section {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .hero { animation-delay: 0.1s; }
+        .section:nth-of-type(2) { animation-delay: 0.2s; }
+        .section:nth-of-type(3) { animation-delay: 0.3s; }
+        .section:nth-of-type(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ═══════════════════════════════════════════════════
@@ -552,29 +611,57 @@
             .cta-card { padding: 32px 20px; }
         }
 
-        /* Skip to content — accessibility */
+        /* ═══════════════════════════════════════════════════
+           ENHANCED ACCESSIBILITY & 2026 FOCUS DESIGN
+           ═══════════════════════════════════════════════════ */
         .skip-link {
             position: absolute;
             top: -100%;
             left: 16px;
             z-index: 200;
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
             color: var(--bg-primary);
-            padding: 12px 24px;
-            border-radius: 0 0 8px 8px;
+            padding: 14px 28px;
+            border-radius: 0 0 12px 12px;
             font-family: var(--font-mono);
             font-size: 13px;
             font-weight: 600;
             text-decoration: none;
-            transition: top 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(74, 144, 164, 0.3);
         }
         .skip-link:focus {
             top: 0;
+            transform: translateY(2px);
         }
 
-        a:focus-visible, button:focus-visible {
-            outline: 2px solid var(--accent);
+        /* Enhanced focus indicators - 2026 style */
+        a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 3px solid var(--accent-light);
             outline-offset: 2px;
+            border-radius: 4px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced interactive states */
+        .nav-links a:focus-visible {
+            background: rgba(74, 144, 164, 0.1);
+            padding: 8px 12px;
+            margin: -8px -12px;
+            border-radius: 6px;
+        }
+
+        .price-cta:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(74, 144, 164, 0.4);
+        }
+
+        /* Keyboard navigation enhancements */
+        .field-chip:focus-within,
+        .quality-card:focus-within,
+        .use-case:focus-within {
+            border-color: rgba(74, 144, 164, 0.4);
+            box-shadow: 0 0 0 1px rgba(74, 144, 164, 0.2);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -582,6 +669,32 @@
                 animation-duration: 0.01ms !important;
                 transition-duration: 0.01ms !important;
             }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           ENHANCED KEYBOARD NAVIGATION
+           ═══════════════════════════════════════════════════ */
+        body.keyboard-nav *:focus-visible {
+            outline: 3px solid var(--accent-light);
+            outline-offset: 3px;
+            box-shadow: 0 0 0 1px var(--bg-primary), 0 0 0 6px rgba(74, 144, 164, 0.2);
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --text-secondary: rgba(255,255,255,0.9);
+                --text-muted: rgba(255,255,255,0.7);
+                --border-card: rgba(255,255,255,0.15);
+            }
+        }
+
+        /* Enhanced print styles */
+        @media print {
+            body::before, body::after { display: none; }
+            .header, .footer { display: none; }
+            .section { page-break-inside: avoid; }
+            .quality-grid, .pricing-grid { break-inside: avoid; }
         }
     </style>
 </head>
@@ -938,16 +1051,55 @@
     </footer>
 
     <script>
-        // Fetch live coverage stats
-        fetch('/api/ssd/coverage')
-            .then(r => r.json())
-            .then(data => {
-                if (data.total_districts) {
-                    document.getElementById('stat-districts').textContent =
-                        data.total_districts.toLocaleString();
+        // Enhanced loading states and accessibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const statElement = document.getElementById('stat-districts');
+            const statContainer = statElement?.closest('.hero-stat');
+            
+            // Add loading state
+            if (statContainer) {
+                statContainer.classList.add('loading');
+                statElement.setAttribute('aria-label', 'Loading district count...');
+            }
+            
+            // Fetch live coverage stats with enhanced UX
+            fetch('/api/ssd/coverage')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.total_districts && statElement) {
+                        // Animate the number change
+                        const finalValue = data.total_districts.toLocaleString();
+                        statElement.textContent = finalValue;
+                        statElement.setAttribute('aria-label', `${finalValue} districts in database`);
+                        
+                        // Remove loading state with slight delay for animation
+                        setTimeout(() => {
+                            statContainer?.classList.remove('loading');
+                        }, 300);
+                    }
+                })
+                .catch(() => {
+                    // Graceful fallback
+                    statContainer?.classList.remove('loading');
+                    statElement?.setAttribute('aria-label', '13,400+ districts in database (estimated)');
+                });
+            
+            // Keyboard navigation enhancement
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    document.body.classList.add('keyboard-nav');
                 }
-            })
-            .catch(() => {}); // Fail silently — static fallbacks are fine
+            });
+            
+            document.addEventListener('mousedown', function() {
+                document.body.classList.remove('keyboard-nav');
+            });
+        });
+        
+        // Respect user's motion preferences
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.style.setProperty('--animation-duration', '0.01ms');
+        }
     </script>
 
 </body>

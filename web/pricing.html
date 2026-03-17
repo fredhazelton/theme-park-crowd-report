@@ -704,30 +704,55 @@
             .faq-section { padding: 30px 16px 40px; }
         }
 
-        /* Skip to content — accessibility */
+        /* ═══════════════════════════════════════════════════
+           ENHANCED ACCESSIBILITY & 2026 FOCUS DESIGN
+           ═══════════════════════════════════════════════════ */
         .skip-link {
             position: absolute;
             top: -100%;
             left: 16px;
             z-index: 200;
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
             color: var(--bg-primary);
-            padding: 12px 24px;
-            border-radius: 0 0 8px 8px;
+            padding: 14px 28px;
+            border-radius: 0 0 12px 12px;
             font-family: var(--font-mono);
             font-size: 13px;
             font-weight: 600;
             text-decoration: none;
-            transition: top 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(74, 144, 164, 0.3);
         }
         .skip-link:focus {
             top: 0;
+            transform: translateY(2px);
         }
 
-        /* Accessibility: focus-visible outlines */
-        a:focus-visible, button:focus-visible, input:focus-visible {
-            outline: 2px solid var(--accent);
+        /* Enhanced focus indicators - 2026 style */
+        a:focus-visible, button:focus-visible, input:focus-visible, .toggle-option:focus-visible {
+            outline: 3px solid var(--accent-light);
             outline-offset: 2px;
+            border-radius: 4px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-links a:focus-visible {
+            background: rgba(74, 144, 164, 0.1);
+            padding: 8px 12px;
+            margin: -8px -12px;
+            border-radius: 6px;
+        }
+
+        .plan-cta:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(74, 144, 164, 0.4);
+        }
+
+        /* Enhanced keyboard navigation */
+        body.keyboard-nav *:focus-visible {
+            outline: 3px solid var(--accent-light);
+            outline-offset: 3px;
+            box-shadow: 0 0 0 1px var(--bg-primary), 0 0 0 6px rgba(74, 144, 164, 0.2);
         }
 
         /* Reduced motion */
@@ -735,6 +760,15 @@
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
                 transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --text-secondary: rgba(255,255,255,0.9);
+                --text-muted: rgba(255,255,255,0.7);
+                --border-card: rgba(255,255,255,0.15);
             }
         }
     </style>
@@ -1070,6 +1104,20 @@
     </footer>
 
     <script>
+        // Enhanced accessibility and keyboard navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Keyboard navigation enhancement
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    document.body.classList.add('keyboard-nav');
+                }
+            });
+            
+            document.addEventListener('mousedown', function() {
+                document.body.classList.remove('keyboard-nav');
+            });
+        });
+
         // Billing toggle
         let isAnnual = false;
 
