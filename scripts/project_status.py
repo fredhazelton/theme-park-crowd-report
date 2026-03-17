@@ -85,22 +85,28 @@ def ssd_status() -> dict:
             "unmerged": llm_found - llm_in_csv,
         }
 
-    # Pipeline v2 status
-    pv2_file = ssd_dir / "pipeline_v2_results.json"
-    if pv2_file.exists():
-        pv2 = json.load(open(pv2_file))
-        pv2_entries = list(pv2.values()) if isinstance(pv2, dict) else pv2
-        pv2_found = sum(1 for r in pv2_entries if isinstance(r, dict) and r.get("status") == "found")
-        status["pipeline_v2"] = {
-            "processed": len(pv2_entries),
-            "found": pv2_found,
-            "hit_rate_pct": round(pv2_found / len(pv2_entries) * 100, 1) if pv2_entries else 0,
-        }
+    # Pipeline v3 status (SQLite DB)
+    v3_db = ssd_dir / "v3" / "school_schedules.db"
+    if v3_db.exists():
+        try:
+            import sqlite3
+            conn = sqlite3.connect(str(v3_db))
+            v3_districts = conn.execute("SELECT COUNT(*) FROM dim_district").fetchone()[0]
+            v3_days = conn.execute("SELECT COUNT(*) FROM fact_school_day").fetchone()[0]
+            v3_sources = conn.execute("SELECT COUNT(*) FROM dim_calendar_source").fetchone()[0]
+            conn.close()
+            status["pipeline_v3"] = {
+                "districts": v3_districts,
+                "school_days": v3_days,
+                "calendar_sources": v3_sources,
+            }
+        except Exception as e:
+            status["pipeline_v3"] = {"error": str(e)}
 
     # Active scraper check
     try:
         result = subprocess.run(
-            ["pgrep", "-f", "llm_scraper|brave_scraper|pipeline_v2"],
+            ["pgrep", "-f", "llm_scraper|brave_scraper|pipeline_v3"],
             capture_output=True, text=True, timeout=5,
         )
         status["scraper_running"] = result.returncode == 0
@@ -271,9 +277,12 @@ def print_human_readable(statuses: list[dict]):
             if "llm_scraper" in s:
                 llm = s["llm_scraper"]
                 print(f"  🤖 LLM scraper: {llm['found']} found, {llm['merged_into_csv']} merged, {llm['unmerged']} UNMERGED")
-            if "pipeline_v2" in s:
-                pv2 = s["pipeline_v2"]
-                print(f"  🔧 Pipeline v2: {pv2['processed']} processed, {pv2['found']} found ({pv2['hit_rate_pct']}% hit rate)")
+            if "pipeline_v3" in s:
+                pv3 = s["pipeline_v3"]
+                if "error" in pv3:
+                    print(f"  🔧 Pipeline v3: ⚠️ {pv3['error']}")
+                else:
+                    print(f"  🔧 Pipeline v3: {pv3['districts']} districts, {pv3['school_days']:,} school days, {pv3['calendar_sources']} sources")
             print(f"  🔄 Scraper running: {s.get('scraper_running', 'unknown')}")
 
         elif s["project"] == "TPCR":
