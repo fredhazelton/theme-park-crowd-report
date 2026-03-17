@@ -34,6 +34,9 @@ SAVE_INTERVAL = 5
 REQUEST_DELAY = 0.3
 BRAVE_DELAY = 1.1
 
+# Global flag to skip Firecrawl when payment limit hit
+FIRECRAWL_DISABLED = False
+
 # Load NCES website URLs
 def load_nces_urls() -> dict:
     url_map = {}
@@ -108,8 +111,11 @@ def brave_search(query: str) -> list[dict]:
 
 def firecrawl_scrape(url: str, max_chars: int = 8000) -> str:
     """Firecrawl scrape — returns markdown."""
-    if not FIRECRAWL_API_KEY:
+    global FIRECRAWL_DISABLED
+    
+    if not FIRECRAWL_API_KEY or FIRECRAWL_DISABLED:
         return ""
+        
     payload = json.dumps({
         "url": url,
         "formats": ["markdown"],
@@ -130,6 +136,12 @@ def firecrawl_scrape(url: str, max_chars: int = 8000) -> str:
         if result.get("success"):
             md = result.get("data", {}).get("markdown", "")
             return md[:max_chars]
+    except urllib.error.HTTPError as e:
+        if e.code == 402:
+            log(f"    Firecrawl payment limit reached (HTTP 402). Disabling Firecrawl for this session.")
+            FIRECRAWL_DISABLED = True
+        else:
+            log(f"    Firecrawl HTTP error: {e}")
     except Exception as e:
         log(f"    Firecrawl error: {e}")
     return ""
@@ -267,11 +279,15 @@ def try_fetch_url(url: str) -> str:
         return content
     
     # Firecrawl fallback — JS rendering for dynamic calendar pages
-    content = firecrawl_scrape(url)
-    if content and len(content) > 100:
-        time.sleep(1.0)  # throttle to avoid concurrency limits
-        return content
-    time.sleep(1.0)
+    if not FIRECRAWL_DISABLED:
+        content = firecrawl_scrape(url)
+        if content and len(content) > 100:
+            time.sleep(1.0)  # throttle to avoid concurrency limits
+            return content
+        time.sleep(1.0)
+    else:
+        # Firecrawl disabled due to payment limits, rely only on web_fetch
+        pass
     
     return ""
 

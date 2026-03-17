@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-03-17T02:32:42",
+  "generated_at": "2026-03-17T09:02:40",
   "summary": {
     "total": 97,
     "this_week": 97,
-    "in_progress": 4,
+    "in_progress": 5,
     "completed_this_week": 0,
     "pct_complete": 0
   },
@@ -864,17 +864,17 @@
     },
     {
       "id": "TASK-7",
-      "title": "Compile Canadian rail infrastructure spending briefing",
-      "description": "Research federal and provincial spending on Canadian rail infrastructure. Include: current budgets, announced investments, HFR project status, VIA Rail modernization, any AI/digital transformation initiatives. Compile into a briefing doc.",
-      "status": "todo",
-      "column": "backlog",
+      "title": "Compile Canadian sovereign AI infrastructure briefing",
+      "description": "Research federal and provincial investments in Canadian sovereign AI infrastructure and data residency initiatives. Include: Budget 2025 AI commitments ($925.6M), AI Compute Access Fund, sovereign cloud strategies, Bell-Hypertec partnership, CLOUD Act implications, open-weight model developments. CDR is AI infrastructure, NOT physical trains.",
+      "status": "in_progress",
+      "column": "in_progress",
       "priority": "high",
       "owner": "Arnold",
       "project": "CDR",
       "is_recurring": false,
       "created": "2026-03-14",
-      "updated": "2026-03-14T19:00:00",
-      "notes": " [Wilma PM audit] Assigned to Arnold."
+      "updated": "2026-03-17T08:00:00",
+      "notes": "[Arnold AM 2026-03-17] TASK CORRECTED: CDR is sovereign AI infrastructure, not rail infrastructure! Gathered intel on Budget 2025 ($925.6M commitment), AI Compute Access Fund, Bell-Hypertec partnership (Feb 25, 2026), call for proposals (closed Feb 15, 2026), open-weight model developments. Original task description was fundamentally wrong."
     },
     {
       "id": "TASK-8",
