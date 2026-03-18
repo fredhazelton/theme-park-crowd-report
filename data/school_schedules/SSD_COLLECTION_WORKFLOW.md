@@ -8,6 +8,83 @@ Barney and Wilma coordinate school calendar data collection through GitHub Issue
 
 Barney is subscription-based (no per-query API costs), so there are no limits on how many districts he can process.
 
+## Labels & Agent Assignment
+
+Since Barney and Wilma share the same GitHub account (`hazeydata`), we use **labels** instead of GitHub's built-in assignee feature to coordinate who is working on what.
+
+| Label | Color | Meaning | Set by |
+|-------|-------|---------|--------|
+| `SSD-collect` | 🟢 Green | New issue, unassigned — available for pickup | Wilma (at issue creation) |
+| `barney` | 🟣 Purple | Barney has claimed this issue and is working on extraction | Barney |
+| `wilma` | 🟡 Yellow | Wilma has claimed this issue and is extracting directly | Wilma |
+| `wilma-ingest` | 🟠 Orange | Extraction complete — Wilma needs to ingest into v3 DB | Barney (or Wilma after self-extraction) |
+| `SSD-complete` | 🔵 Blue | Data ingested into v3 DB, issue closed | Wilma |
+| `SSD-blocked` | 🔴 Red | Cannot find calendar data online — needs email outreach or FOIA | Either agent |
+
+### Assignment Rules
+
+1. **Claim before you work.** Before starting extraction on any issue, add your label (`barney` or `wilma`) to claim it. Remove `SSD-collect` when claiming.
+2. **Never touch the other agent's issues.** If an issue has `barney` label, Wilma does not extract it (and vice versa). The label is a lock.
+3. **Hand off cleanly.** When extraction is complete, swap your label to `wilma-ingest`. This tells Wilma the JSON is ready for ingestion.
+4. **Close on ingestion.** Wilma ingests, removes `wilma-ingest`, adds `SSD-complete`, and closes the issue.
+5. **Check before creating issues.** Before creating new issues, check whether the district already has an open or closed issue to avoid duplicates.
+
+## Workflow
+
+### Issue Lifecycle
+
+```
+[Wilma creates issue]
+        │
+        ▼
+   SSD-collect          ← Unassigned, available for pickup
+        │
+        ├──► barney     ← Barney claims it, does web search extraction
+        │        │
+        │        ▼
+        │   wilma-ingest ← Barney posts JSON comment, swaps label
+        │        │
+        │        ▼
+        │   SSD-complete ← Wilma ingests into DB, closes issue
+        │
+        └──► wilma      ← Wilma claims it, does automated/direct extraction
+                 │
+                 ▼
+            wilma-ingest ← Wilma extracts and prepares for ingestion
+                 │
+                 ▼
+            SSD-complete ← Wilma ingests into DB, closes issue
+```
+
+### Step-by-Step
+
+1. **Wilma** batch-creates issues for target districts (label: `SSD-collect`)
+2. **Agent** picks up an issue:
+   - Adds their label (`barney` or `wilma`) to claim it
+   - Removes `SSD-collect`
+3. **Agent** does extraction work:
+   - Barney: web search → official calendar → exhaustive extraction → posts JSON comment
+   - Wilma: automated pipeline or direct extraction → inserts into DB
+4. **Agent** swaps label to `wilma-ingest` when extraction is complete
+5. **Wilma** ingests JSON into v3 DB, confirms row counts + instructional day count
+6. **Wilma** removes `wilma-ingest`, adds `SSD-complete`, closes issue
+7. If data can't be found: label `SSD-blocked`, document what was tried
+
+### Division of Labor
+
+| District Tier | Primary Agent | Rationale |
+|--------------|---------------|-----------|
+| Top 200 by enrollment | **Barney** | Gold standard manual extraction with source verification |
+| Districts 201-1000 | **Either** (claim first) | Both agents can work these; labels prevent overlap |
+| Districts 1001+ | **Wilma** | Automated pipeline at scale; Barney assists on blocked cases |
+
+### Overlap Prevention
+
+- If both agents discover they've extracted the same district, Wilma compares both extractions and keeps the higher-quality one (more non_school_days, more complete data)
+- Barney's extractions are tagged `scrape_method = 'barney_manual_v3'` in the DB
+- Wilma's extractions are tagged `scrape_method = 'wilma_pipeline_v3'`
+- Both can coexist; `is_primary` flag marks which is trusted for production
+
 ## Quarterly Repeatability
 
 **This process must be repeatable every quarter without reinventing the wheel.**
@@ -31,15 +108,6 @@ Each district extraction should capture **all available school years**, not just
 | **2024-2025** | Bonus | Capture if available on the same page. Enables year-over-year pattern analysis. |
 
 When multiple years are available, produce **separate JSON entries per school year** in the same issue comment. The `school_year` field in each entry identifies which year it covers.
-
-## Labels
-
-| Label | Meaning |
-|-------|---------|
-| `SSD-collect` | District needs calendar data collected |
-| `SSD-extracted` | Barney has posted extraction JSON, awaiting ingestion |
-| `SSD-complete` | Data ingested into v3 DB, issue closed |
-| `SSD-blocked` | Cannot find calendar data online — needs email outreach or FOIA |
 
 ## The Golden Rule
 
@@ -196,14 +264,6 @@ Barney's extractions run as an independent QA layer alongside Wilma's automated 
 - Suggested search queries
 - State-specific notes (e.g., "Louisiana districts typically have Mardi Gras break")
 - Whether Wilma's pipeline already has data for this district (and what's missing)
-
-## Workflow
-
-1. **Wilma** batch-creates issues for all districts (label: `SSD-collect`)
-2. **Barney** picks up issues in priority order, finds the official calendar, reads it exhaustively, captures contact info, posts complete JSON extraction as a comment (one per school year found)
-3. **Barney** labels `SSD-extracted`
-4. **Wilma** ingests into v3 DB, compares against her pipeline data, confirms row counts + instructional day count, closes issue (label: `SSD-complete`)
-5. If data can't be found: label `SSD-blocked`, document what was tried, use contact info for email outreach
 
 ## Priority Order
 
