@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSD v3 — Raw Data Explorer</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a1628;--bg2:#0f1d32;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--cyan:#4a90a4;--red:#A60038;--green:#4ade80;--yellow:#facc15;--orange:#fb923c;--text:#fff;--text2:rgba(255,255,255,0.7);--muted:rgba(255,255,255,0.4);--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5;padding:24px;max-width:1400px;margin:0 auto}
+h1{font-family:var(--mono);font-size:20px;color:var(--cyan);margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{padding:8px 16px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;border-bottom:2px solid transparent;transition:all .2s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.panel{display:none}
+.panel.active{display:block}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.kpi-val{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--cyan)}
+.kpi-label{font-size:12px;color:var(--muted);margin-top:2px}
+.kpi.warn .kpi-val{color:var(--orange)}
+.kpi.bad .kpi-val{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{position:sticky;top:0;background:var(--bg2);color:var(--cyan);font-family:var(--mono);font-size:11px;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--text)}
+td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text2);white-space:nowrap;max-width:250px;overflow:hidden;text-overflow:ellipsis}
+tr:hover td{background:rgba(74,144,164,0.05);color:var(--text)}
+.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-family:var(--mono);font-weight:600}
+.badge-high{background:rgba(74,222,128,0.15);color:var(--green)}
+.badge-medium{background:rgba(250,204,21,0.15);color:var(--yellow)}
+.badge-low{background:rgba(251,146,60,0.15);color:var(--orange)}
+.search{width:100%;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--sans);font-size:13px;margin-bottom:12px;outline:none}
+.search:focus{border-color:var(--cyan)}
+.chart-container{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+.chart-title{font-family:var(--mono);font-size:13px;color:var(--cyan);margin-bottom:12px}
+canvas{width:100%!important;height:300px!important}
+.day-grid{display:grid;grid-template-columns:repeat(53,1fr);gap:1px;margin-top:8px}
+.day-cell{width:100%;aspect-ratio:1;border-radius:1px}
+.day-school{background:var(--cyan)}
+.day-break{background:var(--red)}
+.day-summer{background:var(--yellow)}
+.day-weekend{background:rgba(255,255,255,0.1)}
+.day-unknown{background:rgba(255,255,255,0.05)}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--muted)}
+.legend-dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.scroll-table{max-height:500px;overflow-y:auto;border:1px solid var(--border);border-radius:8px}
+.state-bar{display:inline-block;height:14px;border-radius:2px;vertical-align:middle}
+select{background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:12px;margin-bottom:12px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<h1>📅 SSD v3 — Raw Data Explorer</h1>
+<p class="subtitle">School Schedules Database · Star Schema · <span id="meta-info"></span></p>
+
+<div class="kpi-row" id="kpis"></div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('timeline')">📈 Timeline</div>
+  <div class="tab" onclick="showTab('districts')">🏫 Districts</div>
+  <div class="tab" onclick="showTab('daily')">📋 Daily Sample</div>
+  <div class="tab" onclick="showTab('states')">🗺️ States</div>
+  <div class="tab" onclick="showTab('heatmap')">🔥 Year Heatmap</div>
+</div>
+
+<div class="panel active" id="panel-timeline">
+  <div class="chart-container">
+    <div class="chart-title">Daily Breakdown — Full School Year 2025-2026</div>
+    <canvas id="timelineChart"></canvas>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Spring Break Wave — % of Districts on Break (Weekdays Only)</div>
+    <canvas id="springChart"></canvas>
+  </div>
+</div>
+
+<div class="panel" id="panel-districts">
+  <input class="search" id="district-search" placeholder="Search districts by name, state, city..." oninput="filterDistricts()">
+  <div class="scroll-table">
+    <table id="district-table"><thead><tr>
+      <th onclick="sortTable('district-table',0)">District</th>
+      <th onclick="sortTable('district-table',1)">State</th>
+      <th onclick="sortTable('district-table',2)">City</th>
+      <th onclick="sortTable('district-table',3)">NCES ID</th>
+      <th onclick="sortTable('district-table',4)">Confidence</th>
+      <th onclick="sortTable('district-table',5)">Method</th>
+      <th onclick="sortTable('district-table',6)">First Day</th>
+      <th onclick="sortTable('district-table',7)">Last Day</th>
+      <th onclick="sortTable('district-table',8)">Spring Break</th>
+      <th onclick="sortTable('district-table',9)">Winter Break</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+</div>
+
+<div class="panel" id="panel-daily">
+  <select id="daily-district-select" onchange="renderDailyTable()"></select>
+  <div class="scroll-table">
+    <table id="daily-table"><thead><tr>
+      <th>Date</th><th>Day</th><th>In Session</th><th>Day Type</th><th>Break Name</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+</div>
+
+<div class="panel" id="panel-states">
+  <div class="scroll-table">
+    <table id="state-table"><thead><tr>
+      <th onclick="sortTable('state-table',0)">State</th>
+      <th onclick="sortTable('state-table',1)">Districts</th>
+      <th onclick="sortTable('state-table',2)">Coverage</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+</div>
+
+<div class="panel" id="panel-heatmap">
+  <div class="chart-container">
+    <div class="chart-title">Sample District: ST. LUCIE (FL) — Full Year View</div>
+    <div id="heatmap-grid"></div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background:var(--cyan)"></span>School Day</span>
+      <span><span class="legend-dot" style="background:var(--red)"></span>Break</span>
+      <span><span class="legend-dot" style="background:var(--yellow)"></span>Summer</span>
+      <span><span class="legend-dot" style="background:rgba(255,255,255,0.1)"></span>Weekend</span>
+      <span><span class="legend-dot" style="background:rgba(255,255,255,0.05)"></span>Unknown</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let DATA = null;
+
+async function loadData() {
+  const resp = await fetch('ssd-explorer-data.json');
+  DATA = await resp.json();
+  render();
+}
+
+function render() {
+  document.getElementById('meta-info').textContent = 
+    `${DATA.meta.total_districts.toLocaleString()} districts · ${DATA.meta.total_rows.toLocaleString()} rows · ${DATA.meta.states} states · ${DATA.meta.school_year}`;
+  
+  // KPIs
+  const kpiHtml = [
+    {val: DATA.meta.total_districts.toLocaleString(), label: 'Districts in DB', cls: ''},
+    {val: DATA.meta.total_rows.toLocaleString(), label: 'Day-Level Rows', cls: ''},
+    {val: DATA.meta.states, label: 'States Covered', cls: ''},
+    {val: DATA.meta.school_year, label: 'School Year', cls: ''},
+    {val: '0', label: 'Enrollment (BUG #57)', cls: 'bad'},
+    {val: '21 / 5,932', label: 'High Confidence', cls: 'warn'},
+    {val: '2', label: 'Break Types Only', cls: 'warn'},
+    {val: '406 MB', label: 'Database Size', cls: ''},
+  ].map(k => `<div class="kpi ${k.cls}"><div class="kpi-val">${k.val}</div><div class="kpi-label">${k.label}</div></div>`).join('');
+  document.getElementById('kpis').innerHTML = kpiHtml;
+  
+  renderTimeline();
+  renderSpringChart();
+  renderDistricts();
+  renderStates();
+  renderHeatmap();
+  renderDailySelect();
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+function renderTimeline() {
+  const agg = DATA.daily_aggregate;
+  const weekdays = agg.filter(d => {
+    const dow = new Date(d.date + 'T12:00:00').getDay();
+    return dow > 0 && dow < 6;
+  });
+  
+  new Chart(document.getElementById('timelineChart'), {
+    type: 'line',
+    data: {
+      labels: weekdays.map(d => d.date),
+      datasets: [
+        {label: 'In Session', data: weekdays.map(d => (d.in_session/d.total*100).toFixed(1)), borderColor: '#4a90a4', backgroundColor: 'rgba(74,144,164,0.1)', fill: true, pointRadius: 0, borderWidth: 1.5},
+        {label: 'Spring Break', data: weekdays.map(d => (d.spring_break/d.total*100).toFixed(1)), borderColor: '#A60038', backgroundColor: 'rgba(166,0,56,0.1)', fill: true, pointRadius: 0, borderWidth: 1.5},
+        {label: 'Winter Break', data: weekdays.map(d => (d.winter_break/d.total*100).toFixed(1)), borderColor: '#facc15', backgroundColor: 'rgba(250,204,21,0.1)', fill: true, pointRadius: 0, borderWidth: 1.5},
+        {label: 'Summer', data: weekdays.map(d => (d.summer/d.total*100).toFixed(1)), borderColor: '#fb923c', backgroundColor: 'rgba(251,146,60,0.1)', fill: true, pointRadius: 0, borderWidth: 1.5},
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: {mode: 'index', intersect: false},
+      scales: {
+        x: {ticks: {maxTicksLimit: 12, color: 'rgba(255,255,255,0.4)', font: {size: 10}}, grid: {color: 'rgba(255,255,255,0.05)'}},
+        y: {min: 0, max: 100, ticks: {callback: v => v+'%', color: 'rgba(255,255,255,0.4)', font: {size: 10}}, grid: {color: 'rgba(255,255,255,0.05)'}}
+      },
+      plugins: {legend: {labels: {color: 'rgba(255,255,255,0.7)', font: {size: 11}}}}
+    }
+  });
+}
+
+function renderSpringChart() {
+  const agg = DATA.daily_aggregate.filter(d => {
+    const dow = new Date(d.date + 'T12:00:00').getDay();
+    return d.date >= '2026-02-15' && d.date <= '2026-04-30' && dow > 0 && dow < 6;
+  });
+  
+  new Chart(document.getElementById('springChart'), {
+    type: 'bar',
+    data: {
+      labels: agg.map(d => d.date),
+      datasets: [{
+        label: '% on Spring Break',
+        data: agg.map(d => (d.spring_break/d.total*100).toFixed(1)),
+        backgroundColor: agg.map(d => {
+          const pct = d.spring_break/d.total*100;
+          return pct > 25 ? '#A60038' : pct > 10 ? '#e05577' : 'rgba(166,0,56,0.3)';
+        }),
+        borderRadius: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {ticks: {maxTicksLimit: 15, color: 'rgba(255,255,255,0.4)', font: {size: 9}}, grid: {display: false}},
+        y: {min: 0, ticks: {callback: v => v+'%', color: 'rgba(255,255,255,0.4)'}, grid: {color: 'rgba(255,255,255,0.05)'}}
+      },
+      plugins: {legend: {display: false}}
+    }
+  });
+}
+
+function renderDistricts() {
+  const tbody = document.querySelector('#district-table tbody');
+  tbody.innerHTML = DATA.sample_districts.map(d => {
+    const rd = d.raw_key_dates || {};
+    const confCls = d.quality_confidence === 'high' ? 'badge-high' : d.quality_confidence === 'medium' ? 'badge-medium' : 'badge-low';
+    return `<tr>
+      <td title="${d.district_name}">${d.district_name}</td>
+      <td>${d.state}</td>
+      <td>${d.city || ''}</td>
+      <td style="font-family:var(--mono);font-size:11px">${d.nces_id}</td>
+      <td><span class="badge ${confCls}">${d.quality_confidence}</span></td>
+      <td style="font-family:var(--mono);font-size:11px">${d.scrape_method}</td>
+      <td>${rd.first_day || '—'}</td>
+      <td>${rd.last_day || '—'}</td>
+      <td>${rd.spring_break_start ? rd.spring_break_start + ' → ' + (rd.spring_break_end||'?') : '—'}</td>
+      <td>${rd.winter_break_start ? rd.winter_break_start + ' → ' + (rd.winter_break_end||'?') : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterDistricts() {
+  const q = document.getElementById('district-search').value.toLowerCase();
+  document.querySelectorAll('#district-table tbody tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function renderStates() {
+  const maxD = Math.max(...DATA.state_summary.map(s => s.districts));
+  const tbody = document.querySelector('#state-table tbody');
+  tbody.innerHTML = DATA.state_summary.map(s => {
+    const pct = (s.districts / maxD * 100).toFixed(0);
+    return `<tr>
+      <td style="font-weight:600">${s.state}</td>
+      <td style="font-family:var(--mono)">${s.districts}</td>
+      <td><span class="state-bar" style="width:${pct}px;background:var(--cyan)"></span> ${s.districts}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderHeatmap() {
+  const grid = document.getElementById('heatmap-grid');
+  const days = DATA.sample_daily;
+  if (!days.length) { grid.innerHTML = '<p style="color:var(--muted)">No daily data</p>'; return; }
+  
+  let html = '<div class="day-grid">';
+  days.forEach(d => {
+    const cls = d.day_type === 'SCHOOL_DAY' ? 'day-school' 
+              : d.day_type === 'BREAK' ? 'day-break'
+              : d.day_type === 'SUMMER' ? 'day-summer'
+              : d.day_type === 'WEEKEND' ? 'day-weekend'
+              : 'day-unknown';
+    html += `<div class="day-cell ${cls}" title="${d.date} ${d.day_name}: ${d.day_type}${d.break_name ? ' ('+d.break_name+')' : ''}"></div>`;
+  });
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function renderDailySelect() {
+  const sel = document.getElementById('daily-district-select');
+  sel.innerHTML = '<option value="stlucie">ST. LUCIE (FL) — High Confidence Sample</option>';
+  renderDailyTable();
+}
+
+function renderDailyTable() {
+  const tbody = document.querySelector('#daily-table tbody');
+  tbody.innerHTML = DATA.sample_daily.map(d => {
+    const typeColor = d.day_type === 'SCHOOL_DAY' ? 'var(--cyan)' 
+                    : d.day_type === 'BREAK' ? 'var(--red)'
+                    : d.day_type === 'SUMMER' ? 'var(--yellow)'
+                    : d.day_type === 'WEEKEND' ? 'var(--muted)'
+                    : 'var(--text2)';
+    return `<tr>
+      <td style="font-family:var(--mono);font-size:11px">${d.date}</td>
+      <td>${d.day_name}</td>
+      <td style="color:${d.is_in_session ? 'var(--green)' : 'var(--red)'}">${d.is_in_session ? '✅ Yes' : '❌ No'}</td>
+      <td style="color:${typeColor};font-weight:500">${d.day_type}</td>
+      <td>${d.break_name || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function sortTable(tableId, colIdx) {
+  const table = document.getElementById(tableId);
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const dir = table.dataset.sortDir === 'asc' ? 'desc' : 'asc';
+  table.dataset.sortDir = dir;
+  
+  rows.sort((a, b) => {
+    const aVal = a.cells[colIdx]?.textContent || '';
+    const bVal = b.cells[colIdx]?.textContent || '';
+    const aNum = parseFloat(aVal.replace(/,/g, ''));
+    const bNum = parseFloat(bVal.replace(/,/g, ''));
+    if (!isNaN(aNum) && !isNaN(bNum)) return dir === 'asc' ? aNum - bNum : bNum - aNum;
+    return dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+  });
+  rows.forEach(r => tbody.appendChild(r));
+}
+
+loadData();
+</script>
+</body>
+</html>
