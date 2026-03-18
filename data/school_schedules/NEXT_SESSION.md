@@ -12,20 +12,17 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 ## The Golden Rule
 **For every single day of the school year (July 1 – June 30), determine whether students are in session or not.**
 
-## What's Done (~40 extractions, ~4.0M students)
+## What's Done (~48 extractions, ~4.4M students)
 
 ### TOP 20 COMPLETE (#61-#80)
 ### RE-EXTRACTIONS COMPLETE (#81-#84)
-### NEW EXTRACTIONS (#85-#99 + #94 Klein)
+### NEW EXTRACTIONS (#85-#112 partial)
 
 ⚠️ IMPORTANT: Issue number mapping shifted during FL cluster sprint.
 Issues #88-#99 in GitHub have DIFFERENT district titles than what Barney extracted.
-Example: GitHub #94 = "Klein ISD TX" but Barney posted Polk County FL extraction there.
-Klein ISD extraction was ALSO posted to #94 as a second comment.
 **Wilma needs to reconcile: match extraction JSON district_name to correct NCES ID regardless of issue number.**
 
-### Districts Extracted (by district, not issue number):
-Complete list of 40 unique district extractions posted as GitHub comments:
+### Districts Extracted (48 unique, by district name):
 Broward FL, Fairfax VA, Hawaii DOE, Montgomery MD, CyFair TX, Cobb GA,
 Northside TX, Lee FL, San Diego CA, Katy TX, Prince William VA,
 Nashville TN, Fort Bend TX, Greenville SC, Jeffco CO, Osceola FL,
@@ -33,31 +30,36 @@ Davis UT, Milwaukee WI, Frisco TX, VA Beach VA,
 Philadelphia PA (re), Denver CO (re), Alpine UT (re), Loudoun VA (re),
 Long Beach CA, Washoe NV, Chesterfield VA, Volusia FL, Douglas CO,
 Granite UT, Jordan UT, NYC District #31 NY, NYC District #2 NY,
-Polk FL, Brevard FL, Pasco FL, Seminole FL, Knox TN, Duval FL, Klein TX
+Polk FL, Brevard FL, Pasco FL, Seminole FL, Knox TN, Duval FL,
+Klein TX, NYC District #24 NY, NYC District #20 NY, Round Rock TX,
+Killeen TX, Cherry Creek CO, Rutherford County TN, St. Johns FL,
+Hamilton County TN
 
-## What Remains (issues with 0 comments):
+## What Remains (~9 issues still need extractions):
+- #97 Jefferson Parish LA — 50K
+- #98 Henrico County VA — 50K
+- #100 Charleston SC — 49K
 - #101 Cumberland County NC — 49K
 - #103 Detroit Public Schools MI — 48K
 - #104 Horry 01 SC — 47K
-- #105 Round Rock ISD TX — 46K
-- #106 Hamilton County TN — 45K
 - #107 Columbus City OH — 45K
-- #109 Killeen ISD TX — 43K
 - #110 Chandler Unified AZ — 43K
 - #112 Portland SD 1J OR — 43K
 
-Also need actual extractions for the CORRECT districts on:
-- #95 Cherry Creek CO — 52K
-- #96 Rutherford County TN — 50K
-- #97 Jefferson Parish LA — 50K
-- #98 Henrico County VA — 50K
-- #99 St. Johns FL — 50K
-- #100 Charleston SC — 49K
-- #102 NYC District #24 NY — 49K (batch with #92/#93)
-- #108 NYC District #20 NY — 44K (batch with #92/#93)
+## Updated FL Spring Break Stagger (now with St. Johns!):
+- Week 1 (Mar 16-20): Broward 254K + Duval 129K + Polk 117K + Osceola 74K + Volusia 63K + Seminole 50K + **St. Johns 50K** = **737K**
+- Week 2 (Mar 23-27): Brevard 74K + Lee 99K = **173K**
+- Week 3 (Mar 30-Apr 3): Pasco 75K = **75K**
+- **Total: 985K FL students across 3 weeks!**
+
+## TN Pattern (4 districts: Nashville, Knox, Rutherford, Hamilton):
+- All have full-week October fall breaks (but Hamilton is Oct 13-17, others Oct 6-10)
+- All ~177 student days + accumulated hours per TN code
+- Hamilton has only 3-day Thanksgiving (Wed-Fri); others have full week
+- Hamilton and Rutherford observe Good Friday; Nashville and Knox do not
+- Rutherford spring break is Mar 30-Apr 3 (later); others are Mar 16-20
 
 ## Don't Forget
 - Check issue TITLE before posting — match district to correct issue
 - Always include `contact` block
-- NYC districts can be batch-extracted (same DOE calendar)
 - Update THIS FILE at end of each session
