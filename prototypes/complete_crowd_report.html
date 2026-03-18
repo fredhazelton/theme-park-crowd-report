@@ -649,11 +649,22 @@
     
     <div class="ride-count">3 of 4 selected</div>
     
-    <!-- Brain Button -->
-    <div style="text-align: center; margin: 20px 0;">
-      <button id="brainButton" style="background: rgba(74,144,164,0.2); border: 2px solid #4a90a4; color: #4a90a4; padding: 16px 24px; border-radius: 12px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto; font-weight: 600;">
-        🧠 Get recommendation
-      </button>
+    <!-- Brain + Chart Section -->
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 20px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <!-- Brain Icon (clickable) -->
+        <div id="brainIcon" style="font-size: 32px; cursor: pointer; padding: 12px; border-radius: 12px; background: rgba(74,144,164,0.1); border: 2px solid rgba(74,144,164,0.3); transition: all 0.2s;">
+          🧠
+        </div>
+        
+        <!-- Wait Time Curves Chart -->
+        <div id="waitCurvesChart" style="flex: 1; height: 80px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative; overflow: hidden;">
+          <canvas id="curvesCanvas" width="240" height="80" style="width: 100%; height: 100%;"></canvas>
+          <div style="position: absolute; top: 4px; left: 8px; font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">
+            Wait time curves (next 3h)
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- Hidden Recommendation (shows after brain click) -->
@@ -796,27 +807,107 @@
     container.appendChild(row);
   });
 
-  // Interactive behavior for MY MUST-DOS section
-  document.getElementById('brainButton').addEventListener('click', function() {
-    // Hide the brain button
-    document.getElementById('brainButton').style.display = 'none';
+  // Draw wait time curves for selected rides
+  function drawWaitCurves() {
+    const canvas = document.getElementById('curvesCanvas');
+    if (!canvas) return;
     
-    // Show the recommendation after a brief delay (simulate thinking)
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Sample wait curves for 4 rides over 3-hour weighted window
+    const curves = [
+      { name: 'Space Mountain', color: '#5A96EA', data: [25, 28, 32, 36, 38, 35, 30] },
+      { name: 'Seven Dwarfs', color: '#4a90a4', data: [15, 18, 22, 28, 35, 42, 48] },
+      { name: 'Big Thunder', color: '#9BC4F2', data: [35, 33, 30, 27, 25, 22, 20] },
+      { name: 'Tiana', color: '#C1DDFC', data: [45, 44, 42, 40, 38, 35, 32] }
+    ];
+    
+    const maxWait = Math.max(...curves.flatMap(c => c.data));
+    const minWait = Math.min(...curves.flatMap(c => c.data));
+    const range = maxWait - minWait || 1;
+    
+    curves.forEach(curve => {
+      ctx.strokeStyle = curve.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      curve.data.forEach((wait, i) => {
+        const x = (i / (curve.data.length - 1)) * (width - 20) + 10;
+        const y = height - 10 - ((wait - minWait) / range) * (height - 20);
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      
+      ctx.stroke();
+    });
+  }
+  
+  // Brain click interaction
+  document.getElementById('brainIcon').addEventListener('click', function() {
+    const chartEl = document.getElementById('waitCurvesChart');
+    const brainEl = document.getElementById('brainIcon');
+    const resultEl = document.getElementById('recommendationResult');
+    
+    // Add spin animation to brain
+    brainEl.style.transform = 'rotate(360deg)';
+    brainEl.style.transition = 'transform 0.6s ease-in-out';
+    
+    // Fade out chart with slide animation
+    chartEl.style.transform = 'translateX(100%)';
+    chartEl.style.opacity = '0';
+    chartEl.style.transition = 'all 0.4s ease-in-out';
+    
+    // Show recommendation after animation
     setTimeout(function() {
-      document.getElementById('recommendationResult').style.display = 'block';
-    }, 300);
+      chartEl.style.display = 'none';
+      resultEl.style.display = 'block';
+      resultEl.style.opacity = '0';
+      resultEl.style.transform = 'translateY(20px)';
+      
+      setTimeout(function() {
+        resultEl.style.opacity = '1';
+        resultEl.style.transform = 'translateY(0)';
+        resultEl.style.transition = 'all 0.3s ease-out';
+      }, 50);
+    }, 400);
   });
   
   // Done button - reset the interface
   document.addEventListener('click', function(e) {
     if (e.target.classList.contains('done-button')) {
+      const chartEl = document.getElementById('waitCurvesChart');
+      const brainEl = document.getElementById('brainIcon');
+      const resultEl = document.getElementById('recommendationResult');
+      
       // Hide recommendation
-      document.getElementById('recommendationResult').style.display = 'none';
-      // Show brain button again  
-      document.getElementById('brainButton').style.display = 'flex';
-      // Could remove the completed ride and update the list here
+      resultEl.style.display = 'none';
+      
+      // Reset and show chart
+      chartEl.style.display = 'block';
+      chartEl.style.transform = 'translateX(0)';
+      chartEl.style.opacity = '1';
+      chartEl.style.transition = 'none';
+      
+      // Reset brain
+      brainEl.style.transform = 'rotate(0deg)';
+      brainEl.style.transition = 'none';
+      
+      // Redraw curves
+      setTimeout(drawWaitCurves, 50);
     }
   });
+  
+  // Initial draw
+  setTimeout(drawWaitCurves, 100);
 </script>
 </body>
 </html>
