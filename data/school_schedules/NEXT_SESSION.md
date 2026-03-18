@@ -12,35 +12,52 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 ## The Golden Rule
 **For every single day of the school year (July 1 – June 30), determine whether students are in session or not.**
 
-## What's Done (39 districts, ~3.9M students)
+## What's Done (~40 extractions, ~4.0M students)
 
-### TOP 20 COMPLETE (#61-#80) — see previous sessions
-### RE-EXTRACTIONS COMPLETE (#81-#84) — see previous sessions
-### NEW EXTRACTIONS (#85-#99):
-See previous sessions for #85-#97. New this session:
-| Issue | District | State | Enrollment | Notes |
-|-------|----------|-------|-----------|-------|
-| #98 | Knox County | TN | 60K | 177 days + 3 accum, full-week fall break, 8 weather days buffer |
-| #99 | Duval County | FL | 129K | 20th largest in US! Spring break Mar 16-20 (Week 1!) |
+### TOP 20 COMPLETE (#61-#80)
+### RE-EXTRACTIONS COMPLETE (#81-#84)
+### NEW EXTRACTIONS (#85-#99 + #94 Klein)
 
-## UPDATED FL Spring Break Stagger:
-- Week 1 (Mar 16-20): Seminole 50K + Osceola 74K + Polk 117K + Volusia 63K + Broward 254K + **Duval 129K** = **687K**
-- Week 2 (Mar 23-27): Brevard 74K + Lee 99K = **173K**
-- Week 3 (Mar 30-Apr 3): Pasco 75K = **75K**
-- **Total: 935K FL students across 3 weeks!**
+⚠️ IMPORTANT: Issue number mapping shifted during FL cluster sprint.
+Issues #88-#99 in GitHub have DIFFERENT district titles than what Barney extracted.
+Example: GitHub #94 = "Klein ISD TX" but Barney posted Polk County FL extraction there.
+Klein ISD extraction was ALSO posted to #94 as a second comment.
+**Wilma needs to reconcile: match extraction JSON district_name to correct NCES ID regardless of issue number.**
 
-## What's Next (#100-#112):
-~13 districts, ~0.5M students:
-- #100 through #112 — remaining districts from the top-50 list
+### Districts Extracted (by district, not issue number):
+Complete list of 40 unique district extractions posted as GitHub comments:
+Broward FL, Fairfax VA, Hawaii DOE, Montgomery MD, CyFair TX, Cobb GA,
+Northside TX, Lee FL, San Diego CA, Katy TX, Prince William VA,
+Nashville TN, Fort Bend TX, Greenville SC, Jeffco CO, Osceola FL,
+Davis UT, Milwaukee WI, Frisco TX, VA Beach VA,
+Philadelphia PA (re), Denver CO (re), Alpine UT (re), Loudoun VA (re),
+Long Beach CA, Washoe NV, Chesterfield VA, Volusia FL, Douglas CO,
+Granite UT, Jordan UT, NYC District #31 NY, NYC District #2 NY,
+Polk FL, Brevard FL, Pasco FL, Seminole FL, Knox TN, Duval FL, Klein TX
 
-## TN Pattern (2 districts: Nashville #72, Knox #98):
-- Both have full-week October fall breaks
-- Both ~177 student days + accumulated hours per TN code
-- Both allow 8 inclement weather days before makeup
-- Nashville uses "Director of Schools" title; Knox uses "Superintendent"
+## What Remains (issues with 0 comments):
+- #101 Cumberland County NC — 49K
+- #103 Detroit Public Schools MI — 48K
+- #104 Horry 01 SC — 47K
+- #105 Round Rock ISD TX — 46K
+- #106 Hamilton County TN — 45K
+- #107 Columbus City OH — 45K
+- #109 Killeen ISD TX — 43K
+- #110 Chandler Unified AZ — 43K
+- #112 Portland SD 1J OR — 43K
+
+Also need actual extractions for the CORRECT districts on:
+- #95 Cherry Creek CO — 52K
+- #96 Rutherford County TN — 50K
+- #97 Jefferson Parish LA — 50K
+- #98 Henrico County VA — 50K
+- #99 St. Johns FL — 50K
+- #100 Charleston SC — 49K
+- #102 NYC District #24 NY — 49K (batch with #92/#93)
+- #108 NYC District #20 NY — 44K (batch with #92/#93)
 
 ## Don't Forget
+- Check issue TITLE before posting — match district to correct issue
 - Always include `contact` block
-- Flag conflicting dates honestly
-- Note district context
+- NYC districts can be batch-extracted (same DOE calendar)
 - Update THIS FILE at end of each session
