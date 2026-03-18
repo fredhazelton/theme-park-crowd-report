@@ -247,6 +247,14 @@
             border-radius: 14px;
             padding: 28px 24px;
             backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .quality-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-accent);
+            box-shadow: 0 8px 32px rgba(74,144,164,0.1), 0 2px 8px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.06);
         }
         .quality-card h3 {
             font-family: var(--font-mono);
@@ -511,6 +519,14 @@
             border: 1px solid var(--border-card);
             border-radius: 12px;
             padding: 24px 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .use-case:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-accent);
+            box-shadow: 0 4px 20px rgba(74,144,164,0.08);
+            background: rgba(255,255,255,0.05);
         }
         .use-case .icon { font-size: 24px; margin-bottom: 12px; }
         .use-case h4 {
@@ -756,11 +772,11 @@
                 </p>
             </div>
             <div class="quality-card">
-                <h3 class="yellow">⚠ By District Count — Work in Progress</h3>
-                <div class="quality-meter"><div class="fill yellow" style="width: 48.5%"></div></div>
-                <div class="quality-stat" style="color: var(--accent-yellow)">48.5%</div>
+                <h3 class="green">✅ By District Count — Major Progress</h3>
+                <div class="quality-meter"><div class="fill green" style="width: 60.7%"></div></div>
+                <div class="quality-stat" style="color: var(--accent-green)">60.7%</div>
                 <p class="quality-desc">
-                    <strong>By number of districts confirmed.</strong> About half of districts have verified dates. The gap is mostly small districts (under 2,000 students) where calendars are harder to find online. Our scraper is actively filling this in — the number improves daily.
+                    <strong>By number of districts confirmed.</strong> Over 8,150 districts now have verified calendar dates. Significant progress from our AI scraper pipeline — coverage continues improving daily as we process remaining districts.
                 </p>
             </div>
             <div class="quality-card">
