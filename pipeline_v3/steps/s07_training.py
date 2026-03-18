@@ -94,6 +94,16 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 park_df = pd.read_parquet(actuals_single)
                 park_df = park_df[park_df["entity_code"].isin(park_entities)]
 
+            # === Issue #48: Apply per-park min_training_year cutoff ===
+            # Filters BOTH real and synthetic data from contaminated years.
+            min_year = cfg.get_min_training_year(park_code)
+            if min_year > 0 and "park_date" in park_df.columns:
+                before = len(park_df)
+                park_df = park_df[pd.to_datetime(park_df["park_date"]).dt.year >= min_year]
+                dropped = before - len(park_df)
+                if dropped > 0:
+                    log.info(f"  {park_code}: min_training_year={min_year} dropped {dropped:,} rows ({dropped/before*100:.1f}%)")
+
             for entity_code in park_entities:
                 try:
                     entity_df = park_df[park_df["entity_code"] == entity_code].copy()

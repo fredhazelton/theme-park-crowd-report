@@ -189,11 +189,15 @@ def build_actuals_training_data(logger, output_base: Path) -> int:
         entity_filter_actual = f"AND a.entity_code IN ('{entity_list}')"
 
         # Training data year cutoff (Issue #48: remove contaminated pre-2016 data)
+        # Applied to BOTH real actuals AND synthetic data — the conversion model
+        # that generated pre-2016 synthetics was trained on contaminated data,
+        # and pre-2016 park operations (e.g., AK half-day) are fundamentally different.
         pipeline_cfg = PipelineConfig()
         min_year = pipeline_cfg.get_min_training_year(park_code)
         year_filter_actual = f"AND EXTRACT(YEAR FROM a.park_date::DATE) >= {min_year}" if min_year > 0 else ""
+        year_filter_synth = f"AND EXTRACT(YEAR FROM s.park_date::DATE) >= {min_year}" if min_year > 0 else ""
         if min_year > 0:
-            logger.info(f"  [{park_idx}/{len(parks)}] {park_code}: applying min_training_year={min_year}")
+            logger.info(f"  [{park_idx}/{len(parks)}] {park_code}: applying min_training_year={min_year} (real + synthetic)")
 
         query = f"""
         WITH {operating_filter}
@@ -221,6 +225,7 @@ def build_actuals_training_data(logger, output_base: Path) -> int:
               AND s.synthetic_actual > 0
               {entity_filter}
               {synth_filter}
+              {year_filter_synth}
         ),
         real_actuals AS (
             SELECT

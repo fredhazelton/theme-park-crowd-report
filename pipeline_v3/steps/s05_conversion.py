@@ -91,9 +91,25 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     prod_model_path = conversion_model_path(cfg)
 
     # Load matched pairs with context columns
+    # Issue #48: Apply per-park min_training_year to exclude contaminated
+    # pre-2016 Disney actual-time API data from WDW parks.
     with log.timed("load training data"):
         parquet_str = str(cfg.parquet_dir).replace("\\", "/")
         dim_str = str(cfg.dimension_dir / "dimentity.csv").replace("\\", "/")
+
+        # Build per-park year filter for the conversion model
+        year_filter_parts = []
+        for park_code, min_year in cfg.min_training_year_per_park.items():
+            if min_year > 0:
+                year_filter_parts.append(
+                    f"(entity_code LIKE '{park_code}%' AND park_date < '{min_year}-01-01')"
+                )
+        if year_filter_parts:
+            year_exclusion = "AND NOT (" + " OR ".join(year_filter_parts) + ")"
+            log.info(f"Conversion model year filter: excluding pre-cutoff data for {list(cfg.min_training_year_per_park.keys())}")
+        else:
+            year_exclusion = ""
+
         with read_connection() as con:
             df = con.execute(f"""
                 WITH posted AS (
@@ -103,6 +119,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_type = 'POSTED' AND wait_time_minutes > 0
                       AND observed_at_ts IS NOT NULL
+                      {year_exclusion}
                     GROUP BY entity_code, park_date, hour_bucket
                 ),
                 actual AS (
@@ -112,6 +129,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                     FROM read_parquet('{parquet_str}/*.parquet')
                     WHERE wait_time_type = 'ACTUAL' AND wait_time_minutes > 0
                       AND observed_at_ts IS NOT NULL
+                      {year_exclusion}
                     GROUP BY entity_code, park_date, hour_bucket
                 )
                 SELECT p.entity_code,
