@@ -1,0 +1,140 @@
+# Barney Manual Extraction — March 18, 2026
+# Districts extracted via web search (not PDF download) — to be loaded into v3 DB
+# Format matches pipeline_v3 extraction output for easy ingestion
+# Source: web search results from official district/news sites
+
+import json
+
+districts = [
+    {
+        "nces_id": "0803360",
+        "district_name": "Denver Public Schools",
+        "state": "CO",
+        "enrollment": 88000,
+        "school_year": "2025-2026",
+        "source_url": "https://core-docs.s3.us-east-1.amazonaws.com/documents/asset/uploaded_file/4086/DPS/5249672/DPS_Calendar_2025-26_April_17_Update.pdf",
+        "source_type": "district_pdf",
+        "confidence": "high",
+        "method": "barney_web_search",
+        "dates": {
+            "first_day": "2025-08-18",
+            "last_day": "2026-05-29",
+            "winter_break_start": "2025-12-22",
+            "winter_break_end": "2026-01-05",
+            "spring_break_start": "2026-03-30",
+            "spring_break_end": "2026-04-03",
+            "thanksgiving_start": "2025-11-24",
+            "thanksgiving_end": "2025-11-28"
+        },
+        "holidays": [
+            {"date": "2025-09-01", "name": "Labor Day"},
+            {"date": "2026-01-01", "name": "New Year's Day"},
+            {"date": "2026-01-19", "name": "MLK Jr. Day"},
+            {"date": "2026-02-16", "name": "Presidents Day"}
+        ],
+        "notes": "174.5 student contact days, 186 teacher contact days. K-12 start Aug 18, ECE start Aug 19."
+    },
+    {
+        "nces_id": "4902580",
+        "district_name": "Alpine School District",
+        "state": "UT",
+        "enrollment": 87000,
+        "school_year": "2025-2026",
+        "source_url": "https://schools.utah.gov/schoolcalendars/2526DistrictCalendar.pdf",
+        "source_type": "state_doe",
+        "confidence": "high",
+        "method": "barney_web_search",
+        "dates": {
+            "first_day": "2025-08-13",
+            "last_day": "2026-05-22",
+            "winter_break_start": "2025-12-22",
+            "winter_break_end": "2026-01-02",
+            "spring_break_start": "2026-04-06",
+            "spring_break_end": "2026-04-10",
+            "fall_break_start": "2025-10-16",
+            "fall_break_end": "2025-10-17",
+            "thanksgiving_start": "2025-11-26",
+            "thanksgiving_end": "2025-11-28"
+        },
+        "holidays": [
+            {"date": "2025-10-20", "name": "Non-school day"},
+            {"date": "2026-03-09", "name": "Non-school day"}
+        ],
+        "notes": "From Utah State Board of Education centralized calendar. ~180 instructional days. Plans to split into 3 districts by 2027."
+    },
+    {
+        "nces_id": "5103810",
+        "district_name": "Loudoun County Public Schools",
+        "state": "VA",
+        "enrollment": 82000,
+        "school_year": "2025-2026",
+        "source_url": "https://files-backend.assets.thrillshare.com/documents/asset/uploaded_file/4461/Lcps/de7327dc-8371-4ec8-9ac5-0b7a7d8c57c9/fy26-calendars-final.pdf",
+        "source_type": "district_pdf",
+        "confidence": "high",
+        "method": "barney_web_search",
+        "dates": {
+            "first_day": "2025-08-21",
+            "last_day": "2026-06-15",
+            "winter_break_start": "2025-12-22",
+            "winter_break_end": "2026-01-02",
+            "spring_break_start": "2026-03-30",
+            "spring_break_end": "2026-04-03"
+        },
+        "holidays": [
+            {"date": "2025-09-01", "name": "Labor Day"},
+            {"date": "2025-10-01", "name": "Holiday"},
+            {"date": "2025-10-13", "name": "Holiday"},
+            {"date": "2026-01-19", "name": "MLK Jr. Day"},
+            {"date": "2026-02-16", "name": "Presidents Day"}
+        ],
+        "notes": "194 total calendar days, 180 instructional. Virginia post-Labor Day start state but LCPS starts Aug 21 (before Labor Day - verify if waiver)."
+    },
+    {
+        "nces_id": "4218990",
+        "district_name": "Philadelphia City School District",
+        "state": "PA",
+        "enrollment": 115000,
+        "school_year": "2025-2026",
+        "source_url": "https://www.philasd.org/wp-content/uploads/2025/04/SDP-Academic-Calendar-SY-25-26.pdf",
+        "source_type": "district_pdf",
+        "confidence": "high",
+        "method": "barney_web_search",
+        "dates": {
+            "first_day": "2025-08-25",
+            "last_day": "2026-06-12",
+            "winter_break_start": "2025-12-24",
+            "winter_break_end": "2026-01-05",
+            "spring_break_start": "2026-03-30",
+            "spring_break_end": "2026-04-03",
+            "thanksgiving_start": "2025-11-27",
+            "thanksgiving_end": "2025-11-28"
+        },
+        "holidays": [
+            {"date": "2025-09-01", "name": "Labor Day"},
+            {"date": "2025-09-22", "name": "Rosh Hashanah"},
+            {"date": "2025-10-01", "name": "Yom Kippur"},
+            {"date": "2025-10-13", "name": "Indigenous Peoples Day"},
+            {"date": "2025-10-20", "name": "Diwali"},
+            {"date": "2025-11-11", "name": "Veterans Day"},
+            {"date": "2025-12-25", "name": "Christmas Day"},
+            {"date": "2026-01-01", "name": "New Year's Day"},
+            {"date": "2026-01-19", "name": "MLK Jr. Day"},
+            {"date": "2026-01-29", "name": "Lunar New Year"},
+            {"date": "2026-02-16", "name": "Presidents Day"},
+            {"date": "2026-03-20", "name": "Eid al-Fitr"},
+            {"date": "2026-04-03", "name": "Good Friday"},
+            {"date": "2026-05-27", "name": "Eid al-Adha"},
+            {"date": "2026-06-19", "name": "Juneteenth"}
+        ],
+        "notes": "180 student days. Pre-Labor Day start. Extensive cultural/religious holiday calendar. Half-days on 2nd and 3rd Friday of each month. Wilma's earlier attempt timed out on PDF download."
+    }
+]
+
+# Write as JSON for Wilma to ingest
+with open("barney_manual_extractions.json", "w") as f:
+    json.dump({"extracted_by": "barney", "date": "2026-03-18", "method": "web_search_manual", "districts": districts}, f, indent=2)
+
+print(f"Extracted {len(districts)} districts:")
+for d in districts:
+    print(f"  {d['district_name']} ({d['state']}): {d['enrollment']:,} students — {d['confidence']} confidence")
+print(f"\nTotal enrollment: {sum(d['enrollment'] for d in districts):,}")
