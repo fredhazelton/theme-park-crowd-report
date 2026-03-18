@@ -2,51 +2,50 @@
 
 **Read this first every session. This is your continuity doc.**
 
-## What You're Doing
-You are **Barney** — an AI agent doing gold-standard school calendar extractions for the School Schedules Database (SSD).
+## 🏁 SPRINT COMPLETE — ALL 57 EXTRACTIONS DONE! 🏁
+
+**57 unique district extractions posted as GitHub issue comments**
+**~4.8M students covered (10.4% of national K-12 enrollment)**
+**19 states represented**
 
 ## Repo & Workflow
 - **Repo:** `hazeydata/theme-park-crowd-report`
 - **Issues:** `#61–#112` with label `SSD-collect`
 
-## The Golden Rule
-**For every single day of the school year (July 1 – June 30), determine whether students are in session or not.**
+⚠️ IMPORTANT FOR WILMA:
+- Issues #88-#99 have mismatched district data from FL cluster sprint
+- Match extraction JSON `district_name` and `nces_id` to correct districts, NOT issue numbers
+- Each JSON block is self-describing with correct NCES IDs
 
-## What's Done (~51 extractions, ~4.6M students)
+## Complete District List (57 extractions):
 
-### TOP 20 COMPLETE (#61-#80)
-### RE-EXTRACTIONS COMPLETE (#81-#84)
-### NEW EXTRACTIONS (#85-#112 mostly done)
-
-⚠️ IMPORTANT: Issue number mapping shifted during FL cluster sprint.
-**Wilma needs to reconcile: match extraction JSON district_name to correct NCES ID regardless of issue number.**
-
-### Districts Extracted (51 unique, by district name):
+### TOP 20 (#61-#80):
 Broward FL, Fairfax VA, Hawaii DOE, Montgomery MD, CyFair TX, Cobb GA,
 Northside TX, Lee FL, San Diego CA, Katy TX, Prince William VA,
 Nashville TN, Fort Bend TX, Greenville SC, Jeffco CO, Osceola FL,
-Davis UT, Milwaukee WI, Frisco TX, VA Beach VA,
-Philadelphia PA (re), Denver CO (re), Alpine UT (re), Loudoun VA (re),
+Davis UT, Milwaukee WI, Frisco TX, VA Beach VA
+
+### RE-EXTRACTIONS (#81-#84):
+Philadelphia PA, Denver CO, Alpine UT, Loudoun VA
+
+### NEW EXTRACTIONS (#85-#112):
 Long Beach CA, Washoe NV, Chesterfield VA, Volusia FL, Douglas CO,
-Granite UT, Jordan UT, NYC District #31 NY, NYC District #2 NY,
-Polk FL, Brevard FL, Pasco FL, Seminole FL, Knox TN, Duval FL,
-Klein TX, NYC District #24 NY, NYC District #20 NY, Round Rock TX,
-Killeen TX, Cherry Creek CO, Rutherford County TN, St. Johns FL,
-Hamilton County TN, Jefferson Parish LA, Henrico County VA, Charleston SC
+Granite UT, Jordan UT, NYC #31 NY, NYC #2 NY, Polk FL, Brevard FL,
+Pasco FL, Seminole FL, Knox TN, Duval FL, Klein TX, NYC #24 NY,
+NYC #20 NY, Round Rock TX, Killeen TX, Cherry Creek CO,
+Rutherford County TN, St. Johns FL, Hamilton County TN,
+Jefferson Parish LA, Henrico County VA, Charleston SC,
+Cumberland County NC, Detroit MI, Horry SC, Columbus OH,
+Chandler AZ, Portland OR
 
-## What Remains (6 issues still need extractions):
-- #101 Cumberland County NC — 49K
-- #103 Detroit Public Schools MI — 48K
-- #104 Horry 01 SC — 47K
-- #107 Columbus City OH — 45K
-- #110 Chandler Unified AZ — 43K
-- #112 Portland SD 1J OR — 43K
+## State Coverage (19 states):
+TX(10), FL(9), VA(6), NY(6), TN(4), UT(4), CO(4), SC(3), CA(2),
+GA(1), HI(1), MD(1), PA(1), WI(1), NV(1), LA(1), NC(1), MI(1),
+OH(1), AZ(1), OR(1)
 
-## New State Patterns This Session:
-- **Louisiana (1 district: Jefferson Parish):** MARDI GRAS BREAK (Feb 13-20, 6 school days!). Smart Start staggered entry. Spring break Apr 3-7. Storm recovery days designated.
-- **SC expanded (2 districts: Greenville, Charleston):** Charleston chose Calendar A (no fall break) to preserve school meals. Spring break Apr 6-10.
-
-## Don't Forget
-- Check issue TITLE before posting — match district to correct issue
-- Always include `contact` block
-- Update THIS FILE at end of each session
+## What's Next for the Project:
+- Wilma: Ingest all 57 extractions into v3 DB
+- Wilma: Reconcile issue mapping mismatch
+- Wilma: Batch-create issues for ALL 13,418 districts
+- Fred: Review SALES_STRATEGY_CORRECTIONS.md
+- Post-sprint: Migrate SSD from theme-park-crowd-report to data-hub repo (#58)
