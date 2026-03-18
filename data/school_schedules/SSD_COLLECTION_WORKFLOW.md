@@ -8,6 +8,30 @@ Barney and Wilma coordinate school calendar data collection through GitHub Issue
 
 Barney is subscription-based (no per-query API costs), so there are no limits on how many districts he can process.
 
+## Quarterly Repeatability
+
+**This process must be repeatable every quarter without reinventing the wheel.**
+
+Every extraction must document:
+- **What was found** — the calendar data itself
+- **Where it was found** — exact source URL, page title, search query used
+- **How it was found** — the search path (e.g., "searched district name + '2025-2026 calendar', found PDF link on 3rd result")
+- **When it was found** — extraction date
+
+This creates a **source trace** so the next quarterly run can go directly to known sources. If Denver's calendar was at `dpsk12.org/calendars` this quarter, we start there next quarter instead of searching from scratch.
+
+## Multi-Year Scope
+
+Each district extraction should capture **all available school years**, not just 2025-2026:
+
+| School Year | Priority | Notes |
+|-------------|----------|-------|
+| **2025-2026** | Required | Current year — proving ground for pipeline maturity |
+| **2026-2027** | Required (when available) | **THE SELLABLE PRODUCT** — buyers need future calendars. Many districts have already published. |
+| **2024-2025** | Bonus | Capture if available on the same page. Enables year-over-year pattern analysis. |
+
+When multiple years are available, produce **separate JSON entries per school year** in the same issue comment. The `school_year` field in each entry identifies which year it covers.
+
 ## Labels
 
 | Label | Meaning |
@@ -42,6 +66,7 @@ For each district, read the **complete official calendar** and extract:
    - The name/reason as stated on the calendar
 3. **Any days outside typical boundaries where students ARE in session** (Saturday school, makeup days, summer bridge programs)
 4. **District contact information** for follow-up or FOIA requests
+5. **All available school years** (2024-2025, 2025-2026, 2026-2027)
 
 The engine will handle the rest:
 - Days between first_day and last_day not explicitly marked → `SCHOOL_DAY`
@@ -50,7 +75,7 @@ The engine will handle the rest:
 
 ## JSON Format for Extraction
 
-Post extraction as a GitHub issue comment:
+Post extraction as a GitHub issue comment. **One JSON object per school year:**
 
 ```json
 {
@@ -61,6 +86,8 @@ Post extraction as a GitHub issue comment:
   "school_year": "2025-2026",
   "source_url": "https://...",
   "source_description": "Official 2025-2026 Instructional Calendar PDF from lausd.org",
+  "search_path": "Searched 'Los Angeles Unified 2025-2026 calendar' → found PDF link on lausd.org/calendars page",
+  "extraction_date": "2026-03-18",
   "first_day": "2025-08-14",
   "last_day": "2026-06-10",
   "total_instructional_days": 180,
@@ -90,18 +117,22 @@ Post extraction as a GitHub issue comment:
     "phone": "(213) 241-1000",
     "source": "district website contact page"
   },
-  "notes": "Calendar source is the board-approved instructional calendar. 180 instructional days stated on calendar. Includes 4 teacher-only days and 6 early release days."
+  "notes": "Calendar source is the board-approved instructional calendar. 180 instructional days stated on calendar. Includes 4 teacher-only days and 6 early release days. 2026-2027 calendar also available at same URL."
 }
 ```
 
 **Key fields:**
-- Named break fields (`spring_break_start/end`, etc.) = convenience shortcuts for common breaks
-- `other_breaks` = ANY additional multi-day break not covered by the named fields. Use this freely.
-- `non_school_days` = EVERY individual non-session day (holidays, teacher days, half days, anything)
+- `school_year` = which year this extraction covers (produce separate entries per year)
+- `source_url` = exact URL where calendar was found
+- `search_path` = how you found it (search query → result → page → link). Critical for quarterly repeatability.
+- `extraction_date` = when this extraction was performed
+- Named break fields = convenience shortcuts for common breaks
+- `other_breaks` = ANY additional multi-day break. Use this freely.
+- `non_school_days` = EVERY individual non-session day
 - `saturday_sessions` = Any Saturday or Sunday where students ARE in session
-- `total_instructional_days` = The calendar's own stated instructional day count (for cross-checking)
-- `contact` = District contact info for email outreach or FOIA if calendar can't be found
-- `notes` = Source description, caveats, ambiguities
+- `total_instructional_days` = Calendar's own stated count (for cross-checking)
+- `contact` = District contact info for email outreach or FOIA
+- `notes` = Source description, caveats, other years available
 
 ## Quality Standard
 
@@ -112,7 +143,8 @@ Post extraction as a GitHub issue comment:
 - Teacher workdays / PD days captured
 - Total instructional day count cross-checked against calendar's own stated count
 - Contact info captured (superintendent name + email at minimum)
-- Notes field documents source and any ambiguities
+- Search path documented for quarterly repeatability
+- All available school years captured (2025-2026 required, 2026-2027 if published, 2024-2025 bonus)
 
 **Minimum viable (acceptable for smaller districts):**
 - Source is an official or reliable aggregator
@@ -121,8 +153,18 @@ Post extraction as a GitHub issue comment:
 - Teacher workdays captured if visible on calendar
 - Half days captured if visible on calendar
 - Contact info captured if readily available
+- Source URL documented
 
 **When in doubt, capture it.** An extra entry in `non_school_days` that turns out to be wrong is easy to remove. A missing day is invisible and creates silent errors in the aggregate.
+
+## Schema: Dual-Source Storage
+
+Both Wilma's pipeline extractions and Barney's manual extractions are stored as separate rows in `dim_calendar_source`, tagged by `scrape_method`:
+
+- `scrape_method = 'wilma_pipeline_v3'` — automated extraction
+- `scrape_method = 'barney_manual_v3'` — web search extraction
+
+The `UNIQUE(district_id, school_year)` constraint is dropped. Both sources coexist. An `is_primary` flag marks which source is trusted for the production dataset.
 
 ## Twin Collection / QA Process
 
@@ -140,7 +182,13 @@ Barney's extractions run as an independent QA layer alongside Wilma's automated 
 
 ## Issue Creation (Wilma's job)
 
-**Title:** `SSD Collect: {District Name} ({State}) — {Enrollment}K students`
+**Batching approach (Option C):**
+- **Top 50 by enrollment** → individual issues per district
+- **Districts 51+** → batched by state (one issue per state listing all districts)
+
+**Title format:**
+- Individual: `SSD Collect: {District Name} ({State}) — {Enrollment}K students`
+- Batch: `SSD Collect: {State} — {N} districts, {Enrollment}K total enrollment`
 
 **Body includes:**
 - NCES ID, state, city, enrollment, priority tier
@@ -149,19 +197,17 @@ Barney's extractions run as an independent QA layer alongside Wilma's automated 
 - State-specific notes (e.g., "Louisiana districts typically have Mardi Gras break")
 - Whether Wilma's pipeline already has data for this district (and what's missing)
 
-**Scale:** Issues should be created for ALL 13,418 districts in the universe, batched by state or enrollment tier. Barney works through them systematically.
-
 ## Workflow
 
 1. **Wilma** batch-creates issues for all districts (label: `SSD-collect`)
-2. **Barney** picks up issues in priority order, finds the official calendar, reads it exhaustively, captures contact info, posts complete JSON extraction as a comment
+2. **Barney** picks up issues in priority order, finds the official calendar, reads it exhaustively, captures contact info, posts complete JSON extraction as a comment (one per school year found)
 3. **Barney** labels `SSD-extracted`
 4. **Wilma** ingests into v3 DB, compares against her pipeline data, confirms row counts + instructional day count, closes issue (label: `SSD-complete`)
 5. If data can't be found: label `SSD-blocked`, document what was tried, use contact info for email outreach
 
 ## Priority Order
 
-1. Top 50 by enrollment — gold standard extraction (these alone = ~40% of total enrollment)
+1. Top 50 by enrollment — gold standard, all available school years
 2. Districts 51-200 by enrollment — gold standard
 3. Districts 201-1000 — gold standard where possible, minimum viable otherwise
 4. Remaining ~12,400 districts — minimum viable, batched by state
