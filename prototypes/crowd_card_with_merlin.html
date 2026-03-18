@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 390px;
+    height: 1000px;
+    overflow: auto;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: white;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, 
+      #0b1a3a 0%, #0e1838 25%, #111535 50%, #12102e 75%, #0d0c22 100%);
+    z-index: 0;
+  }
+
+  .stars { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+  .star { position: absolute; background: white; border-radius: 50%; }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
+    height: 100%;
+  }
+
+  /* === TOP SECTION — same font family as forecast === */
+  .watermark {
+    margin-top: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.28);
+    text-align: center;
+  }
+
+  .park-name {
+    margin-top: 14px;
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    text-align: center;
+  }
+
+  .wti-value {
+    font-size: 72px;
+    font-weight: 300;
+    letter-spacing: -3px;
+    line-height: 1.05;
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  .crowd-level {
+    font-size: 17px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 6px;
+  }
+
+  .hi-lo {
+    font-size: 17px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 3px;
+  }
+
+  /* === GLASS CARDS === */
+  .glass-card {
+    width: 100%;
+    margin-top: 16px;
+    background: rgba(120, 140, 180, 0.08);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .card-desc {
+    padding: 14px 16px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .card-divider {
+    height: 0.5px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0 16px;
+  }
+
+  /* === SPECTRUM SECTION === */
+  .spectrum-section {
+    padding: 14px 16px 14px;
+    position: relative;
+  }
+
+  .spectrum-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .spectrum-pill {
+    width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+    position: relative;
+    background: rgba(40, 65, 130, 0.4);
+  }
+
+  .spectrum-bar-container {
+    flex: 1;
+    position: relative;
+    height: 16px;
+  }
+
+  .spectrum-bar {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+  }
+
+  .now-triangle {
+    position: absolute;
+    top: -10px;
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid rgba(255, 255, 255, 0.8);
+    transform: translateX(-5px);
+  }
+
+  .time-labels-row {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 6px;
+    gap: 6px;
+  }
+
+  .time-labels-spacer {
+    width: 22px;
+    flex-shrink: 0;
+  }
+
+  .time-labels {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.22);
+  }
+
+  .time-labels .time-bold {
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* === FORECAST === */
+  .forecast-card {
+    width: 100%;
+    margin-top: 10px;
+    background: rgba(120, 140, 180, 0.08);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .forecast-header {
+    padding: 12px 16px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .forecast-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+  }
+  .forecast-row:last-child { border-bottom: none; }
+
+  .forecast-day {
+    width: 52px;
+    font-size: 17px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .forecast-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 8px;
+    margin-right: 14px;
+    flex-shrink: 0;
+  }
+
+  .forecast-lo {
+    width: 30px;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.45);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .forecast-bar-container {
+    flex: 1;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    position: relative;
+    overflow: visible;
+  }
+
+  .forecast-bar {
+    position: absolute;
+    height: 100%;
+    border-radius: 3px;
+  }
+
+  .forecast-now-dot {
+    position: absolute;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: white;
+    top: -1px;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    transform: translateX(-3.5px);
+  }
+
+  .forecast-hi {
+    width: 30px;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.45);
+    margin-left: 8px;
+    flex-shrink: 0;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 20px; left: 0; right: 0;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(75, 175, 175, 0.6);
+    letter-spacing: 0.2px;
+  }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="stars" id="stars"></div>
+<div class="content">
+  <div class="watermark">WAIT TIME INDEX</div>
+  <div class="park-name">Magic Kingdom</div>
+  <div class="wti-value">15</div>
+  <div class="crowd-level">Low Crowds</div>
+  <div class="hi-lo">L:7 &nbsp; H:16</div>
+
+  <div class="glass-card">
+    <div class="card-desc">
+      Moderate crowds expected today. Peak around 2PM. Early Entry ☀️ available.
+    </div>
+    <div class="card-divider"></div>
+    <div class="spectrum-section">
+      <div class="spectrum-row">
+        <div class="spectrum-pill">☀️</div>
+        <div class="spectrum-bar-container">
+          <div class="spectrum-bar" id="spectrumBar"></div>
+          <div class="now-triangle" id="nowTriangle"></div>
+        </div>
+      </div>
+      <div class="time-labels-row">
+        <div class="time-labels-spacer"></div>
+        <div class="time-labels" id="timeLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="forecast-card">
+    <div class="forecast-header">📅 7-Day Crowd Forecast</div>
+    <div id="forecastRows"></div>
+  </div>
+
+  <!-- === 🧙 MERLIN RIDE ADVISOR === -->
+  <div class="forecast-card" style="margin-top: 16px;">
+    <div class="forecast-header">🎢 MY RIDES</div>
+    
+    <div class="ride-selector" style="margin: 16px 0; display: flex; flex-wrap: wrap; gap: 8px;">
+      <div class="ride-tag" style="background: rgba(255,255,255,0.15); border-radius: 16px; padding: 8px 12px; font-size: 14px; display: flex; align-items: center; gap: 6px; color: white;">
+        <span>Space Mountain</span>
+        <span style="width: 16px; height: 16px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer;">×</span>
+      </div>
+      <div class="ride-tag" style="background: rgba(255,255,255,0.15); border-radius: 16px; padding: 8px 12px; font-size: 14px; display: flex; align-items: center; gap: 6px; color: white;">
+        <span>Seven Dwarfs</span>
+        <span style="width: 16px; height: 16px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer;">×</span>
+      </div>
+      <div class="ride-tag" style="background: rgba(255,255,255,0.15); border-radius: 16px; padding: 8px 12px; font-size: 14px; display: flex; align-items: center; gap: 6px; color: white;">
+        <span>Big Thunder</span>
+        <span style="width: 16px; height: 16px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer;">×</span>
+      </div>
+      <div class="ride-tag" style="background: rgba(255,255,255,0.08); border: 1px dashed rgba(255,255,255,0.3); border-radius: 16px; padding: 8px 12px; font-size: 14px; color: rgba(255,255,255,0.7); cursor: pointer;">
+        <span>+ Add ride</span>
+      </div>
+    </div>
+    
+    <div style="text-align: center; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 16px;">3 of 4 selected</div>
+    
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; text-align: center;">
+      <div style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 8px;">Next up:</div>
+      <div style="font-size: 18px; font-weight: 600; color: #4ade80; margin-bottom: 16px;">🟢 Seven Dwarfs Mine Train</div>
+      <button style="background: #4ade80; border: none; color: white; padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;">Done ✓</button>
+    </div>
+  </div>
+</div>
+<div class="footer">hazeydata.ai &nbsp;•&nbsp; Theme Park Crowd Report</div>
+
+<script>
+  // === REAL Benedictus scale ===
+  // Blue (#0A2F8F) → white (#E9F4FF) → pink → red (#A60038)
+  const BENEDICTUS = [
+    [10,  47, 143],  // #0A2F8F — level 1 (empty)
+    [48,  95, 209],  // #305FD1 — level 2
+    [90, 150, 234],  // #5A96EA — level 3
+    [155, 196, 242], // #9BC4F2 — level 4
+    [193, 221, 252], // #C1DDFC — level 5
+    [233, 244, 255], // #E9F4FF — level 6 (neutral/white)
+    [255, 224, 233], // #FFE0E9 — level 7
+    [255, 177, 201], // #FFB1C9 — level 8
+    [235,  66, 123], // #EB427B — level 9
+    [166,   0,  56], // #A60038 — level 10 (packed)
+  ];
+
+  function benedictus(t) {
+    t = Math.max(0, Math.min(1, t));
+    const idx = t * (BENEDICTUS.length - 1);
+    const i = Math.min(Math.floor(idx), BENEDICTUS.length - 2);
+    const f = idx - i;
+    return BENEDICTUS[i].map((v,j) => Math.round(v + (BENEDICTUS[i+1][j] - v) * f));
+  }
+
+  // === Data ===
+  const todayCurve = [{"t":"08:30","w":7.4},{"t":"09:00","w":8.7},{"t":"09:30","w":10.5},{"t":"10:00","w":12.0},{"t":"10:30","w":13.2},{"t":"11:00","w":14.2},{"t":"11:30","w":14.5},{"t":"12:00","w":14.6},{"t":"12:30","w":14.2},{"t":"13:00","w":14.4},{"t":"13:30","w":15.3},{"t":"14:00","w":15.5},{"t":"14:30","w":15.7},{"t":"15:00","w":14.8},{"t":"15:30","w":14.1},{"t":"16:00","w":15.0},{"t":"16:30","w":15.0},{"t":"17:00","w":15.1},{"t":"17:30","w":15.3},{"t":"18:00","w":15.2},{"t":"18:30","w":14.7},{"t":"19:00","w":13.8},{"t":"19:30","w":12.9},{"t":"20:00","w":11.0},{"t":"20:30","w":9.7},{"t":"21:00","w":9.2},{"t":"21:30","w":9.1},{"t":"22:00","w":9.0},{"t":"22:30","w":7.9},{"t":"23:00","w":7.2}];
+
+  const forecast = [
+    { day:'Today', lo:7.2, hi:15.8, wti:20.4, now:15.2, emhM:true },
+    { day:'Wed',   lo:6.2, hi:15.6, wti:17.8, now:null  },
+    { day:'Thu',   lo:7.5, hi:15.4, wti:19.7, now:null  },
+    { day:'Fri',   lo:7.5, hi:16.2, wti:22.5, now:null  },
+    { day:'Sat',   lo:7.1, hi:14.5, wti:15.1, now:null  },
+    { day:'Sun',   lo:7.4, hi:15.5, wti:20.4, now:null  },
+    { day:'Mon',   lo:7.5, hi:16.6, wti:22.8, now:null  },
+    { day:'Tue',   lo:7.6, hi:16.3, wti:23.6, now:null  },
+  ];
+
+  // === Stars ===
+  const starsEl = document.getElementById('stars');
+  const rng = (function(s){return function(){s=s*16807%2147483647;return(s-1)/2147483646;}})(42);
+  for (let i = 0; i < 70; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = rng() < 0.7 ? 1.5 : 2.5;
+    star.style.cssText = `width:${size}px;height:${size}px;left:${rng()*100}%;top:${rng()*40}%;opacity:${0.15+rng()*0.4}`;
+    starsEl.appendChild(star);
+  }
+
+  // === Spectrum bar — Benedictus colors from real intraday data ===
+  // Normalize: use a reasonable WTI range for color mapping
+  // Park WTI typically ranges 0-60+, but today's curve is 7-16
+  // Use the full Benedictus scale mapped to a reasonable range (0-50)
+  const wtiMax = 50; // WTI of 50+ = fully red
+  const bar = document.getElementById('spectrumBar');
+  const stops = todayCurve.map((d, i) => {
+    const pct = (i / (todayCurve.length - 1)) * 100;
+    const t = Math.min(d.w / wtiMax, 1.0);
+    const c = benedictus(t);
+    return `rgb(${c[0]},${c[1]},${c[2]}) ${pct.toFixed(1)}%`;
+  });
+  bar.style.background = `linear-gradient(to right, ${stops.join(', ')})`;
+
+  // Now triangle
+  const nowPct = ((18*60 - 8*60-30) / (23*60 - 8*60-30)) * 100;
+  document.getElementById('nowTriangle').style.left = nowPct + '%';
+
+  // Time labels
+  const labelSlots = ['9AM','11AM','1PM','3PM','5PM','7PM','9PM','11PM'];
+  const labelsEl = document.getElementById('timeLabels');
+  labelSlots.forEach((l, i) => {
+    const span = document.createElement('span');
+    span.textContent = l;
+    if (i === 0 || i === labelSlots.length - 1) span.className = 'time-bold';
+    labelsEl.appendChild(span);
+  });
+
+  // === 7-Day Forecast ===
+  const gMin = Math.min(...forecast.map(f => f.lo));
+  const gMax = Math.max(...forecast.map(f => f.hi));
+  const gRange = gMax - gMin || 1;
+
+  const container = document.getElementById('forecastRows');
+  forecast.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'forecast-row';
+    const loFrac = (f.lo - gMin) / gRange;
+    const hiFrac = (f.hi - gMin) / gRange;
+    const avgT = Math.min(((f.lo + f.hi) / 2) / wtiMax, 1.0);
+    const dotColor = benedictus(avgT);
+
+    const barSteps = 15;
+    let barGrad = [];
+    for (let i = 0; i <= barSteps; i++) {
+      const frac = loFrac + (hiFrac - loFrac) * (i / barSteps);
+      const wtiAtPoint = gMin + frac * gRange;
+      const t = Math.min(wtiAtPoint / wtiMax, 1.0);
+      const c = benedictus(t);
+      barGrad.push(`rgb(${c[0]},${c[1]},${c[2]}) ${(i/barSteps*100).toFixed(0)}%`);
+    }
+
+    let nowDot = '';
+    if (f.now !== null) {
+      const nowFrac = (f.now - gMin) / gRange;
+      const dotPct = Math.max(0, Math.min(100, ((nowFrac - loFrac) / (hiFrac - loFrac)) * 100));
+      nowDot = `<div class="forecast-now-dot" style="left:${dotPct}%"></div>`;
+    }
+
+    row.innerHTML = `
+      <div class="forecast-day">${f.day}</div>
+      <div class="forecast-dot" style="background:rgb(${dotColor})"></div>
+      <div class="forecast-lo">${Math.round(f.lo)}</div>
+      <div class="forecast-bar-container">
+        <div class="forecast-bar" style="left:${(loFrac*100).toFixed(1)}%;width:${((hiFrac-loFrac)*100).toFixed(1)}%;background:linear-gradient(to right,${barGrad.join(',')})">
+          ${nowDot}
+        </div>
+      </div>
+      <div class="forecast-hi">${Math.round(f.hi)}</div>
+    `;
+    container.appendChild(row);
+  });
+</script>
+</body>
+</html>
