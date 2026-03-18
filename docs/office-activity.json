@@ -4,7 +4,7 @@
     "task": "Morning check-in, reviewing overnight issues"
   },
   "wilma": {
-    "last_active": "2026-03-11T14:43:31.236350+00:00",
+    "last_active": "2026-03-09T16:46:48.105063+00:00",
     "task": "heartbeat check"
   },
   "barney": {},
@@ -12,10 +12,7 @@
   "dino": {},
   "pebbles": {},
   "betty": {},
-  "gazoo": {
-    "last_active": "2026-03-09T06:24:08.956062+00:00",
-    "task": "Nightly review completed — 7.5/10"
-  },
+  "gazoo": {},
   "_recent_activity": [
     {
       "time": "09:57",
@@ -37,9 +34,5 @@
       "agent": "fred",
       "text": "Morning check-in — reviewing The Office page"
     }
-  ],
-  "mr-slate": {
-    "last_active": "2026-03-11T08:32:56.591097+00:00",
-    "task": "AM work session: competitive pricing research, pricing strategy v1 draft, business plan update"
-  }
+  ]
 }

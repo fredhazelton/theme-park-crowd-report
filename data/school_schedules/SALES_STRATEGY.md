@@ -5,6 +5,8 @@
 **Prepared:** March 2026  
 **Author:** Fred — Founder, Data Scientist  
 **Status:** DRAFT — Internal Strategy Document  
+**⚠️ Corrections pending:** See `SALES_STRATEGY_CORRECTIONS.md` for Barney's audit fixes (2026-03-17).  
+**⚠️ Competitive section:** Replace Section 4 entirely with `COMPETITIVE_ANALYSIS_v2.md`.  
 
 ---
 

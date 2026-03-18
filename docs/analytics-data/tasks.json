@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-17T18:54:17",
+  "generated_at": "2026-03-18T09:01:38",
   "summary": {
     "total": 97,
     "this_week": 97,
@@ -474,15 +474,15 @@
       "id": "task-034",
       "title": "Model Competition Framework",
       "description": "Build prediction ledger, evaluation harness, challenger template, and blend analysis for comparing multiple models per entity. First real challenger by March 21.",
-      "status": "backlog",
-      "column": "backlog",
+      "status": "done",
+      "column": "done",
       "priority": "medium",
       "owner": "Barney",
       "project": "Modeling",
       "is_recurring": false,
       "created": "2026-03-10T04:40:00",
-      "updated": "2026-03-12T02:30:00",
-      "notes": "Design doc at ~/clawd-anthropic/docs/MODEL_COMPETITION_DESIGN.md. Key: per-entity evaluation, raw predictions stored, tournament format. Assignment posted to #barney. Source: #barney. [Dino 2026-03-12] Moved to backlog \u2014 Barney occupied with higher-priority pipeline work. Original Mar 21 deadline missed. Reset due date to Mar 28. Will re-evaluate if not started by then."
+      "updated": "2026-03-18T13:00:00",
+      "notes": "Completed by Bam-Bam - Model Competition Framework implemented (git: d5ee6136)"
     },
     {
       "id": "task-035",
