@@ -112,7 +112,9 @@
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 16px;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   /* === SPECTRUM BAR === */
@@ -232,22 +234,24 @@
   
   /* Crowd Density */
   .crowd-density-main {
-    text-align: center;
+    text-align: left;
     margin-bottom: 20px;
   }
 
   .crowd-number {
-    font-size: 48px;
-    font-weight: 800;
-    font-family: 'Inter', monospace;
-    color: #f0883e;
+    font-size: 64px;
+    font-weight: 200;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff;
     line-height: 1;
+    margin-bottom: 8px;
   }
 
   .crowd-label {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 4px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    margin-bottom: 20px;
   }
 
   .benedictus-scale {
@@ -293,9 +297,9 @@
   }
 
   .visitor-reports {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
-    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: left;
     margin-bottom: 16px;
   }
 
@@ -322,8 +326,8 @@
 
   .input-help {
     text-align: center;
-    margin-top: 8px;
-    font-size: 11px;
+    margin-top: 12px;
+    font-size: 12px;
     color: rgba(255, 255, 255, 0.4);
   }
 
@@ -566,13 +570,13 @@
     
     <div class="visitor-reports">Based on 142 visitor reports today</div>
     
-    <div style="margin: 20px 0 16px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px;">
+    <div style="margin: 20px 0 16px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px;">
       HOW DOES IT FEEL TO YOU?
     </div>
     
     <div class="crowd-input">
-      <button style="color: #6bb5c9;">↓ Less Crowded</button>
-      <button style="color: #e05577;">↑ More Crowded</button>
+      <button style="color: #4a90a4; background: rgba(74, 144, 164, 0.15);">↓ Less Crowded</button>
+      <button style="color: #d6536d; background: rgba(214, 83, 109, 0.15);">↑ More Crowded</button>
       <button class="submit">Submit</button>
     </div>
     
@@ -656,7 +660,7 @@
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; max-width: 350px; width: 100%;">
     <!-- Park Hours -->
     <div class="glass-card" style="margin-bottom: 0;">
-      <div class="glass-header" style="font-size: 14px; margin-bottom: 12px;">🌅 PARK HOURS</div>
+      <div class="glass-header" style="font-size: 13px; margin-bottom: 12px;">🌅 PARK HOURS</div>
       <div style="font-size: 24px; font-weight: 300; margin-bottom: 4px;">9—11</div>
       <div style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 12px;">AM — PM</div>
       <div style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.4;">
@@ -666,7 +670,7 @@
 
     <!-- Rides Operating -->
     <div class="glass-card" style="margin-bottom: 0;">
-      <div class="glass-header" style="font-size: 14px; margin-bottom: 12px;">🎢 RIDES OPERATING</div>
+      <div class="glass-header" style="font-size: 13px; margin-bottom: 12px;">🎢 RIDES OPERATING</div>
       <div style="font-size: 24px; font-weight: 300; margin-bottom: 4px;">32<span style="color: rgba(255,255,255,0.5);">/35</span></div>
       <div style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 12px;">Open Now</div>
       <div style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.4;">
