@@ -25,15 +25,17 @@ fact_school_day      → ~365 rows per district per year (date, is_in_session, d
 
 ---
 
-## 2. Current State (2026-03-17)
+## 2. Current State (2026-03-18)
 
 | Metric | Count | Notes |
 |--------|-------|-------|
-| Districts in database | 5,932 | From LLM scraper v1 |
-| Day-level rows | 2,165,180 | 365 × 5,932 |
-| Break types captured | 2 | Spring + Winter only |
-| Target break types | ALL | Every non-school day |
-| Database size | 407 MB | |
+| Districts in database | 8,143 | 60.7% of universe |
+| Day-level rows | 2,918,905 | 365 × 8,143 |
+| Enrollment covered | 22.7M / 46.3M | 49.2% by enrollment |
+| States | 51 | All 50 + DC |
+| High confidence (v3) | 2,233 | Full calendar, all break types |
+| Medium confidence (v1) | 5,910 | Spring + winter only |
+| Target | ALL 13,418 | Every non-school day |
 
 ### District Universe
 
