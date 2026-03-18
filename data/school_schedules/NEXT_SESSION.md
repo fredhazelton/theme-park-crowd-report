@@ -13,43 +13,41 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 ## The Golden Rule
 **For every single day of the school year (July 1 – June 30), determine whether students are in session or not. No assumptions. No shortcuts.**
 
-## What's Done (29 districts, ~2.9M students)
+## What's Done (31 districts, ~3.1M students)
 
 ### TOP 20 COMPLETE (#61-#80) — see previous sessions
 ### RE-EXTRACTIONS COMPLETE (#81-#84) — see previous sessions
-### NEW EXTRACTIONS (#85-#89):
+### NEW EXTRACTIONS (#85-#91):
 | Issue | District | State | Enrollment | Notes |
 |-------|----------|-------|-----------|-------|
-| #85 | Long Beach Unified | CA | 65K | Lincoln Day + Admission Day (CA-specific), supt retiring |
-| #86 | Washoe County | NV | 64K | Balanced calendar, 2wk fall intersession, Nevada Day, supt retiring |
-| #87 | Chesterfield County | VA | 64K | REVISED calendar (snow make-up), Presidents Day canceled |
+| #85 | Long Beach Unified | CA | 65K | Lincoln Day + Admission Day, supt retiring |
+| #86 | Washoe County | NV | 64K | Balanced calendar, 2wk fall intersession, supt retiring |
+| #87 | Chesterfield County | VA | 64K | REVISED (snow make-up), Presidents Day canceled |
 | #88 | Volusia County | FL | 63K | 36 Wed early releases, hurricane days, 2025 Supt of Year |
-| #89 | Douglas County | CO | 62K | ~173 student days, Compensation Days, full-week fall break |
+| #89 | Douglas County | CO | 62K | ~173 days, Compensation Days, full-week fall break |
+| #90 | Granite District | UT | 61K | 177/189 student/teacher days, 4-term, A/B rotation |
+| #91 | Jordan District | UT | 59K | 180 days, full-week fall recess, Health & Wellness Virtual Day |
 
-## What's Next — Remaining new extractions (#90-#112):
-~23 districts, ~1.0M students:
-- #90 Granite District UT — 61K
-- #91 Jordan District UT — 59K
+## What's Next — Remaining new extractions (#92-#112):
+~21 districts, ~0.9M students:
 - #92 NYC Geographic District #31 NY — 57K
 - #93 NYC Geographic District #2 NY — 54K
+- #94 Polk County FL — 53K (Disney-adjacent!)
+- #95 Brevard FL — 52K
+- #96 Pasco FL — 51K
+- #97 Seminole FL — 50K (Disney-adjacent!)
 - ...through #112 Portland SD 1J OR — 43K
 
-## How To Extract
-1. Search for official 2025-2026 calendar
-2. Fetch calendar page/PDF for detail
-3. Extract into JSON format
-4. Search for superintendent contact
-5. Post as comment on GitHub issue
-6. Move to next issue
+NOTE: NYC Geographic Districts #31 and #2 follow the NYC DOE calendar — these can be batch-extracted since all NYC districts share the same calendar.
 
 ## Key Patterns by State
-- **Texas ISDs**: DOI = early August start, dual bad-weather/PD days, ~171-177 days
-- **Virginia**: Teacher + professional workdays, quarter-end early releases, snow make-up revisions
-- **Florida**: ~180 days, teacher planning/hurricane days, Wednesday early releases (Volusia: 36!)
+- **Texas ISDs**: DOI = early Aug, bad-weather/PD days, ~171-177 days
+- **Virginia**: Teacher workdays, quarter-end early releases, snow make-up revisions
+- **Florida**: ~180 days, hurricane days, Wednesday early releases
 - **California**: Lincoln Day + Washington Day separate, Admission Day, Juneteenth
-- **Colorado**: 172-174.5 student / 185-186 teacher days, Compensation Days (DCSD), Non-Student Contact Days (DPS)
-- **Utah**: Fall recess/break, A/B or Wed early release, districts splitting
-- **Nevada**: Balanced calendar, Nevada Day (Oct 31), fall intersession
+- **Colorado**: 172-174.5 student / 185-186 teacher days, Compensation Days, Non-Student Contact Days
+- **Utah**: Fall recess (2 days to full week), A/B or Wed early release, 177-180 student days, compensatory days for P-T conferences
+- **Nevada**: Balanced calendar, Nevada Day, fall intersession
 
 ## Don't Forget
 - Always include `contact` block
