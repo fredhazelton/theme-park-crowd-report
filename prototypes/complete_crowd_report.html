@@ -627,7 +627,10 @@
 
   <!-- Ride Advisor -->
   <div class="glass-card">
-    <div class="glass-header">🎢 MY MUST-DOS</div>
+    <div class="glass-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <span>🎢 MY MUST-DOS</span>
+      <button id="infoButton" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); width: 24px; height: 24px; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;">ℹ️</button>
+    </div>
     
     <div class="ride-selector">
       <div class="ride-tag" style="border-left: 3px solid #5A96EA;">
@@ -676,6 +679,35 @@
       <div class="recommendation-label">Next up:</div>
       <div class="recommended-ride">🔵 Seven Dwarfs Mine Train</div>
       <button class="done-button">Done ✓</button>
+    </div>
+  </div>
+
+  <!-- Info Modal (hidden by default) -->
+  <div id="infoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 1000; padding: 20px; box-sizing: border-box;">
+    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 24px; max-width: 350px; margin: 40px auto; backdrop-filter: blur(20px); max-height: 70vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 18px; font-weight: 600; color: white; margin: 0;">🧠 How It Works</h3>
+        <button id="closeModal" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer; padding: 4px;">×</button>
+      </div>
+      
+      <div style="font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.8);">
+        <p style="margin-bottom: 12px;">The brain analyzes wait time patterns to recommend which ride to do right now.</p>
+        
+        <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+          <div style="font-weight: 600; margin-bottom: 8px; color: rgba(255,255,255,0.9);">Gain Function:</div>
+          <div style="font-family: 'Inter', monospace; font-size: 12px; background: rgba(255,255,255,0.1); padding: 6px 8px; border-radius: 4px; color: #5A96EA;">
+            gain = future_wait - current_wait
+          </div>
+        </div>
+        
+        <p style="margin-bottom: 12px;"><strong>Positive gain</strong> means a ride is cheaper now than later. <strong>Negative gain</strong> means it's better to wait.</p>
+        
+        <p style="margin-bottom: 12px;">The brain always recommends the ride with the highest gain - the one where waiting would cost you the most time.</p>
+        
+        <div style="font-size: 12px; color: rgba(255,255,255,0.6); padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+          <strong>Chart shows:</strong> Wait time forecasts for next ~3 hours based on historical patterns and current conditions.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -911,6 +943,23 @@
     }
   });
   
+  // Info button modal
+  document.getElementById('infoButton').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('infoModal').style.display = 'block';
+  });
+  
+  document.getElementById('closeModal').addEventListener('click', function() {
+    document.getElementById('infoModal').style.display = 'none';
+  });
+  
+  // Close modal when clicking outside
+  document.getElementById('infoModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.style.display = 'none';
+    }
+  });
+
   // Initial draw
   setTimeout(drawWaitCurves, 100);
 </script>
