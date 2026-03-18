@@ -14,7 +14,7 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 ## The Golden Rule
 **For every single day of the school year (July 1 – June 30), determine whether students are in session or not. No assumptions. No shortcuts. The source calendar is the only truth.**
 
-## What's Done (10 districts, ~1.38M students)
+## What's Done (13 districts, ~1.63M students)
 
 | Issue | District | State | Enrollment | Status |
 |-------|----------|-------|-----------|--------|
@@ -28,21 +28,21 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 | #68 | Lee County | FL | 99K | ✅ Posted |
 | #69 | San Diego Unified | CA | 94K | ✅ Posted (MEDIUM confidence — conflicting first-day dates) |
 | #70 | Katy ISD | TX | 93K | ✅ Posted |
+| #71 | Prince William County | VA | 91K | ✅ Posted (revised calendar — added Eid al-Adha) |
+| #72 | Davidson County (Nashville) | TN | 81K | ✅ Posted |
+| #73 | Fort Bend ISD | TX | 80K | ✅ Posted |
 
 ## What's Next (in priority order)
 
 ### Continue top-50 new extractions:
-1. **#71 Prince William County VA** — 91K students
-2. **#72 Davidson County TN (Nashville)** — 81K students
-3. **#73 Fort Bend ISD TX** — 80K students
-4. **#74 Greenville 01 SC** — 78K students
-5. **#75 Jefferson County CO** — 75K students
-6. **#76 Osceola FL** — 74K students
-7. **#77 Davis District UT** — 73K students
-8. **#78 Milwaukee WI** — 68K students
-9. **#79 Frisco ISD TX** — 67K students
-10. **#80 VA Beach City VA** — 65K students
-11. Then #85–#112 (Long Beach CA through Portland OR)
+1. **#74 Greenville 01 SC** — 78K students
+2. **#75 Jefferson County CO** — 75K students
+3. **#76 Osceola FL** — 74K students
+4. **#77 Davis District UT** — 73K students
+5. **#78 Milwaukee WI** — 68K students
+6. **#79 Frisco ISD TX** — 67K students
+7. **#80 VA Beach City VA** — 65K students
+8. Then #85–#112 (Long Beach CA through Portland OR)
 
 ### Re-extractions needed (incomplete first-pass data):
 - **#81 Philadelphia PA** — 115K — has breaks+holidays but MISSING teacher workdays, half days (Philly has half-days on 2nd+3rd Friday monthly)
@@ -59,7 +59,7 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 5. **Post** as a comment on the GitHub issue using `github:add_issue_comment`
 6. **Move to next issue**
 
-Target pace: ~8-10 minutes per district, 6-8 districts per session.
+Target pace: ~8-10 minutes per district, 3-6 districts per session.
 
 ## JSON Format
 
@@ -106,11 +106,13 @@ Target pace: ~8-10 minutes per district, 6-8 districts per session.
 ```
 
 ## Key Patterns Observed
-- **Texas ISDs** (CFISD, NISD, Katy, etc.): District of Innovation = early August start. Dual-designated bad weather/PD days. ~172-177 instructional days.
-- **Virginia districts** (Fairfax, etc.): Teacher workdays + professional workdays around holidays. Quarter-end early releases.
+- **Texas ISDs** (CFISD, NISD, Katy, Fort Bend): District of Innovation = early August start. Dual-designated bad weather/PD days. ~171-177 instructional days. 187-day teacher contracts.
+- **Virginia districts** (Fairfax, Prince William): Teacher workdays + professional workdays around holidays. Quarter-end early releases. PWCS observes Rosh Hashanah + both Eids.
 - **Florida districts** (Broward, Lee): ~180 days. Teacher planning days. Hurricane/severe weather make-up days built in.
 - **Georgia districts** (Cobb): Digital Learning Days count toward instructional requirement. Fall break in September.
 - **California districts** (San Diego): Lincoln Day separate from Presidents Day. Non-instructional days. 80/20 split model.
+- **Tennessee districts** (Nashville/Davidson): "Director of Schools" title. Fall break full week in October. Stockpiled PD days.
+- **Maryland districts** (Montgomery County): Student Transition Day. 181 instructional days. Contingency days built in.
 
 ## Discord Channels
 - **#school-schedules:** `1482263793013756064`
