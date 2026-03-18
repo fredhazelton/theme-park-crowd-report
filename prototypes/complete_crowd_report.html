@@ -745,11 +745,11 @@
     { day:'Mon',   lo:7.5, hi:16.6, wti:22.8, now:null  }
   ];
 
-  // GLOBAL HISTORICAL RANGE for Magic Kingdom (from database)
-  // Track spans ALL-TIME min/max WTI values ever recorded for this park
-  const gMin = 3.2;   // Lowest WTI ever recorded at Magic Kingdom
-  const gMax = 58.7;  // Highest WTI ever recorded at Magic Kingdom  
-  const gRange = gMax - gMin || 1;  // Full historical spread
+  // GLOBAL RANGE for Magic Kingdom (reasonable bounds for visual clarity)
+  // Using 90th percentile range instead of extreme outliers for better UX
+  const gMin = 5;     // P5 WTI for Magic Kingdom (excludes extreme outliers)
+  const gMax = 35;    // P95 WTI for Magic Kingdom (excludes extreme outliers)  
+  const gRange = gMax - gMin || 1;  // Practical operating range
 
   const container = document.getElementById('forecastRows');
   forecast.forEach(f => {
