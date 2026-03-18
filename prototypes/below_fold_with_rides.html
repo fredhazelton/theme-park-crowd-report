@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Below the Fold - Magic Kingdom</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  /* ═══════════════════════════════════════════════════
+     DESIGN SYSTEM — HazeyData Brand
+     Navy #0a1628 · Red #A60038 · Cyan #4a90a4
+     JetBrains Mono + Inter
+     ═══════════════════════════════════════════════════ */
+
+  :root {
+    --bg-primary: #0a1628;
+    --bg-secondary: #0f1d32;
+    --bg-card: rgba(255,255,255,0.03);
+    --bg-glass: rgba(255,255,255,0.04);
+    --border-card: rgba(255,255,255,0.08);
+    --border-accent: rgba(74,144,164,0.3);
+    --accent: #4a90a4;
+    --accent-light: #6bb5c9;
+    --accent-glow: rgba(74,144,164,0.15);
+    --accent-red: #A60038;
+    --accent-red-light: #e05577;
+    --accent-green: #4ade80;
+    --accent-amber: #f0883e;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255,255,255,0.7);
+    --text-muted: rgba(255,255,255,0.4);
+    --font-text: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-primary);
+    font-family: var(--font-text);
+    color: var(--text-primary);
+    padding: 20px;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .section-header .emoji {
+    margin-right: 12px;
+    font-size: 20px;
+  }
+
+  /* CROWD DENSITY SECTION */
+  .benedictus-scale {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px 0;
+  }
+
+  .scale-bar {
+    flex: 1;
+    height: 8px;
+    background: linear-gradient(to right, #4a90a4, #f0883e, #A60038);
+    border-radius: 4px;
+    position: relative;
+    margin: 0 16px;
+  }
+
+  .scale-indicator {
+    position: absolute;
+    top: -4px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    left: 70%; /* Position for "7" on scale */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .crowd-level {
+    text-align: center;
+    margin: 16px 0;
+  }
+
+  .crowd-number {
+    font-size: 48px;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--accent-amber);
+  }
+
+  .crowd-label {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .crowd-context {
+    background: var(--bg-glass);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .visitor-reports {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .crowd-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .crowd-input button {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-card);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .crowd-input button:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+  }
+
+  /* EVENTS SECTION */
+  .event-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .event-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  .event-time {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-secondary);
+    min-width: 80px;
+  }
+
+  .event-name {
+    flex: 1;
+    font-size: 15px;
+  }
+
+  .event-badge {
+    background: var(--accent-glow);
+    color: var(--accent-light);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .event-badge.ended {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-muted);
+  }
+
+  /* RIDE ADVISOR SECTION */
+  .ride-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .ride-tag {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-card);
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .ride-tag:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+  }
+
+  .ride-tag.selected {
+    background: var(--accent);
+    border-color: var(--accent-light);
+    color: white;
+  }
+
+  .ride-tag .remove {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .add-ride {
+    background: var(--bg-glass);
+    border: 1px dashed var(--border-accent);
+    color: var(--accent-light);
+  }
+
+  .recommendation-section {
+    border-top: 1px solid var(--border-card);
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+
+  .recommendation {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .recommendation-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .recommended-ride {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent-green);
+    margin-bottom: 16px;
+  }
+
+  .done-button {
+    background: var(--accent-green);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+  }
+
+  .done-button:hover {
+    background: #22c55e;
+    transform: translateY(-1px);
+  }
+
+  .ride-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- CROWD DENSITY SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">🏰</span>
+      CROWD DENSITY
+    </div>
+    
+    <div class="crowd-level">
+      <div class="crowd-number">7</div>
+      <div class="crowd-label">Feels Crowded</div>
+    </div>
+    
+    <div class="benedictus-scale">
+      <span style="font-size: 12px; color: var(--text-muted);">Less Crowded</span>
+      <div class="scale-bar">
+        <div class="scale-indicator"></div>
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">More Crowded</span>
+    </div>
+    
+    <div class="crowd-context">
+      MK feels busy even on lighter wait days thanks to its compact layout and popularity. Today's 7/10 reflects typical Wednesday afternoon energy.
+    </div>
+    
+    <div class="visitor-reports">
+      Based on 142 visitor reports today
+    </div>
+    
+    <div class="crowd-input">
+      <button>↓ Less Crowded</button>
+      <button>↑ More Crowded</button>
+      <button style="background: var(--accent); border-color: var(--accent-light);">Submit</button>
+    </div>
+    
+    <div style="text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-muted);">
+      Your rating helps other guests plan their day
+    </div>
+  </div>
+
+  <!-- TODAY'S EVENTS SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">🎆</span>
+      TODAY'S EVENTS
+    </div>
+    
+    <div class="event-timeline">
+      <div class="event-item">
+        <span class="emoji">☀️</span>
+        <span class="event-time">8:30 AM</span>
+        <span class="event-name">Early Entry</span>
+        <span class="event-badge ended">Ended</span>
+      </div>
+      
+      <div class="event-item">
+        <span class="emoji">🎭</span>
+        <span class="event-time">2:00 PM</span>
+        <span class="event-name">Festival of Fantasy Parade</span>
+      </div>
+      
+      <div class="event-item">
+        <span class="emoji">🏰</span>
+        <span class="event-time">5:30 PM</span>
+        <span class="event-name">Cavalcade</span>
+      </div>
+      
+      <div class="event-item">
+        <span class="emoji">🎆</span>
+        <span class="event-time">9:15 PM</span>
+        <span class="event-name">Happily Ever After</span>
+        <span class="event-badge">Tonight</span>
+      </div>
+      
+      <div class="event-item">
+        <span class="emoji">🌙</span>
+        <span class="event-time">11:00 PM</span>
+        <span class="event-name">Park Close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIDE ADVISOR SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">🎢</span>
+      MY RIDES
+    </div>
+    
+    <div class="ride-selector">
+      <div class="ride-tag selected">
+        Space Mountain
+        <span class="remove">×</span>
+      </div>
+      
+      <div class="ride-tag selected">
+        Seven Dwarfs Mine Train
+        <span class="remove">×</span>
+      </div>
+      
+      <div class="ride-tag selected">
+        Big Thunder Mountain
+        <span class="remove">×</span>
+      </div>
+      
+      <div class="ride-tag selected">
+        Tiana's Bayou Adventure
+        <span class="remove">×</span>
+      </div>
+      
+      <div class="ride-tag add-ride">
+        + Add a ride
+      </div>
+    </div>
+    
+    <div class="ride-count">4 of 4 selected</div>
+    
+    <div class="recommendation-section">
+      <div class="recommendation">
+        <div class="recommendation-label">Next up:</div>
+        <div class="recommended-ride">🟢 Seven Dwarfs Mine Train</div>
+        <button class="done-button">Done ✓</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Basic interactivity for prototype
+document.addEventListener('DOMContentLoaded', function() {
+  // Ride tag removal
+  document.querySelectorAll('.ride-tag .remove').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      btn.parentElement.remove();
+      updateRideCount();
+    });
+  });
+  
+  // Done button
+  document.querySelector('.done-button').addEventListener('click', function() {
+    // Remove the recommended ride from the list
+    const rides = ['Space Mountain', 'Big Thunder Mountain', 'Tiana\'s Bayou Adventure'];
+    const nextRide = rides[Math.floor(Math.random() * rides.length)];
+    document.querySelector('.recommended-ride').textContent = `🟢 ${nextRide}`;
+  });
+  
+  function updateRideCount() {
+    const count = document.querySelectorAll('.ride-tag.selected').length;
+    document.querySelector('.ride-count').textContent = `${count} of 4 selected`;
+  }
+});
+</script>
+
+</body>
+</html>
