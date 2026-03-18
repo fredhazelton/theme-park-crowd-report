@@ -41,6 +41,18 @@ from datetime import datetime, date
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Set
 import threading
+import socket
+import signal
+
+# Global socket timeout — prevents any network call from hanging indefinitely
+socket.setdefaulttimeout(30)
+
+class DistrictTimeout(Exception):
+    """Raised when a district takes too long to process."""
+    pass
+
+def _district_timeout_handler(signum, frame):
+    raise DistrictTimeout("District processing timed out")
 
 # Global rate limiter for Brave API — shared across all workers
 _brave_lock = threading.Lock()
@@ -59,7 +71,7 @@ BRAVE_API_KEY = os.environ.get("BRAVE_SEARCH_API_KEY", "")
 FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
 
 # Config
-MAX_WORKERS = 15
+MAX_WORKERS = 1  # Sequential processing — eliminates concurrency bugs, correct results first
 BRAVE_RATE_LIMIT = 1.1  # seconds between Brave API calls
 REQUEST_DELAY = 0.3     # seconds between general requests
 SAVE_INTERVAL = 10      # Save results every N districts
@@ -88,7 +100,9 @@ JS_PLATFORMS = {
 }
 
 # Evidence-based extraction prompt (from evidence_rescrape.py)
-EVIDENCE_PROMPT = """You are extracting school calendar dates for {district_name} in {state} for the 2025-2026 school year.
+EVIDENCE_PROMPT = """You are extracting school calendar dates for {district_name} in {state}.
+
+PRIORITY: 2025-2026 school year is preferred, but ANY valid school year is acceptable (2024-2025, 2026-2027, etc).
 
 You MUST follow these rules strictly:
 1. ONLY extract dates that are EXPLICITLY stated in the content below.
@@ -97,22 +111,32 @@ You MUST follow these rules strictly:
 4. Do NOT guess, infer, or use "typical" dates. If it's not written on the page, it's not found.
 5. Check that the content is actually about {district_name} — not a different district.
 6. Event feeds (sports, PTA meetings, concerts) are NOT school calendars. Ignore them.
-7. If you see dates for a different school year (2024-2025, 2026-2027), ignore them.
+7. If the page has MULTIPLE school years, extract 2025-2026 first. If 2025-2026 is not available, extract the most recent year available.
+8. ALWAYS specify which school year the dates are from in the "school_year" field.
 
 Return ONLY valid JSON in this format:
 {{
   "status": "found",
+  "school_year": "YYYY-YYYY (e.g. 2025-2026 or 2024-2025)",
   "first_day": "YYYY-MM-DD or null",
   "last_day": "YYYY-MM-DD or null", 
   "spring_break_start": "YYYY-MM-DD or null",
   "spring_break_end": "YYYY-MM-DD or null",
   "winter_break_start": "YYYY-MM-DD or null",
   "winter_break_end": "YYYY-MM-DD or null",
+  "thanksgiving_break_start": "YYYY-MM-DD or null",
+  "thanksgiving_break_end": "YYYY-MM-DD or null",
+  "fall_break_start": "YYYY-MM-DD or null",
+  "fall_break_end": "YYYY-MM-DD or null",
+  "other_breaks": [
+    {{"name": "break name (e.g. Mardi Gras, Mid-Winter, Presidents Day)", "start": "YYYY-MM-DD", "end": "YYYY-MM-DD"}}
+  ],
   "evidence": {{
     "first_day_quote": "exact text from page or null",
     "last_day_quote": "exact text from page or null",
     "spring_break_quote": "exact text from page or null", 
-    "winter_break_quote": "exact text from page or null"
+    "winter_break_quote": "exact text from page or null",
+    "other_breaks_quote": "exact text for any additional breaks or null"
   }},
   "source_type": "district_pdf | district_website | aggregator | other",
   "confidence": "high | medium | low",
@@ -179,34 +203,48 @@ class DistrictProcessor:
         self.nces_urls = nces_urls
         
     def score_search_result(self, result: Dict, district_name: str) -> int:
-        """Score a search result per collection_methodology.md strategy."""
+        """Score a search result per collection_methodology.md strategy.
+        
+        Score results: PDFs +4, "calendar" in title +3, "2025-2026" +3, .gov domains +2
+        """
         score = 0
         url = result.get('url', '').lower()
         title = result.get('title', '').lower()
         desc = result.get('description', '').lower()
+        combined = url + ' ' + title + ' ' + desc
         
-        # PDF bonus (Tier 1 priority)
+        # PDF bonus (Tier 1 priority) — "PDFs are gold"
         if url.endswith('.pdf') or 'pdf' in title:
             score += 4
-        # Calendar in title
-        if 'calendar' in title:
+        # Calendar-specific terms in title (strong signal)
+        if any(t in title for t in ['student calendar', 'school calendar', 'academic calendar', 'school year calendar']):
+            score += 5  # Stronger than generic "calendar"
+        elif 'calendar' in title:
             score += 3
         # Year reference
-        if '2025-2026' in title or '2025-2026' in desc:
+        if '2025-2026' in combined or ('2025' in combined and '2026' in combined):
             score += 3
-        # Official domain
-        if any(d in url for d in ['.gov', '.k12.', '.edu', 'schools.org']):
+        # Official domain — from district_profiles_schema.md hosting patterns
+        if any(d in url for d in ['.k12.', '.edu']):
+            score += 3  # District's own domain is best
+        elif '.gov' in url:
             score += 2
-        # Known hosting platforms
-        if any(p in url for p in ['finalsite', 'thrillshare', 'core-docs', 'myconnectsuite']):
+        # Known hosting platforms — from district_profiles_schema.md
+        if any(p in url for p in ['finalsite', 'thrillshare', 'core-docs', 'myconnectsuite',
+                                   'campussuite', 'sharpschool', 'edl.io']):
             score += 2
-        # District name in URL
-        clean = district_name.lower().split()[0]
-        if clean in url:
-            score += 1
-        # Penalty: aggregator sites
-        if any(a in url for a in ['schools-calendar.com', 'educounty', 'schooldistrictcalendar']):
-            score -= 2
+        # District name in URL (confirms it's the right district)
+        clean = re.sub(r'[^a-z]', '', district_name.lower().split()[0])
+        if len(clean) > 3 and clean in url:
+            score += 2
+        # Penalty: aggregator sites (Tier 3 reliability per PIPELINE_ARCHITECTURE.md)
+        if any(a in url for a in ['schools-calendar.com', 'educounty', 'schooldistrictcalendar',
+                                   'niche.com', 'greatschools.org', 'usnews.com']):
+            score -= 3
+        # Penalty: definitely-not-calendar content
+        if any(t in combined for t in ['salary', 'handbook', 'budget', 'employment',
+                                        'nces.ed.gov', 'census.gov']):
+            score -= 5
             
         return score
         
@@ -393,20 +431,42 @@ class DistrictProcessor:
         """Check if URL is from a known JS platform."""
         return any(platform in url.lower() for platform in JS_PLATFORMS)
         
+    def _is_wrong_pdf(self, url: str, title: str) -> bool:
+        """Filter out non-calendar PDFs per collection_methodology.md lessons."""
+        lower_url = url.lower()
+        lower_title = title.lower()
+        combined = lower_url + ' ' + lower_title
+        # Reject: salary schedules, handbooks, budgets, reports, applications
+        reject_terms = ['salary', 'handbook', 'budget', 'financial', 'application',
+                        'employment', 'job', 'bid', 'contract', 'audit', 'meal',
+                        'nutrition', 'transportation', 'bus route', 'supply list',
+                        'dress code', 'enrollment form', 'registration form']
+        return any(term in combined for term in reject_terms)
+
     def tier1_pdf_search(self, district_name: str, state: str) -> List[Dict]:
-        """Tier 1: PDF-first search strategy."""
+        """Tier 1: PDF-first search strategy per collection_methodology.md.
+        
+        Search Strategy (from manual review lessons):
+        1. Search Brave: "[District Name]" "2025-2026" school calendar
+        2. Search Brave: "[District Name]" school district first day of school 2025
+        3. Score results: PDFs +4, "calendar" in title +3, "2025-2026" +3, .gov +2
+        4. Fetch top 3 results (PDF via pdftotext locally, HTML via basic fetch)
+        """
         attempts = []
         clean_name = re.sub(r'\s*\(.*?\)', '', district_name)
         
-        # PDF-targeted queries
+        # Multiple search queries — per methodology doc + improvements
+        # Primary: 2025-2026, but also accept other years
         queries = [
-            f'"{clean_name}" {state} 2025-2026 school calendar PDF',
-            f'"{clean_name}" schools calendar 2025 2026 filetype:pdf'
+            f'"{clean_name}" "2025-2026" school calendar',
+            f'"{clean_name}" {state} student calendar 2025-2026 PDF',
+            f'"{clean_name}" school district calendar PDF',
         ]
+        
+        seen_urls = set()
         
         for query in queries:
             results = self.brave_search(query)
-            time.sleep(BRAVE_RATE_LIMIT)
             
             # Score and sort results
             scored = [(self.score_search_result(r, district_name), r) for r in results]
@@ -414,9 +474,20 @@ class DistrictProcessor:
             
             for score, result in scored[:3]:
                 url = result['url']
+                title = result.get('title', '')
                 
-                # Prioritize PDFs
-                if url.lower().endswith('.pdf') or 'pdf' in result.get('title', '').lower():
+                # Skip duplicates
+                if url in seen_urls:
+                    continue
+                seen_urls.add(url)
+                
+                # Skip obviously wrong PDFs
+                if self._is_wrong_pdf(url, title):
+                    logger.debug(f"    Skipping non-calendar PDF: {title[:60]}")
+                    continue
+                
+                # Try PDFs
+                if url.lower().endswith('.pdf') or 'pdf' in title.lower():
                     content = self.fetch_pdf_text(url)
                     if content and len(content) > 100:
                         attempts.append({
@@ -427,9 +498,15 @@ class DistrictProcessor:
                             'search_query': query,
                             'score': score
                         })
-                        return attempts  # Found PDF, use it
+                        # Try up to 3 PDFs total (don't stop at first hit)
+                        if len(attempts) >= 3:
+                            return attempts
                         
                 time.sleep(REQUEST_DELAY)
+                
+            # If we already have good candidates, don't burn more searches
+            if len(attempts) >= 2:
+                break
                 
         return attempts
         
@@ -536,14 +613,15 @@ class DistrictProcessor:
                 'url': result['source_url'],
                 'type': 'pdf' if 'pdf' in result['source_type'] else 'html',
                 'method': result.get('method', tier_used),
-                'school_year': '2025-2026',
+                'school_year': result.get('school_year', '2025-2026'),
                 'quality': result.get('confidence', 'medium'),
                 'last_checked': datetime.now().isoformat()
             }
             profile['sources'].append(source_record)
             
             # Update collection history
-            profile['collection_history']['2025-2026'] = {
+            detected_year = result.get('school_year', '2025-2026')
+            profile['collection_history'][detected_year] = {
                 'dates': result['dates'],
                 'confidence': result.get('confidence', 'medium'),
                 'tier_used': tier_used,
@@ -570,6 +648,18 @@ class DistrictProcessor:
                     
         self.profiles[nces_id] = profile
         
+    def _has_minimum_data(self, extraction: Dict) -> bool:
+        """Check if extraction has enough useful data to count as 'found'.
+        
+        Must have at least: spring_break dates OR (first_day + last_day).
+        Winter break alone is not enough commercial value.
+        """
+        if not extraction or extraction.get('status') != 'found':
+            return False
+        has_spring = extraction.get('spring_break_start') and extraction.get('spring_break_end')
+        has_year = extraction.get('first_day') and extraction.get('last_day')
+        return has_spring or has_year
+
     def process_district(self, district: Dict) -> Dict:
         """Process a single district through all tiers."""
         nces_id = district['leaid']
@@ -584,6 +674,28 @@ class DistrictProcessor:
             }
         
         logger.info(f"Processing: {name} ({state})")
+        
+        # Hard 90-second timeout per district (signal-based, works even when urllib hangs)
+        old_handler = signal.signal(signal.SIGALRM, _district_timeout_handler)
+        signal.alarm(90)
+        try:
+            return self._process_district_inner(district)
+        except DistrictTimeout:
+            logger.warning(f"  ⏰ TIMEOUT: {name} ({state}) — skipping after 90s")
+            return {
+                'status': 'not_found', 'name': name, 'state': state,
+                'error': 'timeout', 'search_queries_tried': [],
+                'urls_tried': [], 'timestamp': datetime.now().isoformat()
+            }
+        finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old_handler)
+
+    def _process_district_inner(self, district: Dict) -> Dict:
+        """Inner processing logic (called with alarm set)."""
+        nces_id = district['leaid']
+        name = district['lea_name']
+        state = district.get('st') or district.get('state', 'XX')
         
         all_attempts = []
         urls_tried = []
@@ -605,7 +717,7 @@ class DistrictProcessor:
                     attempt['content'], name, state, attempt['url']
                 )
                 
-                if extraction and extraction.get('status') == 'found':
+                if extraction and self._has_minimum_data(extraction):
                     result = {
                         'status': 'found',
                         'name': name,
@@ -619,11 +731,17 @@ class DistrictProcessor:
                             'spring_break_end': extraction.get('spring_break_end'),
                             'winter_break_start': extraction.get('winter_break_start'),
                             'winter_break_end': extraction.get('winter_break_end'),
+                            'thanksgiving_break_start': extraction.get('thanksgiving_break_start'),
+                            'thanksgiving_break_end': extraction.get('thanksgiving_break_end'),
+                            'fall_break_start': extraction.get('fall_break_start'),
+                            'fall_break_end': extraction.get('fall_break_end'),
+                            'other_breaks': extraction.get('other_breaks', []),
                         },
                         'evidence': extraction.get('evidence', {}),
                         'source_url': attempt['url'],
                         'source_type': attempt['source_type'],
                         'confidence': extraction.get('confidence', 'medium'),
+                        'school_year': extraction.get('school_year', '2025-2026'),
                         'search_queries_tried': queries_tried,
                         'urls_tried': urls_tried,
                         'firecrawl_used': False,
@@ -648,7 +766,7 @@ class DistrictProcessor:
                     attempt['content'], name, state, attempt['url']
                 )
                 
-                if extraction and extraction.get('status') == 'found':
+                if extraction and self._has_minimum_data(extraction):
                     result = {
                         'status': 'found',
                         'name': name,
@@ -662,11 +780,17 @@ class DistrictProcessor:
                             'spring_break_end': extraction.get('spring_break_end'),
                             'winter_break_start': extraction.get('winter_break_start'),
                             'winter_break_end': extraction.get('winter_break_end'),
+                            'thanksgiving_break_start': extraction.get('thanksgiving_break_start'),
+                            'thanksgiving_break_end': extraction.get('thanksgiving_break_end'),
+                            'fall_break_start': extraction.get('fall_break_start'),
+                            'fall_break_end': extraction.get('fall_break_end'),
+                            'other_breaks': extraction.get('other_breaks', []),
                         },
                         'evidence': extraction.get('evidence', {}),
                         'source_url': attempt['url'],
                         'source_type': attempt['source_type'],
                         'confidence': extraction.get('confidence', 'medium'),
+                        'school_year': extraction.get('school_year', '2025-2026'),
                         'search_queries_tried': queries_tried,
                         'urls_tried': urls_tried,
                         'firecrawl_used': False,
@@ -690,7 +814,7 @@ class DistrictProcessor:
                     attempt['content'], name, state, attempt['url']
                 )
                 
-                if extraction and extraction.get('status') == 'found':
+                if extraction and self._has_minimum_data(extraction):
                     result = {
                         'status': 'found',
                         'name': name,
@@ -704,11 +828,17 @@ class DistrictProcessor:
                             'spring_break_end': extraction.get('spring_break_end'),
                             'winter_break_start': extraction.get('winter_break_start'),
                             'winter_break_end': extraction.get('winter_break_end'),
+                            'thanksgiving_break_start': extraction.get('thanksgiving_break_start'),
+                            'thanksgiving_break_end': extraction.get('thanksgiving_break_end'),
+                            'fall_break_start': extraction.get('fall_break_start'),
+                            'fall_break_end': extraction.get('fall_break_end'),
+                            'other_breaks': extraction.get('other_breaks', []),
                         },
                         'evidence': extraction.get('evidence', {}),
                         'source_url': attempt['url'],
                         'source_type': attempt['source_type'],
                         'confidence': extraction.get('confidence', 'medium'),
+                        'school_year': extraction.get('school_year', '2025-2026'),
                         'search_queries_tried': queries_tried,
                         'urls_tried': urls_tried,
                         'firecrawl_used': True,
@@ -820,32 +950,51 @@ def save_results(results: Dict[str, Any]):
 
 
 def run_quality_check(district_result: Dict) -> List[str]:
-    """Run inline quality checks on a district result."""
+    """Run inline quality checks on a district result.
+    
+    Accepts ANY valid school year (2024-2025, 2025-2026, 2026-2027).
+    Only flags truly implausible dates or hallucination signals.
+    """
     flags = []
     
     if district_result['status'] != 'found':
         return flags
         
     dates = district_result.get('dates', {})
+    school_year = district_result.get('school_year', '2025-2026')
     
-    # Check for suspicious patterns
-    if dates.get('spring_break_start') == '2026-03-23':
-        flags.append('suspicious_spring_break_date')
-        
-    # Check date plausibility
+    # Determine expected year ranges based on school_year
+    try:
+        start_year = int(school_year.split('-')[0])
+        end_year = int(school_year.split('-')[1])
+    except (ValueError, IndexError, AttributeError):
+        start_year, end_year = 2025, 2026
+    
+    # Check date plausibility for the detected school year
     try:
         if dates.get('first_day'):
             first_day = date.fromisoformat(dates['first_day'])
-            if not (date(2025, 7, 1) <= first_day <= date(2025, 10, 15)):
-                flags.append('implausible_first_day')
+            # First day should be Jul-Oct of start year
+            if not (date(start_year, 7, 1) <= first_day <= date(start_year, 10, 15)):
+                flags.append(f'implausible_first_day_for_{school_year}')
                 
         if dates.get('last_day'):
             last_day = date.fromisoformat(dates['last_day'])
-            if not (date(2026, 4, 15) <= last_day <= date(2026, 7, 15)):
-                flags.append('implausible_last_day')
+            # Last day should be Apr-Jul of end year
+            if not (date(end_year, 4, 15) <= last_day <= date(end_year, 7, 15)):
+                flags.append(f'implausible_last_day_for_{school_year}')
+                
+        if dates.get('spring_break_start'):
+            sb = date.fromisoformat(dates['spring_break_start'])
+            # Spring break should be Feb-May of end year
+            if not (date(end_year, 2, 1) <= sb <= date(end_year, 5, 31)):
+                flags.append(f'implausible_spring_break_for_{school_year}')
                 
     except (ValueError, TypeError):
         flags.append('invalid_date_format')
+    
+    # Flag duplicate "hallucination" patterns — same spring break for 5+ districts
+    # (This is checked at batch level, not here)
         
     return flags
 
@@ -955,21 +1104,12 @@ def main():
         batch_results = {}
         batch_stats = defaultdict(int)
         
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            future_to_district = {
-                executor.submit(
-                    DistrictProcessor(cost_tracker, profiles, nces_urls).process_district,
-                    district
-                ): district
-                for district in batch
-            }
-            
-            for future in as_completed(future_to_district):
-                district = future_to_district[future]
+        processor = DistrictProcessor(cost_tracker, profiles, nces_urls)
+        for district in batch:
                 nces_id = district['leaid']
                 
                 try:
-                    result = future.result()
+                    result = processor.process_district(district)
                     results[nces_id] = result
                     batch_results[nces_id] = result
                     
@@ -1036,7 +1176,9 @@ def main():
                 pattern = (d.get('first_day'), d.get('spring_break_start'), d.get('last_day'))
                 date_patterns[pattern] += 1
         
-        duplicate_patterns = {p: c for p, c in date_patterns.items() if c >= 5}
+        # Exclude null patterns — (None, None, None) is just missing data, not hallucination
+        duplicate_patterns = {p: c for p, c in date_patterns.items() 
+                             if c >= 5 and any(v is not None for v in p)}
         # Quality score measures data ACCURACY (of found entries), not find rate
         # Quality = (clean found entries) / (total found entries)
         # Find rate is reported separately

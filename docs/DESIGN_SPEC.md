@@ -152,6 +152,7 @@ Generated text including:
 | Intraday curves | `curves/forecast_parquet/all_forecasts.parquet` | entity_code, park_date, time_slot (5-min), predicted_actual |
 | Park hours | `dimension_tables/dimparkhours.csv` | open/close, EMH morning/evening, party nights |
 | Entity list | `dimension_tables/dimentity.csv` | entity codes, has_posted flag |
+| **Historical WTI ranges** | `wti/wti.parquet` (aggregated) | **MIN/MAX WTI per park across all historical data for global range bars** |
 
 All paths relative to `/home/wilma/hazeydata/pipeline/`.
 
@@ -251,7 +252,7 @@ All sections use glassmorphism cards matching the Info Card and Forecast Card st
 - "EPCOT: 12 · HS: 24 · AK: 9"
 - Helps park-hop decisions
 
-### 🎢 MY RIDES (full-width)
+### 🎢 MY MUST-DOS (full-width)
 **Live ride recommendation engine** based on gain function algorithm. Super simple UX — no explanations, no complexity.
 
 **Algorithm:**
@@ -315,8 +316,16 @@ gain(ride) = expected_future_wait(ride) - current_wait(ride)
 
 ## Global Design Rules
 
-### Forecast Range Bars
-The "track" for ALL forecast range bars spans the full range across ALL days for that park (not just the individual day). Example: if MK across all displayed days ranges from 5 to 40, the background track = 5 to 40. Each day's colored bar floats proportionally within that global range. This lets users instantly compare days.
+### Forecast Range Bars (Apple Weather Style)
+**GLOBAL HISTORICAL RANGE:** The "track" for ALL forecast range bars spans the **full historical range** for that specific park from the database (not just the 7 days displayed).
+
+**Example:** If Magic Kingdom's all-time database range is 3.2 (lowest ever) to 58.7 (highest ever), then:
+- **Background track** = 3.2 to 58.7 for ALL forecast rows at Magic Kingdom
+- **Each day's colored bar** floats proportionally within that historical track  
+- **Today's 15.8** appears as a relatively low value within the full historical context
+- **Visual result:** Users instantly see if today is unusually high/low compared to what's ever been recorded
+
+This provides true historical context. A "15" at Magic Kingdom vs "15" at EPCOT would appear differently if parks have different historical ranges. Same as Apple Weather where 75°F in Phoenix vs 75°F in Seattle occupy different positions on their respective historical scales.
 
 ---
 

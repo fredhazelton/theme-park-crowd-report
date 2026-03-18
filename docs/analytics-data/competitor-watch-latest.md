@@ -1,4 +1,4 @@
-# 🔭 Competitor Watch — Monday, March 16, 2026
+# 🔭 Competitor Watch — Tuesday, March 17, 2026
 
 ## 📊 TouringPlans
 - **Grand Floridian Merch: Photo Tour** — <https://touringplans.com/blog/grand-floridian-merch-photo-tour/>
@@ -18,25 +18,25 @@
 - Unable to fetch (Cloudflare protected) — manual check recommended
 
 ## 📰 Theme Park News
-- **Guest has Gone Fishin’ in EPCOT World Showcase Waterways** (WDWNT) — <https://wdwnt.com/2026/03/guest-gone-fishin-epcot-world-showcase-waterways/>
-- **Upside Down Limo Repainting Continues for Muppets Takeover of Rock ‘n’ Roller Coaster** (BlogMickey) — <https://blogmickey.com/2026/03/upside-down-limo-repainting-continues-for-muppets-takeover-of-rock-n-roller-coaster/>
-- **First Look Inside the Reimagined Garden View Lounge at Disney’s Grand Floridian Resort & Spa** (Laughing Place) — <https://www.laughingplace.com/disney-parks/garden-view-lounge-first-look/>
-- **Hundreds of Disney Trips Marked Cancelled as 7+ Million Arrive into Orlando Airport** (Inside the Magic) — <https://insidethemagic.net/2026/03/hundreds-of-disney-trips-marked-cancelled-as-7-million-arrive-into-orlando-airport-ad1/>
-- **‘Sesame Street’ owner sues to end SeaWorld contract** (Theme Park Tribune) — <https://www.themeparktribune.com/sesame-street-owner-sues-to-end-seaworld-contract/>
-- **Hot Hack for Hidden Hotel Deals at Disney World!** (Disney Tourist Blog) — <https://www.disneytouristblog.com/hidden-hotel-deals-disney-world-priceline-tool-tips-tricks/>
+- **Disney World Files Permit for Construction at Tower of Terror** (WDWNT) — <https://wdwnt.com/2026/03/disney-world-permit-construction-tower-of-terror/>
+- **Tons & Tons of Dirt Moved Into Magic Kingdom for Villains Land Grading** (BlogMickey) — <https://blogmickey.com/2026/03/tons-of-dirt-moved-into-villains-land-at-magic-kingdom/>
+- **Thank You, Bob: A Brief Look at Iger's Legacy** (Laughing Place) — <https://www.laughingplace.com/disney-business/bob-iger-disney-legacy-2026/>
+- **Beloved ‘Pirates of the Caribbean’ Location Removed from Disneyland** (Inside the Magic) — <https://insidethemagic.net/2026/03/pirates-of-the-caribbean-location-removed-from-disneyland-ad1/>
+- **Disney World Completes Overhaul of Best Value Resort!** (Disney Tourist Blog) — <https://www.disneytouristblog.com/disney-world-finishes-pop-century-room-refresh-reimagining-lobby-common-areas/>
 - **Is the Magic Kingdom Testing Roaming Characters?** (TouringPlans Blog) — <https://touringplans.com/blog/is-the-magic-kingdom-testing-roaming-characters/>
-- **Mickey Mouse Joins Main Street Philharmonic at Magic Kingdom** (WDWNT) — <https://wdwnt.com/2026/03/mickey-mouse-joins-main-street-philharmonic-at-magic-kingdom/>
-- **Former Galactic Starcruiser Docking Bay Renamed at Hollywood Studios** (BlogMickey) — <https://blogmickey.com/2026/03/former-galactic-starcruiser-docking-bay-gets-new-name-at-hollywood-studios/>
-- **Mickey, Duffy, and All Their Friends Dress to the Nines for 10th Anniversary of Shanghai Disney Resort** (Laughing Place) — <https://www.laughingplace.com/disney-parks/shanghai-disney-resort-10-outfits/>
+- **Club Cool Missing Branded Cups & Multiple Soda Flavors at EPCOT** (WDWNT) — <https://wdwnt.com/2026/03/club-cool-missing-branded-cups-multiple-soda-flavors-at-epcot/>
+- **Monsters Inc. Monstropolis Metamorphosis: Widespread Facade Modifications in Former Muppets Courtyard** (BlogMickey) — <https://blogmickey.com/2026/03/monstropolis-facade-modifications-former-muppets-courtyard/>
+- **Hulu Officially Renews Hit Series "Paradise" for a Third Season** (Laughing Place) — <https://www.laughingplace.com/entertainment/paradise-hulu-season-3-renewal/>
+- **Disney Confirms Extended Timeline for Major Hotel Refurbishment** (Inside the Magic) — <https://insidethemagic.net/2026/03/disney-confirms-extended-timeline-for-major-hotel-refurbishment-sb1/>
 
 ## 💬 Reddit Mentions
-- **In case y’all are wondering how crowded it is today…** (Reddit r/Disneyland) — <https://www.reddit.com/r/Disneyland/comments/1rur73e/in_case_yall_are_wondering_how_crowded_it_is_today/>
-- **Bad experiences as a single rider on Ratatouille?** (Reddit r/WaltDisneyWorld) — <https://www.reddit.com/r/WaltDisneyWorld/comments/1rubjw4/bad_experiences_as_a_single_rider_on_ratatouille/>
-- **Beautiful Day at DL** (Reddit r/Disneyland) — <https://www.reddit.com/r/Disneyland/comments/1rurdvq/beautiful_day_at_dl/>
-- **I accidentally walked 23 miles across Disney World in one day (solo adventure report)** (Reddit r/WaltDisneyWorld) — <https://www.reddit.com/r/WaltDisneyWorld/comments/1rvahly/i_accidentally_walked_23_miles_across_disney/>
-- **Looking for a buddy to go to Epic Universe in Orlando with on WED, MAR 18** (Reddit r/UniversalStudios) — <https://www.reddit.com/r/universalstudios/comments/1rts8ap/looking_for_a_buddy_to_go_to_epic_universe_in/>
+- **Up themed outfit for Disney World!** (Reddit r/WaltDisneyWorld) — <https://www.reddit.com/r/WaltDisneyWorld/comments/1rw257t/up_themed_outfit_for_disney_world/>
+- **Epic Universe Changed My Life (Literally)** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rvwjjg/epic_universe_changed_my_life_literally/>
+- **I found these bands, sealed, but they look misprinted. Is this normal? Can you swap them out?** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rvutuq/i_found_these_bands_sealed_but_they_look/>
+- **Weirdly wholesome moment with strangers in line after a brutal week in court** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rw69s4/weirdly_wholesome_moment_with_strangers_in_line/>
+- **Have you ever been the only person on a ride?** (Reddit r/WaltDisneyWorld) — <https://www.reddit.com/r/WaltDisneyWorld/comments/1rwa4ap/have_you_ever_been_the_only_person_on_a_ride/>
 
 ## 🔍 HazeyData Mentions
 - No mentions found this week
 
-*Report generated 2026-03-16 13:00 ET*
+*Report generated 2026-03-17 13:00 ET*
