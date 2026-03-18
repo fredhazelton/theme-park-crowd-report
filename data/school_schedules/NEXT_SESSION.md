@@ -13,11 +13,11 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 ## The Golden Rule
 **For every single day of the school year (July 1 – June 30), determine whether students are in session or not. No assumptions. No shortcuts.**
 
-## What's Done (33 districts, ~3.2M students)
+## What's Done (34 districts, ~3.3M students)
 
 ### TOP 20 COMPLETE (#61-#80) — see previous sessions
 ### RE-EXTRACTIONS COMPLETE (#81-#84) — see previous sessions
-### NEW EXTRACTIONS (#85-#93):
+### NEW EXTRACTIONS (#85-#94):
 | Issue | District | State | Enrollment | Notes |
 |-------|----------|-------|-----------|-------|
 | #85 | Long Beach Unified | CA | 65K | Lincoln Day + Admission Day, supt retiring |
@@ -29,25 +29,24 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 | #91 | Jordan District | UT | 59K | 180 days, full-week fall recess, Health & Wellness Virtual Day |
 | #92 | NYC District #31 | NY | 57K | NYC DOE calendar — 12+ holidays, Diwali, Midwinter Recess |
 | #93 | NYC District #2 | NY | 54K | Same NYC DOE calendar — batch extracted with #92 |
+| #94 | Polk County | FL | 117K | LEGOLAND in-county! Disney-adjacent! 10 early dismissals |
 
-## What's Next — Remaining new extractions (#94-#112):
-~19 districts, ~0.8M students:
-- #94 Polk County FL — 53K (Disney-adjacent!)
-- #95 Brevard FL — 52K
-- #96 Pasco FL — 51K
+## What's Next — Remaining new extractions (#95-#112):
+~18 districts, ~0.7M students:
+- #95 Brevard FL — 52K (Space Coast)
+- #96 Pasco FL — 51K (Tampa metro)
 - #97 Seminole FL — 50K (Disney-adjacent!)
 - #98 Knox County TN — 50K
 - #99 Duval County FL — 49K
 - ...through #112 Portland SD 1J OR — 43K
 
-## Key Patterns by State
-- **New York**: NYC DOE post-Labor Day start (Sep 4), latest start we've seen. 12+ holidays incl. Diwali, Rosh Hashanah×2, Yom Kippur, Lunar New Year, Eid×2. Midwinter Recess (full week Feb). Spring Recess 7 school days (Passover+Easter). Snow days = remote learning.
-- **Texas ISDs**: DOI = early Aug, bad-weather/PD days, ~171-177 days
-- **Virginia**: Teacher workdays, quarter-end early releases, snow make-up revisions
-- **Florida**: ~180 days, hurricane days, Wednesday early releases
-- **California**: Lincoln Day + Washington Day separate, Admission Day, Juneteenth
-- **Colorado**: 172-174.5 student / 185-186 teacher days
-- **Utah**: Fall recess (2 days to full week), 177-180 student days
+## FL Disney-Adjacent Cluster Status:
+- ✅ #68 Lee County FL — 99K (Fort Myers)
+- ✅ #76 Osceola FL — 74K (Adjacent to Disney, "Rodeo Day")
+- ✅ #88 Volusia County FL — 63K (Daytona, 36 Wed early releases)
+- ✅ #94 Polk County FL — 117K (LEGOLAND in-county, Disney-adjacent)
+- 🔲 #95 Brevard FL — 52K (Space Coast, next up)
+- 🔲 #97 Seminole FL — 50K (Adjacent to Orange County)
 
 ## Don't Forget
 - Always include `contact` block
