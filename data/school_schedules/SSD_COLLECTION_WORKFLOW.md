@@ -2,7 +2,11 @@
 
 ## Overview
 
-Barney and Wilma coordinate school calendar data collection through GitHub Issues on the `theme-park-crowd-report` repo. This mirrors the ACCORD project workflow where agents communicate through git.
+Barney and Wilma coordinate school calendar data collection through GitHub Issues on the `theme-park-crowd-report` repo, using the same pattern as the ACCORD project.
+
+**Barney operates as a parallel QA / twin collection process.** He independently extracts calendar data for every district via web search, running alongside Wilma's automated pipeline. Where both sources agree, confidence is highest. Where they differ, discrepancies are flagged for review. Over time, Barney's extractions may become the primary source of truth — or at minimum, they validate and fill gaps in the automated pipeline.
+
+Barney is subscription-based (no per-query API costs), so there are no limits on how many districts he can process.
 
 ## Labels
 
@@ -11,7 +15,7 @@ Barney and Wilma coordinate school calendar data collection through GitHub Issue
 | `SSD-collect` | District needs calendar data collected |
 | `SSD-extracted` | Barney has posted extraction JSON, awaiting ingestion |
 | `SSD-complete` | Data ingested into v3 DB, issue closed |
-| `SSD-blocked` | Cannot find calendar data online — needs alternative approach |
+| `SSD-blocked` | Cannot find calendar data online — needs email outreach or FOIA |
 
 ## The Golden Rule
 
@@ -36,7 +40,8 @@ For each district, read the **complete official calendar** and extract:
    - The exact date
    - The type: `HOLIDAY`, `BREAK`, `TEACHER_WORKDAY`, `HALF_DAY`
    - The name/reason as stated on the calendar
-3. **Any days outside typical boundaries where students ARE in session** (Saturday school, summer bridge programs if applicable)
+3. **Any days outside typical boundaries where students ARE in session** (Saturday school, makeup days, summer bridge programs)
+4. **District contact information** for follow-up or FOIA requests
 
 The engine will handle the rest:
 - Days between first_day and last_day not explicitly marked → `SCHOOL_DAY`
@@ -58,6 +63,7 @@ Post extraction as a GitHub issue comment:
   "source_description": "Official 2025-2026 Instructional Calendar PDF from lausd.org",
   "first_day": "2025-08-14",
   "last_day": "2026-06-10",
+  "total_instructional_days": 180,
   "spring_break_start": "2026-03-30",
   "spring_break_end": "2026-04-03",
   "winter_break_start": "2025-12-22",
@@ -78,7 +84,13 @@ Post extraction as a GitHub issue comment:
   "saturday_sessions": [
     {"date": "2026-03-14", "name": "Saturday Makeup Day"}
   ],
-  "notes": "Calendar source is the board-approved instructional calendar. 180 instructional days. Includes 4 teacher-only days and 6 early release days."
+  "contact": {
+    "name": "Dr. Jane Smith, Superintendent",
+    "email": "jsmith@lausd.net",
+    "phone": "(213) 241-1000",
+    "source": "district website contact page"
+  },
+  "notes": "Calendar source is the board-approved instructional calendar. 180 instructional days stated on calendar. Includes 4 teacher-only days and 6 early release days."
 }
 ```
 
@@ -87,16 +99,19 @@ Post extraction as a GitHub issue comment:
 - `other_breaks` = ANY additional multi-day break not covered by the named fields. Use this freely.
 - `non_school_days` = EVERY individual non-session day (holidays, teacher days, half days, anything)
 - `saturday_sessions` = Any Saturday or Sunday where students ARE in session
-- `notes` = Total instructional days from the calendar (for cross-checking), any caveats
+- `total_instructional_days` = The calendar's own stated instructional day count (for cross-checking)
+- `contact` = District contact info for email outreach or FOIA if calendar can't be found
+- `notes` = Source description, caveats, ambiguities
 
 ## Quality Standard
 
-**Gold standard (required for top 50 districts by enrollment):**
+**Gold standard (required for top 200 districts by enrollment):**
 - Source is the official board-approved calendar (not an aggregator site)
 - Every non-session day extracted with date, type, and name
 - Half days and early release days captured
 - Teacher workdays / PD days captured
 - Total instructional day count cross-checked against calendar's own stated count
+- Contact info captured (superintendent name + email at minimum)
 - Notes field documents source and any ambiguities
 
 **Minimum viable (acceptable for smaller districts):**
@@ -105,29 +120,48 @@ Post extraction as a GitHub issue comment:
 - Major holidays captured
 - Teacher workdays captured if visible on calendar
 - Half days captured if visible on calendar
+- Contact info captured if readily available
 
 **When in doubt, capture it.** An extra entry in `non_school_days` that turns out to be wrong is easy to remove. A missing day is invisible and creates silent errors in the aggregate.
 
-## Issue Template (created by Wilma)
+## Twin Collection / QA Process
+
+Barney's extractions run as an independent QA layer alongside Wilma's automated pipeline:
+
+| Scenario | Action |
+|----------|--------|
+| Both Barney and Wilma agree on dates | ✅ Highest confidence — mark as `confirmed` |
+| Barney finds days Wilma missed | Barney's data fills the gap |
+| Wilma has data Barney can't find | Use Wilma's data, flag for future verification |
+| Both disagree on a date | Flag for manual review by Fred |
+| Neither can find calendar data | Use contact info to email district or file FOIA |
+
+**Validation check:** For each district, count SCHOOL_DAY rows between first_day and last_day. If the count is significantly higher than the calendar's stated instructional days (e.g., 195 vs 180), there are likely missing non-school days in the data.
+
+## Issue Creation (Wilma's job)
 
 **Title:** `SSD Collect: {District Name} ({State}) — {Enrollment}K students`
 
 **Body includes:**
-- NCES ID, state, enrollment, priority tier
+- NCES ID, state, city, enrollment, priority tier
 - Known URLs (NCES website, Brave scan results, calendar URLs if found)
 - Suggested search queries
-- Any state-specific notes (e.g., "Louisiana districts typically have Mardi Gras break")
+- State-specific notes (e.g., "Louisiana districts typically have Mardi Gras break")
+- Whether Wilma's pipeline already has data for this district (and what's missing)
+
+**Scale:** Issues should be created for ALL 13,418 districts in the universe, batched by state or enrollment tier. Barney works through them systematically.
 
 ## Workflow
 
-1. **Wilma** creates issues for districts needing collection (label: `SSD-collect`)
-2. **Barney** picks up issues, finds the official calendar, reads it exhaustively, posts complete JSON extraction as a comment
+1. **Wilma** batch-creates issues for all districts (label: `SSD-collect`)
+2. **Barney** picks up issues in priority order, finds the official calendar, reads it exhaustively, captures contact info, posts complete JSON extraction as a comment
 3. **Barney** labels `SSD-extracted`
-4. **Wilma** ingests into v3 DB, confirms row counts + instructional day count, closes issue (label: `SSD-complete`)
-5. If data can't be found: label `SSD-blocked`, document what was tried
+4. **Wilma** ingests into v3 DB, compares against her pipeline data, confirms row counts + instructional day count, closes issue (label: `SSD-complete`)
+5. If data can't be found: label `SSD-blocked`, document what was tried, use contact info for email outreach
 
 ## Priority Order
 
-1. Top 50 by enrollment — gold standard extraction
+1. Top 50 by enrollment — gold standard extraction (these alone = ~40% of total enrollment)
 2. Districts 51-200 by enrollment — gold standard
-3. Remaining districts — minimum viable
+3. Districts 201-1000 — gold standard where possible, minimum viable otherwise
+4. Remaining ~12,400 districts — minimum viable, batched by state
