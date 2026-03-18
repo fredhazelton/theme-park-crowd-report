@@ -102,7 +102,16 @@ def ingest():
                 "type": "HOLIDAY",
                 "name": h["name"]
             })
+        # Also include any non_school_days already in the source data
+        for nsd in d.get("non_school_days", []):
+            non_school_days.append(nsd)
         key_dates["non_school_days"] = non_school_days
+        
+        # Pass through saturday_sessions and other_breaks
+        if "saturday_sessions" in d:
+            key_dates["saturday_sessions"] = d["saturday_sessions"]
+        if "other_breaks" in d:
+            key_dates["other_breaks"] = d["other_breaks"]
         
         # Generate day-level rows
         school_year = d["school_year"]
