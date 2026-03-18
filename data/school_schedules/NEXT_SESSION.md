@@ -14,7 +14,7 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 ## The Golden Rule
 **For every single day of the school year (July 1 – June 30), determine whether students are in session or not. No assumptions. No shortcuts. The source calendar is the only truth.**
 
-## What's Done (13 districts, ~1.63M students)
+## What's Done (16 districts, ~1.86M students)
 
 | Issue | District | State | Enrollment | Status |
 |-------|----------|-------|-----------|--------|
@@ -26,23 +26,23 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 | #66 | Cobb County | GA | 107K | ✅ Posted |
 | #67 | Northside ISD | TX | 103K | ✅ Posted |
 | #68 | Lee County | FL | 99K | ✅ Posted |
-| #69 | San Diego Unified | CA | 94K | ✅ Posted (MEDIUM confidence — conflicting first-day dates) |
+| #69 | San Diego Unified | CA | 94K | ✅ Posted (MEDIUM — conflicting first-day dates) |
 | #70 | Katy ISD | TX | 93K | ✅ Posted |
 | #71 | Prince William County | VA | 91K | ✅ Posted (revised calendar — added Eid al-Adha) |
 | #72 | Davidson County (Nashville) | TN | 81K | ✅ Posted |
 | #73 | Fort Bend ISD | TX | 80K | ✅ Posted |
+| #74 | Greenville 01 | SC | 78K | ✅ Posted |
+| #75 | Jefferson County (Jeffco) | CO | 75K | ✅ Posted |
+| #76 | Osceola | FL | 74K | ✅ Posted (Rodeo Day! Adjacent to Disney) |
 
 ## What's Next (in priority order)
 
 ### Continue top-50 new extractions:
-1. **#74 Greenville 01 SC** — 78K students
-2. **#75 Jefferson County CO** — 75K students
-3. **#76 Osceola FL** — 74K students
-4. **#77 Davis District UT** — 73K students
-5. **#78 Milwaukee WI** — 68K students
-6. **#79 Frisco ISD TX** — 67K students
-7. **#80 VA Beach City VA** — 65K students
-8. Then #85–#112 (Long Beach CA through Portland OR)
+1. **#77 Davis District UT** — 73K students
+2. **#78 Milwaukee WI** — 68K students
+3. **#79 Frisco ISD TX** — 67K students
+4. **#80 VA Beach City VA** — 65K students
+5. Then #85–#112 (Long Beach CA through Portland OR)
 
 ### Re-extractions needed (incomplete first-pass data):
 - **#81 Philadelphia PA** — 115K — has breaks+holidays but MISSING teacher workdays, half days (Philly has half-days on 2nd+3rd Friday monthly)
@@ -91,33 +91,16 @@ Target pace: ~8-10 minutes per district, 3-6 districts per session.
 }
 ```
 
-## Comment Format
-```
-## Barney Extraction — [District Name] ([State])
-
-**Source:** [description + URL]
-
-\```json
-{ ... }
-\```
-
-**Confidence:** HIGH|MEDIUM-HIGH|MEDIUM
-**Summary:** [1-2 sentence summary of key facts]
-```
-
 ## Key Patterns Observed
-- **Texas ISDs** (CFISD, NISD, Katy, Fort Bend): District of Innovation = early August start. Dual-designated bad weather/PD days. ~171-177 instructional days. 187-day teacher contracts.
+- **Texas ISDs** (CFISD, NISD, Katy, Fort Bend): District of Innovation = early August start. Dual-designated bad weather/PD days. ~171-177 instructional days.
 - **Virginia districts** (Fairfax, Prince William): Teacher workdays + professional workdays around holidays. Quarter-end early releases. PWCS observes Rosh Hashanah + both Eids.
-- **Florida districts** (Broward, Lee): ~180 days. Teacher planning days. Hurricane/severe weather make-up days built in.
+- **Florida districts** (Broward, Lee, Osceola): ~180 days. Teacher planning days. Hurricane/severe weather make-up days. Osceola has "Rodeo Day."
 - **Georgia districts** (Cobb): Digital Learning Days count toward instructional requirement. Fall break in September.
 - **California districts** (San Diego): Lincoln Day separate from Presidents Day. Non-instructional days. 80/20 split model.
-- **Tennessee districts** (Nashville/Davidson): "Director of Schools" title. Fall break full week in October. Stockpiled PD days.
-- **Maryland districts** (Montgomery County): Student Transition Day. 181 instructional days. Contingency days built in.
-
-## Discord Channels
-- **#school-schedules:** `1482263793013756064`
-- **#theme-park-crowd-report:** `1479351572386414675`
-- **Bot:** Barney#2550
+- **Tennessee districts** (Nashville/Davidson): "Director of Schools" title. Fall break full week in October.
+- **Maryland districts** (Montgomery County): Student Transition Day. 181 instructional days.
+- **South Carolina districts** (Greenville): "Modified year-round" designation. Semester ends before winter break. SC State Composite Calendar is excellent source.
+- **Colorado districts** (Jeffco): 172 student days / 185 teacher days. Modified Contact Days vary by school.
 
 ## Don't Forget
 - Always include `contact` block (superintendent name, email, phone)
