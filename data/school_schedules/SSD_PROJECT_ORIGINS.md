@@ -177,22 +177,36 @@ For districts where no calendar can be found online:
 
 ### Medium-Term Roadmap
 
-#### F. Multi-Year Historical Backfill
-Collect 2024-2025 and 2023-2024 calendars for pattern analysis and prediction model training. Multi-year data enables:
-- Year-over-year stability analysis
-- **Predictive model**: Forecast next year's calendars before districts publish them
-- Customer value: "We can tell you next year's school schedule today"
+#### F. 2026-2027 Collection (THE SELLABLE PRODUCT)
+Once 2025-2026 hits 95%, repeat the pipeline for 2026-2027 calendars as districts publish them (summer 2026). This is the first revenue-generating dataset — buyers need *future* calendars.
 
-#### G. Data Product Packaging
+#### G. Retrofit 2024-2025 (Medium Confidence)
+With two years of high-quality data (2025-2026 + 2026-2027), analyze year-over-year patterns to retrofit 2024-2025 at medium confidence. Most districts repeat the same calendar structure ±1 week.
+
+#### H. Data Product Packaging
 - **API**: REST endpoint — `GET /api/ssd/districts?state=FL&format=csv`
 - **Stripe integration**: One-time purchase ($X) or annual subscription
 - **Landing page**: hazeydata.ai/school-schedules with sample data + methodology
 - **Data dictionary**: Column definitions, confidence levels, update cadence
 
-#### H. Sales & Distribution
+#### I. Sales & Distribution
 - Target buyers: theme parks, travel companies, retail chains, transportation, education analytics
 - Pricing research completed (see `SALES_STRATEGY.md`)
 - Competitive positioning: More comprehensive than Burbio, more affordable, API-first
+
+### Business Timeline & Market Reality
+
+**The 2025-2026 school year is NOT the product for sale.** By the time we reach 95% coverage, that school year will be mostly over. The 2025-2026 collection is the **proving ground** — building the pipeline, validating quality, and establishing coverage.
+
+**The real product is 2026-2027:**
+1. Hit 95% coverage on 2025-2026 (proves the pipeline works)
+2. Repeat the process for 2026-2027 calendars (published summer 2026)
+3. Ship 2026-2027 data to market — this is the first sellable product
+4. With two years of high-quality data (2025-2026 + 2026-2027), analyze patterns
+5. Retrofit 2024-2025 with medium confidence using those patterns
+6. Three school years of data = predictive model + recurring annual product
+
+**Why this order matters:** Buyers need *future* school calendars, not past ones. A travel company planning for spring break 2027 needs that data by fall 2026. The 2025-2026 collection is an investment in pipeline maturity, not direct revenue.
 
 ### Long-Term Vision
 
