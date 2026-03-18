@@ -7,50 +7,60 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 
 ## Repo & Workflow
 - **Repo:** `hazeydata/theme-park-crowd-report`
-- **Issues:** `#61–#112` with label `SSD-collect` (top 50 missing districts by enrollment)
-- **Re-extractions:** `#81–#84` (Denver, Philly, Alpine, Loudoun — partial data, need gold standard)
-- **Workflow doc:** `data/school_schedules/SSD_COLLECTION_WORKFLOW.md` — has the JSON format spec and golden rule
+- **Issues:** `#61–#112` with label `SSD-collect`
+- **Workflow doc:** `data/school_schedules/SSD_COLLECTION_WORKFLOW.md`
 
 ## The Golden Rule
-**For every single day of the school year (July 1 – June 30), determine whether students are in session or not. No assumptions. No shortcuts. The source calendar is the only truth.**
+**For every single day of the school year (July 1 – June 30), determine whether students are in session or not. No assumptions. No shortcuts.**
 
-## What's Done (18 districts, ~2.0M students)
+## What's Done (20 districts, ~2.2M students)
 
-| Issue | District | State | Enrollment | Status |
-|-------|----------|-------|-----------|--------|
-| #61 | Broward County | FL | 254K | ✅ |
-| #62 | Fairfax County | VA | 180K | ✅ |
-| #63 | Hawaii DOE | HI | 170K | ✅ |
-| #64 | Montgomery County | MD | 161K | ✅ |
-| #65 | Cypress-Fairbanks ISD | TX | 118K | ✅ |
-| #66 | Cobb County | GA | 107K | ✅ |
-| #67 | Northside ISD | TX | 103K | ✅ |
-| #68 | Lee County | FL | 99K | ✅ |
-| #69 | San Diego Unified | CA | 94K | ✅ (MEDIUM) |
-| #70 | Katy ISD | TX | 93K | ✅ |
-| #71 | Prince William County | VA | 91K | ✅ |
-| #72 | Davidson County (Nashville) | TN | 81K | ✅ |
-| #73 | Fort Bend ISD | TX | 80K | ✅ |
-| #74 | Greenville 01 | SC | 78K | ✅ |
-| #75 | Jefferson County (Jeffco) | CO | 75K | ✅ |
-| #76 | Osceola | FL | 74K | ✅ |
-| #77 | Davis District | UT | 73K | ✅ |
-| #78 | Milwaukee | WI | 68K | ✅ (Sept start!) |
+### TOP 20 COMPLETE (#61-#80):
+| Issue | District | State | Enrollment |
+|-------|----------|-------|-----------|
+| #61 | Broward County | FL | 254K |
+| #62 | Fairfax County | VA | 180K |
+| #63 | Hawaii DOE | HI | 170K |
+| #64 | Montgomery County | MD | 161K |
+| #65 | Cypress-Fairbanks ISD | TX | 118K |
+| #66 | Cobb County | GA | 107K |
+| #67 | Northside ISD | TX | 103K |
+| #68 | Lee County | FL | 99K |
+| #69 | San Diego Unified | CA | 94K |
+| #70 | Katy ISD | TX | 93K |
+| #71 | Prince William County | VA | 91K |
+| #72 | Davidson County (Nashville) | TN | 81K |
+| #73 | Fort Bend ISD | TX | 80K |
+| #74 | Greenville 01 | SC | 78K |
+| #75 | Jefferson County (Jeffco) | CO | 75K |
+| #76 | Osceola | FL | 74K |
+| #77 | Davis District | UT | 73K |
+| #78 | Milwaukee | WI | 68K |
+| #79 | Frisco ISD | TX | 67K |
+| #80 | VA Beach City | VA | 65K |
 
 ## What's Next (in priority order)
 
-### Continue top-50 new extractions:
-1. **#79 Frisco ISD TX** — 67K students
-2. **#80 VA Beach City VA** — 65K students
-3. Then #85–#112 (Long Beach CA through Portland OR)
-
-### Re-extractions needed (incomplete first-pass data — HIGH VALUE):
-- **#81 Philadelphia PA** — 115K — MISSING teacher workdays, half days
-- **#82 Denver CO** — 88K — MISSING ~11 teacher-only days
+### 1. Re-extractions (#81-#84) — HIGH VALUE, ~372K students:
+These districts already have partial data but are MISSING teacher workdays, half days, and other non-obvious days. Each needs a complete gold-standard re-extraction.
+- **#81 Philadelphia PA** — 115K — MISSING teacher workdays, half days (Philly has half-days on 2nd+3rd Friday monthly)
+- **#82 Denver CO** — 88K — MISSING ~11 teacher-only days (174.5 student days vs 186 teacher days)
 - **#83 Alpine UT** — 87K — MISSING teacher workdays, half days
-- **#84 Loudoun County VA** — 82K — MISSING teacher workdays, half days
+- **#84 Loudoun County VA** — 82K — MISSING teacher workdays, half days, thanksgiving
 
-## How To Extract (step by step)
+### 2. Remaining new extractions (#85-#112) — ~28 districts, ~1.3M students:
+- #85 Long Beach Unified CA — 65K
+- #86 Washoe County NV — 64K
+- #87 Chesterfield County VA — 64K
+- #88 Volusia FL — 63K
+- #89 Douglas County CO — 62K
+- #90 Granite District UT — 61K
+- #91 Jordan District UT — 59K
+- #92 NYC Geographic District #31 NY — 57K
+- #93 NYC Geographic District #2 NY — 54K
+- ...through #112 Portland SD 1J OR — 43K
+
+## How To Extract
 1. Search for official 2025-2026 calendar
 2. Fetch calendar page/PDF for detail
 3. Extract into JSON format
@@ -63,12 +73,12 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 - **Virginia**: Teacher + professional workdays, quarter-end early releases, religious holidays
 - **Florida**: ~180 days, teacher planning days, hurricane make-up days
 - **Georgia**: Digital Learning Days, September fall break
-- **California**: Lincoln Day separate from Presidents Day, NI days
+- **California**: Lincoln Day separate, NI days
 - **Tennessee**: "Director of Schools" title, October fall break
 - **South Carolina**: "Modified year-round," semester before winter break
-- **Colorado**: 172 student / 185 teacher days, Modified Contact Days
+- **Colorado**: 172 student / 185 teacher days
 - **Utah**: Fall recess (2 days), A/B rotation, late-start Wednesdays
-- **Wisconsin**: Late September start (post-Labor Day), calendar in 9 languages
+- **Wisconsin**: Late September start (post-Labor Day)
 
 ## Don't Forget
 - Always include `contact` block
