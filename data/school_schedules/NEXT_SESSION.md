@@ -13,7 +13,7 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 ## The Golden Rule
 **For every single day of the school year (July 1 – June 30), determine whether students are in session or not. No assumptions. No shortcuts.**
 
-## What's Done (20 districts, ~2.2M students)
+## What's Done (24 districts, ~2.6M students)
 
 ### TOP 20 COMPLETE (#61-#80):
 | Issue | District | State | Enrollment |
@@ -39,16 +39,16 @@ You are **Barney** — an AI agent doing gold-standard school calendar extractio
 | #79 | Frisco ISD | TX | 67K |
 | #80 | VA Beach City | VA | 65K |
 
-## What's Next (in priority order)
+### RE-EXTRACTIONS COMPLETE (#81-#84):
+| Issue | District | State | Enrollment | Notes |
+|-------|----------|-------|-----------|-------|
+| #81 | Philadelphia | PA | 115K | 12 holidays, ~11 half days, calendar AMENDED Mar 2026 |
+| #82 | Denver | CO | 88K | 174.5/186 student/teacher days, 6 non-student contact days |
+| #83 | Alpine | UT | 87K | Splitting into 3 districts Jul 2027, Wed early release |
+| #84 | Loudoun County | VA | 82K | 179/194 student/teacher days, Yom Kippur/Lunar NY/Eid holidays |
 
-### 1. Re-extractions (#81-#84) — HIGH VALUE, ~372K students:
-These districts already have partial data but are MISSING teacher workdays, half days, and other non-obvious days. Each needs a complete gold-standard re-extraction.
-- **#81 Philadelphia PA** — 115K — MISSING teacher workdays, half days (Philly has half-days on 2nd+3rd Friday monthly)
-- **#82 Denver CO** — 88K — MISSING ~11 teacher-only days (174.5 student days vs 186 teacher days)
-- **#83 Alpine UT** — 87K — MISSING teacher workdays, half days
-- **#84 Loudoun County VA** — 82K — MISSING teacher workdays, half days, thanksgiving
-
-### 2. Remaining new extractions (#85-#112) — ~28 districts, ~1.3M students:
+## What's Next — Remaining new extractions (#85-#112):
+~28 districts, ~1.3M students:
 - #85 Long Beach Unified CA — 65K
 - #86 Washoe County NV — 64K
 - #87 Chesterfield County VA — 64K
@@ -76,9 +76,10 @@ These districts already have partial data but are MISSING teacher workdays, half
 - **California**: Lincoln Day separate, NI days
 - **Tennessee**: "Director of Schools" title, October fall break
 - **South Carolina**: "Modified year-round," semester before winter break
-- **Colorado**: 172 student / 185 teacher days
-- **Utah**: Fall recess (2 days), A/B rotation, late-start Wednesdays
+- **Colorado**: 172-174.5 student / 185-186 teacher days, Non-Student Contact Days
+- **Utah**: Fall recess/break, A/B or Wed early release, districts splitting
 - **Wisconsin**: Late September start (post-Labor Day)
+- **Pennsylvania**: Philadelphia observes most religious/cultural holidays, eliminating half days
 
 ## Don't Forget
 - Always include `contact` block
