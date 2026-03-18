@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Magic Kingdom - Complete Design</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 390px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: white;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    background: linear-gradient(180deg, 
+      #0b1a3a 0%, #0e1838 25%, #111535 50%, #12102e 75%, #0d0c22 100%);
+  }
+
+  .stars { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+  .star { position: absolute; background: white; border-radius: 50%; }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* === ABOVE THE FOLD - WTI CARD === */
+  .watermark {
+    margin-top: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.28);
+    text-align: center;
+  }
+
+  .hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 32px;
+  }
+
+  .park-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .park-icon { font-size: 32px; }
+
+  .park-name {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .wti-display {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .wti-number {
+    font-size: 64px;
+    font-weight: 200;
+    line-height: 0.9;
+    margin-bottom: 4px;
+  }
+
+  .crowd-level {
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 4px;
+  }
+
+  .daily-range {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* === GLASS CARDS === */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .glass-header {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* === SPECTRUM BAR === */
+  .spectrum-section {
+    margin-bottom: 16px;
+  }
+
+  .spectrum-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .spectrum-pill {
+    font-size: 18px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px 12px;
+    border-radius: 20px;
+    min-width: 48px;
+    text-align: center;
+  }
+
+  .spectrum-bar-container {
+    position: relative;
+    flex: 1;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .spectrum-bar {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+  }
+
+  .now-triangle {
+    position: absolute;
+    top: -8px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 8px solid white;
+    transform: translateX(-50%);
+  }
+
+  .time-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 60px;
+  }
+
+  /* === FORECAST === */
+  .forecast-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .forecast-day {
+    width: 45px;
+    font-weight: 500;
+  }
+
+  .forecast-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 12px;
+  }
+
+  .forecast-lo {
+    width: 25px;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+  }
+
+  .forecast-bar-container {
+    position: relative;
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    margin: 0 8px;
+  }
+
+  .forecast-bar {
+    position: absolute;
+    height: 100%;
+    border-radius: 4px;
+  }
+
+  .forecast-now-dot {
+    position: absolute;
+    top: -2px;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    transform: translateX(-50%);
+  }
+
+  .forecast-hi {
+    width: 25px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+  }
+
+  /* === BELOW THE FOLD SECTIONS === */
+  
+  /* Crowd Density */
+  .crowd-density-main {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .crowd-number {
+    font-size: 48px;
+    font-weight: 800;
+    font-family: 'Inter', monospace;
+    color: #f0883e;
+    line-height: 1;
+  }
+
+  .crowd-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 4px;
+  }
+
+  .benedictus-scale {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    gap: 12px;
+  }
+
+  .scale-labels {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .scale-bar {
+    flex: 1;
+    height: 8px;
+    background: linear-gradient(to right, #0A2F8F, #305FD1, #5A96EA, #9BC4F2, #C1DDFC, #E9F4FF, #FFE0E9, #FFB1C9, #EB427B, #A60038);
+    border-radius: 4px;
+    position: relative;
+  }
+
+  .scale-indicator {
+    position: absolute;
+    top: -4px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    left: 70%;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .crowd-context {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+  }
+
+  .visitor-reports {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .crowd-input {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .crowd-input button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .crowd-input .submit {
+    background: #4a90a4;
+    border-color: #6bb5c9;
+  }
+
+  .input-help {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Events Timeline */
+  .event-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .event-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  .event-emoji {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+  }
+
+  .event-time {
+    font-family: 'Inter', monospace;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    min-width: 70px;
+  }
+
+  .event-name {
+    flex: 1;
+    font-size: 14px;
+  }
+
+  .event-badge {
+    background: rgba(74, 144, 164, 0.3);
+    color: #6bb5c9;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .event-badge.ended {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Ride Advisor */
+  .ride-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .ride-tag {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 8px 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: white;
+  }
+
+  .ride-tag.add-ride {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+  }
+
+  .ride-tag-remove {
+    width: 16px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .ride-count {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 16px;
+  }
+
+  .recommendation-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 16px;
+    text-align: center;
+  }
+
+  .recommendation-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+  }
+
+  .recommended-ride {
+    font-size: 17px;
+    font-weight: 600;
+    color: #4ade80;
+    margin-bottom: 16px;
+  }
+
+  .done-button {
+    background: #4ade80;
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 20px;
+  }
+
+  /* Section dividers */
+  .section-divider {
+    height: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="content">
+  <!-- === ABOVE THE FOLD === -->
+  <div class="watermark">WAIT TIME INDEX</div>
+  
+  <div class="hero-section">
+    <div class="park-header">
+      <span class="park-icon">🏰</span>
+      <span class="park-name">Magic Kingdom</span>
+    </div>
+    
+    <div class="wti-display">
+      <div class="wti-number">15</div>
+      <div class="crowd-level">Moderate Crowds</div>
+      <div class="daily-range">L: 7 • H: 16</div>
+    </div>
+  </div>
+
+  <!-- Info Card (Glass) -->
+  <div class="glass-card">
+    <div style="margin-bottom: 16px;">
+      <div style="font-size: 14px; line-height: 1.4; color: rgba(255,255,255,0.85); margin-bottom: 16px;">
+        MK feels busy even on lighter wait days thanks to its compact layout and popularity. Peak around 2PM during parade windows.
+      </div>
+    </div>
+    
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+      <div class="spectrum-section">
+        <div class="spectrum-row">
+          <div class="spectrum-pill">☀️</div>
+          <div class="spectrum-bar-container">
+            <div class="spectrum-bar" id="spectrumBar"></div>
+            <div class="now-triangle" style="left: 65%;"></div>
+          </div>
+        </div>
+        <div class="time-labels">
+          <span style="font-weight: 600;">9AM</span>
+          <span>11AM</span>
+          <span>1PM</span>
+          <span>3PM</span>
+          <span>5PM</span>
+          <span>7PM</span>
+          <span style="font-weight: 600;">11PM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forecast Card -->
+  <div class="glass-card">
+    <div class="glass-header">📅 7-Day Crowd Forecast</div>
+    <div id="forecastRows">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- === BELOW THE FOLD === -->
+  
+  <!-- Crowd Density -->
+  <div class="glass-card">
+    <div class="glass-header">🏰 CROWD DENSITY</div>
+    
+    <div class="crowd-density-main">
+      <div class="crowd-number">7</div>
+      <div class="crowd-label">Feels Crowded</div>
+    </div>
+    
+    <div class="benedictus-scale">
+      <span class="scale-labels">Less</span>
+      <div class="scale-bar">
+        <div class="scale-indicator"></div>
+      </div>
+      <span class="scale-labels">More</span>
+    </div>
+    
+    <div class="crowd-context">
+      MK feels busy even on lighter wait days thanks to its compact layout and popularity. Today's 7/10 reflects typical Wednesday afternoon energy.
+    </div>
+    
+    <div class="visitor-reports">Based on 142 visitor reports today</div>
+    
+    <div class="crowd-input">
+      <button>↓ Less Crowded</button>
+      <button>↑ More Crowded</button>
+      <button class="submit">Submit</button>
+    </div>
+    
+    <div class="input-help">Your rating helps other guests plan their day</div>
+  </div>
+
+  <!-- Today's Events -->
+  <div class="glass-card">
+    <div class="glass-header">🎆 TODAY'S EVENTS</div>
+    
+    <div class="event-timeline">
+      <div class="event-item">
+        <span class="event-emoji">☀️</span>
+        <span class="event-time">8:30 AM</span>
+        <span class="event-name">Early Entry</span>
+        <span class="event-badge ended">Ended</span>
+      </div>
+      
+      <div class="event-item">
+        <span class="event-emoji">🎭</span>
+        <span class="event-time">2:00 PM</span>
+        <span class="event-name">Festival of Fantasy Parade</span>
+        <span></span>
+      </div>
+      
+      <div class="event-item">
+        <span class="event-emoji">🏰</span>
+        <span class="event-time">5:30 PM</span>
+        <span class="event-name">Cavalcade</span>
+        <span></span>
+      </div>
+      
+      <div class="event-item">
+        <span class="event-emoji">🎆</span>
+        <span class="event-time">9:15 PM</span>
+        <span class="event-name">Happily Ever After</span>
+        <span class="event-badge">Tonight</span>
+      </div>
+      
+      <div class="event-item">
+        <span class="event-emoji">🌙</span>
+        <span class="event-time">11:00 PM</span>
+        <span class="event-name">Park Close</span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Merlin Ride Advisor -->
+  <div class="glass-card">
+    <div class="glass-header">🎢 MY RIDES</div>
+    
+    <div class="ride-selector">
+      <div class="ride-tag">
+        <span>Space Mountain</span>
+        <span class="ride-tag-remove">×</span>
+      </div>
+      <div class="ride-tag">
+        <span>Seven Dwarfs</span>
+        <span class="ride-tag-remove">×</span>
+      </div>
+      <div class="ride-tag">
+        <span>Big Thunder</span>
+        <span class="ride-tag-remove">×</span>
+      </div>
+      <div class="ride-tag add-ride">
+        <span>+ Add ride</span>
+      </div>
+    </div>
+    
+    <div class="ride-count">3 of 4 selected</div>
+    
+    <div class="recommendation-section">
+      <div class="recommendation-label">Next up:</div>
+      <div class="recommended-ride">🟢 Seven Dwarfs Mine Train</div>
+      <button class="done-button">Done ✓</button>
+    </div>
+  </div>
+
+  <div class="footer">hazeydata.ai • Theme Park Crowd Report</div>
+</div>
+
+<script>
+  // === REAL Benedictus scale ===
+  const BENEDICTUS = [
+    [10,  47, 143], [48,  95, 209], [90, 150, 234], [155, 196, 242], [193, 221, 252],
+    [233, 244, 255], [255, 224, 233], [255, 177, 201], [235,  66, 123], [166,   0,  56]
+  ];
+
+  function benedictus(t) {
+    t = Math.max(0, Math.min(1, t));
+    const idx = t * (BENEDICTUS.length - 1);
+    const i = Math.min(Math.floor(idx), BENEDICTUS.length - 2);
+    const f = idx - i;
+    return BENEDICTUS[i].map((v,j) => Math.round(v + (BENEDICTUS[i+1][j] - v) * f));
+  }
+
+  // === Stars ===
+  const starsEl = document.getElementById('stars');
+  const rng = (function(s){return function(){s=s*16807%2147483647;return(s-1)/2147483646;}})(42);
+  for (let i = 0; i < 70; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = rng() < 0.7 ? 1.5 : 2.5;
+    star.style.cssText = `width:${size}px;height:${size}px;left:${rng()*100}%;top:${rng()*40}%;opacity:${0.15+rng()*0.4}`;
+    starsEl.appendChild(star);
+  }
+
+  // === Spectrum bar ===
+  const todayCurve = [
+    {"t":"08:30","w":7.4},{"t":"09:00","w":8.7},{"t":"09:30","w":10.5},{"t":"10:00","w":12.0},
+    {"t":"10:30","w":13.2},{"t":"11:00","w":14.2},{"t":"11:30","w":14.5},{"t":"12:00","w":14.6},
+    {"t":"12:30","w":14.2},{"t":"13:00","w":14.4},{"t":"13:30","w":15.3},{"t":"14:00","w":15.5},
+    {"t":"14:30","w":15.7},{"t":"15:00","w":14.8},{"t":"15:30","w":14.1},{"t":"16:00","w":15.0},
+    {"t":"16:30","w":15.0},{"t":"17:00","w":15.1},{"t":"17:30","w":15.3},{"t":"18:00","w":15.2},
+    {"t":"18:30","w":14.7},{"t":"19:00","w":13.8},{"t":"19:30","w":12.9},{"t":"20:00","w":11.0},
+    {"t":"20:30","w":9.7},{"t":"21:00","w":9.2},{"t":"21:30","w":9.1},{"t":"22:00","w":9.0},
+    {"t":"22:30","w":7.9},{"t":"23:00","w":7.2}
+  ];
+
+  const wtiMax = 50;
+  const bar = document.getElementById('spectrumBar');
+  const stops = todayCurve.map((d, i) => {
+    const pct = (i / (todayCurve.length - 1)) * 100;
+    const t = Math.min(d.w / wtiMax, 1.0);
+    const c = benedictus(t);
+    return `rgb(${c[0]},${c[1]},${c[2]}) ${pct.toFixed(1)}%`;
+  });
+  bar.style.background = `linear-gradient(to right, ${stops.join(', ')})`;
+
+  // === 7-Day Forecast ===
+  const forecast = [
+    { day:'Today', lo:7.2, hi:15.8, wti:20.4, now:15.2 },
+    { day:'Wed',   lo:6.2, hi:15.6, wti:17.8, now:null  },
+    { day:'Thu',   lo:7.5, hi:15.4, wti:19.7, now:null  },
+    { day:'Fri',   lo:7.5, hi:16.2, wti:22.5, now:null  },
+    { day:'Sat',   lo:7.1, hi:14.5, wti:15.1, now:null  },
+    { day:'Sun',   lo:7.4, hi:15.5, wti:20.4, now:null  },
+    { day:'Mon',   lo:7.5, hi:16.6, wti:22.8, now:null  }
+  ];
+
+  const gMin = Math.min(...forecast.map(f => f.lo));
+  const gMax = Math.max(...forecast.map(f => f.hi));
+  const gRange = gMax - gMin || 1;
+
+  const container = document.getElementById('forecastRows');
+  forecast.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'forecast-row';
+    const loFrac = (f.lo - gMin) / gRange;
+    const hiFrac = (f.hi - gMin) / gRange;
+    const avgT = Math.min(((f.lo + f.hi) / 2) / wtiMax, 1.0);
+    const dotColor = benedictus(avgT);
+
+    const barSteps = 15;
+    let barGrad = [];
+    for (let i = 0; i <= barSteps; i++) {
+      const frac = loFrac + (hiFrac - loFrac) * (i / barSteps);
+      const wtiAtPoint = gMin + frac * gRange;
+      const t = Math.min(wtiAtPoint / wtiMax, 1.0);
+      const c = benedictus(t);
+      barGrad.push(`rgb(${c[0]},${c[1]},${c[2]}) ${(i/barSteps*100).toFixed(0)}%`);
+    }
+
+    let nowDot = '';
+    if (f.now !== null) {
+      const nowFrac = (f.now - gMin) / gRange;
+      const dotPct = Math.max(0, Math.min(100, ((nowFrac - loFrac) / (hiFrac - loFrac)) * 100));
+      nowDot = `<div class="forecast-now-dot" style="left:${dotPct}%"></div>`;
+    }
+
+    row.innerHTML = `
+      <div class="forecast-day">${f.day}</div>
+      <div class="forecast-dot" style="background:rgb(${dotColor})"></div>
+      <div class="forecast-lo">${Math.round(f.lo)}</div>
+      <div class="forecast-bar-container">
+        <div class="forecast-bar" style="left:${(loFrac*100).toFixed(1)}%;width:${((hiFrac-loFrac)*100).toFixed(1)}%;background:linear-gradient(to right,${barGrad.join(',')})">
+          ${nowDot}
+        </div>
+      </div>
+      <div class="forecast-hi">${Math.round(f.hi)}</div>
+    `;
+    container.appendChild(row);
+  });
+</script>
+</body>
+</html>
