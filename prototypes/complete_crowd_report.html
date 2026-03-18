@@ -461,6 +461,23 @@
   .section-divider {
     height: 24px;
   }
+
+  /* 2-column grid for bottom cards */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+    max-width: 350px;
+    width: 100%;
+  }
+
+  @media (max-width: 340px) {
+    .bottom-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -544,14 +561,18 @@
     </div>
     
     <div class="crowd-context">
-      MK feels busy even on lighter wait days thanks to its compact layout and popularity. Today's 7/10 reflects typical Wednesday afternoon energy.
+      Magic Kingdom feels busy even on lighter wait days. Main Street and Fantasyland walkways typically congested by midday.
     </div>
     
     <div class="visitor-reports">Based on 142 visitor reports today</div>
     
+    <div style="margin: 20px 0 16px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px;">
+      HOW DOES IT FEEL TO YOU?
+    </div>
+    
     <div class="crowd-input">
-      <button>↓ Less Crowded</button>
-      <button>↑ More Crowded</button>
+      <button style="color: #6bb5c9;">↓ Less Crowded</button>
+      <button style="color: #e05577;">↑ More Crowded</button>
       <button class="submit">Submit</button>
     </div>
     
@@ -580,7 +601,7 @@
       <div class="event-item">
         <span class="event-emoji">🏰</span>
         <span class="event-time">5:30 PM</span>
-        <span class="event-name">Cavalcade</span>
+        <span class="event-name">Mickey's Celebration Cavalcade</span>
         <span></span>
       </div>
       
@@ -600,9 +621,9 @@
     </div>
   </div>
 
-  <!-- Merlin Ride Advisor -->
+  <!-- Ride Advisor -->
   <div class="glass-card">
-    <div class="glass-header">🎢 MY RIDES</div>
+    <div class="glass-header">🎢 MY MUST-DOS</div>
     
     <div class="ride-selector">
       <div class="ride-tag">
@@ -628,6 +649,29 @@
       <div class="recommendation-label">Next up:</div>
       <div class="recommended-ride">🟢 Seven Dwarfs Mine Train</div>
       <button class="done-button">Done ✓</button>
+    </div>
+  </div>
+
+  <!-- 2-Column Bottom Section -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; max-width: 350px; width: 100%;">
+    <!-- Park Hours -->
+    <div class="glass-card" style="margin-bottom: 0;">
+      <div class="glass-header" style="font-size: 14px; margin-bottom: 12px;">🌅 PARK HOURS</div>
+      <div style="font-size: 24px; font-weight: 300; margin-bottom: 4px;">9—11</div>
+      <div style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 12px;">AM — PM</div>
+      <div style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.4;">
+        Early Entry from 8:30 AM. No extended evening hours today.
+      </div>
+    </div>
+
+    <!-- Rides Operating -->
+    <div class="glass-card" style="margin-bottom: 0;">
+      <div class="glass-header" style="font-size: 14px; margin-bottom: 12px;">🎢 RIDES OPERATING</div>
+      <div style="font-size: 24px; font-weight: 300; margin-bottom: 4px;">32<span style="color: rgba(255,255,255,0.5);">/35</span></div>
+      <div style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 12px;">Open Now</div>
+      <div style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.4;">
+        Tron, Splash Mountain closed for maintenance.
+      </div>
     </div>
   </div>
 
@@ -682,7 +726,8 @@
   });
   bar.style.background = `linear-gradient(to right, ${stops.join(', ')})`;
 
-  // === 7-Day Forecast ===
+  // === 7-Day Forecast with GLOBAL RANGE BARS ===
+  // Apple Weather style: all bars use HISTORICAL range for this park
   const forecast = [
     { day:'Today', lo:7.2, hi:15.8, wti:20.4, now:15.2 },
     { day:'Wed',   lo:6.2, hi:15.6, wti:17.8, now:null  },
@@ -693,9 +738,11 @@
     { day:'Mon',   lo:7.5, hi:16.6, wti:22.8, now:null  }
   ];
 
-  const gMin = Math.min(...forecast.map(f => f.lo));
-  const gMax = Math.max(...forecast.map(f => f.hi));
-  const gRange = gMax - gMin || 1;
+  // GLOBAL HISTORICAL RANGE for Magic Kingdom (from database)
+  // Track spans ALL-TIME min/max WTI values ever recorded for this park
+  const gMin = 3.2;   // Lowest WTI ever recorded at Magic Kingdom
+  const gMax = 58.7;  // Highest WTI ever recorded at Magic Kingdom  
+  const gRange = gMax - gMin || 1;  // Full historical spread
 
   const container = document.getElementById('forecastRows');
   forecast.forEach(f => {
