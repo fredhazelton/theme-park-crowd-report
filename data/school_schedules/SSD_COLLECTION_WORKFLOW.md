@@ -109,6 +109,45 @@ Each district extraction should capture **all available school years**, not just
 
 When multiple years are available, produce **separate JSON entries per school year** in the same issue comment. The `school_year` field in each entry identifies which year it covers.
 
+## Labels
+
+### Status Labels (Pipeline Stage)
+
+| Label | Meaning | Set By |
+|-------|---------|--------|
+| `SSD-collect` | District needs calendar data collected — **available for pickup** | Wilma (at issue creation) |
+| `SSD-extracted` | Extraction JSON posted, awaiting DB ingestion | Barney or Wilma (after extraction) |
+| `wilma-ingest` | Extraction complete, queued for Wilma's DB ingestion | Barney or Wilma |
+| `SSD-complete` | Data ingested into v3 DB, issue closed | Wilma (after ingestion) |
+| `SSD-blocked` | Cannot find calendar data online — needs email outreach or FOIA | Anyone |
+
+### Agent Labels (Who's Working On It)
+
+| Label | Meaning |
+|-------|---------|
+| `barney` | 🟣 Barney is actively working on this extraction — **hands off** |
+| `wilma` | 🟡 Wilma is actively working on this extraction — **hands off** |
+
+### Rules
+
+1. **Only pick up issues labeled `SSD-collect`** — never grab something another agent is working on
+2. **Add your agent label immediately** when you start working on an issue, and **remove `SSD-collect`**
+3. **Remove your agent label** when extraction is done and you move to the next stage
+4. If you need to abandon an issue mid-work, **remove your label and re-add `SSD-collect`** so someone else can pick it up
+
+### Label Transitions
+
+```
+SSD-collect                          ← Available for pickup
+  ├─→ barney + (remove SSD-collect)  ← Barney claimed it
+  │     └─→ SSD-extracted or wilma-ingest + (remove barney)  ← Extraction done
+  ├─→ wilma + (remove SSD-collect)   ← Wilma claimed it
+  │     └─→ wilma-ingest + (remove wilma)  ← Extraction done
+  └─→ SSD-blocked                    ← Can't find data
+
+wilma-ingest or SSD-extracted        ← Ready for DB ingestion
+  └─→ SSD-complete + close issue     ← Ingested into v3 DB
+```
 ## The Golden Rule
 
 **We are building the most comprehensive school calendar dataset ever assembled. It needs to be worth $15K to a buyer.**
@@ -265,6 +304,22 @@ Barney's extractions run as an independent QA layer alongside Wilma's automated 
 - State-specific notes (e.g., "Louisiana districts typically have Mardi Gras break")
 - Whether Wilma's pipeline already has data for this district (and what's missing)
 
+## Workflow
+
+1. **Wilma** batch-creates issues for all districts (label: `SSD-collect`)
+2. **Agent picks up issue:** Add your agent label (`barney` or `wilma`), remove `SSD-collect`
+3. **Agent extracts calendar:** Find official calendar, read exhaustively, capture contact info, post complete JSON extraction as a comment (one per school year found)
+4. **Agent marks extraction done:** Remove agent label, add `SSD-extracted` or `wilma-ingest`
+5. **Wilma ingests into v3 DB:** Compare against pipeline data, confirm row counts + instructional day count
+6. **Wilma closes issue:** Remove intermediate labels, add `SSD-complete`, close issue
+7. **If data can't be found:** Label `SSD-blocked`, document what was tried, use contact info for email outreach
+
+### Important Notes for Agents
+
+- **Check labels before picking up ANY issue.** If it has `barney` or `wilma`, someone else is on it.
+- **Label immediately** when you start — don't extract first and label later. This prevents collisions.
+- **One agent per issue.** No parallel extraction on the same district.
+- **If you hit a wall** (PDF won't parse, calendar not online, etc.), remove your label, add `SSD-blocked`, and document the issue in a comment so the next person knows what was tried.
 ## Priority Order
 
 1. Top 50 by enrollment — gold standard, all available school years
