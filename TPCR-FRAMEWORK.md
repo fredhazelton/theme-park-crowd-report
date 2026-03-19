@@ -84,57 +84,14 @@ Compressed from the full RACI. For this project, at this scale:
 
 ### Task Management — Recursive Improvement Loop
 
-**Single source of truth: GitHub Issues** across all hazeydata repos (auto-discovered via `gh repo list hazeydata`).
+**Task management follows the company-wide Recursive Improvement Loop documented in ~/clawd/OPERATIONS.md. All hazeydata repos use GitHub Issues as the single source of truth.**
 
-**The Loop:**
-```
-1. Issues created (by agents, Gazoo, Fred, or anyone)
-   → labeled with domain (testing, design, pipeline, etc.)
-   
-2. Auto-assigned (1:00 AM daily)
-   → assign_stale_issues.py labels unassigned issues >24h old
-   → domain labels determine which agent gets it
-   
-3. Agent picks up work (every sprint)
-   → python3 ~/clawd/scripts/my_issues.py <agent>
-   → assigned issues ALWAYS take priority over self-directed work
-   
-4. Agent executes → commits → comments results → closes issue
-
-5. Agent creates NEW issues for problems found during work
-   → feeds back into step 1
-
-6. Gazoo reviews all work (9:00 PM daily)
-   → grades agents, files quality issues
-   → proposes prompt patches for recurring problems
-   
-7. Next day: cycle repeats
-```
-
-**Key Scripts:**
-- `my_issues.py <agent>` — "What should I work on?" (scans all repos)
-- `assign_stale_issues.py` — Auto-assigns unassigned issues after 24h
-- `improvement_tracker.py` — Gazoo's grading and tracking system
-
-**Label Convention:**
-| Label | Purpose |
-|-------|---------|
-| Agent labels (bam-bam, pebbles, betty, etc.) | Assignment — who owns this |
-| Domain labels (testing, design, pipeline, etc.) | Routing — which agent's domain |
-| `sprint-ready` | Ready for an agent to pick up |
-| `priority:high` / `priority:low` | Urgency |
-
-**Discord Mirror:**
-- #tasks channel shows a live read-only dashboard of all GitHub Issues
-- Auto-refreshes periodically — NOT a separate task system
-- Dino maintains the mirror, not a separate task list
-
-**What we retired:**
-- tasks.json (replaced by GitHub Issues)
-- generate_tasks_json.py (no longer needed)
-- stale_task_check.py (replaced by assign_stale_issues.py)
-
-**Current reality:** Most work flows through GitHub Issues now. Fred creates strategic issues, agents pick them up via `my_issues.py`, work gets done and tracked automatically.
+**TPCR-Specific Workflow:**
+- Fred creates strategic issues for TPCR priorities
+- Agents use `my_issues.py <agent>` to pick up assigned work
+- Pipeline work requires Barney methodology review + Bam-Bam implementation
+- Wilma monitors daily operations and coordinates across the improvement loop
+- Gazoo provides quality review specific to TPCR's accuracy targets
 
 ---
 

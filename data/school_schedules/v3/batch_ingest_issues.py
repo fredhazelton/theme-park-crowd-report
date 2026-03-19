@@ -53,16 +53,23 @@ def get_json_from_comments(issue_num):
     body = gh("issue", "view", str(issue_num), "--json", "comments",
               "--jq", ".comments[-1].body")
     
-    # Find JSON block
+    # Try JSON in code block first
     match = re.search(r'```json\s*\n(.*?)\n```', body, re.DOTALL)
-    if not match:
-        return None
+    if match:
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError as e:
+            print(f"  ❌ JSON parse error (code block): {e}")
     
-    try:
-        return json.loads(match.group(1))
-    except json.JSONDecodeError as e:
-        print(f"  ❌ JSON parse error: {e}")
-        return None
+    # Try raw JSON (starts with {)
+    match = re.search(r'(\{.*\})', body, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError as e:
+            print(f"  ❌ JSON parse error (raw): {e}")
+    
+    return None
 
 
 def main():
