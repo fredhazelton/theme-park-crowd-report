@@ -253,48 +253,46 @@ All sections use glassmorphism cards matching the Info Card and Forecast Card st
 - Helps park-hop decisions
 
 ### 🎢 MY MUST-DOS (full-width)
-**Live ride recommendation engine** based on gain function algorithm. Super simple UX — no explanations, no complexity.
+**Live ride recommendation engine** based on gain function algorithm.
+
+> **Full algorithm spec:** `merlin/DESIGN.md`
+> **Full UX spec:** `~/clawd/docs/pebbles-design-decisions.md`
+> **Approved prototypes:** `hazeydata.ai/preview/ride-picker-v4.html` + `optimizer-v3.html`
 
 **Algorithm:**
 ```
 gain(ride) = expected_future_wait(ride) - current_wait(ride)
 ```
 - **Positive gain** = cheaper now than later → recommend now
-- **Negative gain** = better later → save for later  
+- **Negative gain** = better later → save for later
 - Always recommends something (highest gain, even if all negative)
+- Expected future wait = weighted average over dynamic window (see `merlin/DESIGN.md`)
 
-**Expected future wait** = weighted average of forecasted waits over dynamic window
-- **Window size** = `sum(current_wait + ride_duration)` for remaining rides
-- Window shrinks as rides completed → more decisive recommendations
-- Weights favor near-term time slots, far-term fade out
-
-**User Interface:**
-- User selects 3-4 must-do rides (tap to add/remove)
-- Simple ride tags with × to remove
-- **"Next up: Seven Dwarfs Mine Train"** — clear recommendation
-- **[Done ✓] button** — completes ride, triggers recalculation
-- **[+ Add a ride]** option when under 4 selected
-- No gain scores shown, no explanations — just trust the algorithm
+**User Flow (finalized 2026-03-18):**
+1. Tap [+] → **Ride Picker** slides up as bottom sheet modal
+2. Select up to 4 rides from compact rows grouped by land (no wait times shown — desire, not logistics)
+3. Collapsible mini-map shows selected ride locations
+4. Tap Done → cards appear in user's selection order with blank ranks
+5. Cards **animate/shuffle** to optimized order (FLIP animation) — this IS the "computation visible" moment
+6. Rank numbers pop in; **"✦ Merlin's Pick" insight card** explains WHY #1 was chosen
+7. Swipe RIGHT = "Done ✓" (cyan pill) / Swipe LEFT = "Remove ✕" (red pill)
+8. Card removed → recalculate → re-rank remaining → "+ Add another ride"
 
 **Product Decisions:**
 - Lightning Lane excluded (user handles scheduled rides)
 - Walking distances ignored ("you're at a theme park, you walk")
 - No filler ride suggestions (only user-selected rides)
 - Re-rides user-managed (want to ride again? add it back)
-- Works regardless of when rides are selected (morning/midday/anytime)
-
-**Key Insight:** Universal wait curve pattern (low → peak → fade to ~1/3) makes gain function predictable:
-- Morning (pre-peak): Gain positive → "go now, waits climbing"
-- Peak hours: Gain negative → recommend least-bad option
-- Evening (post-peak): Small gains → order matters less
+- No gain scores shown to users — ranked order IS the output; insight card explains in plain English
+- Max 4 rides (hard cap)
 
 **Data Requirements:**
 - Live wait times (Queue-Times API)
-- Wait time forecasts (crowd model) 
+- Wait time forecasts (crowd model)
 - Ride durations (static lookup)
 - Current time + park hours
 
-**Layout:** Matches other glassmorphism cards. Ride selector at top, recommendation prominently displayed, done button below.
+**Layout:** Glassmorphism card matching rest of below-the-fold sections.
 
 ---
 

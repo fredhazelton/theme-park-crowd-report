@@ -103,12 +103,12 @@ No walking time needed — this is a lower bound. If you can't do it even at tel
 - User feedback loop
 
 ## Open Questions
-1. **How do we define "expected future wait"?** (see section above)
-2. **Which parks first?** Magic Kingdom seems natural
-3. **How do we present the gain score to users?** Raw number? Stars? Just "recommended" vs "wait"?
-4. **What happens when two rides have nearly identical gain?** Tie-breaking strategy?
+1. ~~How do we define "expected future wait"?~~ ✅ Weighted average with dynamic window (see above)
+2. ~~Which parks first?~~ ✅ Magic Kingdom
+3. ~~How do we present the gain score to users?~~ ✅ Not shown. The ranked order IS the output. Insight card explains #1 pick in plain English.
+4. **What happens when two rides have nearly identical gain?** Tie-breaking strategy TBD.
 5. **Refresh rate?** How often does Merlin recalculate? On-demand? Every 5 min?
-6. **What's the UI?** Mobile web? In the existing crowd report? Standalone?
+6. ~~What's the UI?~~ ✅ Below-the-fold section in crowd report. See UX spec below.
 
 ## Edge Cases to Stress Test
 - [ ] All rides negative gain at 11 AM (park is crowded, everything is worse now)
@@ -132,6 +132,67 @@ No walking time needed — this is a lower bound. If you can't do it even at tel
                      ↕ (add/remove/complete)
                    [Ride List State]
 ```
+
+---
+
+## UX Specification (Finalized 2026-03-18)
+
+> Full UX decisions documented in `~/clawd/docs/pebbles-design-decisions.md`
+> Approved prototypes at `hazeydata.ai/preview/`
+
+### User Flow
+```
+[+] tap → Ride Picker modal (list + mini-map)
+  → Select up to 4 rides → Done
+  → Cards appear in user's selection order (blank ranks)
+  → Animated shuffle to optimized order (gain function)
+  → Rank numbers pop in (1, 2, 3, 4)
+  → "Merlin's Pick" insight card explains WHY #1 was chosen
+  → Leader line connects insight → highlighted #1 card
+  → Auto-peek nudge teaches swipe gestures
+  → Swipe right = Done ✓ | Swipe left = Remove ✕
+  → Card removed → recalculate → re-rank remaining
+  → "+ Add another ride" to refill slots
+```
+
+### Ride Picker (modal bottom sheet)
+- Compact text rows grouped by **land cards** (color-coded)
+- **No wait times shown** — picker is about desire, not logistics
+- Search bar + max 4 rides + slot indicator
+- ✦ REC badges on optimizer-recommended rides
+- Collapsible **mini-map** (~150px) shows selected ride locations
+- Auto-opens on first selection
+
+### Optimizer Result (main page section)
+- Cards: rank badge · ride name · description · current wait time
+- **Animated FLIP reorder** from user order → optimized order = the "computation visible" moment
+- **"✦ Merlin's Pick" insight card** above #1: plain-English explanation of WHY
+  - e.g., "Wait times are at their lowest right now. Heading here first saves you up to 37 minutes."
+- Animated dashed leader line → highlighted #1 card (cyan glow)
+- #1 rank badge = filled cyan; others = outlined
+
+### Swipe Actions (iOS-style)
+- **Swipe RIGHT** → compact cyan pill: "✓ Done" (logged as completed)
+- **Swipe LEFT** → compact red pill: "Remove ✕" (logged as removed/skipped)
+- Auto-peek nudge on #1 card teaches interaction
+- Directional swipe captures user intent = free behavioral data
+
+### Design Principles
+1. Less is more — ruthlessly cut text and visual noise
+2. Show, don't tell — animated reorder > loading spinner
+3. Desire over logistics — picker = want; optimizer = strategy
+4. Computation must be felt — the shuffle IS the intelligence
+5. iOS conventions — bottom sheets, swipe actions, compact pills
+6. Benedictus palette only — navy, cyan, red, gold
+7. Data is a byproduct — swipe direction captures intent passively
+
+### Approved Prototypes
+| File | Status |
+|------|--------|
+| `hazeydata.ai/preview/ride-picker-v4.html` | ✅ FINAL — Ride picker with mini-map |
+| `hazeydata.ai/preview/optimizer-v3.html` | ✅ FINAL — Optimizer with insight card + swipe |
+
+---
 
 ## Timeline
 48 hours. Go.
