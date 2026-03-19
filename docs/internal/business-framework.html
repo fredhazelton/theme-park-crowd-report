@@ -1733,7 +1733,141 @@
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 26: STAGE GATES -->
+<!-- SECTION 26: RECURSIVE TASK MANAGEMENT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <span class="icon">🔄</span>
+    <h2>Recursive Task Management</h2>
+    <span class="desc">GitHub Issues as the single source of truth across all projects</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>📋 System Overview <span class="badge badge-critical">Core Infrastructure</span></h3>
+      <p>Every task, every project, every problem tracked in one place with full automation.</p>
+      <ul>
+        <li><span class="highlight">Single source of truth:</span> GitHub Issues across ALL hazeydata repos</li>
+        <li><span class="highlight">Auto-discovery:</span> Repos discovered via `gh repo list hazeydata` (never hardcoded)</li>
+        <li><span class="highlight">Universal scope:</span> TPCR, ACCORD, CDR, hazeydata.ai, data-hub, plus any future repos</li>
+        <li><span class="warn">No parallel systems:</span> GitHub Issues is THE task management system (Discord is read-only mirror only)</li>
+      </ul>
+      <div class="note green-note">🎯 This system scales from 1 person to 100+ people without changing methodology. The loop stays the same.</div>
+    </div>
+
+    <div class="card">
+      <h3>🔄 The Loop <span class="badge badge-phase">Daily Cycle</span></h3>
+      <div class="timeline">
+        <div class="timeline-item active">
+          <h4>1. Issues Created → Labeled</h4>
+          <p>New issues tagged with domain labels (testing, design, pipeline, etc.)</p>
+        </div>
+        <div class="timeline-item">
+          <h4>2. Auto-Assignment (1 AM Daily)</h4>
+          <p>assign_stale_issues.py assigns unassigned issues >24h to appropriate agents</p>
+        </div>
+        <div class="timeline-item">
+          <h4>3. Agent Work Sprint</h4>
+          <p>Agents check my_issues.py &lt;agent&gt; for their assigned work each sprint</p>
+        </div>
+        <div class="timeline-item">
+          <h4>4. Execute → Commit → Comment → Close</h4>
+          <p>Agent completes work, commits code, comments results, closes issue</p>
+        </div>
+        <div class="timeline-item">
+          <h4>5. Problem Detection</h4>
+          <p>New issues filed for any problems found during work execution</p>
+        </div>
+        <div class="timeline-item">
+          <h4>6. Quality Review</h4>
+          <p>Gazoo reviews all completed work nightly, grades quality, files improvement issues</p>
+        </div>
+        <div class="timeline-item">
+          <h4>7. Cycle Repeats</h4>
+          <p>Next day starts with new assignments, continuous improvement</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🏷️ Label Convention <span class="badge badge-phase">Standardized</span></h3>
+      <p>Consistent tagging across all repos for routing and automation.</p>
+      <ul>
+        <li><span class="success">Agent labels:</span> bam-bam, pebbles, betty, arnold, dino, mr-slate, wilma, barney, gazoo</li>
+        <li><span class="highlight">Domain labels:</span> testing, design, pipeline, content, infrastructure, business, data-quality, ops, methodology, qa</li>
+        <li><span class="warn">Status labels:</span> sprint-ready, priority:high, priority:low</li>
+      </ul>
+      <div class="note">📝 Labels auto-applied by domain detection logic in assign_stale_issues.py</div>
+    </div>
+
+    <div class="card">
+      <h3>👥 Agent Domains <span class="badge badge-phase">Specialized</span></h3>
+      <p>Each agent has specific expertise areas for automatic assignment routing.</p>
+      <ul>
+        <li><span class="highlight">Bam-Bam:</span> Engineering, testing, pipeline, bugs, enhancements</li>
+        <li><span class="highlight">Pebbles:</span> Visual design, CSS, UI</li>
+        <li><span class="highlight">Betty:</span> Content, copy, documentation</li>
+        <li><span class="highlight">Arnold:</span> Data processing, intelligence</li>
+        <li><span class="highlight">Dino:</span> Infrastructure, project management</li>
+        <li><span class="highlight">Mr. Slate:</span> Business strategy, finance</li>
+        <li><span class="highlight">Wilma:</span> Operations, data quality, orchestration</li>
+        <li><span class="highlight">Barney:</span> Methodology, statistical QA</li>
+        <li><span class="highlight">Gazoo:</span> Quality review, improvement tracking</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>⚙️ Management Scripts <span class="badge badge-critical">Essential Tools</span></h3>
+      <p>Command-line tools for agents and orchestration.</p>
+      <ul>
+        <li><span class="success">~/clawd/scripts/my_issues.py &lt;agent&gt;</span> — "What should I work on?"</li>
+        <li><span class="highlight">~/clawd/scripts/assign_stale_issues.py</span> — Auto-assign unassigned issues >24h</li>
+        <li><span class="highlight">~/clawd/scripts/render_issue_dashboard.py</span> — Generate Discord dashboard</li>
+        <li><span class="warn">~/clawd/scripts/improvement_tracker.py</span> — Gazoo grading and tracking</li>
+      </ul>
+      <div class="note warn-note">⚡ Scripts run on cron schedule. Manual execution available for sprint planning.</div>
+    </div>
+
+    <div class="card">
+      <h3>🧪 Testing & Quality <span class="badge badge-important">Non-Negotiable</span></h3>
+      <p>Quality standards enforced across all projects through automated workflows.</p>
+      <ul>
+        <li><span class="highlight">Test coverage expected:</span> All projects must have test coverage</li>
+        <li><span class="highlight">Test issue routing:</span> `testing` + `sprint-ready` labels for test work</li>
+        <li><span class="success">Bam-Bam ownership:</span> Primary owner of all testing work</li>
+        <li><span class="warn">Gazoo quality review:</span> Nightly review of test quality and coverage</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>💬 Discord Integration <span class="badge badge-phase">Read-Only Mirror</span></h3>
+      <p>Task status reflected in Discord, but GitHub Issues remains the primary system.</p>
+      <ul>
+        <li><span class="highlight">#tasks channel:</span> Read-only dashboard of GitHub Issues status</li>
+        <li><span class="warn">NOT a parallel system:</span> Discord does not create or manage tasks</li>
+        <li><span class="highlight">Auto-refresh:</span> Dashboard updates via cron/Dino sprints</li>
+        <li><span class="success">Transparency:</span> Everyone can see project status without GitHub access</li>
+      </ul>
+      <div class="note green-note">🔄 Discord shows the work, GitHub drives the work</div>
+    </div>
+
+    <div class="card">
+      <h3>📋 Core Principles <span class="badge badge-critical">Non-Negotiable</span></h3>
+      <ul>
+        <li><span class="danger">Assigned issues ALWAYS take priority</span> over self-directed work</li>
+        <li><span class="highlight">Every problem found = new issue filed</span> = feeds the loop</li>
+        <li><span class="success">Never hardcode repo lists</span> — always auto-discover</li>
+        <li><span class="warn">GitHub Issues is the ONLY task management system</span> (no parallel lists)</li>
+        <li><span class="highlight">Quality review is mandatory</span> — Gazoo reviews everything</li>
+        <li><span class="success">Automation over manual processes</span> — scripts handle routing</li>
+      </ul>
+      <div class="note warn-note">⚠️ Breaking these principles leads to system fragmentation and missed work.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 27: STAGE GATES -->
 <!-- ═══════════════════════════════════════════ -->
 <div class="section">
   <div class="section-head">
