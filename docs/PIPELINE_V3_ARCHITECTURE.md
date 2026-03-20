@@ -1,7 +1,9 @@
 # Pipeline v3 — Shadow Pipeline Architecture
 
+> **Status:** IMPLEMENTED — in production since ~March 2026
+> **This document is the DESIGN doc. For current state, see pipeline_v3/ source code.**
+
 > **Author**: Barney (Chief of Pipeline)
-> **Status**: DESIGN — not yet implemented
 > **Goal**: Replace the current pipeline with a cleaner, more reliable, more accurate system
 > **Approach**: Build in shadow mode, compare outputs, swap when validated
 

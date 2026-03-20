@@ -1,13 +1,13 @@
-# 🔭 Competitor Watch — Wednesday, March 18, 2026
+# 🔭 Competitor Watch — Thursday, March 19, 2026
 
 ## 📊 TouringPlans
+- **First Look! The Garden View Lounge- Tea Experience Reopening!** — <https://touringplans.com/blog/first-look-the-garden-view-lounge-tea-experience-reopening/>
+- **Disney & Universal Crowd Calendar Updates: April – June 2026** — <https://touringplans.com/blog/disney-universal-crowd-calendar-updates-april-june-2026/>
 - **How Accurate Are Our Wait-Time Estimates? There’s a Spreadsheet, Of Course.** — <https://touringplans.com/blog/how-accurate-are-our-wait-time-estimates-theres-a-spreadsheet-of-course/>
 - **Universal Orlando Ride Downtime Report for Early 2026** — <https://touringplans.com/blog/universal-orlando-ride-downtime-report-for-early-2026/>
 - **Grand Floridian Merch: Photo Tour** — <https://touringplans.com/blog/grand-floridian-merch-photo-tour/>
 - **Is the Magic Kingdom Testing Roaming Characters?** — <https://touringplans.com/blog/is-the-magic-kingdom-testing-roaming-characters/>
 - **It’s Time to Raise the Curtain on the Muppet Show.. Eggs** — <https://touringplans.com/blog/its-time-to-raise-the-curtain-on-the-muppet-show-eggs/>
-- **Getting to Know – Halloween Horror Nights Premium Scream Night** — <https://touringplans.com/blog/getting-to-know-halloween-horror-nights-premium-scream-night-draft/>
-- **The Best Food from 2026 Disney California Adventure Food & Wine Festival** — <https://touringplans.com/blog/the-best-food-from-2026-disney-california-adventure-food-wine-festival/>
 - *+3 other post(s) (non-crowd-related)*
 
 ## 🎯 Thrill Data
@@ -17,25 +17,25 @@
 - Unable to fetch (Cloudflare protected) — manual check recommended
 
 ## 📰 Theme Park News
-- **Super Nintendo World’s 5th Anniversary Ceremony at Universal Studios Japan** (WDWNT) — <https://wdwnt.com/2026/03/super-nintendo-worlds-5th-anniversary-ceremony-at-universal-studios-japan/>
-- **New Closure Announced for Wilderness Lodge Boat Transportation** (BlogMickey) — <https://blogmickey.com/2026/03/new-closure-announced-for-wilderness-lodge-boat-transportation/>
-- **"The Super Mario Galaxy Movie" Make Guinness World Record Attempt for World's Smallest Popcorn Bucket** (Laughing Place) — <https://www.laughingplace.com/parks/super-mario-galaxy-movie-guinness-world-records/>
-- **Disney Officially Cancels 7 Disney+ Shows Despite Fan Demand** (Inside the Magic) — <https://insidethemagic.net/2026/03/disney-officially-cancels-7-disney-shows-despite-fan-demand-sb1/>
-- **It’s Officially Disney’s Josh D’Amaro Era: New CEO & Leadership Team Takes Over!** (Disney Tourist Blog) — <https://www.disneytouristblog.com/its-officially-disneys-josh-damaro-era-new-ceo-leadership-team-takes-over/>
-- **Universal Orlando Ride Downtime Report for Early 2026** (TouringPlans Blog) — <https://touringplans.com/blog/universal-orlando-ride-downtime-report-for-early-2026/>
-- **Possible Construction at Former Indiana Jones Merchandise Kiosk in Disney’s Hollywood Studios** (WDWNT) — <https://wdwnt.com/2026/03/possible-construction-former-indiana-jones-merchandise-kiosk/>
-- **Grand Floridian Cafe Closing for 3-Month Refurbishment** (BlogMickey) — <https://blogmickey.com/2026/03/grand-floridian-cafe-closing-for-3-month-refurbishment/>
-- **A Whole New World of Food at Disneyland Paris' Reimagined Second Gate** (Laughing Place) — <https://www.laughingplace.com/disney-parks/disney-adventure-world-foodie-guide/>
-- **Disney World Drops 5 NEW Discounts That Are Shifting 2026 Vacations** (Inside the Magic) — <https://insidethemagic.net/2026/03/disney-world-drops-5-new-discounts-that-are-shifting-2026-vacations-sb1/>
+- **BREAKING: Digital Pricing Signs Introduced at Disney Springs at Walt Disney World** (WDWNT) — <https://wdwnt.com/2026/03/breaking-digital-pricing-signs-introduced-at-disney-springs-at-walt-disney-world/>
+- **Early Infrastructure Work Underway for Villains Land at Magic Kingdom** (BlogMickey) — <https://blogmickey.com/2026/03/early-infrastructure-work-underway-for-villains-land/>
+- **Get A Peek Inside the Newly Enhanced Buzz Lightyear's Space Ranger Spin** (Laughing Place) — <https://www.laughingplace.com/disney-parks/buzz-lightyears-space-ranger-spin-inside-look/>
+- **Marvel Just Loaded the New ‘Spider-Man’ Trailer With 9 Major Reveals** (Inside the Magic) — <https://insidethemagic.net/2026/03/marvel-just-loaded-the-new-spider-man-trailer-with-9-major-reveals-sb1/>
+- **Disability Access Service Review Proposal Fails, Only 5% of Disney Shareholders Support** (Disney Tourist Blog) — <https://www.disneytouristblog.com/disability-access-service-review-proposal-fails-5-percent-disney-shareholders-support/>
+- **First Look! The Garden View Lounge- Tea Experience Reopening!** (TouringPlans Blog) — <https://touringplans.com/blog/first-look-the-garden-view-lounge-tea-experience-reopening/>
+- **Restaurantosaurus Trailer Marked for Demolition as Tropical Americas Site Sees Heavy Activity** (WDWNT) — <https://wdwnt.com/2026/03/restaurantosaurus-trailer-marked-for-demolition-as-tropical-americas-site-sees-heavy-activity/>
+- **Sneak Peek Inside Refreshed Buzz Lightyear’s Space Ranger Spin Attraction at Magic Kingdom** (BlogMickey) — <https://blogmickey.com/2026/03/sneak-peek-refreshed-buzz-lightyears-space-ranger-spin/>
+- **Disneyland Paris Celebrates Transformation of Disney Adventure World with Brand New Souvenir Book** (Laughing Place) — <https://www.laughingplace.com/disney-parks/adventure-has-a-new-name-book/>
+- **Disney World: April 8 May End up Being Extremely Disappointing for Magic Kingdom Guests** (Inside the Magic) — <https://insidethemagic.net/2026/03/disney-world-april-8-may-end-up-being-extremely-disappointing-for-magic-kingdom-guests-th1/>
 
 ## 💬 Reddit Mentions
-- **Resort Mug Carrier** (Reddit r/WaltDisneyWorld) — <https://www.reddit.com/r/WaltDisneyWorld/comments/1rx4ep4/resort_mug_carrier/>
-- **Todays park sketches** (Reddit r/Disneyland) — <https://www.reddit.com/r/Disneyland/comments/1rwnp6c/todays_park_sketches/>
-- **“Catching up” with family in single rider?** (Reddit r/Disneyland) — <https://www.reddit.com/r/Disneyland/comments/1rwkcc4/catching_up_with_family_in_single_rider/>
-- **Hot take: stop treating Lightning Lane like a minute-by-minute schedule and plan for the little annoyances** (Reddit r/DisneyPlanning) — <https://www.reddit.com/r/DisneyPlanning/comments/1rw6qxi/hot_take_stop_treating_lightning_lane_like_a/>
-- **My One Day Studios/IOA Experience without Express (3/17/26)** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rx346o/my_one_day_studiosioa_experience_without_express/>
+- **Yall let’s be real 2003-2010 Universal Was One of the best times for rides in the park** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rxb6tp/yall_lets_be_real_20032010_universal_was_one_of/>
+- **Adding or subtracting from magic** (Reddit r/Disneyland) — <https://www.reddit.com/r/Disneyland/comments/1rx8rp3/adding_or_subtracting_from_magic/>
+- **Aventura is dead, why?** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rxn8eu/aventura_is_dead_why/>
+- **Meet and Greet with Vader** (Reddit r/Disneyland) — <https://www.reddit.com/r/Disneyland/comments/1ry2kw1/meet_and_greet_with_vader/>
+- **New team member here** (Reddit r/UniversalOrlando) — <https://www.reddit.com/r/UniversalOrlando/comments/1rxs4bo/new_team_member_here/>
 
 ## 🔍 HazeyData Mentions
 - No mentions found this week
 
-*Report generated 2026-03-18 13:00 ET*
+*Report generated 2026-03-19 13:00 ET*
