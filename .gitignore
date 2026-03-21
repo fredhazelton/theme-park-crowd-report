@@ -90,3 +90,4 @@ data/school_schedules/nces_lea_*.zip
 data/school_schedules/*.json
 data/school_schedules/__pycache__/
 data/school_schedules/daily_calendar.csv.gz
+*.mp3

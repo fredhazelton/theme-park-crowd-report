@@ -62,7 +62,10 @@ class PipelineConfig:
     })
 
     # === WTI ===
-    real_actual_weight: float = 3.5  # TODO: switch to inverse_freq when validated
+    # VALIDATED: Higher real weighting improves accuracy (2026-03-06 experiment)
+    # inverse_freq MAE=6.96 (best), uniform_20 MAE=6.99, uniform_3.5 MAE=7.04
+    # Using 10.0x as practical compromise: simpler than full inverse_freq, most of the benefit
+    real_actual_weight: float = 10.0  # Increased from 3.5 based on weighting experiment
     synthetic_weight: float = 1.0
     wti_min_wait: float = 5.0  # Floor for WTI values
     exclude_fallback_ratio: bool = True
