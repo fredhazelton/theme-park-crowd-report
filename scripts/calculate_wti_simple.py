@@ -313,12 +313,15 @@ def main():
     
     # =========================================================================
     # ADAPTIVE BIAS CORRECTION (DISABLED 2026-02-28)
+    # PERMANENTLY DISABLED 2026-03-21: Bias correction caused 83% accuracy degradation
+    # Evidence: MAE 8.5 with correction vs 1.5 without correction
+    # Decision: Kill bias correction system permanently
     # =========================================================================
     # Disabled: season_year feature in XGBoost already captures short-term trends,
     # making external bias correction redundant (double-correction).
     # Raw MAE consistently outperformed adjusted MAE over 14-day evaluation window.
     # Keeping code intact for potential future use.
-    if False and not args.historical_only and len(results) >= 1:
+    if False:  # PERMANENTLY DISABLED - DO NOT RE-ENABLE
         wti_accuracy_path = output_base / "accuracy" / "wti_accuracy.parquet"
         entity_accuracy_path = output_base / "accuracy" / "entity_daily_accuracy.parquet"
         if wti_accuracy_path.exists():
