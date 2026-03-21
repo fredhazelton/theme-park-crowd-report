@@ -162,6 +162,7 @@ def _train_baseline_model(
     """Train a single 5-feature XGBoost model for one entity."""
 
     entity_df = park_df[park_df["entity_code"] == entity_code].copy()
+    entity_df = entity_df.reset_index(drop=True)  # CRITICAL: align index with position
 
     if len(entity_df) < min_samples:
         return None
@@ -176,26 +177,28 @@ def _train_baseline_model(
         entity_df[col] = pd.to_numeric(entity_df[col], errors="coerce").fillna(0)
     entity_df["actual_time"] = pd.to_numeric(entity_df["actual_time"], errors="coerce")
 
-    X = entity_df[BASELINE_FEATURES].values.astype(np.float32)
-    y = entity_df["actual_time"].values.astype(np.float32)
+    # Build arrays
+    X_all = entity_df[BASELINE_FEATURES].values.astype(np.float32)
+    y_all = entity_df["actual_time"].values.astype(np.float32)
 
     # Filter invalid rows
-    valid = ~np.isnan(y) & (y > 0) & ~np.any(np.isnan(X), axis=1)
-    if valid.sum() < min_samples:
+    valid_mask = ~np.isnan(y_all) & (y_all > 0) & ~np.any(np.isnan(X_all), axis=1)
+    if valid_mask.sum() < min_samples:
         return None
 
-    X = X[valid]
-    y = y[valid]
+    # Apply mask to get clean arrays
+    X = X_all[valid_mask]
+    y = y_all[valid_mask]
 
-    # Geo-decay weights
+    # Geo-decay weights (using the valid rows from the reset-indexed DataFrame)
     today = date.today()
-    park_dates = pd.to_datetime(entity_df.loc[valid.nonzero()[0], "park_date"]).dt.date
-    days_old = np.array([(today - d).days for d in park_dates], dtype=np.float32)
+    valid_dates = pd.to_datetime(entity_df.loc[valid_mask, "park_date"]).dt.date
+    days_old = np.array([(today - d).days for d in valid_dates], dtype=np.float32)
     weights = np.float32(0.5) ** (days_old / cfg.geo_decay_halflife_days)
 
     # Synthetic weighting: real actuals get higher weight
     if "is_synthetic" in entity_df.columns:
-        is_synth = entity_df.loc[valid.nonzero()[0], "is_synthetic"].values.astype(bool)
+        is_synth = entity_df.loc[valid_mask, "is_synthetic"].values.astype(bool)
         real_weight = getattr(cfg, "real_actual_weight", 10.0)
         synth_weight = getattr(cfg, "synthetic_weight", 1.0)
         weights = weights * np.where(is_synth, synth_weight, real_weight)
