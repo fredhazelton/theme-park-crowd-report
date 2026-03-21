@@ -23,12 +23,12 @@ try:
 except ImportError:
     xgb = None
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.core.park_codes import entity_to_park
-from pipeline_v3.core.validation import ValidationError
-from pipeline_v3.models.model_selector import train_best_model
-from pipeline_v3.models.synthetic_scorer import score_synthetic_quality
+from pipeline.config import PipelineConfig
+from pipeline.core.logging import PipelineLogger
+from pipeline.core.park_codes import entity_to_park
+from pipeline.core.validation import ValidationError
+from pipeline.models.model_selector import train_best_model
+from pipeline.models.synthetic_scorer import score_synthetic_quality
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:

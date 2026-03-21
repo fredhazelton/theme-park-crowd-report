@@ -30,7 +30,7 @@ try:
 except ImportError:
     xgb = None
 
-from pipeline_v3.config import PipelineConfig
+from pipeline.config import PipelineConfig
 
 # Candidate feature sets
 CANDIDATES = {

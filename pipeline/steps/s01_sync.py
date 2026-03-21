@@ -11,8 +11,8 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.logging import PipelineLogger
+from pipeline.config import PipelineConfig
+from pipeline.core.logging import PipelineLogger
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:

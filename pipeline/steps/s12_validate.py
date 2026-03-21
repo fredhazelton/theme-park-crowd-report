@@ -15,9 +15,9 @@ from __future__ import annotations
 
 import pandas as pd
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.core.validation import (
+from pipeline.config import PipelineConfig
+from pipeline.core.logging import PipelineLogger
+from pipeline.core.validation import (
     ValidationError,
     require_file,
     require_parquet_rows,

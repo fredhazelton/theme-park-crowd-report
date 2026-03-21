@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Benchmark script to profile where forecast time is spent.
 
-Run: python3 pipeline_v3/bench_forecast.py --output-base /home/wilma/hazeydata/pipeline
+Run: python3 pipeline/bench_forecast.py --output-base /home/wilma/hazeydata/pipeline
 """
 
 import argparse
@@ -13,10 +13,10 @@ import sys
 if str(Path(__file__).parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pipeline_v3.config import load_config
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.core.park_codes import PARK_TIMEZONE, entity_to_park
-from pipeline_v3.steps.s08_forecast import (
+from pipeline.config import load_config
+from pipeline.core.logging import PipelineLogger
+from pipeline.core.park_codes import PARK_TIMEZONE, entity_to_park
+from pipeline.steps.s08_forecast import (
     _load_date_features, _load_park_hours, _load_aggregates_df,
     _load_entity_list, _load_operating_calendar, _load_fallback_ratios,
     _generate_park_time_grid, _forecast_entity_vectorized,

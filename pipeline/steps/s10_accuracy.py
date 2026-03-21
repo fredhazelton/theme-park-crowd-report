@@ -28,9 +28,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.db import read_connection
-from pipeline_v3.core.logging import PipelineLogger
+from pipeline.config import PipelineConfig
+from pipeline.core.db import read_connection
+from pipeline.core.logging import PipelineLogger
 
 
 def _extract_date(filename: str) -> str | None:

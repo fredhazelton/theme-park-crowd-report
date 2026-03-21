@@ -37,11 +37,11 @@ try:
 except ImportError:
     xgb = None
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.db import read_connection
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.core.park_codes import PARK_TIMEZONE, entity_to_park
-from pipeline_v3.core.validation import ValidationError, require_file
+from pipeline.config import PipelineConfig
+from pipeline.core.db import read_connection
+from pipeline.core.logging import PipelineLogger
+from pipeline.core.park_codes import PARK_TIMEZONE, entity_to_park
+from pipeline.core.validation import ValidationError, require_file
 
 # Feature columns by model type
 FEATURES_ACTUALS = [

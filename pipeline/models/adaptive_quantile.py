@@ -7,7 +7,7 @@ per park from recent accuracy data. Parks where mapping helps get more
 stretch; parks where it hurts get less.
 
 Usage:
-    from pipeline_v3.models.adaptive_quantile import optimize_stretch_factors
+    from pipeline.models.adaptive_quantile import optimize_stretch_factors
     factors = optimize_stretch_factors(cfg, log)
     # factors = {"MK": 1.5, "TDL": 2.0, "IA": 1.1, ...}
 """
@@ -20,9 +20,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.db import read_connection
-from pipeline_v3.core.logging import PipelineLogger
+from pipeline.config import PipelineConfig
+from pipeline.core.db import read_connection
+from pipeline.core.logging import PipelineLogger
 
 
 def optimize_stretch_factors(

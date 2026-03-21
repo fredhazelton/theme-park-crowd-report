@@ -1,10 +1,10 @@
 """Compare v3 WTI output against production WTI.
 
 Usage:
-    python -m pipeline_v3.shadow.compare_wti
+    python -m pipeline.shadow.compare_wti
 
 Reads:
-    - pipeline_v3 WTI: wti/wti_v3.parquet
+    - pipeline WTI: wti/wti_v3.parquet
     - Production WTI:   wti/wti.parquet
 
 Outputs:
@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from pipeline_v3.config import load_config
+from pipeline.config import load_config
 
 
 def compare(output_base: Path | None = None) -> dict:

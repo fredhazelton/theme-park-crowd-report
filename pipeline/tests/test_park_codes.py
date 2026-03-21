@@ -4,7 +4,7 @@ The USH→UH bug of 2026-03-07 happened because someone rolled their own.
 These tests ensure the canonical mapping stays correct.
 """
 
-from pipeline_v3.core.park_codes import entity_to_park, park_code_sql
+from pipeline.core.park_codes import entity_to_park, park_code_sql
 
 
 def test_standard_parks():

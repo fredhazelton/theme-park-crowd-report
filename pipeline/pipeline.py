@@ -2,11 +2,11 @@
 """Pipeline v3 — Single entry point.
 
 Usage:
-    python pipeline_v3/pipeline.py                        # Full run
-    python pipeline_v3/pipeline.py --shadow               # Shadow mode
-    python pipeline_v3/pipeline.py --step s09_wti         # Single step
-    python pipeline_v3/pipeline.py --step s07_training --park MK  # Single park
-    python pipeline_v3/pipeline.py --output-base /path    # Custom output
+    python pipeline/pipeline.py                        # Full run
+    python pipeline/pipeline.py --shadow               # Shadow mode
+    python pipeline/pipeline.py --step s09_wti         # Single step
+    python pipeline/pipeline.py --step s07_training --park MK  # Single park
+    python pipeline/pipeline.py --output-base /path    # Custom output
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from datetime import date, datetime, timezone
 from importlib import import_module
 from pathlib import Path
 
-# Ensure pipeline_v3 and src/ are importable
+# Ensure pipeline and src/ are importable
 _repo_root = str(Path(__file__).parent.parent)
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
@@ -27,11 +27,11 @@ _src_dir = str(Path(__file__).parent.parent / "src")
 if _src_dir not in sys.path:
     sys.path.insert(0, _src_dir)
 
-from pipeline_v3.config import load_config
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.core.metrics import PipelineMetrics
-from pipeline_v3.core.paths import log_events_path
-from pipeline_v3.steps import STEP_ORDER
+from pipeline.config import load_config
+from pipeline.core.logging import PipelineLogger
+from pipeline.core.metrics import PipelineMetrics
+from pipeline.core.paths import log_events_path
+from pipeline.steps import STEP_ORDER
 
 # v3→legacy bridge: keep pipeline_status.json updated for monitoring scripts
 try:
@@ -126,7 +126,7 @@ def main():
         metrics.start_step(step_name)
 
         try:
-            module = import_module(f"pipeline_v3.steps.{step_name}")
+            module = import_module(f"pipeline.steps.{step_name}")
             if not hasattr(module, "run"):
                 log.warning(f"Step {step_name} has no run() function — skipping")
                 metrics.skip_step(step_name, "no run() function")

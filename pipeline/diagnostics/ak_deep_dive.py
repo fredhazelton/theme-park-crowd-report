@@ -6,9 +6,9 @@ Traces every entity through each pipeline filtering step to identify where
 attractions get dropped, misclassified, or suppressed.
 
 Usage:
-    python3 pipeline_v3/diagnostics/ak_deep_dive.py \
+    python3 pipeline/diagnostics/ak_deep_dive.py \
         --output-base /home/wilma/hazeydata/pipeline
-    python3 pipeline_v3/diagnostics/ak_deep_dive.py --park UH
+    python3 pipeline/diagnostics/ak_deep_dive.py --park UH
 
 Outputs:
     - Console report with all findings

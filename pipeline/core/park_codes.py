@@ -3,7 +3,7 @@
 Import from here. Never roll your own. The USH→UH bug of 2026-03-07
 happened because entity_wti_diagnostics.py had its own version.
 
-This is a copy of src/utils/park_code.py, kept in pipeline_v3 to avoid
+This is a copy of src/utils/park_code.py, kept in pipeline to avoid
 cross-package imports. If the canonical mapping changes, update BOTH.
 """
 

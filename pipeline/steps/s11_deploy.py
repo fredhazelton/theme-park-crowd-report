@@ -10,9 +10,9 @@ from __future__ import annotations
 
 import pandas as pd
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.db import write_connection
-from pipeline_v3.core.logging import PipelineLogger
+from pipeline.config import PipelineConfig
+from pipeline.core.db import write_connection
+from pipeline.core.logging import PipelineLogger
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
@@ -47,7 +47,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 """)
                 con.execute("""
                     INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
-                    VALUES ('wti', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM wti), 'pipeline_v3')
+                    VALUES ('wti', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM wti), 'pipeline')
                 """)
             log.info(f"WTI deployed: {len(wti_df):,} rows")
     else:
@@ -82,7 +82,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 """)
                 con.execute("""
                     INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
-                    VALUES ('forecasts', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM forecasts), 'pipeline_v3')
+                    VALUES ('forecasts', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM forecasts), 'pipeline')
                 """)
             log.info(f"Forecasts deployed: {len(fc_df):,} rows")
             del fc_df

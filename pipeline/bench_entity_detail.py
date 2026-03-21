@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Detailed per-operation benchmark for a single entity forecast.
 
-Run: python3 pipeline_v3/bench_entity_detail.py --output-base /home/wilma/hazeydata/pipeline
+Run: python3 pipeline/bench_entity_detail.py --output-base /home/wilma/hazeydata/pipeline
 """
 
 import argparse
@@ -17,9 +17,9 @@ import xgboost as xgb
 if str(Path(__file__).parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pipeline_v3.config import load_config
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.steps.s08_forecast import (
+from pipeline.config import load_config
+from pipeline.core.logging import PipelineLogger
+from pipeline.steps.s08_forecast import (
     _load_date_features, _load_park_hours, _load_aggregates_df,
     _load_operating_calendar, _generate_park_time_grid,
 )

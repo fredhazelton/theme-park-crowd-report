@@ -7,7 +7,7 @@ where both exist for the same time slots. Entities with |bias| > threshold
 should be trained on real_only data.
 
 Usage:
-    from pipeline_v3.models.synthetic_scorer import score_synthetic_quality
+    from pipeline.models.synthetic_scorer import score_synthetic_quality
     scores = score_synthetic_quality(cfg, log)
     # scores = {"MK01": {"bias": 1.2, "use_synthetic": True}, ...}
 """
@@ -19,9 +19,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.db import read_connection
-from pipeline_v3.core.logging import PipelineLogger
+from pipeline.config import PipelineConfig
+from pipeline.core.db import read_connection
+from pipeline.core.logging import PipelineLogger
 
 
 def score_synthetic_quality(

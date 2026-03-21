@@ -8,7 +8,7 @@ This is the synergy between hazeydata's two products:
 - Better crowd predictions validate school calendar data's value
 
 Usage in training:
-    from pipeline_v3.models.school_calendar_feature import enrich_with_school_calendar
+    from pipeline.models.school_calendar_feature import enrich_with_school_calendar
     entity_df = enrich_with_school_calendar(entity_df, cfg)
     # Now entity_df has 'pct_on_break' and 'is_break_season' columns
 
@@ -26,7 +26,7 @@ from functools import lru_cache
 import pandas as pd
 import numpy as np
 
-from pipeline_v3.config import PipelineConfig
+from pipeline.config import PipelineConfig
 
 
 # Where to find the school calendar data

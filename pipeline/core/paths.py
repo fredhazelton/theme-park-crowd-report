@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pipeline_v3.config import PipelineConfig
+from pipeline.config import PipelineConfig
 
 
 def entity_model_dir(cfg: PipelineConfig, entity_code: str) -> Path:

@@ -126,7 +126,7 @@ class PipelineConfig:
         self.prod_output_base = prod_base
 
         if self.shadow:
-            shadow_base = self.shadow_output_base or (prod_base.parent / "pipeline_v3_shadow")
+            shadow_base = self.shadow_output_base or (prod_base.parent / "pipeline_shadow")
             self.shadow_output_base = shadow_base
         else:
             shadow_base = None

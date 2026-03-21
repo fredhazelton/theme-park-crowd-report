@@ -23,7 +23,7 @@ class PipelineLogger:
         self._start_time = time.time()
 
         # Standard Python logger for human-readable output
-        self.logger = logging.getLogger(f"pipeline_v3.{step_name}")
+        self.logger = logging.getLogger(f"pipeline.{step_name}")
         if not self.logger.handlers:
             handler = logging.StreamHandler(sys.stdout)
             handler.setFormatter(

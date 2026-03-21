@@ -8,9 +8,9 @@ Post-swap: runs dimension fetch scripts.
 
 from __future__ import annotations
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.core.validation import require_file
+from pipeline.config import PipelineConfig
+from pipeline.core.logging import PipelineLogger
+from pipeline.core.validation import require_file
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:

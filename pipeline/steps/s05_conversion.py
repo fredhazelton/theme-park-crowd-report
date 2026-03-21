@@ -46,11 +46,11 @@ try:
 except ImportError:
     xgb = None
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.db import read_connection
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.core.paths import conversion_model_path, conversion_model_backup_path
-from pipeline_v3.core.validation import ValidationError
+from pipeline.config import PipelineConfig
+from pipeline.core.db import read_connection
+from pipeline.core.logging import PipelineLogger
+from pipeline.core.paths import conversion_model_path, conversion_model_backup_path
+from pipeline.core.validation import ValidationError
 
 TIME_EPOCH = date(2015, 1, 1)
 
