@@ -1,10 +1,26 @@
-"""Step 9: WTI Calculation — v4 with adaptive quantile mapping.
+"""Step 9: WTI Calculation — V4 Pure Aggregation.
+
+=== V4 DESIGN PRINCIPLE: NO POST-PROCESSING ===
+
+Quantile mapping, adaptive stretch factors, and all other post-processing 
+techniques have been REMOVED in V4. 
+
+RATIONALE:
+- Post-processing is a challenger hypothesis, not a production feature
+- WTI becomes pure aggregation: simple average of predicted_actual per park per day
+- No distribution stretching, no bias adjustment, no quantile mapping
+- Clean separation between prediction (steps 1-8) and aggregation (step 9)
+- Easier to debug, understand, and maintain
+
+V4 WTI = AVG(predicted_actual) grouped by (park_code, park_date)
+
+Historical note: V3 had adaptive quantile mapping with per-park stretch factors.
+This was removed 2026-03-21 as part of Pipeline V4 restructure.
+
+=== END V4 DESIGN PRINCIPLE ===
 
 v3.2 fix: removed legacy fallback to all_forecasts.parquet (v2 file).
 Only reads all_forecasts_v3.parquet now.
-
-v4: Per-park stretch factors optimized from historical accuracy (Pillar 3).
-Stretch candidates capped at 1.5x.
 """
 
 from __future__ import annotations
@@ -12,28 +28,22 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from pipeline_v3.config import PipelineConfig
-from pipeline_v3.core.db import read_connection
-from pipeline_v3.core.logging import PipelineLogger
-from pipeline_v3.core.park_codes import park_code_sql
-from pipeline_v3.core.validation import require_file, require_parquet_rows
-from pipeline_v3.models.adaptive_quantile import optimize_stretch_factors
+from pipeline.config import PipelineConfig
+from pipeline.core.db import read_connection
+from pipeline.core.logging import PipelineLogger
+from pipeline.core.park_codes import park_code_sql
+from pipeline.core.validation import require_file, require_parquet_rows
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
-    """Calculate WTI from forecasts and historical actuals."""
+    """Calculate WTI from forecasts and historical actuals - V4 Pure Aggregation."""
 
     log.info("=" * 60)
-    log.info("STEP 9: WTI CALCULATION (v4 — adaptive quantile mapping)")
+    log.info("STEP 9: WTI CALCULATION (V4 — Pure Aggregation)")
     log.info("=" * 60)
 
     results = []
     pc_sql = park_code_sql("entity_code")
-
-    # === Pillar 3: Optimize per-park stretch factors ===
-    with log.timed("optimize quantile mapping stretch factors"):
-        stretch_factors = optimize_stretch_factors(cfg, log)
-    log.info(f"Per-park stretch factors: {stretch_factors}")
 
     # Historical WTI
     with log.timed("historical WTI"):
@@ -47,10 +57,8 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     else:
         log.warning(f"No v3 forecast file at {forecast_file} — forecast WTI skipped")
 
-    # Adaptive quantile mapping with per-park stretch factors
-    if cfg.quantile_mapping and len(results) >= 2:
-        with log.timed("adaptive quantile mapping"):
-            results = _apply_adaptive_quantile_mapping(cfg, log, results, stretch_factors)
+    # V4: NO POST-PROCESSING - Pure aggregation only
+    log.info("V4: No quantile mapping, stretch factors, or post-processing applied")
 
     # Combine and save
     if not results or all(r is None for r in results):
@@ -206,64 +214,6 @@ def _compute_forecast_wti(
     return df
 
 
-def _apply_adaptive_quantile_mapping(
-    cfg: PipelineConfig,
-    log: PipelineLogger,
-    results: list[pd.DataFrame],
-    stretch_factors: dict[str, float],
-) -> list[pd.DataFrame]:
-    """Quantile mapping with per-park adaptive stretch factors (Pillar 3)."""
-    from scipy import stats
-
-    historical = [df for df in results if df is not None and (df["source"] == "historical").any()]
-    forecast_idx = [i for i, df in enumerate(results) if df is not None and (df["source"] == "forecast").any()]
-
-    if not historical or not forecast_idx:
-        log.info("Quantile mapping skipped — missing data")
-        return results
-
-    hist_combined = pd.concat(historical, ignore_index=True)
-    hist_combined = hist_combined[hist_combined["source"] == "historical"]
-    default_stretch = cfg.quantile_mapping_max_stretch
-    parks_mapped = 0
-    total_capped = 0
-
-    for idx in forecast_idx:
-        df = results[idx]
-        forecast_mask = df["source"] == "forecast"
-
-        for park_code in df.loc[forecast_mask, "park_code"].unique():
-            park_hist = hist_combined[hist_combined["park_code"] == park_code]["wti"].values
-            if len(park_hist) < 30:
-                continue
-
-            park_mask = forecast_mask & (df["park_code"] == park_code)
-            forecast_vals = df.loc[park_mask, "wti"].values
-            if len(forecast_vals) == 0:
-                continue
-
-            # Per-park stretch factor (v4 adaptive)
-            max_stretch = stretch_factors.get(park_code, default_stretch)
-
-            percentiles = stats.rankdata(forecast_vals, method="average") / len(forecast_vals)
-            clamped = np.clip(percentiles * 100, 1.0, 99.0)
-            mapped = np.percentile(park_hist, clamped)
-
-            original = forecast_vals
-            stretch = np.where(original > 0, mapped / original, 1.0)
-            capped = np.where(
-                np.abs(stretch) > max_stretch,
-                original * np.sign(stretch) * max_stretch,
-                mapped,
-            )
-
-            n_capped = int(np.sum(np.abs(stretch) > max_stretch))
-            if n_capped > 0:
-                log.info(f"  {park_code}: {n_capped} values capped at {max_stretch}x")
-                total_capped += n_capped
-
-            results[idx].loc[park_mask, "wti"] = np.round(capped, 1)
-            parks_mapped += 1
-
-    log.info(f"Adaptive quantile mapping: {parks_mapped} parks, {total_capped} values capped")
-    return results
+# V4: _apply_adaptive_quantile_mapping function REMOVED
+# This function contained all the quantile mapping and stretch factor logic
+# Removed 2026-03-21 as part of Pipeline V4 Pure Aggregation restructure
