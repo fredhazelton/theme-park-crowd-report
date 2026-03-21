@@ -227,47 +227,62 @@ def _train_baseline_model(
         "verbosity": 0,
     }
 
-    bst = xgb.train(
-        params, dtrain,
-        num_boost_round=cfg.training_rounds,
-        evals=[(dtrain, "train"), (dval, "eval")],
-        early_stopping_rounds=cfg.training_early_stopping,
-        verbose_eval=False,
-    )
+    try:
+        bst = xgb.train(
+            params, dtrain,
+            num_boost_round=cfg.training_rounds,
+            evals=[(dtrain, "train"), (dval, "eval")],
+            early_stopping_rounds=cfg.training_early_stopping,
+            verbose_eval=False,
+        )
 
-    # Evaluate
-    pred = bst.predict(dval)
-    mae = float(np.mean(np.abs(y_val - pred)))
-    best_trees = getattr(bst, "best_iteration", cfg.training_rounds)
+        # Evaluate
+        pred = bst.predict(dval)
+        mae = float(np.mean(np.abs(y_val - pred)))
+        best_trees = getattr(bst, "best_iteration", cfg.training_rounds)
 
-    # Save model
-    model_dir = cfg.models_dir / entity_code
-    model_dir.mkdir(parents=True, exist_ok=True)
+        # Save model
+        model_dir = cfg.models_dir / entity_code
+        model_dir.mkdir(parents=True, exist_ok=True)
 
-    model_path = model_dir / "model_v3.json"
-    bst.save_model(str(model_path))
+        model_path = model_dir / "model_v3.json"
+        bst.save_model(str(model_path))
 
-    metadata = {
-        "model_label": "BASELINE",
-        "entity_code": entity_code,
-        "trained_at": datetime.now(timezone.utc).isoformat(),
-        "n_train": split,
-        "n_val": n - split,
-        "n_total": n,
-        "mae": round(mae, 3),
-        "best_trees": best_trees,
-        "features": BASELINE_FEATURES,
-        "uses_geo_decay_weights": True,
-        "geo_decay_halflife_days": cfg.geo_decay_halflife_days,
-        "backend": "Python xgboost",
-        "hyperparameters": params,
-        "version": "v4_baseline",
-    }
-    meta_path = model_dir / "metadata_v3.json"
-    with open(meta_path, "w") as f:
-        json.dump(metadata, f, indent=2, default=str)
+        metadata = {
+            "model_label": "BASELINE",
+            "entity_code": entity_code,
+            "trained_at": datetime.now(timezone.utc).isoformat(),
+            "n_train": split,
+            "n_val": n - split,
+            "n_total": n,
+            "mae": round(mae, 3),
+            "best_trees": best_trees,
+            "features": BASELINE_FEATURES,
+            "uses_geo_decay_weights": True,
+            "geo_decay_halflife_days": cfg.geo_decay_halflife_days,
+            "backend": "Python xgboost",
+            "hyperparameters": params,
+            "version": "v4_baseline",
+        }
+        meta_path = model_dir / "metadata_v3.json"
+        with open(meta_path, "w") as f:
+            json.dump(metadata, f, indent=2, default=str)
 
-    return {"mae": mae, "n_samples": split, "best_trees": best_trees}
+        result = {"mae": mae, "n_samples": split, "best_trees": best_trees}
+        
+    finally:
+        # Critical cleanup: prevent memory leaks in multi-entity training
+        del dtrain
+        del dval  
+        if 'bst' in locals():
+            del bst
+        if 'pred' in locals():
+            del pred
+        # Clean up large arrays
+        del X_all, y_all, X, y, weights
+        del entity_df
+        
+    return result
 
 
 def _scan_entity_counts(parquet_files: list[Path]) -> dict[str, int]:
