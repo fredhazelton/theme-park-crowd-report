@@ -38,40 +38,40 @@
             "emoji": "\ud83d\udd04",
             "event": "Conversion model retrain",
             "date": "Mar 23",
-            "days_out": 3,
+            "days_out": 2,
             "urgency": ""
         }
     ],
     "pipeline_status": {
         "etl": {
-            "status": "pending",
+            "status": "error",
             "label": "S3 ETL",
-            "detail": "Awaiting 6 AM run"
+            "detail": "1,713 entities tracked"
         },
         "forecasts": {
-            "status": "pending",
+            "status": "done",
             "label": "Forecasts",
-            "detail": "Awaiting 6 AM run"
+            "detail": "23,469,851 rows, 9 MB"
         },
         "wti": {
-            "status": "pending",
+            "status": "done",
             "label": "WTI",
-            "detail": "Awaiting 6 AM run"
+            "detail": "54,705 park-dates"
         },
         "live_waits": {
-            "status": "pending",
+            "status": "done",
             "label": "Live Waits",
-            "detail": "Awaiting 6 AM run"
+            "detail": ""
         },
         "discord_bot": {
-            "status": "pending",
+            "status": "done",
             "label": "Discord Bot",
-            "detail": "Awaiting 6 AM run"
+            "detail": ""
         },
         "daily_report": {
-            "status": "pending",
+            "status": "done",
             "label": "Daily Report",
-            "detail": "Awaiting 6 AM run"
+            "detail": "Completed today"
         }
     },
     "accuracy": {
@@ -79,8 +79,8 @@
         "entity_bias": "+1.4 min",
         "overall_rmse": "9.8",
         "wti_mae": "6.7",
-        "wti_bias": "0.0",
-        "days_evaluated": 37
+        "wti_bias": "-0.2",
+        "days_evaluated": 38
     },
     "ask_analytics": {
         "total_questions": 105,
@@ -115,10 +115,10 @@
         ],
         "disk_main_pct": 7,
         "disk_data_pct": 21,
-        "db_entities": 1710,
+        "db_entities": 1713,
         "db_forecasts": 23469851,
-        "db_live_waits": 124408608,
+        "db_live_waits": 124493555,
         "db_wti": 54705
     },
-    "last_updated": "2026-03-20T17:01:14.814431"
+    "last_updated": "2026-03-21T08:16:50.309440"
 }
