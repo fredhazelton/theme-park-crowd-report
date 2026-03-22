@@ -9,8 +9,8 @@ Usage (standalone):
     .venv/bin/python -m pipeline.steps.s13_report
     .venv/bin/python -m pipeline.steps.s13_report --output-base /path/to/pipeline
 
-Usage (from Wilma's post-run cron):
-    7 7 * * * cd /home/wilma/theme-park-crowd-report && .venv/bin/python -m pipeline.steps.s13_report --output-base /home/wilma/hazeydata/pipeline
+Usage (from Wilma's post-run cron — with Discord posting):
+    7 7 * * * cd /home/wilma/theme-park-crowd-report && .venv/bin/python -m pipeline.steps.s13_report --output-base /home/wilma/hazeydata/pipeline --post-discord
 
 Output:
     {logs_dir}/pipeline_report_{date}.md — formatted report for Discord posting
@@ -25,10 +25,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import urllib.request
+import urllib.error
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+
+# #pipeline channel ID
+PIPELINE_CHANNEL_ID = "1479351574177513576"
+
+# Discord API base
+DISCORD_API = "https://discord.com/api/v10"
 
 # Human-readable step names for the report
 STEP_DISPLAY_NAMES = {
@@ -193,7 +202,127 @@ def _build_report(metrics: dict, accuracy: dict) -> str:
     return "\n".join(lines)
 
 
-def run_report(output_base: Path) -> str | None:
+# ---------------------------------------------------------------------------
+# Discord posting — uses bot token directly, no external dependencies
+# ---------------------------------------------------------------------------
+
+def _load_bot_token() -> str | None:
+    """Load DISCORD_BOT_TOKEN from ~/.env or environment."""
+    token = os.environ.get("DISCORD_BOT_TOKEN")
+    if token:
+        return token.strip()
+
+    env_path = Path.home() / ".env"
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line.startswith("DISCORD_BOT_TOKEN="):
+                return line.split("=", 1)[1].strip().strip("'\"")
+    return None
+
+
+def _discord_api(method: str, endpoint: str, token: str, payload: dict | None = None) -> dict | None:
+    """Make a Discord REST API call. Returns parsed JSON or None."""
+    url = f"{DISCORD_API}{endpoint}"
+    headers = {
+        "Authorization": f"Bot {token}",
+        "Content-Type": "application/json",
+    }
+    data = json.dumps(payload).encode() if payload else None
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req) as resp:
+            body = resp.read()
+            if body:
+                return json.loads(body)
+            return {}
+    except urllib.error.HTTPError as e:
+        print(f"Discord API error: {e.code} {e.reason}")
+        try:
+            print(f"  Body: {e.read().decode()[:500]}")
+        except Exception:
+            pass
+        return None
+
+
+def _unpin_previous_reports(token: str, channel_id: str) -> None:
+    """Unpin any previous pipeline run reports in the channel."""
+    pins = _discord_api("GET", f"/channels/{channel_id}/pins", token)
+    if not pins or not isinstance(pins, list):
+        return
+    for msg in pins:
+        content = msg.get("content", "")
+        if "PIPELINE RUN REPORT" in content:
+            msg_id = msg["id"]
+            print(f"  Unpinning previous report (message {msg_id})")
+            _discord_api("DELETE", f"/channels/{channel_id}/pins/{msg_id}", token)
+
+
+def _post_and_pin(report: str, token: str, channel_id: str) -> bool:
+    """Post the report to Discord and pin it. Returns True on success."""
+    # Discord message limit is 2000 chars. Report is designed to fit,
+    # but split gracefully if it ever grows.
+    chunks = []
+    if len(report) <= 2000:
+        chunks = [report]
+    else:
+        # Split on double-newlines (section breaks) to keep formatting
+        sections = report.split("\n\n")
+        current = ""
+        for section in sections:
+            candidate = f"{current}\n\n{section}" if current else section
+            if len(candidate) > 1950:
+                if current:
+                    chunks.append(current)
+                current = section
+            else:
+                current = candidate
+        if current:
+            chunks.append(current)
+
+    first_msg_id = None
+    for i, chunk in enumerate(chunks):
+        result = _discord_api("POST", f"/channels/{channel_id}/messages", token, {"content": chunk})
+        if result is None:
+            print(f"Failed to post message chunk {i + 1}")
+            return False
+        if i == 0:
+            first_msg_id = result.get("id")
+            print(f"  Posted report to #{channel_id} (message {first_msg_id})")
+
+    # Unpin previous reports, then pin today's
+    if first_msg_id:
+        _unpin_previous_reports(token, channel_id)
+        pin_result = _discord_api("PUT", f"/channels/{channel_id}/pins/{first_msg_id}", token)
+        if pin_result is not None:
+            print(f"  Pinned message {first_msg_id}")
+        else:
+            print(f"  Warning: failed to pin message {first_msg_id}")
+
+    return True
+
+
+def post_to_discord(report: str) -> bool:
+    """Post the pipeline run report to #pipeline and pin it.
+
+    Loads the bot token from ~/.env or DISCORD_BOT_TOKEN env var.
+    Unpins any previous pipeline reports before pinning today's.
+    Returns True on success, False on failure.
+    """
+    token = _load_bot_token()
+    if not token:
+        print("DISCORD_BOT_TOKEN not found in ~/.env or environment — skipping Discord post")
+        return False
+
+    print(f"Posting report to #pipeline ({PIPELINE_CHANNEL_ID})...")
+    return _post_and_pin(report, token, PIPELINE_CHANNEL_ID)
+
+
+# ---------------------------------------------------------------------------
+# Main entry points
+# ---------------------------------------------------------------------------
+
+def run_report(output_base: Path, post_discord: bool = False) -> str | None:
     """Generate the Pipeline Run Report. Returns the report text, or None on failure."""
     from pipeline.config import load_config
 
@@ -221,6 +350,10 @@ def run_report(output_base: Path) -> str | None:
     print(f"Report saved: {report_path}")
     print()
     print(report)
+
+    # Post to Discord if requested
+    if post_discord:
+        post_to_discord(report)
 
     return report
 
@@ -260,7 +393,11 @@ if __name__ == "__main__":
         default=Path("/home/wilma/hazeydata/pipeline"),
         help="Pipeline output base directory",
     )
+    parser.add_argument(
+        "--post-discord", action="store_true",
+        help="Post the report to #pipeline and pin it",
+    )
     args = parser.parse_args()
 
-    result = run_report(args.output_base)
+    result = run_report(args.output_base, post_discord=args.post_discord)
     sys.exit(0 if result else 1)
