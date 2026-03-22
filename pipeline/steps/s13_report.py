@@ -1,7 +1,7 @@
-"""Pipeline Run Report — standalone post-run script.
+"""WTI Pipeline Run Report — standalone post-run script.
 
 Generates a structured run report from pipeline metrics and accuracy data.
-Runs AFTER the pipeline completes so it has access to the full metrics JSON
+Runs AFTER the WTI pipeline completes so it has access to the full metrics JSON
 including step timings, row counts, and pass/fail status.
 
 When metrics data is incomplete (missing steps), the report falls back to
@@ -37,8 +37,8 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 
-# #pipeline channel ID
-PIPELINE_CHANNEL_ID = "1479351574177513576"
+# #wti-pipeline channel ID (formerly #pipeline)
+WTI_PIPELINE_CHANNEL_ID = "1479351574177513576"
 
 # Discord API base
 DISCORD_API = "https://discord.com/api/v10"
@@ -175,7 +175,7 @@ def _build_report(metrics: dict, accuracy: dict, output_base: Path | None = None
 
     status_icon = "\u2705 COMPLETE" if status == "done" else "\u274c FAILED"
     lines = []
-    lines.append(f"\U0001f4ca **PIPELINE RUN REPORT \u2014 {run_date}**")
+    lines.append(f"\U0001f4ca **WTI PIPELINE RUN REPORT \u2014 {run_date}**")
     lines.append("")
     lines.append(f"**Status:** {status_icon} ({_format_duration(total_sec)})")
     lines.append("")
@@ -333,6 +333,7 @@ def _unpin_previous_reports(token: str, channel_id: str) -> None:
         return
     for msg in pins:
         content = msg.get("content", "")
+        # Match both old "PIPELINE RUN REPORT" and new "WTI PIPELINE RUN REPORT"
         if "PIPELINE RUN REPORT" in content:
             msg_id = msg["id"]
             print(f"  Unpinning previous report (message {msg_id})")
@@ -366,7 +367,7 @@ def _post_and_pin(report: str, token: str, channel_id: str) -> bool:
             return False
         if i == 0:
             first_msg_id = result.get("id")
-            print(f"  Posted report to #{channel_id} (message {first_msg_id})")
+            print(f"  Posted report to #wti-pipeline (message {first_msg_id})")
 
     if first_msg_id:
         _unpin_previous_reports(token, channel_id)
@@ -380,14 +381,14 @@ def _post_and_pin(report: str, token: str, channel_id: str) -> bool:
 
 
 def post_to_discord(report: str) -> bool:
-    """Post the pipeline run report to #pipeline and pin it."""
+    """Post the WTI pipeline run report to #wti-pipeline and pin it."""
     token = _load_bot_token()
     if not token:
         print("DISCORD_BOT_TOKEN not found in ~/.env or environment — skipping Discord post")
         return False
 
-    print(f"Posting report to #pipeline ({PIPELINE_CHANNEL_ID})...")
-    return _post_and_pin(report, token, PIPELINE_CHANNEL_ID)
+    print(f"Posting report to #wti-pipeline ({WTI_PIPELINE_CHANNEL_ID})...")
+    return _post_and_pin(report, token, WTI_PIPELINE_CHANNEL_ID)
 
 
 # ---------------------------------------------------------------------------
@@ -395,7 +396,7 @@ def post_to_discord(report: str) -> bool:
 # ---------------------------------------------------------------------------
 
 def run_report(output_base: Path, post_discord: bool = False) -> str | None:
-    """Generate the Pipeline Run Report. Returns the report text, or None on failure."""
+    """Generate the WTI Pipeline Run Report. Returns the report text, or None on failure."""
     from pipeline.config import load_config
 
     cfg = load_config(output_base=output_base)
@@ -456,7 +457,7 @@ if __name__ == "__main__":
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
 
-    parser = argparse.ArgumentParser(description="Generate Pipeline Run Report")
+    parser = argparse.ArgumentParser(description="Generate WTI Pipeline Run Report")
     parser.add_argument(
         "--output-base", type=Path,
         default=Path("/home/wilma/hazeydata/pipeline"),
@@ -464,7 +465,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--post-discord", action="store_true",
-        help="Post the report to #pipeline and pin it",
+        help="Post the report to #wti-pipeline and pin it",
     )
     args = parser.parse_args()
 
