@@ -1,24 +1,33 @@
-"""Step 13: Pipeline Run Report.
+"""Pipeline Run Report — standalone post-run script.
 
-Generates a structured run report from the pipeline metrics and accuracy data.
-Writes the report to pipeline_report_{date}.md for Discord posting.
+Generates a structured run report from pipeline metrics and accuracy data.
+Runs AFTER the pipeline completes so it has access to the full metrics JSON
+including step timings, row counts, and pass/fail status.
 
-This is the FINAL step. It runs after validation so it can report on all
-previous steps including pass/fail status.
+Usage (standalone):
+    cd ~/theme-park-crowd-report
+    .venv/bin/python -m pipeline.steps.s13_report
+    .venv/bin/python -m pipeline.steps.s13_report --output-base /path/to/pipeline
 
-The report file is picked up by Wilma's post-run cron and posted to #pipeline.
+Usage (from Wilma's post-run cron):
+    7 7 * * * cd /home/wilma/theme-park-crowd-report && .venv/bin/python -m pipeline.steps.s13_report --output-base /home/wilma/hazeydata/pipeline
 
-Design: docs/PIPELINE_V4_DESIGN.md (Pipeline Run Report section)
+Output:
+    {logs_dir}/pipeline_report_{date}.md — formatted report for Discord posting
+
+NOT in STEP_ORDER. This is a consumer of pipeline output, not a pipeline step.
+The pipeline produces data; the report reads it after the fact.
+
+Design: docs/PIPELINE_V4_DESIGN.md
 """
 
 from __future__ import annotations
 
+import argparse
 import json
+import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
-
-from pipeline.config import PipelineConfig
-from pipeline.core.logging import PipelineLogger
 
 
 # Human-readable step names for the report
@@ -61,25 +70,25 @@ def _status_icon(status: str) -> str:
     }.get(status, "\u2753")
 
 
-def _load_metrics(cfg: PipelineConfig, run_date: str) -> dict | None:
+def _load_metrics(logs_dir: Path, run_date: str) -> dict | None:
     """Load the pipeline metrics JSON for today's run."""
-    metrics_path = cfg.logs_dir / f"pipeline_metrics_{run_date}.json"
+    metrics_path = logs_dir / f"pipeline_metrics_{run_date}.json"
     if not metrics_path.exists():
         return None
     with open(metrics_path) as f:
         return json.load(f)
 
 
-def _load_accuracy_summary(cfg: PipelineConfig) -> dict:
+def _load_accuracy_summary(accuracy_dir: Path) -> dict:
     """Load the accuracy summary JSON."""
-    path = cfg.accuracy_dir / "accuracy_summary.json"
+    path = accuracy_dir / "accuracy_summary.json"
     if not path.exists():
         return {}
     with open(path) as f:
         return json.load(f)
 
 
-def _build_report(metrics: dict, accuracy: dict, cfg: PipelineConfig) -> str:
+def _build_report(metrics: dict, accuracy: dict) -> str:
     """Build the formatted run report string."""
     run_date = metrics.get("run_date", date.today().isoformat())
     status = metrics.get("status", "unknown")
@@ -111,7 +120,6 @@ def _build_report(metrics: dict, accuracy: dict, cfg: PipelineConfig) -> str:
         lines.append("  New observations: N/A")
 
     sync_step = steps.get("s01_sync", {})
-    conv_step = steps.get("s05_conversion", {})
     lines.append(f"  S3 sync: {_status_icon(sync_step.get('status', 'unknown'))} ({_format_duration(sync_step.get('duration_sec', 0))})")
     lines.append("")
 
@@ -170,8 +178,6 @@ def _build_report(metrics: dict, accuracy: dict, cfg: PipelineConfig) -> str:
     lines.append("**TIMING:**")
     timing_parts = []
     for step_name, step_data in steps.items():
-        if step_name == "s13_report":
-            continue  # Don't include ourselves
         display = STEP_DISPLAY_NAMES.get(step_name, step_name)
         icon = _status_icon(step_data.get("status", "unknown"))
         dur = _format_duration(step_data.get("duration_sec", 0))
@@ -187,36 +193,24 @@ def _build_report(metrics: dict, accuracy: dict, cfg: PipelineConfig) -> str:
     return "\n".join(lines)
 
 
-def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
-    """Generate and save the Pipeline Run Report."""
+def run_report(output_base: Path) -> str | None:
+    """Generate the Pipeline Run Report. Returns the report text, or None on failure."""
+    from pipeline.config import load_config
 
-    log.info("=" * 60)
-    log.info("STEP 13: PIPELINE RUN REPORT")
-    log.info("=" * 60)
-
+    cfg = load_config(output_base=output_base)
     run_date = date.today().isoformat()
 
-    # Load metrics (written by pipeline.py just before this step)
-    # Note: metrics may not include s13 itself since we're currently running
-    metrics = _load_metrics(cfg, run_date)
-
+    # Load metrics
+    metrics = _load_metrics(cfg.logs_dir, run_date)
     if metrics is None:
-        # Metrics file might not exist yet if we're running as part of the pipeline
-        # (pipeline.py writes it AFTER all steps complete).
-        # In that case, build a minimal report from what we can find.
-        log.info("No metrics file found yet \u2014 building report from accuracy data only")
-        metrics = {
-            "run_date": run_date,
-            "status": "done",
-            "total_duration_sec": 0,
-            "steps": {},
-        }
+        print(f"No metrics file found at {cfg.logs_dir}/pipeline_metrics_{run_date}.json")
+        return None
 
     # Load accuracy summary
-    accuracy = _load_accuracy_summary(cfg)
+    accuracy = _load_accuracy_summary(cfg.accuracy_dir)
 
     # Build report
-    report = _build_report(metrics, accuracy, cfg)
+    report = _build_report(metrics, accuracy)
 
     # Save report to file
     report_path = cfg.logs_dir / f"pipeline_report_{run_date}.md"
@@ -224,10 +218,49 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     with open(report_path, "w") as f:
         f.write(report)
 
-    log.info(f"Report saved: {report_path}")
-    log.info("--- REPORT PREVIEW ---")
-    for line in report.split("\n")[:10]:
-        log.info(f"  {line}")
-    log.info("--- END PREVIEW ---")
+    print(f"Report saved: {report_path}")
+    print()
+    print(report)
 
+    return report
+
+
+# Legacy interface for pipeline.py (if ever re-added to STEP_ORDER)
+def run(cfg, log) -> dict:
+    """Pipeline step interface (not currently used — runs standalone)."""
+    from pipeline.core.logging import PipelineLogger
+
+    run_date = date.today().isoformat()
+    metrics = _load_metrics(cfg.logs_dir, run_date)
+    if metrics is None:
+        log.info("No metrics file found — building report from accuracy data only")
+        metrics = {"run_date": run_date, "status": "done", "total_duration_sec": 0, "steps": {}}
+
+    accuracy = _load_accuracy_summary(cfg.accuracy_dir)
+    report = _build_report(metrics, accuracy)
+
+    report_path = cfg.logs_dir / f"pipeline_report_{run_date}.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(report_path, "w") as f:
+        f.write(report)
+
+    log.info(f"Report saved: {report_path}")
     return {"rows": 0, "report_path": str(report_path)}
+
+
+if __name__ == "__main__":
+    # Standalone execution — the intended usage path
+    _repo_root = str(Path(__file__).parent.parent.parent)
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
+
+    parser = argparse.ArgumentParser(description="Generate Pipeline Run Report")
+    parser.add_argument(
+        "--output-base", type=Path,
+        default=Path("/home/wilma/hazeydata/pipeline"),
+        help="Pipeline output base directory",
+    )
+    args = parser.parse_args()
+
+    result = run_report(args.output_base)
+    sys.exit(0 if result else 1)
