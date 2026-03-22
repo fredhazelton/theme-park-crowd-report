@@ -23,4 +23,5 @@ STEP_ORDER = [
     "s10_accuracy",
     "s11_deploy",
     "s12_validate",
+    "s13_report",
 ]
