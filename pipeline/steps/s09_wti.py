@@ -1,26 +1,22 @@
-"""Step 9: WTI Calculation — V4 Pure Aggregation.
+"""Step 9: WTI Calculation — Pure Aggregation.
 
 === V4 DESIGN PRINCIPLE: NO POST-PROCESSING ===
 
 Quantile mapping, adaptive stretch factors, and all other post-processing 
-techniques have been REMOVED in V4. 
+techniques have been REMOVED. 
 
 RATIONALE:
 - Post-processing is a challenger hypothesis, not a production feature
-- WTI becomes pure aggregation: simple average of predicted_actual per park per day
+- WTI is pure aggregation: simple average of predicted_actual per park per day
 - No distribution stretching, no bias adjustment, no quantile mapping
 - Clean separation between prediction (steps 1-8) and aggregation (step 9)
-- Easier to debug, understand, and maintain
 
-V4 WTI = AVG(predicted_actual) grouped by (park_code, park_date)
+WTI = AVG(predicted_actual) grouped by (park_code, park_date)
 
-Historical note: V3 had adaptive quantile mapping with per-park stretch factors.
-This was removed 2026-03-21 as part of Pipeline V4 restructure.
+Historical note: Before 2026-03-21, this step had adaptive quantile mapping
+with per-park stretch factors. Removed as part of Pipeline V4 restructure.
 
 === END V4 DESIGN PRINCIPLE ===
-
-v3.2 fix: removed legacy fallback to all_forecasts.parquet (v2 file).
-Only reads all_forecasts_v3.parquet now.
 """
 
 from __future__ import annotations
@@ -36,10 +32,10 @@ from pipeline.core.validation import require_file, require_parquet_rows
 
 
 def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
-    """Calculate WTI from forecasts and historical actuals - V4 Pure Aggregation."""
+    """Calculate WTI from forecasts and historical actuals — pure aggregation."""
 
     log.info("=" * 60)
-    log.info("STEP 9: WTI CALCULATION (V4 — Pure Aggregation)")
+    log.info("STEP 9: WTI CALCULATION (Pure Aggregation)")
     log.info("=" * 60)
 
     results = []
@@ -49,16 +45,16 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     with log.timed("historical WTI"):
         results.append(_compute_historical_wti(cfg, log, pc_sql))
 
-    # Forecast WTI (v3.2+: ONLY v3 file, no fallback to stale v2)
-    forecast_file = cfg.forecast_dir / "all_forecasts_v3.parquet"
+    # Forecast WTI
+    forecast_file = cfg.forecast_dir / "all_forecasts.parquet"
     if forecast_file.exists():
         with log.timed("forecast WTI"):
             results.append(_compute_forecast_wti(cfg, log, pc_sql, forecast_file))
     else:
-        log.warning(f"No v3 forecast file at {forecast_file} — forecast WTI skipped")
+        log.warning(f"No forecast file at {forecast_file} — forecast WTI skipped")
 
-    # V4: NO POST-PROCESSING - Pure aggregation only
-    log.info("V4: No quantile mapping, stretch factors, or post-processing applied")
+    # NO POST-PROCESSING — pure aggregation only
+    log.info("No quantile mapping, stretch factors, or post-processing applied")
 
     # Combine and save
     if not results or all(r is None for r in results):
@@ -69,7 +65,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     combined = combined.sort_values(["park_code", "park_date", "source"])
     combined = combined.drop_duplicates(subset=["park_code", "park_date"], keep="first")
 
-    output_path = cfg.wti_dir / "wti_v3.parquet"
+    output_path = cfg.wti_dir / "wti.parquet"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     combined.to_parquet(output_path, index=False)
 
@@ -214,6 +210,6 @@ def _compute_forecast_wti(
     return df
 
 
-# V4: _apply_adaptive_quantile_mapping function REMOVED
-# This function contained all the quantile mapping and stretch factor logic
-# Removed 2026-03-21 as part of Pipeline V4 Pure Aggregation restructure
+# _apply_adaptive_quantile_mapping function REMOVED 2026-03-21
+# Contained all quantile mapping and stretch factor logic.
+# Post-processing enters as a named challenger in the competition framework.

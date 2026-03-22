@@ -58,7 +58,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         raise ValidationError("XGBoost is required. pip install xgboost")
 
     log.info("=" * 60)
-    log.info("STEP 7: MODEL TRAINING (V4 — pure baseline, one model per entity)")
+    log.info("STEP 7: MODEL TRAINING (baseline, one model per entity)")
     log.info("=" * 60)
     log.info(f"Features: {BASELINE_FEATURES}")
 
@@ -137,7 +137,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     avg_mae = total_mae / successful if successful > 0 else 0
 
     log.info("=" * 60)
-    log.info("TRAINING COMPLETE (V4 baseline)")
+    log.info("TRAINING COMPLETE (baseline)")
     log.info(f"Successful: {successful}, Failed: {failed}")
     log.info(f"Average MAE: {avg_mae:.2f} min")
     log.metric("training_successful", successful)
@@ -244,7 +244,7 @@ def _train_baseline_model(
     model_dir = cfg.models_dir / entity_code
     model_dir.mkdir(parents=True, exist_ok=True)
 
-    model_path = model_dir / "model_v3.json"
+    model_path = model_dir / "model_baseline.json"
     bst.save_model(str(model_path))
 
     metadata = {
@@ -261,9 +261,8 @@ def _train_baseline_model(
         "geo_decay_halflife_days": cfg.geo_decay_halflife_days,
         "backend": "Python xgboost",
         "hyperparameters": params,
-        "version": "v4_baseline",
     }
-    meta_path = model_dir / "metadata_v3.json"
+    meta_path = model_dir / "metadata_baseline.json"
     with open(meta_path, "w") as f:
         json.dump(metadata, f, indent=2, default=str)
 

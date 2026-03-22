@@ -1,9 +1,9 @@
-"""Step 11: Deploy \u2014 Load results into DuckDB + Cloudflare.
+"""Step 11: Deploy — Load results into DuckDB.
 
 The ONLY step that writes to DuckDB. All previous steps work with parquet.
 
 In shadow mode: skip deployment entirely (just compare outputs).
-In production: load forecasts + WTI into tpcr_live.duckdb, restart API.
+In production: load forecasts + WTI into tpcr_live.duckdb.
 """
 
 from __future__ import annotations
@@ -26,8 +26,10 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         log.info("Shadow mode: skipping deployment. Run shadow/compare_wti.py to compare outputs.")
         return {"rows": 0, "action": "skipped_shadow"}
 
-    # Load WTI into DuckDB
-    wti_path = cfg.wti_dir / "wti_v3.parquet"
+    # Load WTI into DuckDB — check both new and legacy filenames
+    wti_path = cfg.wti_dir / "wti.parquet"
+    if not wti_path.exists():
+        wti_path = cfg.wti_dir / "wti_v3.parquet"  # legacy fallback
     if wti_path.exists():
         with log.timed("deploy WTI to DuckDB"):
             wti_df = pd.read_parquet(wti_path)
@@ -51,10 +53,12 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 """)
             log.info(f"WTI deployed: {len(wti_df):,} rows")
     else:
-        log.warning("No v3 WTI file to deploy")
+        log.warning("No WTI file to deploy")
 
-    # Load forecasts into DuckDB
-    forecast_path = cfg.forecast_dir / "all_forecasts_v3.parquet"
+    # Load forecasts into DuckDB — check both new and legacy filenames
+    forecast_path = cfg.forecast_dir / "all_forecasts.parquet"
+    if not forecast_path.exists():
+        forecast_path = cfg.forecast_dir / "all_forecasts_v3.parquet"  # legacy fallback
     if forecast_path.exists():
         with log.timed("deploy forecasts to DuckDB"):
             fc_df = pd.read_parquet(forecast_path)
@@ -87,6 +91,6 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
             log.info(f"Forecasts deployed: {len(fc_df):,} rows")
             del fc_df
     else:
-        log.warning("No v3 forecast file to deploy")
+        log.warning("No forecast file to deploy")
 
     return {"rows": 0, "action": "deployed"}

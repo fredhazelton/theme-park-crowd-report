@@ -1,17 +1,5 @@
 """Step 8: Forecast Generation — Memory-safe and FAST.
 
-v3.0: correct but slow (42 min) — df.apply() row-by-row loops.
-v3.1: vectorized aggregates (30 min) — merge instead of apply.
-v3.2: pre-indexed OC + aggregates (target: <8 min) — O(1) lookups.
-v4:   reads model metadata to determine correct feature set per entity.
-
-The v3.1 benchmark showed OC filter = 84% of per-entity time (2.77s/3.3s).
-Root cause: scanning 9.3M set elements per entity instead of O(1) dict lookup.
-
-v4 fix: The model selector trains multiple candidates with different feature
-sets. The forecast step now reads metadata_v3.json to know which features
-each model was trained with, instead of assuming FEATURES_ACTUALS for all v3 models.
-
 Architecture:
 - Process ONE PARK at a time
 - Sequential (no multiprocessing)
@@ -19,6 +7,13 @@ Architecture:
 - Pre-indexed aggregates: dict[entity] → DataFrame
 - Flush to parquet between parks, release memory
 - Peak memory: ~2-3GB
+
+Model loading priority (backward compat):
+  1. model_baseline.json (V4 — produced by current training step)
+  2. model_v3.json (legacy — old training runs still on disk)
+  3. model_julia_actuals.json (legacy)
+  4. model_julia_v2.json (legacy)
+  5. Fallback ratio (no model)
 """
 
 from __future__ import annotations
@@ -44,19 +39,18 @@ from pipeline.core.park_codes import PARK_TIMEZONE, entity_to_park
 from pipeline.core.validation import ValidationError, require_file
 
 # Feature columns by model type
-FEATURES_ACTUALS = [
+FEATURES_BASELINE = [
     "mins_since_6am", "mins_since_open",
     "date_group_id_encoded", "season_encoded", "season_year_encoded",
 ]
-FEATURES_ACTUALS_LITE = ["mins_since_6am", "mins_since_open"]
-FEATURES_V2 = [
+FEATURES_LITE = ["mins_since_6am", "mins_since_open"]
+FEATURES_LEGACY_V2 = [
     "posted_time", "mins_since_6am", "mins_since_open",
     "hour_of_day", "date_group_id_encoded", "season_encoded",
     "season_year_encoded",
 ]
 
 # All possible features that might be in a time grid row
-# (we generate all of these, then select the subset each model needs)
 ALL_POSSIBLE_FEATURES = [
     "mins_since_6am", "mins_since_open",
     "date_group_id_encoded", "season_encoded", "season_year_encoded",
@@ -71,7 +65,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         raise ValidationError("XGBoost is required for forecasting. pip install xgboost")
 
     log.info("=" * 60)
-    log.info("STEP 8: FORECAST GENERATION (v4 — metadata-aware feature selection)")
+    log.info("STEP 8: FORECAST GENERATION (metadata-aware feature selection)")
     log.info("=" * 60)
 
     start_date = date.today()  # Include today — users ask about "today" and need predicted values
@@ -100,7 +94,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     # Process one park at a time
     output_dir = cfg.forecast_dir
     output_dir.mkdir(parents=True, exist_ok=True)
-    temp_dir = output_dir / "_v3_temp"
+    temp_dir = output_dir / "_temp"
     temp_dir.mkdir(parents=True, exist_ok=True)
 
     total_predictions = 0
@@ -165,7 +159,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
             combined = pd.concat(chunks, ignore_index=True)
             del chunks
 
-            output_file = output_dir / "all_forecasts_v3.parquet"
+            output_file = output_dir / "all_forecasts.parquet"
             combined.to_parquet(output_file, index=False)
 
             # Log method breakdown
@@ -183,7 +177,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         except OSError:
             pass
 
-    # Log feature set usage (v4 diagnostic)
+    # Log feature set usage (diagnostic)
     if method_feature_counts:
         log.info("Feature set usage:")
         for feat_key, count in sorted(method_feature_counts.items()):
@@ -202,18 +196,20 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
 
 
 # =========================================================================
-# Entity-level forecasting — v4 (metadata-aware features)
+# Entity-level forecasting — metadata-aware features
 # =========================================================================
 
 def _get_model_features(entity_dir: Path) -> list[str] | None:
     """Read model metadata to determine which features it was trained with.
 
-    v4 FIX: The model selector saves the feature list in metadata_v3.json.
-    We read that to know exactly what the model expects, instead of guessing
-    based on the model filename.
-
+    Checks metadata_baseline.json first (V4), then metadata_v3.json (legacy).
     Returns the feature list, or None if no metadata found.
     """
+    # V4 metadata first
+    meta = _read_metadata(entity_dir, "metadata_baseline.json")
+    if meta and "features" in meta:
+        return meta["features"]
+    # Legacy fallback
     meta = _read_metadata(entity_dir, "metadata_v3.json")
     if meta and "features" in meta:
         return meta["features"]
@@ -239,7 +235,7 @@ def _forecast_entity_fast(
     df = time_grid.copy()
     df["entity_code"] = entity_code
 
-    # O(1) operating calendar filter (was 84% of per-entity time in v3.1)
+    # O(1) operating calendar filter
     if oc_by_entity is not None:
         ec_upper = entity_code.upper()
         entity_dates = oc_by_entity.get(ec_upper)
@@ -270,53 +266,52 @@ def _forecast_entity_fast(
     df["mins_since_open"] = (df["mins_since_6am"] + 6 * 60 - df["_open_mins"]).clip(lower=0)
     df.drop(columns=["_open_mins"], inplace=True)
 
-    # Model selection — v4: read metadata for feature list
+    # Model selection — priority: baseline > v3 (legacy) > julia_actuals > julia_v2 > fallback
     entity_dir = models_dir / entity_code
-    v3_path = entity_dir / "model_v3.json"
+    baseline_path = entity_dir / "model_baseline.json"
+    legacy_v3_path = entity_dir / "model_v3.json"
     actuals_path = entity_dir / "model_julia_actuals.json"
     v2_path = entity_dir / "model_julia_v2.json"
 
     fallback_ratio = fallback_ratios.get(entity_code, fallback_ratios.get("__global__", 0.678))
 
-    if v3_path.exists():
+    if baseline_path.exists() or legacy_v3_path.exists():
+        model_path = baseline_path if baseline_path.exists() else legacy_v3_path
         model = xgb.XGBRegressor()
-        model.load_model(str(v3_path))
+        model.load_model(str(model_path))
 
-        # v4 FIX: Read features from metadata instead of assuming FEATURES_ACTUALS
+        # Read features from metadata instead of assuming
         meta_features = _get_model_features(entity_dir)
         if meta_features is not None:
-            # Verify all required features exist in the DataFrame
             missing = [f for f in meta_features if f not in df.columns]
             if missing:
-                # Fall back to actuals features if metadata features aren't available
-                features = FEATURES_ACTUALS
-                feat_key = "v3_actuals_fallback"
+                features = FEATURES_BASELINE
+                feat_key = "baseline_fallback"
             else:
                 features = meta_features
-                feat_key = f"v3_meta_{len(features)}feat"
+                feat_key = f"baseline_{len(features)}feat"
         else:
-            # No metadata (old v3 model) — use default actuals features
-            features = FEATURES_ACTUALS
-            feat_key = "v3_actuals_default"
-        method = "model_v3"
+            features = FEATURES_BASELINE
+            feat_key = "baseline_default"
+        method = "model_baseline"
 
     elif actuals_path.exists():
         model = xgb.XGBRegressor()
         model.load_model(str(actuals_path))
         meta = _read_metadata(entity_dir, "metadata_julia_actuals.json")
         is_lite = meta and (meta.get("model_label") == "XGBOOST_ACTUALS_LITE" or meta.get("version") == "actuals_lite")
-        features = FEATURES_ACTUALS_LITE if is_lite else FEATURES_ACTUALS
-        method = "model_actuals"
-        feat_key = "julia_actuals_lite" if is_lite else "julia_actuals"
+        features = FEATURES_LITE if is_lite else FEATURES_BASELINE
+        method = "model_legacy_actuals"
+        feat_key = "legacy_actuals_lite" if is_lite else "legacy_actuals"
 
     elif v2_path.exists():
         model = xgb.XGBRegressor()
         model.load_model(str(v2_path))
         meta = _read_metadata(entity_dir, "metadata_julia_v2.json")
         is_lite = meta and (meta.get("model_label") == "XGBOOST_LITE_MODEL" or meta.get("version") == "lite")
-        features = ["posted_time", "mins_since_6am", "mins_since_open", "hour_of_day"] if is_lite else FEATURES_V2
-        method = "model_v2"
-        feat_key = "julia_v2_lite" if is_lite else "julia_v2"
+        features = ["posted_time", "mins_since_6am", "mins_since_open", "hour_of_day"] if is_lite else FEATURES_LEGACY_V2
+        method = "model_legacy_v2"
+        feat_key = "legacy_v2_lite" if is_lite else "legacy_v2"
 
     else:
         # No model — vectorized fallback
@@ -335,7 +330,7 @@ def _forecast_entity_fast(
 
 
 # =========================================================================
-# Data loading helpers — PRE-INDEXED (v3.2)
+# Data loading helpers — PRE-INDEXED
 # =========================================================================
 
 def _load_date_features(cfg: PipelineConfig, log: PipelineLogger) -> dict:
@@ -496,7 +491,7 @@ def _load_operating_calendar_indexed(cfg: PipelineConfig, log: PipelineLogger) -
     """Load operating calendar PRE-INDEXED by entity code.
     
     Returns dict[entity_code_upper] → set(dates) or None if no OC.
-    O(1) lookup per entity instead of scanning 9.3M tuples (was 84% of forecast time).
+    O(1) lookup per entity instead of scanning 9.3M tuples.
     """
     oc_path = cfg.output_base / "operating_calendar" / "operating_calendar.parquet"
     if not oc_path.exists():

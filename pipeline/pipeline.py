@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pipeline v3 — Single entry point.
+"""HazeyData Pipeline — Single entry point.
 
 Usage:
     python pipeline/pipeline.py                        # Full run
@@ -33,15 +33,15 @@ from pipeline.core.metrics import PipelineMetrics
 from pipeline.core.paths import log_events_path
 from pipeline.steps import STEP_ORDER
 
-# v3→legacy bridge: keep pipeline_status.json updated for monitoring scripts
+# Legacy bridge: keep pipeline_status.json updated for monitoring scripts
 try:
     from utils.pipeline_status import pipeline_start as _ps_start, step_done as _ps_step_done, step_failed as _ps_step_failed
     _HAS_PIPELINE_STATUS = True
 except ImportError:
     _HAS_PIPELINE_STATUS = False
 
-# Map v3 step names → legacy step names used by pipeline_status.json
-_V3_TO_LEGACY_STEP = {
+# Map step names to legacy step names used by pipeline_status.json
+_LEGACY_STEP_MAP = {
     "s01_sync": None,        # no legacy equivalent
     "s02_etl": "etl",
     "s03_dimensions": "dimensions",
@@ -58,7 +58,7 @@ _V3_TO_LEGACY_STEP = {
 
 
 def main():
-    parser = argparse.ArgumentParser(description="HazeyData Pipeline v3")
+    parser = argparse.ArgumentParser(description="HazeyData Pipeline")
     parser.add_argument("--output-base", type=Path, default=None)
     parser.add_argument("--shadow", action="store_true", help="Shadow mode: compare, don't deploy")
     parser.add_argument("--step", type=str, default=None, help="Run a single step (e.g. s09_wti)")
@@ -92,7 +92,7 @@ def main():
     )
 
     log.info("=" * 60)
-    log.info(f"HAZEYDATA PIPELINE v3.1 {'(SHADOW MODE — nice +10)' if cfg.shadow else ''}")
+    log.info(f"HAZEYDATA PIPELINE {'(SHADOW MODE — nice +10)' if cfg.shadow else ''}")
     log.info(f"Run date: {run_date}")
     log.info(f"Output: {cfg.output_base}")
     if cfg.shadow:
@@ -138,7 +138,7 @@ def main():
 
             # Update legacy pipeline_status.json
             if _HAS_PIPELINE_STATUS and not cfg.shadow:
-                legacy = _V3_TO_LEGACY_STEP.get(step_name)
+                legacy = _LEGACY_STEP_MAP.get(step_name)
                 if legacy:
                     try:
                         _ps_step_done(cfg.output_base, legacy)
@@ -155,7 +155,7 @@ def main():
 
             # Update legacy pipeline_status.json on failure
             if _HAS_PIPELINE_STATUS and not cfg.shadow:
-                legacy = _V3_TO_LEGACY_STEP.get(step_name)
+                legacy = _LEGACY_STEP_MAP.get(step_name)
                 if legacy:
                     try:
                         _ps_step_failed(cfg.output_base, legacy)
@@ -175,7 +175,7 @@ def main():
     log.info("=" * 60)
 
     # Save metrics
-    metrics_path = cfg.logs_dir / f"v3_metrics_{run_date}.json"
+    metrics_path = cfg.logs_dir / f"pipeline_metrics_{run_date}.json"
     metrics.save(metrics_path)
     log.info(f"Metrics saved: {metrics_path}")
 

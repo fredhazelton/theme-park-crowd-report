@@ -1,10 +1,10 @@
-"""Step 10: Accuracy Evaluation — v4 complete implementation.
+"""Step 10: Accuracy Evaluation.
 
 Compares archived forecasts against actuals.
 Reports MAE, bias, RMSE, median AE. No MAPE (broken for near-zero actuals).
 
 Workflow:
-1. Archive current v3 forecast + WTI for future comparison
+1. Archive current forecast + WTI for future comparison
 2. Find dates where archived forecasts now have actuals available
 3. Compare forecast vs actuals at slot, entity-date, and WTI levels
 4. Append results to accumulating accuracy parquets
@@ -14,8 +14,8 @@ Output files:
   - accuracy/slot_accuracy.parquet            (per entity, per 5-min slot)
   - accuracy/entity_daily_accuracy.parquet    (per entity, per day — aggregated)
   - accuracy/wti_accuracy.parquet             (per park, per day — WTI level)
-  - accuracy/archive/forecast_v3_YYYY-MM-DD.parquet
-  - accuracy/archive/wti_v3_YYYY-MM-DD.parquet
+  - accuracy/archive/forecast_YYYY-MM-DD.parquet
+  - accuracy/archive/wti_YYYY-MM-DD.parquet
   - accuracy/accuracy_summary.json
 """
 
@@ -40,14 +40,16 @@ def _extract_date(filename: str) -> str | None:
 
 
 def _archive_forecast(cfg: PipelineConfig, log: PipelineLogger, run_date: str):
-    """Archive current v3 forecast + WTI before they get overwritten."""
+    """Archive current forecast + WTI before they get overwritten."""
     archive_dir = cfg.accuracy_dir / "archive"
     archive_dir.mkdir(parents=True, exist_ok=True)
 
-    # Archive forecast
-    forecast_path = cfg.forecast_dir / "all_forecasts_v3.parquet"
+    # Archive forecast — check both new and legacy filenames
+    forecast_path = cfg.forecast_dir / "all_forecasts.parquet"
+    if not forecast_path.exists():
+        forecast_path = cfg.forecast_dir / "all_forecasts_v3.parquet"  # legacy fallback
     if forecast_path.exists():
-        archive_path = archive_dir / f"forecast_v3_{run_date}.parquet"
+        archive_path = archive_dir / f"forecast_{run_date}.parquet"
         if not archive_path.exists():
             with log.timed("archive forecast"):
                 cutoff = (datetime.strptime(run_date, "%Y-%m-%d") + timedelta(days=14)).strftime("%Y-%m-%d")
@@ -65,12 +67,14 @@ def _archive_forecast(cfg: PipelineConfig, log: PipelineLogger, run_date: str):
         else:
             log.info(f"Forecast archive already exists for {run_date}")
     else:
-        log.info("No v3 forecast to archive yet")
+        log.info("No forecast file to archive yet")
 
-    # Archive WTI forecast
-    wti_path = cfg.wti_dir / "wti_v3.parquet"
+    # Archive WTI forecast — check both new and legacy filenames
+    wti_path = cfg.wti_dir / "wti.parquet"
+    if not wti_path.exists():
+        wti_path = cfg.wti_dir / "wti_v3.parquet"  # legacy fallback
     if wti_path.exists():
-        wti_archive = archive_dir / f"wti_v3_{run_date}.parquet"
+        wti_archive = archive_dir / f"wti_{run_date}.parquet"
         if not wti_archive.exists():
             with log.timed("archive WTI"):
                 cutoff = (datetime.strptime(run_date, "%Y-%m-%d") + timedelta(days=14)).strftime("%Y-%m-%d")
@@ -91,10 +95,10 @@ def _get_eval_dates(cfg: PipelineConfig, log: PipelineLogger) -> list[str]:
     """Find dates where we have both archived forecasts and actuals, minus already-evaluated."""
     archive_dir = cfg.accuracy_dir / "archive"
 
-    # Collect ALL archived forecasts (v2 + v3)
+    # Collect ALL archived forecasts (new naming + legacy v3 naming)
     archive_files = sorted(
         f for f in archive_dir.glob("forecast_*.parquet")
-        if f.name.startswith("forecast_v3_") or f.name.startswith("forecast_2026")
+        if not f.name.endswith(".CONTAMINATED_BACKUP")
     )
     if not archive_files:
         log.info("No archived forecasts found")
@@ -158,10 +162,10 @@ def _evaluate_slots_and_entities(
         return None, None
 
     archive_dir = cfg.accuracy_dir / "archive"
-    # All forecast archives (v2 + v3)
+    # All forecast archives (new naming + legacy v3 naming)
     archive_files = sorted(
         f for f in archive_dir.glob("forecast_*.parquet")
-        if f.name.startswith("forecast_v3_") or f.name.startswith("forecast_2026")
+        if not f.name.endswith(".CONTAMINATED_BACKUP")
     )
     if not archive_files:
         log.warning("No archived forecasts found")
@@ -315,18 +319,19 @@ def _evaluate_wti(
     eval_dates: list[str], run_date: str
 ) -> pd.DataFrame | None:
     """Compare archived WTI forecast vs historical WTI (computed from actuals)."""
-    wti_path = cfg.wti_dir / "wti_v3.parquet"
-    # Also check the non-v3 WTI as fallback
+    # Check both new and legacy WTI filenames
+    wti_path = cfg.wti_dir / "wti.parquet"
     if not wti_path.exists():
-        wti_path = cfg.wti_dir / "wti.parquet"
+        wti_path = cfg.wti_dir / "wti_v3.parquet"  # legacy fallback
     if not wti_path.exists():
         log.info("No WTI data — skipping WTI accuracy")
         return None
 
     archive_dir = cfg.accuracy_dir / "archive"
-    # Collect all WTI archives (v2 wti_ + v3 wti_v3_)
+    # Collect all WTI archives (new wti_ + legacy wti_v3_)
     wti_archives = sorted(
         f for f in archive_dir.glob("wti_*.parquet")
+        if not f.name.endswith(".CONTAMINATED_BACKUP")
     )
     if not wti_archives:
         log.info("No archived WTI files — WTI accuracy will start tomorrow")
@@ -513,7 +518,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     """Evaluate forecast accuracy and archive current forecast."""
 
     log.info("=" * 60)
-    log.info("STEP 10: ACCURACY EVALUATION (v4)")
+    log.info("STEP 10: ACCURACY EVALUATION")
     log.info("=" * 60)
 
     run_date = datetime.now().strftime("%Y-%m-%d")
