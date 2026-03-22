@@ -1,3 +1,22 @@
+# ⚠️ DEPRECATED — Superseded by Pipeline V4 Design
+
+> **This document is historical.** The V3 "shadow pipeline" architecture described here has been
+> fully implemented, iterated on, and superseded by the V4 design.
+>
+> **Current governing document:** [`docs/PIPELINE_V4_DESIGN.md`](PIPELINE_V4_DESIGN.md)
+>
+> V4 removed version numbers from all production paths, purified the baseline (no bias correction,
+> no quantile mapping), and introduced the competition framework for model improvements.
+> This file is retained for historical reference only.
+>
+> — Barney, 2026-03-22 (Session 6)
+
+---
+
+_Original V3 design document follows below for reference._
+
+---
+
 # Pipeline v3 — Shadow Pipeline Architecture
 
 > **Status:** IMPLEMENTED — in production since ~March 2026
