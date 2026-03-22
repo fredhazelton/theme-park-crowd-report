@@ -39,6 +39,9 @@ PIPELINE_CHANNEL_ID = "1479351574177513576"
 # Discord API base
 DISCORD_API = "https://discord.com/api/v10"
 
+# User-Agent required by Discord API
+USER_AGENT = "DiscordBot (https://hazeydata.ai, 1.0)"
+
 # Human-readable step names for the report
 STEP_DISPLAY_NAMES = {
     "s01_sync": "Sync",
@@ -227,6 +230,7 @@ def _discord_api(method: str, endpoint: str, token: str, payload: dict | None = 
     headers = {
         "Authorization": f"Bot {token}",
         "Content-Type": "application/json",
+        "User-Agent": USER_AGENT,
     }
     data = json.dumps(payload).encode() if payload else None
     req = urllib.request.Request(url, data=data, headers=headers, method=method)
