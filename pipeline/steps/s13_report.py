@@ -4,6 +4,10 @@ Generates a structured run report from pipeline metrics and accuracy data.
 Runs AFTER the pipeline completes so it has access to the full metrics JSON
 including step timings, row counts, and pass/fail status.
 
+When metrics data is incomplete (missing steps), the report falls back to
+reading directly from pipeline output files (parquets, model dirs) to
+ensure the report always has real numbers.
+
 Usage (standalone):
     cd ~/theme-park-crowd-report
     .venv/bin/python -m pipeline.steps.s13_report
@@ -100,12 +104,74 @@ def _load_accuracy_summary(accuracy_dir: Path) -> dict:
         return json.load(f)
 
 
-def _build_report(metrics: dict, accuracy: dict) -> str:
-    """Build the formatted run report string."""
+def _probe_output_files(output_base: Path) -> dict:
+    """Probe pipeline output files directly for stats.
+
+    This is the fallback when metrics JSON is incomplete or missing.
+    Reads row counts from parquet files and counts model directories.
+    Returns a dict of discovered values.
+    """
+    stats = {}
+
+    # Count baseline models
+    models_dir = output_base / "models"
+    if models_dir.exists():
+        entity_dirs = [d for d in models_dir.iterdir() if d.is_dir() and not d.name.startswith("_")]
+        baseline = sum(1 for d in entity_dirs if (d / "model_baseline.json").exists())
+        legacy = sum(1 for d in entity_dirs if (d / "model_v3.json").exists() and not (d / "model_baseline.json").exists())
+        stats["models_baseline"] = baseline
+        stats["models_legacy"] = legacy
+        stats["models_total"] = baseline + legacy
+
+    # Count forecast rows via file size heuristic or DuckDB if available
+    forecast_path = output_base / "forecasts" / "all_forecasts.parquet"
+    if not forecast_path.exists():
+        forecast_path = output_base / "forecasts" / "all_forecasts_v3.parquet"
+    if forecast_path.exists():
+        try:
+            import duckdb
+            con = duckdb.connect()
+            result = con.execute(f"SELECT COUNT(*) FROM read_parquet('{forecast_path}')").fetchone()
+            stats["forecast_rows"] = result[0] if result else 0
+            con.close()
+        except Exception:
+            # Fallback: estimate from file size (roughly 100 bytes per row for this schema)
+            size_mb = forecast_path.stat().st_size / (1024 * 1024)
+            stats["forecast_rows_approx"] = int(size_mb * 10000)  # rough estimate
+
+    # Count WTI rows
+    wti_path = output_base / "wti" / "wti.parquet"
+    if not wti_path.exists():
+        wti_path = output_base / "wti" / "wti_v3.parquet"
+    if wti_path.exists():
+        try:
+            import duckdb
+            con = duckdb.connect()
+            result = con.execute(f"SELECT COUNT(*) FROM read_parquet('{wti_path}') WHERE source = 'forecast'").fetchone()
+            stats["wti_forecast_rows"] = result[0] if result else 0
+            con.close()
+        except Exception:
+            pass
+
+    return stats
+
+
+def _build_report(metrics: dict, accuracy: dict, output_base: Path | None = None) -> str:
+    """Build the formatted run report string.
+
+    Uses metrics JSON as the primary source. When step data is missing
+    (e.g., metrics were overwritten by a single-step re-run), falls back
+    to probing the output files directly.
+    """
     run_date = metrics.get("run_date", date.today().isoformat())
     status = metrics.get("status", "unknown")
     total_sec = metrics.get("total_duration_sec", 0)
     steps = metrics.get("steps", {})
+
+    # Probe output files if metrics look incomplete (fewer than 6 steps)
+    file_stats = {}
+    if output_base and len(steps) < 6:
+        file_stats = _probe_output_files(output_base)
 
     status_icon = "\u2705 COMPLETE" if status == "done" else "\u274c FAILED"
     lines = []
@@ -117,7 +183,6 @@ def _build_report(metrics: dict, accuracy: dict) -> str:
     # --- DATA HEALTH ---
     etl_step = steps.get("s02_etl", {})
     new_obs = etl_step.get("new_observations", None)
-    # rows_out from the metrics captures the return dict's "rows" value
     if new_obs is None:
         new_obs = etl_step.get("rows_out", None)
 
@@ -142,14 +207,26 @@ def _build_report(metrics: dict, accuracy: dict) -> str:
 
     lines.append("**MODELS & FORECASTS:**")
 
+    # Training: prefer metrics, fallback to file probe
     train_rows = train_step.get("rows_out", 0)
-    lines.append(f"  Training: {train_rows} baseline models ({_format_duration(train_step.get('duration_sec', 0))})")
+    if train_rows == 0 and file_stats.get("models_total", 0) > 0:
+        train_rows = file_stats["models_total"]
+    train_dur = train_step.get("duration_sec", 0)
+    lines.append(f"  Training: {train_rows} baseline models ({_format_duration(train_dur)})")
 
+    # Forecasts: prefer metrics, fallback to file probe
     forecast_rows = forecast_step.get("rows_out", 0)
-    lines.append(f"  Forecast: {forecast_rows:,} predictions ({_format_duration(forecast_step.get('duration_sec', 0))})")
+    if forecast_rows == 0:
+        forecast_rows = file_stats.get("forecast_rows", file_stats.get("forecast_rows_approx", 0))
+    forecast_dur = forecast_step.get("duration_sec", 0)
+    lines.append(f"  Forecast: {forecast_rows:,} predictions ({_format_duration(forecast_dur)})")
 
+    # WTI: prefer metrics, fallback to file probe
     wti_rows = wti_step.get("rows_out", 0)
-    lines.append(f"  WTI: {wti_rows:,} park-dates ({_format_duration(wti_step.get('duration_sec', 0))})")
+    if wti_rows == 0:
+        wti_rows = file_stats.get("wti_forecast_rows", 0)
+    wti_dur = wti_step.get("duration_sec", 0)
+    lines.append(f"  WTI: {wti_rows:,} park-dates ({_format_duration(wti_dur)})")
     lines.append("")
 
     # --- ACCURACY ---
@@ -264,13 +341,10 @@ def _unpin_previous_reports(token: str, channel_id: str) -> None:
 
 def _post_and_pin(report: str, token: str, channel_id: str) -> bool:
     """Post the report to Discord and pin it. Returns True on success."""
-    # Discord message limit is 2000 chars. Report is designed to fit,
-    # but split gracefully if it ever grows.
     chunks = []
     if len(report) <= 2000:
         chunks = [report]
     else:
-        # Split on double-newlines (section breaks) to keep formatting
         sections = report.split("\n\n")
         current = ""
         for section in sections:
@@ -294,7 +368,6 @@ def _post_and_pin(report: str, token: str, channel_id: str) -> bool:
             first_msg_id = result.get("id")
             print(f"  Posted report to #{channel_id} (message {first_msg_id})")
 
-    # Unpin previous reports, then pin today's
     if first_msg_id:
         _unpin_previous_reports(token, channel_id)
         pin_result = _discord_api("PUT", f"/channels/{channel_id}/pins/{first_msg_id}", token)
@@ -307,12 +380,7 @@ def _post_and_pin(report: str, token: str, channel_id: str) -> bool:
 
 
 def post_to_discord(report: str) -> bool:
-    """Post the pipeline run report to #pipeline and pin it.
-
-    Loads the bot token from ~/.env or DISCORD_BOT_TOKEN env var.
-    Unpins any previous pipeline reports before pinning today's.
-    Returns True on success, False on failure.
-    """
+    """Post the pipeline run report to #pipeline and pin it."""
     token = _load_bot_token()
     if not token:
         print("DISCORD_BOT_TOKEN not found in ~/.env or environment — skipping Discord post")
@@ -342,8 +410,8 @@ def run_report(output_base: Path, post_discord: bool = False) -> str | None:
     # Load accuracy summary
     accuracy = _load_accuracy_summary(cfg.accuracy_dir)
 
-    # Build report
-    report = _build_report(metrics, accuracy)
+    # Build report — pass output_base so it can probe files as fallback
+    report = _build_report(metrics, accuracy, output_base=output_base)
 
     # Save report to file
     report_path = cfg.logs_dir / f"pipeline_report_{run_date}.md"
@@ -365,8 +433,6 @@ def run_report(output_base: Path, post_discord: bool = False) -> str | None:
 # Legacy interface for pipeline.py (if ever re-added to STEP_ORDER)
 def run(cfg, log) -> dict:
     """Pipeline step interface (not currently used — runs standalone)."""
-    from pipeline.core.logging import PipelineLogger
-
     run_date = date.today().isoformat()
     metrics = _load_metrics(cfg.logs_dir, run_date)
     if metrics is None:
@@ -374,7 +440,7 @@ def run(cfg, log) -> dict:
         metrics = {"run_date": run_date, "status": "done", "total_duration_sec": 0, "steps": {}}
 
     accuracy = _load_accuracy_summary(cfg.accuracy_dir)
-    report = _build_report(metrics, accuracy)
+    report = _build_report(metrics, accuracy, output_base=cfg.output_base)
 
     report_path = cfg.logs_dir / f"pipeline_report_{run_date}.md"
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -386,7 +452,6 @@ def run(cfg, log) -> dict:
 
 
 if __name__ == "__main__":
-    # Standalone execution — the intended usage path
     _repo_root = str(Path(__file__).parent.parent.parent)
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)

@@ -12,6 +12,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -97,13 +98,16 @@ def main():
     log.info(f"Output: {cfg.output_base}")
     if cfg.shadow:
         log.info(f"Shadow output: {cfg.shadow_output_base}")
+    if args.step:
+        log.info(f"Single-step mode: {args.step}")
     log.info("=" * 60)
 
     start_time = time.time()
     metrics.status = "running"
 
     # Determine which steps to run
-    if args.step:
+    single_step = args.step is not None
+    if single_step:
         if args.step not in STEP_ORDER:
             log.error(f"Unknown step: {args.step}. Available: {STEP_ORDER}")
             return 1
@@ -112,7 +116,7 @@ def main():
         steps = STEP_ORDER
 
     # Update legacy pipeline_status.json for monitoring scripts
-    if _HAS_PIPELINE_STATUS and not args.step and not cfg.shadow:
+    if _HAS_PIPELINE_STATUS and not single_step and not cfg.shadow:
         try:
             _ps_start(cfg.output_base)
             log.info("Legacy pipeline_status.json initialized")
@@ -174,8 +178,13 @@ def main():
     log.info(f"PIPELINE {'FAILED' if failed else 'COMPLETE'} in {total}s")
     log.info("=" * 60)
 
-    # Save metrics
-    metrics_path = cfg.logs_dir / f"pipeline_metrics_{run_date}.json"
+    # Save metrics — but DON'T overwrite the full-run metrics with a
+    # single-step re-run. Single-step metrics go to a separate file.
+    if single_step:
+        metrics_path = cfg.logs_dir / f"pipeline_metrics_{run_date}_{args.step}.json"
+        log.info(f"Single-step mode: metrics saved to {metrics_path.name} (full-run metrics preserved)")
+    else:
+        metrics_path = cfg.logs_dir / f"pipeline_metrics_{run_date}.json"
     metrics.save(metrics_path)
     log.info(f"Metrics saved: {metrics_path}")
 
