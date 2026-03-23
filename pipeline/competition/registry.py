@@ -90,7 +90,7 @@ class ChallengerRegistry:
     
     def _load_challenger(self, challenger_name: str) -> None:
         """Load a specific challenger module."""
-        module_name = f"competition.challengers.{challenger_name}"
+        module_name = f"pipeline.competition.challengers.{challenger_name}"
         
         try:
             # Import the module
