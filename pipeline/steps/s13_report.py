@@ -104,6 +104,15 @@ def _load_accuracy_summary(accuracy_dir: Path) -> dict:
         return json.load(f)
 
 
+def _load_entity_diagnostics(accuracy_dir: Path) -> dict:
+    """Load the entity diagnostics JSON."""
+    path = accuracy_dir / "entity_diagnostics.json"
+    if not path.exists():
+        return {}
+    with open(path) as f:
+        return json.load(f)
+
+
 def _probe_output_files(output_base: Path) -> dict:
     """Probe pipeline output files directly for stats.
 
@@ -154,6 +163,55 @@ def _probe_output_files(output_base: Path) -> dict:
             pass
 
     return stats
+
+
+def _format_entity_diagnostics_section(entity_diag: dict) -> list[str]:
+    """Format the entity diagnostics section for the Discord report."""
+    if not entity_diag or entity_diag.get('error'):
+        return ["**🔍 ENTITY DIAGNOSTICS:**", "  No diagnostics available", ""]
+    
+    lines = ["**🔍 ENTITY DIAGNOSTICS:**"]
+    
+    # Worst 5 entities by MAE
+    worst = entity_diag.get('worst_entities', [])[:5]
+    if worst:
+        worst_names = [f"{e['entity_name']} ({e['entity_code']}) MAE {e['mae']}" for e in worst]
+        lines.append(f"  Worst 5: {' | '.join(worst_names)}")
+    else:
+        lines.append("  Worst entities: No data")
+    
+    # Daily movers (entities with significant changes)
+    movers = entity_diag.get('daily_movers', [])
+    spiking = [m for m in movers if m['direction'] == 'worsening'][:3]
+    improving = [m for m in movers if m['direction'] == 'improving'][:2]
+    
+    if spiking:
+        spike_desc = []
+        for m in spiking:
+            spike_desc.append(f"{m['entity_name']} ({m['entity_code']}) MAE {m['historical_avg']} → {m['recent_mae']} ({m['change_description']})")
+        lines.append(f"  ⚠️ Spiking: {' | '.join(spike_desc)}")
+    
+    if improving and not spiking:  # Only show improving if no spiking entities (keep it concise)
+        improv_desc = []
+        for m in improving:
+            improv_desc.append(f"{m['entity_name']} ({m['entity_code']}) {m['change_description']}")
+        lines.append(f"  ✅ Improving: {' | '.join(improv_desc)}")
+    
+    # Coverage summary
+    coverage = entity_diag.get('coverage', {})
+    baseline_count = coverage.get('baseline_count', 0)
+    fallback_count = coverage.get('fallback_count', 0)
+    lines.append(f"  Coverage: {baseline_count} baseline models, {fallback_count} on fallback")
+    
+    # Distribution summary  
+    dist = entity_diag.get('distribution', {})
+    good_count = dist.get('0-5', 0)
+    ok_count = dist.get('5-10', 0)
+    bad_count = dist.get('10-15', 0) + dist.get('15-20', 0) + dist.get('20+', 0)
+    lines.append(f"  Distribution: {good_count} entities <5 min | {ok_count} at 5-10 | {bad_count} at 10+")
+    
+    lines.append("")
+    return lines
 
 
 def _build_report(metrics: dict, accuracy: dict, output_base: Path | None = None) -> str:
@@ -262,6 +320,12 @@ def _build_report(metrics: dict, accuracy: dict, output_base: Path | None = None
     if dates_eval:
         lines.append(f"  Evaluated: {dates_eval} dates, {entities_eval} entities")
     lines.append("")
+
+    # --- ENTITY DIAGNOSTICS ---
+    if output_base:
+        entity_diag = _load_entity_diagnostics(output_base / "accuracy")
+        entity_lines = _format_entity_diagnostics_section(entity_diag)
+        lines.extend(entity_lines)
 
     # --- TIMING ---
     lines.append("**TIMING:**")
