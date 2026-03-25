@@ -3,7 +3,7 @@
 **Version:** 1.0
 **Date:** 2026-03-25
 **Authors:** Barney (architect) + Fred (decision-maker)
-**Status:** PROPOSED — Awaiting Fred's approval
+**Status:** APPROVED by Fred 2026-03-25
 **Amends:** `PIPELINE_V4_DESIGN.md` v1.0 APPROVED (2026-03-21)
 
 ---
