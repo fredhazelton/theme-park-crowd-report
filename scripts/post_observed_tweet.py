@@ -207,8 +207,8 @@ def post_reply_tweet(video_path: Path, content: dict, reply_to_id: str) -> str |
     """Post observed tweet as reply to prediction tweet."""
     try:
         # Load Twitter API credentials from environment
-        api_key = os.getenv("TWITTER_API_KEY")
-        api_secret = os.getenv("TWITTER_API_SECRET")
+        api_key = os.getenv("TWITTER_CONSUMER_KEY")
+        api_secret = os.getenv("TWITTER_CONSUMER_SECRET")
         access_token = os.getenv("TWITTER_ACCESS_TOKEN")
         access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
         

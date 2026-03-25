@@ -185,8 +185,8 @@ def post_tweet(video_path: Path, content: dict) -> str | None:
     """Post tweet with video to Twitter."""
     try:
         # Load Twitter API credentials from environment
-        api_key = os.getenv("TWITTER_API_KEY")
-        api_secret = os.getenv("TWITTER_API_SECRET")
+        api_key = os.getenv("TWITTER_CONSUMER_KEY")
+        api_secret = os.getenv("TWITTER_CONSUMER_SECRET")
         access_token = os.getenv("TWITTER_ACCESS_TOKEN")
         access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
         
