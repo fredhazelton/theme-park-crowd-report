@@ -1,8 +1,8 @@
 # SESSION_LOG — WTI Pipeline
 
-**Last updated:** 2026-03-25 by Barney (Session 20 — final update)
+**Last updated:** 2026-03-25 by Barney (Session 20 — final)
 **Session:** 20
-**Status:** Production pipeline running. Twitter content pipeline LIVE — first automated tweet expected 2026-03-26 at 4 PM ET.
+**Status:** Production pipeline running. Twitter content pipeline LIVE — first automated tweet expected 2026-03-26 at 4 PM ET. Multi-property expansion planned for Session 21.
 
 ---
 
@@ -73,6 +73,7 @@
 |------|--------|---------|
 | **Twitter content pipeline** | LIVE — awaiting first pipeline run | Crons active: 4 PM predicted, 8:30 AM observed. First tweet expected 2026-03-26 |
 | **TPCR #456** | Phases 1-3 complete, monitoring | Close after first successful tweet thread |
+| **Multi-property tweet expansion** | Planned for Session 21 | Add Disneyland Resort, Universal Orlando, etc. |
 | **TPCR #453 — Competition framework** | Open | 430 entities trained, needs fresh eval with full model set |
 | **Scraper freshness** | Flagged by Gazoo | 60.4h stale as of Mar 24 PM audit |
 
@@ -82,10 +83,11 @@
 
 1. **Monitor first tweet cycle (2026-03-26):** Check #wti-pipeline for quality gate results after 6 AM pipeline. Verify 4 PM predicted tweet posts correctly to @DisneyStatsWhiz.
 2. **Monitor first reply thread (2026-03-27 8:30 AM):** Verify observed tweet replies to yesterday's prediction.
-3. **Wilma: Verify cron environment loads Twitter credentials** — cron jobs may not inherit shell env vars. Test with `env -i` simulation.
-4. **Wilma: Run fresh competition evaluation** (TPCR #453) — need baseline vs hypertuned_v1 comparison
-5. **Wilma: Fix scraper freshness** — Gazoo flagged 60h stale
-6. **Pebbles: Design predicted vs observed tweet visuals** — distinct styles per Amendment 001
+3. **Session 21: Expand to multi-property tweets.** Fred wants additional automated tweets — "This week at Disneyland Resort", "Universal Orlando Crowd Forecast", etc. Same architecture (Step 14 content JSON → quality gate → Remotion → tweet), just more property configurations. Design the tweet schedule so we're not flooding followers.
+4. **Wilma: Verify cron environment loads Twitter credentials** — cron jobs may not inherit shell env vars. Test with `env -i` simulation.
+5. **Wilma: Run fresh competition evaluation** (TPCR #453) — need baseline vs hypertuned_v1 comparison
+6. **Wilma: Fix scraper freshness** — Gazoo flagged 60h stale
+7. **Pebbles: Design predicted vs observed tweet visuals** — distinct styles per Amendment 001
 
 ---
 
@@ -114,6 +116,7 @@
 
 | Date | Session | Decision | Who |
 |------|---------|----------|-----|
+| 2026-03-25 | 20 | Next session: expand tweets to Disneyland Resort, Universal Orlando, etc. | Fred |
 | 2026-03-25 | 20 | Twitter content pipeline GO LIVE — quality gate is the safeguard | Fred |
 | 2026-03-25 | 20 | V4 Amendment 001 approved: Step 14 content pipeline + quality gate | Fred + Barney |
 | 2026-03-25 | 20 | The Quarry retired | Fred + Barney |
@@ -146,6 +149,7 @@
 | `c493b09` | Wilma | Phase 1: s14_content.py + quality gate + legacy archive |
 | `298bf2c` | Wilma | Phase 2/3: posting scripts + crons |
 | `c187c91` | Wilma | Fix Twitter credential env var names |
+| `e5ea31a` | Barney | SESSION_LOG go-live update |
 
 ---
 
@@ -157,6 +161,7 @@
 - **Content output:** `~/hazeydata/pipeline/content/` — predicted/observed JSONs + tweet_state.json
 - **Clawdbot config:** `~/.clawdbot/clawdbot.json` on wilma-server. Discord bot token is in `~/.env`, NOT the JSON config.
 - **Gazoo audits:** Fire at 2 AM and 4 PM ET. Posts to #gazoo channel.
+- **Multi-property expansion:** Fred wants DLR, Universal Orlando, etc. in Session 21. The Step 14 architecture supports this — just add park code filters and property-specific Remotion compositions. Need to check which properties have WTI data in wti.parquet.
 
 ---
 
@@ -168,7 +173,7 @@ Any agent beginning work on this project should:
 2. Read the governing spec (`docs/PIPELINE_V4_DESIGN.md`) and Amendment 001 (`docs/V4_AMENDMENT_001_CONTENT_PIPELINE.md`)
 3. Check `#wti-pipeline` (`1479351574177513576`) — did the tweet go out? Any quality gate holds?
 4. Check @DisneyStatsWhiz on Twitter — verify tweet content looks correct
-5. Pick up from "Next Actions" above
+5. Pick up from "Next Actions" above — **Session 21 priority is multi-property tweet expansion**
 
 ---
 
