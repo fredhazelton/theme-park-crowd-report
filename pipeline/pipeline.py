@@ -55,6 +55,7 @@ _LEGACY_STEP_MAP = {
     "s10_accuracy": None,    # no legacy equivalent
     "s11_deploy": None,      # no legacy equivalent
     "s12_validate": None,    # no legacy equivalent
+    "s14_content": None,     # no legacy equivalent
 }
 
 

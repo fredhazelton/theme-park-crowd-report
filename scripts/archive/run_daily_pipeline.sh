@@ -401,7 +401,7 @@ elif $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py check training 2>/d
     $PYTHON scripts/pipeline_state.py record training false "no dirty entities" 2>/dev/null || true
 else
     # Build training command
-    TRAINING_CMD="$PYTHON scripts/hybrid_pipeline_v2.py --output-base $OUTPUT_BASE --skip-scoring"
+    TRAINING_CMD="$PYTHON scripts/archive/hybrid_pipeline_v2.py --output-base $OUTPUT_BASE --skip-scoring"
     if $USE_ACTUALS_ONLY; then
         TRAINING_CMD="$TRAINING_CMD --actuals-only"
         TRAINING_DESC="Actuals-only training (5 features, no posted_time, OOM-safe)"
@@ -498,6 +498,15 @@ else
         $SKIP_IF_UNCHANGED && $PYTHON scripts/pipeline_state.py record wti false "wti failed" 2>/dev/null || true
         $STOP_ON_ERROR && exit 1
     fi
+fi
+
+# Generate daily accuracy report (compares yesterday's forecast vs actuals)
+log_info "=== Daily accuracy report ==="
+YESTERDAY=$(date -d "yesterday" +%Y-%m-%d 2>/dev/null || date -v -1d +%Y-%m-%d 2>/dev/null || python3 -c "import datetime; print((datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))")
+if run_step "Daily accuracy report" $PYTHON scripts/daily_accuracy_report.py --date "$YESTERDAY" --json --output "accuracy_report_${YESTERDAY}.txt"; then
+    log_info "Accuracy report saved: accuracy_report_${YESTERDAY}.txt and accuracy_report_${YESTERDAY}.json"
+else
+    log_info "WARNING: Daily accuracy report failed (non-fatal, continuing)"
 fi
 
 # Pre-generate calendar heatmap images for Discord bot
