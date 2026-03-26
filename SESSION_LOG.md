@@ -6,6 +6,19 @@
 
 ---
 
+## Enterprise Architecture (v3.0)
+
+| Tier | Agent | WTI Role |
+|------|-------|----------|
+| 1 | **Fred** | Approvals, content direction, monetization |
+| 2 | **Barney** | Pipeline design, amendment specs, accuracy review |
+| 3 | **Dino** 🦕 | Daily pipeline report (7:07 AM), deployment, monitoring |
+| 4 | **wilma-server** | WTI pipeline (6 AM), databases, Twitter posting, models |
+
+**Dino (Tier 3)** runs the WTI Daily Report at 7:07 AM from the Mac Mini — SSHs to wilma, checks pipeline metrics and accuracy, posts to #wti-pipeline. He replaced Wilma's s13_report (which has been disabled on wilma's crontab). Dino can also deploy code changes, manage crons, and troubleshoot pipeline issues.
+
+**To request WTI execution:** Post to #wti-pipeline, create a GitHub ticket, or write a spec for Dino.
+
 ## Project Background
 
 **What we're building:** The Wait Time Index (WTI) — a theme park crowd prediction and analytics platform that forecasts wait times and crowd patterns for Walt Disney World attractions up to 730 days out.
