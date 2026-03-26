@@ -103,7 +103,7 @@ class PipelineConfig:
         "UH",                     # Universal Hollywood
         "TDL", "TDS",             # Tokyo
     ])
-    ignore_parks: list[str] = field(default_factory=lambda: ["BB"])  # Blizzard Beach
+    ignore_parks: list[str] = field(default_factory=lambda: ["BB", "TL", "VB"])  # Water parks
 
     def get_min_training_year(self, park_code: str) -> int:
         """Get minimum training year for a park (0 = no cutoff)."""

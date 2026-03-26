@@ -57,7 +57,15 @@ def convert_month_to_parquet(args):
             return prefix.lower()
         
         combined["park_code"] = combined["entity_code"].apply(get_park)
-        
+
+        # Exclude water parks (BB, TL, VB) per config.ignore_parks
+        excluded_parks = {"bb", "tl", "vb"}
+        before = len(combined)
+        combined = combined[~combined["park_code"].isin(excluded_parks)]
+        dropped = before - len(combined)
+        if dropped > 0:
+            logging.getLogger(__name__).info(f"  {month_dir.name}: dropped {dropped} water park rows")
+
         # Output path
         output_path = output_dir / f"{month_dir.name}.parquet"
         combined.to_parquet(output_path, index=False, compression="snappy")
