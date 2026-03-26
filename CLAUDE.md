@@ -2,7 +2,7 @@
 
 ## Critical: Read Before Writing Code
 
-**Read `docs/ARCHITECTURE.md` first.** It defines the mandatory data access pattern.
+**Read `docs/PIPELINE_V4_DESIGN.md` first.** It defines the pipeline architecture, data flow, and quality gates.
 
 ## The #1 Rule
 
@@ -20,19 +20,21 @@ df = con.execute(f"""
 ## Project Overview
 
 - **What:** Theme park wait time predictions (Disney, Universal)
-- **Stack:** Python + DuckDB + XGBoost (Julia for production training)
+- **Stack:** Python + DuckDB + XGBoost
 - **Data:** Parquet fact tables in `/mnt/data/pipeline/fact_tables/parquet/`
 - **Dimensions:** CSV in `/mnt/data/pipeline/dimension_tables/`
 - **Models:** Per-entity XGBoost in `/mnt/data/pipeline/models/{entity_code}/`
 
 ## Key Files
 
-- `scripts/hybrid_pipeline_v2.py` — **Main pipeline** (reference for patterns)
-- `src/processors/training.py` — Per-entity model training
+- `pipeline/pipeline.py` — **Main pipeline entry point** (V4, runs daily at 6 AM ET)
+- `pipeline/steps/s07_training.py` — Per-entity XGBoost training
+- `pipeline/steps/s14_content.py` — Content generation + quality gate for tweets
 - `src/processors/encoding.py` — Label encoding
-- `src/processors/posted_to_actual.py` — POSTED→ACTUAL conversion (DuckDB)
-- `src/processors/synthetic_actuals.py` — Synthetic actuals generator (DuckDB)
+- `src/processors/posted_to_actual.py` — POSTED to ACTUAL conversion (DuckDB)
+- `docs/PIPELINE_V4_DESIGN.md` — Governing pipeline spec
 - `docs/MODELING_AND_WTI_METHODOLOGY.md` — Full methodology docs
+- `SESSION_LOG.md` — Source of truth for current project state
 
 ## Memory Limits
 
