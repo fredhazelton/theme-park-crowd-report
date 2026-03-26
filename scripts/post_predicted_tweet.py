@@ -150,10 +150,10 @@ def render_remotion_composition(target_date: str) -> Path | None:
         try:
             # Render DailyWTIAll composition
             cmd = [
-                "npm", "run", "build",
-                "--", 
-                "--id=DailyWTIAll",
-                f"--output={output_file}"
+                "npx", "remotion", "render",
+                "src/index.ts", 
+                "DailyWTIAll",
+                str(output_file)
             ]
             
             logger.info(f"Rendering Remotion composition: {' '.join(cmd)}")
