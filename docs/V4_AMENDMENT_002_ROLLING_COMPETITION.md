@@ -3,7 +3,7 @@
 **Version:** 1.0
 **Date:** 2026-03-26
 **Authors:** Barney (architect) + Fred (decision-maker)
-**Status:** PROPOSED — Awaiting Fred's approval
+**Status:** APPROVED by Fred — 2026-03-26
 **Amends:** `PIPELINE_V4_DESIGN.md` Phase E (Competition Framework)
 
 ---
@@ -160,13 +160,13 @@ Each tests ONE thing. Results are interpretable. The queue is replenished as we 
 
 ## Excluded Parks
 
-The following park codes are excluded from competition evaluation (and all pipeline processing per Fred directive):
+The following park codes are excluded from all pipeline processing per Fred directive (Session 22):
 
 - **BB** — Blizzard Beach (WDW water park)
 - **TL** — Typhoon Lagoon (WDW water park)
 - **VB** — Volcano Bay (Universal water park)
 
-Water parks are a fundamentally different product with intermittent schedules and weather-dependent operations. WTI doesn't translate meaningfully for their format. They are filtered at ETL ingestion (`step_02_etl.py`) so no observations enter the fact tables.
+Water parks are a fundamentally different product with intermittent schedules and weather-dependent operations. WTI doesn't translate meaningfully for their format. They are filtered at ETL ingestion (`step_02_etl.py`) so no observations enter the fact tables. No models trained, no forecasts generated, no tweets published.
 
 ---
 
