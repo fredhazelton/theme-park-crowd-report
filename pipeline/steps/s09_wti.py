@@ -62,6 +62,7 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
         return {"rows": 0}
 
     combined = pd.concat([r for r in results if r is not None], ignore_index=True)
+    combined = combined[~combined["park_code"].isin(cfg.ignore_parks)]
     combined = combined.sort_values(["park_code", "park_date", "source"])
     combined = combined.drop_duplicates(subset=["park_code", "park_date"], keep="first")
 

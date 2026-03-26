@@ -96,6 +96,8 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
     total_mae = 0.0
 
     for park_code in sorted(park_entity_map.keys()):
+        if park_code in cfg.ignore_parks:
+            continue
         park_entities = park_entity_map[park_code]
 
         with log.timed(f"train park {park_code} ({len(park_entities)} entities)"):
