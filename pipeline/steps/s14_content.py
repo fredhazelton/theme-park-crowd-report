@@ -37,11 +37,12 @@ WDW_PARKS = {
     "AK": "Animal Kingdom"
 }
 
-# Quality gate thresholds
+# Quality gate thresholds (relaxed 2026-03-30 — Barney directive)
+# Previous values: BOUNDS 1-70, PEER 0.60, DAY_JUMP 15, STALENESS exact date
 BOUNDS_MIN = 1.0
 BOUNDS_MAX = 70.0
-PEER_OUTLIER_THRESHOLD = 0.60  # 60%
-DAY_JUMP_THRESHOLD = 15.0      # 15 WTI points
+PEER_OUTLIER_THRESHOLD = 0.90  # 90% (was 60%)
+DAY_JUMP_THRESHOLD = 25.0      # 25 WTI points (was 15)
 
 
 def _extract_wti_data(cfg: PipelineConfig, log: PipelineLogger, target_date: str, source: str) -> Dict[str, float] | None:
@@ -105,7 +106,7 @@ def _check_absolute_bounds(wti_data: Dict[str, float]) -> List[str]:
 
 
 def _check_peer_outlier(wti_data: Dict[str, float]) -> List[str]:
-    """Check 3: No park should deviate >60% from peer mean."""
+    """Check 3: No park should deviate >90% from peer mean."""
     failures = []
     
     if len(wti_data) < 4:
@@ -131,7 +132,7 @@ def _check_peer_outlier(wti_data: Dict[str, float]) -> List[str]:
 
 
 def _check_day_jump(wti_data: Dict[str, float], cfg: PipelineConfig, target_date: str) -> List[str]:
-    """Check 4: Day-over-day stability for predictions (<15 point jump)."""
+    """Check 4: Day-over-day stability for predictions (<25 point jump)."""
     failures = []
     
     try:
@@ -176,7 +177,7 @@ def _check_day_jump(wti_data: Dict[str, float], cfg: PipelineConfig, target_date
 
 
 def _check_staleness(cfg: PipelineConfig, run_date: str) -> List[str]:
-    """Check 5: WTI parquet must have been modified today."""
+    """Check 5: WTI parquet must have been modified within the last 24 hours."""
     failures = []
     
     wti_path = cfg.wti_dir / "wti.parquet"
@@ -184,12 +185,13 @@ def _check_staleness(cfg: PipelineConfig, run_date: str) -> List[str]:
         failures.append("STALE_DATA: wti.parquet does not exist")
         return failures
     
-    # Get file modification date
+    # Get file modification time — allow within 24 hours (was: exact date match)
     mod_time = datetime.fromtimestamp(wti_path.stat().st_mtime)
-    mod_date = mod_time.strftime("%Y-%m-%d")
+    age_hours = (datetime.now() - mod_time).total_seconds() / 3600
     
-    if mod_date != run_date:
-        failures.append(f"STALE_DATA: wti.parquet last modified {mod_date}, expected {run_date}")
+    if age_hours > 24:
+        mod_date = mod_time.strftime("%Y-%m-%d %H:%M")
+        failures.append(f"STALE_DATA: wti.parquet last modified {mod_date}, {age_hours:.1f}h ago (threshold: 24h)")
     
     return failures
 
@@ -236,7 +238,7 @@ def _create_content_json(content_type: str, target_date: str, wti_data: Dict[str
         "held_reasons": held_reasons,
         "target_date": target_date,
         "generated_at": run_time,
-        "generated_by": "s14_content v1.0",
+        "generated_by": "s14_content v1.1",
         "property": "WDW",
         "parks": parks_data
     }
