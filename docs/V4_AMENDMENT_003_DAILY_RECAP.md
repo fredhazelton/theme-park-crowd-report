@@ -3,7 +3,7 @@
 **Version:** 1.0
 **Date:** 2026-04-01
 **Authors:** Barney (architect) + Fred (decision-maker)
-**Status:** PROPOSED — Awaiting Fred's approval
+**Status:** APPROVED by Fred — 2026-04-01
 **Amends:** `PIPELINE_V4_DESIGN.md` (adds Step 15: Daily Recap)
 
 ---
@@ -23,6 +23,7 @@ This is a **content product** built on top of the WTI pipeline — it turns our 
 **Frequency:** Daily, published after the observed WTI tweet (~8:30 AM ET)
 **Scope:** Walt Disney World only (MK, EP, HS, AK) — Phase 1
 **Format:** Pure data/template (no LLM generation) — Phase 1
+**Blog repo:** `hazeydata/hazeydata.ai` (master branch), path `theme-park-crowd-report/blog/`
 
 ### What It Answers
 
