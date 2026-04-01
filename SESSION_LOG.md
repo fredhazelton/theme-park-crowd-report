@@ -1,8 +1,8 @@
 # Session Log
 
-**Last updated:** 2026-03-30 by Barney (Session 23)
-**Session:** 23
-**Status:** Quality gate relaxed. Shadow run broken (Dino fixing). PQ research complete. Tweets posting daily.
+**Last updated:** 2026-04-01 by Barney (Session 25)
+**Session:** 25
+**Status:** Shadow evaluation overhauled. Pipeline stable 13/13. Tweets posting. xgb-highLR shadow resetting for clean 7 days.
 
 ---
 
@@ -23,7 +23,7 @@
 
 **Why it matters:** WTI is HazeyData's core product. Accurate crowd predictions are the foundation for all monetization — Discord bot, premium subscriptions, public dashboards, and the eventual customer-facing analytics layer.
 
-**How we got here:** Pipeline evolved v1→v4. Sessions 20-21 built Twitter content pipeline (Step 14 + quality gate). Session 22 proved the four-tier architecture, migrated tweets to Dino, launched rolling competition framework (Amendment 002), and excluded water parks from the pipeline. Session 23 relaxed the quality gate, diagnosed broken shadow run, and completed Priority Queue (Lightning Lane) research.
+**How we got here:** Pipeline evolved v1→v4. Sessions 20-21 built Twitter content pipeline (Step 14 + quality gate). Session 22 proved the four-tier architecture, migrated tweets to Dino, launched rolling competition framework (Amendment 002), and excluded water parks from the pipeline. Session 23 relaxed the quality gate, diagnosed broken shadow run, and completed Priority Queue (Lightning Lane) research. Session 24 (Dino solo): fixed shadow paths, tweet threading, intel brief dedup. Session 25: overhauled shadow evaluation methodology.
 
 **Key findings that still apply:**
 - Archive filenames MUST contain `YYYY-MM-DD` dates with hyphens or the forecast evaluator silently skips them
@@ -32,6 +32,7 @@
 - The Quarry is **retired** as of Session 20 / Amendment 001
 - EU entity = **Epic Universe** (Universal Orlando), NOT Europa-Park — dimension table fix pending
 - Water parks (BB, TL, VB) **excluded from all pipeline processing** — ETL, training, forecasts, tweets
+- **Shadow evaluation must use identical methodology to s10_accuracy.py** — evaluation logic lives in `pipeline/competition/shadow_evaluate.py` in TPCR, never in the orchestrator scripts
 
 **Foundational documents:**
 | Document | Location | What |
@@ -52,10 +53,10 @@
 | 2:00 AM | Gazoo audit | ✅ Live |
 | 4:00 AM | SSD daily report | ✅ Live |
 | 6:00 AM | ACCORD intel brief | ✅ Live |
-| 7:00 AM | Shadow run challenger (`shadow_run_challenger.py`) | ⚠️ BROKEN — path mismatches (Dino fixing) |
+| 7:00 AM | Shadow run (`rolling_shadow.py` or `shadow_run_challenger.py`) | ⚠️ NEEDS DEPLOY — new code committed, Dino must `git pull` both repos |
 | 7:07 AM | WTI daily report | ✅ Live |
-| 8:30 AM | WTI observed tweet | ✅ Live (quality gate relaxed S23) |
-| 4:00 PM | Gazoo audit + WTI predicted tweet | ✅ Live (quality gate relaxed S23) |
+| 8:30 AM | WTI observed tweet | ✅ Live |
+| 4:00 PM | Gazoo audit + WTI predicted tweet | ✅ Live |
 
 wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 
@@ -63,37 +64,40 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 
 ## Current State
 
-- **Forecast scope:** ~47M predictions/day, 59,255 WTI park-dates through March 2028
+- **Forecast scope:** ~46M predictions/day, 59,255 WTI park-dates through March 2028
 - **Pipeline version:** V4 (governed by `PIPELINE_V4_DESIGN.md` + Amendments 001, 002)
-- **Daily pipeline:** Running 6 AM ET on wilma-server, steps s01-s14, ~58-60 min, 13/13 passing daily
-- **Accuracy:** Overall MAE 8.4, WTI MAE 6.9 (baseline, Mar 30)
-- **Challenger:** `xgb-highLR` — shadow Day 4, but **zero comparison data** due to broken paths
+- **Daily pipeline:** Running 6 AM ET on wilma-server, steps s01-s14, ~59 min, 13/13 passing daily
+- **Accuracy:** Overall MAE 8.4, WTI MAE 7.1, 1-Day MAE 7.3 (Apr 1)
+- **Challenger:** `xgb-highLR` — shadow run resetting for clean 7 days with corrected evaluation
 - **Models:** 420 baseline, 433 total coverage, 109 on fallback
-- **Twitter:** LIVE on @DisneyStatsWhiz — predicted + observed tweets posting daily (confirmed visible)
+- **Twitter:** LIVE on @DisneyStatsWhiz — predicted + observed tweets posting daily, threading fixed
 - **Quality gate:** Relaxed Session 23 (peer outlier 60%→90%, day-jump 15→25, staleness exact→24h)
 - **Scraper:** Running (Restart=always)
-- **Shadow run:** BROKEN — `rolling_shadow.py` has hardcoded `hypertuned_v1` paths instead of using challenger name, plus stale V3 baseline path. Dino briefed to fix.
+- **Shadow run:** Evaluation overhauled Session 25. Old data used POSTED methodology (inflated MAE 16-17). New methodology matches s10_accuracy.py exactly. Needs deploy + reset.
 - **Water parks:** BB/TL/VB excluded from ETL (TPCR #457)
 - **Properties with WTI data:** 13 (WDW, DLR, Universal Orlando, Universal Hollywood, Tokyo Disney, Epic Universe)
 
 ---
 
-## Session 23 Summary (2026-03-30)
+## Session 25 Summary (2026-04-01)
 
 ### Barney (Tier 2):
-1. Read SESSION_LOG, checked Discord #wti-pipeline (50 messages), reviewed commit history
-2. **Priority Queue research:** Complete web research sweep on Lightning Lane system — current rules, tiers, pricing, public opinion, competitive landscape, data collection opportunities. Document ready for repo at `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md`
-3. **Drafted reply to @TheHappyRecap** — methodology question about non-operational rides in WTI (screenshot from X)
-4. **Tweet troubleshooting:** Diagnosed intermittent tweet failures — quality gate too strict was holding good content
-5. **Committed quality gate relaxation** to `s14_content.py` (SHA `873a4027`) — peer outlier 60→90%, day-jump 15→25, staleness exact date→24h window
-6. **Diagnosed broken shadow run:** `rolling_shadow.py` has 3 path bugs — hardcoded `hypertuned_v1` in forecast generation, hardcoded `hypertuned_v1` in archive paths, stale V3 baseline path `/mnt/data/`. Briefed Dino directly.
-7. Updated SESSION_LOG
+1. Read SESSION_LOG, checked Discord #wti-pipeline (50 msgs), #barney-wilma-dev (20 msgs), recent commits in both repos
+2. **Situational awareness:** Pipeline stable 13/13 daily. Shadow run fixed by Dino (S24) but producing inflated MAE. Tweets posting reliably. Tweet threading fix deployed Mar 31. Intel brief dedup deployed.
+3. **Shadow run deep dive (Fred-directed):** Analyzed `rolling_shadow.py`, `shadow_run_challenger.py`, and `s10_accuracy.py` line by line. Found 4 methodology divergences causing shadow MAE ~16-17 vs pipeline MAE 8.4:
+   - `wait_time_type = 'POSTED'` instead of `'ACTUAL'`
+   - Floor-based time bucketing vs `TIME_BUCKET` with midpoint rounding
+   - No synthetic actuals fallback
+   - Residual stale paths in `shadow_run_challenger.py`
+4. **Created `pipeline/competition/shadow_evaluate.py`** in TPCR — shared evaluation module using identical SQL patterns to `s10_accuracy.py`. Called via CLI.
+5. **Rewrote `rolling_shadow.py`** in operations — removed all inline evaluation SQL, delegates to `shadow_evaluate.py` via SSH. Fixed baseline path.
+6. **Deprecated `shadow_run_challenger.py`** — now a redirect wrapper to `rolling_shadow.py`.
+7. **Briefed Dino** via #barney-wilma-dev with deployment steps.
+8. Updated SESSION_LOG.
 
 ### Fred (Tier 1) — Decisions:
-- Approved quality gate relaxation (~50%)
-- Directed Priority Queue research as next data product after WTI competition stabilizes
-- Confirmed "Priority Queue" as enterprise-wide term for all skip-the-line systems
-- Sent shadow run fix directly to Dino
+- Directed full shadow evaluation fix (no quick patches)
+- Principle established: shadow run = same logic, different predictions. Evaluation methodology must live in one place.
 
 ---
 
@@ -101,9 +105,9 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 
 | Item | Status | Details |
 |------|--------|---------|
-| **Shadow run fix** | Dino briefed | 3 path bugs in `rolling_shadow.py`. Reset xgb-highLR for clean 7 days after fix. |
-| **Quality gate relaxation** | ✅ Committed | Takes effect next pipeline run (tomorrow 6 AM). Wilma must `git pull`. |
-| **PQ research doc** | Complete | Ready for commit to `docs/priority-queue/` in TPCR |
+| **Shadow evaluation deploy** | Dino must deploy | `git pull` on both TPCR (wilma-server) and operations (Mac Mini). Reset challenger registry. |
+| **Shadow run reset** | After deploy | Clear xgb-highLR daily_metrics and shadow_days. Clean 7 days with correct methodology. |
+| **PQ research doc** | Needs commit | Ready for commit to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR |
 | **EU dimension fix** | Flagged | "Europa-Park" → "Epic Universe" across pipeline |
 | **extract_daily_wti.py date bug** | Flagged | Predicted mode date logic wrong — workaround in place |
 
@@ -111,14 +115,13 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 
 ## Next Actions (Priority Order)
 
-1. **Dino: Fix rolling_shadow.py paths** — 3 bugs identified. Reset shadow run after fix.
-2. **Verify quality gate relaxation works** — check tomorrow's tweets post without holds
+1. **Dino: Deploy shadow evaluation overhaul** — `git pull` both repos, reset challenger registry
+2. **Monitor shadow run Apr 2-3** — verify new methodology produces comparison data with MAE consistent with pipeline (~8-9 range, not 16-17)
 3. **Commit PQ research doc** to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR
 4. **Dino: Add challenger #2 from queue** — `xgb-dow` (day-of-week feature) per Amendment 002
-5. **Reply to @TheHappyRecap** — methodology question about non-operational rides
-6. **Fix EU dimension table** — "Europa-Park" → "Epic Universe"
-7. **Multi-property tweets** — DLR + Universal Orlando ready. Design schedule.
-8. **PQ data collection** — evaluate MDE scraper vs Thrill-Data partnership (5 open questions in research doc)
+5. **Fix EU dimension table** — "Europa-Park" → "Epic Universe"
+6. **Multi-property tweets** — DLR + Universal Orlando ready. Design schedule.
+7. **PQ data collection** — evaluate MDE scraper vs Thrill-Data partnership
 
 ---
 
@@ -126,7 +129,7 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 
 | Blocker | Impact | Resolution |
 |---------|--------|------------|
-| Shadow run path bugs | Zero competition data after 4 days | Dino fixing — reset shadow run after |
+| Shadow evaluation deploy | No clean competition data until Dino deploys | Briefed via Discord, straightforward git pull + reset |
 
 ---
 
@@ -134,18 +137,18 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 
 | Metric | Value | Updated |
 |--------|-------|---------|
-| Total predictions | ~47M/day | S20 |
-| WTI park-dates | 59,255 | S23 |
+| Total predictions | ~46M/day | S25 |
+| WTI park-dates | 59,255 | S25 |
 | Forecast horizon | Through March 2028 | S1 |
-| Overall MAE | 8.4 min | S23 |
-| WTI MAE | 6.9 min | S23 |
-| 1-Day MAE | 7.3 min | S23 |
-| Baseline models | 420 | S23 |
+| Overall MAE | 8.4 min | S25 |
+| WTI MAE | 7.1 min | S25 |
+| 1-Day MAE | 7.3 min | S25 |
+| Baseline models | 420 | S25 |
 | Fallback entities | 109 | S20 |
 | Properties with WTI | 13 | S22 |
 | Dino crons | 8 | S22 |
-| Active challengers | 1 (broken, fixing) | S23 |
-| Tweet success rate | ~70% → expected ~95%+ after gate fix | S23 |
+| Active challengers | 1 (resetting for clean eval) | S25 |
+| Tweet success rate | High — posting daily since gate fix | S25 |
 
 ---
 
@@ -153,6 +156,9 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 
 | Date | Session | Decision | Who |
 |------|---------|----------|-----|
+| 2026-04-01 | 25 | Shadow evaluation must use identical methodology to s10_accuracy.py — no divergent SQL | Fred + Barney |
+| 2026-04-01 | 25 | Shadow evaluation logic lives in TPCR repo (`shadow_evaluate.py`), never in orchestrator scripts | Barney |
+| 2026-04-01 | 25 | Old shadow data (3 days, POSTED methodology) discarded — reset for clean 7 days | Fred + Barney |
 | 2026-03-30 | 23 | Quality gate relaxed ~50%: peer 60→90%, day-jump 15→25, staleness 24h | Fred + Barney |
 | 2026-03-30 | 23 | Priority Queue confirmed as enterprise-wide term for skip-the-line systems | Fred |
 | 2026-03-30 | 23 | PQ research is next data product after WTI competition stabilizes | Fred |
@@ -174,7 +180,7 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 | Ticket | Repo | Status | Notes |
 |--------|------|--------|-------|
 | #457 | TPCR | Open | Water park suppression (BB/TL/VB) — ETL filter implemented |
-| #453 | TPCR | Open | Competition — shadow run broken, Dino fixing paths |
+| #453 | TPCR | Open | Competition — shadow evaluation overhauled S25, needs deploy |
 | PR #1 | data-hub | Open | Firecrawl WDW park hours scraper |
 
 ---
@@ -187,21 +193,22 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 - **Tweet state:** Mac Mini `~/hazeydata/reports/wti_daily/tweet_state.json`.
 - **Pipeline output:** `/home/wilma/hazeydata/pipeline` on wilma-server.
 - **Content JSONs:** `/home/wilma/hazeydata/pipeline/content/`.
-- **Shadow forecasts:** `forecasts/shadow/{challenger_name}/` on wilma-server.
+- **Shadow archives:** `{PIPELINE_BASE}/competition/shadow/{challenger_name}/` on wilma-server.
 - **Challenger registry:** `pipeline/competition/challenger_registry.json` on wilma-server.
+- **Baseline forecasts path:** `curves/forecast_parquet/all_forecasts.parquet` (from `config.py`).
 - **Briefings:** `docs/briefings/` in operations repo — version-controlled cross-tier comms.
 - **EU bug:** Epic Universe, NOT Europa-Park. Dimension table corrupted enterprise-wide. Fix pending.
 - **Water parks:** BB/TL/VB filtered at ETL. No models, no forecasts, no tweets.
-- **Shadow run bug (S23):** `rolling_shadow.py` in operations repo has 3 path issues: (1) `generate_forecasts()` hardcodes `--challenger hypertuned_v1` instead of using challenger name, (2) `archive_predictions()` hardcodes `hypertuned_v1` in chal_src path, (3) `base_src` uses stale `/mnt/data/` V3 path instead of V4 `/home/wilma/hazeydata/pipeline/forecasts/all_forecasts.parquet`. All three must be fixed, then shadow run reset for clean 7 days.
+- **Shadow evaluation architecture (S25):** Evaluation logic lives in `pipeline/competition/shadow_evaluate.py` (TPCR). Uses identical SQL to `s10_accuracy.py`: ACTUAL wait_time_type, TIME_BUCKET with 2.5-min midpoint rounding, synthetic actuals fallback. Orchestrator (`rolling_shadow.py` in operations) calls it via SSH — never runs its own evaluation SQL. `shadow_run_challenger.py` deprecated to a redirect wrapper.
 
 ---
 
 ## How to Start Next Session
 
 1. Read this file (`SESSION_LOG.md` in `hazeydata/theme-park-crowd-report`)
-2. Check if Dino fixed the shadow run paths — should see comparison data in Discord reports
-3. Check @DisneyStatsWhiz — verify quality gate relaxation eliminated held tweets
-4. Check `#wti-pipeline` for Dino's updates
+2. Check if Dino deployed the shadow evaluation overhaul — look for shadow reports with MAE ~8-9 (not 16-17)
+3. Check `#wti-pipeline` for shadow reports and pipeline status
+4. Verify tweets still posting on @DisneyStatsWhiz
 5. Pick up from "Next Actions" above
 
 ---
