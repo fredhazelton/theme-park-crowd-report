@@ -129,6 +129,7 @@ def _write_to_live_duckdb(
     Fails gracefully if DuckDB/init not available.
     """
     import time as _time
+    import gc
 
     if duckdb is None or df.empty:
         return False
@@ -169,6 +170,8 @@ def _write_to_live_duckdb(
                 """)
             finally:
                 con.close()
+                del con
+                gc.collect()
             logger.debug(f"Wrote {len(df)} rows to live_waits")
             return True
         except Exception as e:
