@@ -61,6 +61,10 @@ WARNING_PATTERNS = [
 
 def get_log_path(date_str: str) -> Path:
     """Get the daily pipeline log path for a given date."""
+    # Try both naming conventions (pipeline_ and daily_pipeline_)
+    new_path = LOG_DIR / f"pipeline_{date_str}.log"
+    if new_path.exists():
+        return new_path
     return LOG_DIR / f"daily_pipeline_{date_str}.log"
 
 
@@ -72,7 +76,7 @@ def check_log_for_issues(log_path: Path) -> dict:
         # Pipeline is scheduled at 6 AM ET — don't fire critical before run time
         from zoneinfo import ZoneInfo
         now_et = datetime.now(ZoneInfo("America/Toronto"))
-        date_from_log = log_path.stem.replace("daily_pipeline_", "")
+        date_from_log = log_path.stem.replace("pipeline_", "").replace("daily_", "")
         is_today = now_et.strftime("%Y-%m-%d") == date_from_log
         pipeline_hour = 7  # alert after 7 AM to give the 6 AM run time to finish
         if is_today and now_et.hour < pipeline_hour:
