@@ -1,6 +1,6 @@
 # Session Log
 
-**Last updated:** 2026-04-02 by Barney (Session 26)
+**Last updated:** 2026-04-02 by Barney (Session 26), note added 2026-04-03 by Barney (SSD S23)
 **Session:** 26
 **Status:** All 8 Gazoo findings fixed. Shadow MAE averaging aligned with s10. Pipeline 13/13. Tweets posting. Daily Recap live. 10 Mac Mini crons.
 
@@ -48,6 +48,34 @@
 | REDESIGN.md v3.0 | `docs/REDESIGN.md` in operations | Four-tier enterprise architecture |
 | PQ Research | `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR | Lightning Lane / Priority Queue complete landscape analysis |
 | Dino briefings | `docs/briefings/` in operations | Cross-tier task assignments |
+
+---
+
+## Blog Post Scheduling System (Added SSD S23, 2026-04-03)
+
+**⚠️ NEW: All blog posts should use the scheduler instead of pushing directly to live directories.**
+
+A scheduling system is deployed on `hazeydata/hazeydata.ai`:
+- **Generator scripts** write posts + JSON manifests to `scheduled/` directory (not directly to blog dirs)
+- **GitHub Actions workflow** (`.github/workflows/publish-scheduled.yml`) runs daily at 6 AM ET
+- Posts whose `publish_date` has arrived are automatically moved to their target blog directory and the index is updated
+
+**Manifest format** (write to `scheduled/{slug}.json`):
+```json
+{
+  "publish_date": "2026-04-20",
+  "post_file": "orlando-this-week-april-20-2026.html",
+  "target_dir": "theme-park-crowd-report/blog",
+  "index_card_html": "<a href=\"orlando-this-week-april-20-2026.html\" class=\"blog-card\">...card HTML...</a>"
+}
+```
+
+**Impact on TPCR blog generators:**
+- `generate_weekly_blog.py` (wilma-server) needs refactoring to write to `scheduled/` instead of directly to `theme-park-crowd-report/blog/`
+- `daily_recap_publish.py` (Mac Mini) should also use the scheduler — generate recap HTML + manifest to `scheduled/`, let Actions publish on schedule
+- The workflow + publish script are already deployed: `.github/workflows/publish-scheduled.yml` and `.github/scripts/publish_scheduled.py`
+
+**Spec:** `data-hub/docs/SSD_WEEKLY_BLOG_SPEC.md` has the full design. SSD generator already refactored (SSD S23).
 
 ---
 
@@ -130,6 +158,7 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED. Broken mont
 | **EU dimension fix** | Flagged | "Europa-Park" → "Epic Universe" across pipeline |
 | **TPCR #457 close** | Ready | Dino verified 0 water park entities. Just needs ticket closure. |
 | **extract_daily_wti.py date bug** | Flagged | Predicted mode date logic wrong — workaround in place |
+| **Refactor blog generators to use scheduler** | NEW (SSD S23) | `generate_weekly_blog.py` and `daily_recap_publish.py` need to write to `scheduled/` instead of directly to blog dirs |
 
 ---
 
@@ -140,10 +169,11 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED. Broken mont
 3. **xgb-highLR promotion decision** — Apr 8+ (Day 7). Review entity-level breakdown with entity-weighted MAE.
 4. **Verify Gazoo score improvement** — next audit should jump from 5.9 to ~8+
 5. **Commit PQ research doc** to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR
-6. **Dino: Add challenger #2** — `xgb-dow` (day-of-week feature) per Amendment 002 queue
-7. **Fix EU dimension table** — "Europa-Park" → "Epic Universe"
-8. **Multi-property tweets** — DLR + Universal Orlando ready. Design schedule.
-9. **Daily Recap Phase 2** — add LLM narrative after template proven (~1 week of data)
+6. **Refactor TPCR blog generators to use scheduler** — see "Blog Post Scheduling System" section above
+7. **Dino: Add challenger #2** — `xgb-dow` (day-of-week feature) per Amendment 002 queue
+8. **Fix EU dimension table** — "Europa-Park" → "Epic Universe"
+9. **Multi-property tweets** — DLR + Universal Orlando ready. Design schedule.
+10. **Daily Recap Phase 2** — add LLM narrative after template proven (~1 week of data)
 
 ---
 
@@ -178,6 +208,7 @@ None. All systems operational. Bot health restored. Analytics automated. Service
 
 | Date | Session | Decision | Who |
 |------|---------|----------|-----|
+| 2026-04-03 | SSD S23 | **Blog scheduling system deployed** — all blog generators should write to `scheduled/` with manifests, GitHub Actions publishes on date. Refactor TPCR generators. | Fred + Barney |
 | 2026-04-02 | 26 | Shadow MAE must use entity-weighted averaging (match s10_accuracy) | Fred + Barney |
 | 2026-04-02 | 26 | Fix all Gazoo findings with proper fixes, not band-aids | Fred |
 | 2026-04-02 | 26 | DuckDB scraper: never hold write connections across sleep cycles | Barney |
@@ -229,6 +260,7 @@ None. All systems operational. Bot health restored. Analytics automated. Service
 - **Challenger registry:** `pipeline/competition/challenger_registry.json` on wilma-server.
 - **Baseline forecasts path:** `curves/forecast_parquet/all_forecasts.parquet` (from `config.py`).
 - **Blog repo:** `hazeydata/hazeydata.ai` (master branch). Blog at `theme-park-crowd-report/blog/`. CSS: `blog.css` + `styles.css`.
+- **Blog scheduling (NEW SSD S23):** All blog posts should use the scheduler at `scheduled/` in hazeydata.ai. See "Blog Post Scheduling System" section above.
 - **Briefings:** `docs/briefings/` in operations repo — version-controlled cross-tier comms.
 - **EU bug:** Epic Universe, NOT Europa-Park. Dimension table corrupted enterprise-wide. Fix pending.
 - **Water parks:** BB/TL/VB filtered at ETL. No models, no forecasts, no tweets. Verified S26.
