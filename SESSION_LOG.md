@@ -1,8 +1,8 @@
 # Session Log
 
-**Last updated:** 2026-04-01 by Barney (Session 25 FINAL)
-**Session:** 25
-**Status:** Shadow eval fixed + deployed. Daily Recap APPROVED + built + cron live. Pipeline 13/13. Tweets posting. 9 Mac Mini crons.
+**Last updated:** 2026-04-02 by Barney (Session 26)
+**Session:** 26
+**Status:** All 8 Gazoo findings fixed. Shadow MAE averaging aligned with s10. Pipeline 13/13. Tweets posting. Daily Recap live. 10 Mac Mini crons.
 
 ---
 
@@ -23,7 +23,7 @@
 
 **Why it matters:** WTI is HazeyData's core product. Accurate crowd predictions are the foundation for all monetization — Discord bot, premium subscriptions, public dashboards, and the eventual customer-facing analytics layer.
 
-**How we got here:** Pipeline evolved v1→v4. Sessions 20-21 built Twitter content pipeline (Step 14 + quality gate). Session 22 proved the four-tier architecture, migrated tweets to Dino, launched rolling competition framework (Amendment 002), and excluded water parks from the pipeline. Session 23 relaxed the quality gate, diagnosed broken shadow run, and completed Priority Queue (Lightning Lane) research. Session 24 (Dino solo): fixed shadow paths, tweet threading, intel brief dedup. Session 25: overhauled shadow evaluation methodology, designed + approved + built WDW Daily Recap blog product.
+**How we got here:** Pipeline evolved v1→v4. Sessions 20-21 built Twitter content pipeline (Step 14 + quality gate). Session 22 proved the four-tier architecture, migrated tweets to Dino, launched rolling competition framework (Amendment 002), and excluded water parks from the pipeline. Session 23 relaxed the quality gate, diagnosed broken shadow run, and completed Priority Queue (Lightning Lane) research. Session 24 (Dino solo): fixed shadow paths, tweet threading, intel brief dedup. Session 25: overhauled shadow evaluation methodology, designed + approved + built WDW Daily Recap blog product. Session 26: fixed all Gazoo audit findings (DuckDB lock Day 31, service status, analytics staleness, etc.), aligned shadow MAE averaging with s10 methodology.
 
 **Key findings that still apply:**
 - Archive filenames MUST contain `YYYY-MM-DD` dates with hyphens or the forecast evaluator silently skips them
@@ -33,7 +33,10 @@
 - EU entity = **Epic Universe** (Universal Orlando), NOT Europa-Park — dimension table fix pending
 - Water parks (BB, TL, VB) **excluded from all pipeline processing** — ETL, training, forecasts, tweets
 - **Shadow evaluation must use identical methodology to s10_accuracy.py** — evaluation logic lives in `pipeline/competition/shadow_evaluate.py` in TPCR, never in the orchestrator scripts
+- **Shadow MAE uses entity-weighted averaging** (S26) — average of per-entity MAEs, not flat slot average. This matches how s10 computes entity_daily_accuracy. Slot-level MAE available as `slot_baseline_mae` / `slot_challenger_mae` for reference.
 - **Blog repo:** `hazeydata/hazeydata.ai` (master branch), blog at `theme-park-crowd-report/blog/`
+- **DuckDB scraper lock fix (S26):** Scraper patched with `gc.collect()` after `con.close()` to release DuckDB lock. WAL backups cleaned. Never hold DuckDB connections across sleep cycles.
+- **Analytics refresh automated (S26):** 7:30 AM cron on wilma-server refreshes analytics JSONs after pipeline completes.
 
 **Foundational documents:**
 | Document | Location | What |
@@ -48,20 +51,21 @@
 
 ---
 
-## Dino's Mac Mini Crontab (9 jobs)
+## Dino's Mac Mini Crontab (10 jobs)
 
 | Time (ET) | Job | Status |
 |-----------|-----|--------|
 | 2:00 AM | Gazoo audit | ✅ Live |
 | 4:00 AM | SSD daily report | ✅ Live |
 | 6:00 AM | ACCORD intel brief | ✅ Live |
-| 7:00 AM | Shadow run (`rolling_shadow.py`) | ✅ Live — overhauled S25, deployed, registry reset |
+| 7:00 AM | Shadow run (`rolling_shadow.py`) | ✅ Live — entity-weighted MAE deployed S26 |
 | 7:07 AM | WTI daily report | ✅ Live |
+| 7:30 AM | **Analytics refresh** | ✅ Live — NEW S26, auto-refreshes analytics JSONs on wilma-server |
 | 8:30 AM | WTI observed tweet | ✅ Live |
-| 9:00 AM | **WDW Daily Recap** (`daily_recap_publish.py`) | ✅ Live — NEW S25, proof-batched, cron added |
+| 9:00 AM | **WDW Daily Recap** (`daily_recap_publish.py`) | ✅ Live — S25, proof-batched |
 | 4:00 PM | Gazoo audit + WTI predicted tweet | ✅ Live |
 
-wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
+wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED. Broken monthly conversion retrain cron REMOVED (s05 handles daily).
 
 ---
 
@@ -70,41 +74,49 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 - **Forecast scope:** ~46M predictions/day, 59,255 WTI park-dates through March 2028
 - **Pipeline version:** V4 (governed by `PIPELINE_V4_DESIGN.md` + Amendments 001, 002, 003)
 - **Daily pipeline:** Running 6 AM ET on wilma-server, steps s01-s14, ~59 min, 13/13 passing daily
-- **Accuracy:** Overall MAE 8.4, WTI MAE 7.1, 1-Day MAE 7.3 (Apr 1)
-- **Challenger:** `xgb-highLR` — shadow reset for clean 7 days with corrected ACTUAL methodology. Promotion eligible Apr 8.
+- **Accuracy:** Overall MAE 8.4, WTI MAE 7.2, 1-Day MAE 7.3 (Apr 2)
+- **Challenger:** `xgb-highLR` — shadow eval with entity-weighted MAE (S26 fix). Promotion eligible Apr 8.
 - **Models:** 420 baseline, 433 total coverage, 109 on fallback
-- **Twitter:** LIVE on @DisneyStatsWhiz — predicted + observed tweets posting daily, threading fixed
-- **Blog:** WDW Daily Recap cron live at 9:00 AM ET. First real post publishes Apr 2.
+- **Twitter:** LIVE on @DisneyStatsWhiz — predicted + observed tweets posting daily, threading working
+- **Blog:** WDW Daily Recap live — first real post published Apr 2 (MAE 7.2, AK spotlight +10.1)
 - **Quality gate:** Relaxed Session 23 (peer outlier 60%→90%, day-jump 15→25, staleness exact→24h)
-- **Scraper:** Running (Restart=always)
-- **Shadow run:** Evaluation overhauled + deployed S25. Delegated to `shadow_evaluate.py` (TPCR). Registry reset. Clean Day 1 starts Apr 2.
-- **Water parks:** BB/TL/VB excluded from ETL (TPCR #457)
+- **Scraper:** Running (Restart=always), DuckDB lock fix deployed S26
+- **Bot health:** RESTORED S26 — DuckDB lock resolved (was Day 31), WAL backups cleaned, bot can read/write
+- **Service status:** FIXED S26 — no longer reporting false degradation to customers
+- **Analytics:** FRESH + AUTOMATED S26 — 7:30 AM cron refreshes daily
+- **Shadow run:** Entity-weighted MAE fix deployed S26. Expect shadow baseline MAE ~8-9 (was ~17 due to slot-level averaging).
+- **Water parks:** BB/TL/VB excluded from ETL — verified S26 (0 entities in live data)
 - **Properties with WTI data:** 13 (WDW, DLR, Universal Orlando, Universal Hollywood, Tokyo Disney, Epic Universe)
 
 ---
 
-## Session 25 Summary (2026-04-01)
+## Session 26 Summary (2026-04-02)
 
 ### Barney (Tier 2):
-1. Read SESSION_LOG, checked Discord #wti-pipeline (50 msgs), #barney-wilma-dev (20 msgs), recent commits in both repos
-2. **Situational awareness:** Pipeline stable 13/13 daily. Shadow run fixed by Dino (S24) but producing inflated MAE (16-17 vs pipeline 8.4). Tweets posting reliably. Tweet threading fix deployed Mar 31.
-3. **Shadow run deep dive (Fred-directed):** Found 4 methodology divergences in shadow evaluation vs s10_accuracy.py. Created shared `shadow_evaluate.py` module in TPCR, rewrote `rolling_shadow.py` in operations, deprecated `shadow_run_challenger.py`.
-4. **Dino deployed shadow eval overhaul** — git pull both repos, registry reset, import verified (all within session).
-5. **V4 Amendment 003: WDW Daily Recap** — Fred spotted AK +15.1 miss on Twitter and asked for daily blog post analyzing predicted-vs-observed gaps. Designed full spec: park scorecard, entity-level spotlight, closure detection, pattern classification. Pure data/template Phase 1. Blog lives in `hazeydata/hazeydata.ai` repo.
-6. **Fred approved Amendment 003** — committed as APPROVED.
-7. **Dino built + deployed Daily Recap** — both scripts (extract + publish), proof-batched 3 historical dates (Mar 29-31), caught and fixed overnight closure false positives, added system cron at 9 AM ET. All within same session.
+1. Read SESSION_LOG, checked Discord #wti-pipeline (30 msgs), #barney-wilma-dev (15 msgs), #gazoo (30 msgs), recent commits
+2. **Situational awareness:** Pipeline stable 13/13. Daily Recap first real post published (Apr 1 data, MAE 7.2, AK +10.1). Tweet threading confirmed working. Shadow reporting MAE ~17 (unexplained discrepancy vs pipeline 8.4).
+3. **Gazoo audit review:** Read full Apr 2 audit (4 PM). Composite score 5.9/10. Three HIGHs stuck: DuckDB lock Day 31, analytics 3.4 days stale, service status inverted Day 23. Five MEDIUMs: clawdbot perms, screenshot push, water parks unassigned, conversion cron broken, zombie.
+4. **Wrote comprehensive Dino briefing** — `docs/briefings/DINO_GAZOO_FIXES_20260402.md` in operations. 8 fixes in priority order with verification steps for each. Committed to GitHub.
+5. **Dino executed all 8 fixes** within same session (~9 min). All verification checks pass. Posted report to #wti-pipeline.
+6. **Shadow MAE discrepancy investigation:** Traced both code paths (shadow_evaluate.py vs s10_accuracy.py). Root cause: shadow used flat slot-level averaging (over-weights high-traffic entities), while s10 uses entity-weighted averaging (per-entity MAE first, then average across entities). Methodology (ACTUAL type, TIME_BUCKET, synthetic fallback) was correct — only the aggregation differed.
+7. **Committed entity-weighted MAE fix** to `shadow_evaluate.py` in TPCR. Primary MAE now = average of per-entity MAEs. Slot-level MAE preserved as reference fields. No orchestrator changes needed.
+8. **Dino confirmed deployment** — TPCR already pulled on wilma-server, `shadow_evaluate.py` verified importable. Live for Apr 3 shadow run.
 
 ### Fred (Tier 1) — Decisions:
-- Shadow evaluation: full fix, no quick patches. Evaluation methodology lives in one place.
-- Daily Recap approved: pure data/template Phase 1, WDW only, publish to hazeydata.ai blog.
-- Approved proof batch output → cron added.
+- Fix all Gazoo findings with proper fixes via Dino (not band-aids)
+- Align shadow MAE averaging before promotion decision (not after)
 
 ### Dino (Tier 3) — Execution:
-- Deployed shadow eval overhaul (4 steps, 32 seconds)
-- Built `extract_daily_recap.py` (TPCR, wilma-server) — DuckDB queries matching s10_accuracy.py methodology
-- Built `daily_recap_publish.py` (operations, Mac Mini) — 606 lines, SSH orchestration, HTML rendering, blog index update, git push, Discord notification
-- Proof batch: Mar 29 (MAE 4.9, AK +8.4), Mar 30 (MAE 7.6, AK +15.4, 1 closure: Character Landing 95m), Mar 31 (MAE 7.1, AK +12.6)
-- System cron added at 9:00 AM ET
+- All 8 Gazoo fixes executed and verified:
+  - Fix 1: DuckDB lock — scraper patched with gc.collect() after con.close(), 1,218 WAL backups cleaned
+  - Fix 2: Service status — alert check log filename pattern corrected, now reports `status=ok`
+  - Fix 3: Analytics — refreshed to current, 7:30 AM daily cron added
+  - Fix 4: clawdbot.json — chmod 400 (was 444)
+  - Fix 5: Screenshot git push — rebased diverged branch, conflict resolved
+  - Fix 6: Conversion cron — removed broken monthly retrain (s05 handles daily)
+  - Fix 7: Water parks — verified 0 BB/TL/VB entities in live data, TPCR #457 ready to close
+  - Fix 8: Zombie — reaped via bot restart
+- Shadow evaluate pull confirmed — TPCR pulled on wilma, module verified importable
 
 ---
 
@@ -112,30 +124,32 @@ wilma-server: Pipeline at 6 AM (compute only). Tweet crons DISABLED.
 
 | Item | Status | Details |
 |------|--------|---------|
-| **Shadow run clean eval** | Day 1 starts Apr 2 | Corrected ACTUAL methodology. First comparison Apr 3. Promotion eligible Apr 8. |
-| **Daily Recap first real post** | Apr 2 at 9 AM | Recap for Apr 1 reference date publishes to hazeydata.ai blog |
+| **Shadow run entity-weighted eval** | Deployed, Day 1 results Apr 3 | Entity-weighted MAE fix live. Expect baseline ~8-9 (not ~17). |
+| **xgb-highLR promotion** | Eligible Apr 8 | 7 clean days needed. Entity-weighted comparison starts Apr 3. |
 | **PQ research doc** | Needs commit | Ready for commit to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR |
 | **EU dimension fix** | Flagged | "Europa-Park" → "Epic Universe" across pipeline |
+| **TPCR #457 close** | Ready | Dino verified 0 water park entities. Just needs ticket closure. |
 | **extract_daily_wti.py date bug** | Flagged | Predicted mode date logic wrong — workaround in place |
 
 ---
 
 ## Next Actions (Priority Order)
 
-1. **Monitor Daily Recap Apr 2** — verify first real post publishes correctly to hazeydata.ai
-2. **Monitor shadow run Apr 2-3** — verify corrected methodology produces MAE ~8-9 (not 16-17)
-3. **xgb-highLR promotion decision** — Apr 8 (Day 7+). Review entity-level breakdown.
-4. **Commit PQ research doc** to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR
-5. **Dino: Add challenger #2** — `xgb-dow` (day-of-week feature) per Amendment 002 queue
-6. **Fix EU dimension table** — "Europa-Park" → "Epic Universe"
-7. **Multi-property tweets** — DLR + Universal Orlando ready. Design schedule.
-8. **Daily Recap Phase 2** — add LLM narrative after template proven (~1 week of data)
+1. **Monitor shadow run Apr 3** — verify entity-weighted MAE produces baseline ~8-9 (not ~17)
+2. **Close TPCR #457** — water park suppression verified by Dino S26
+3. **xgb-highLR promotion decision** — Apr 8+ (Day 7). Review entity-level breakdown with entity-weighted MAE.
+4. **Verify Gazoo score improvement** — next audit should jump from 5.9 to ~8+
+5. **Commit PQ research doc** to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR
+6. **Dino: Add challenger #2** — `xgb-dow` (day-of-week feature) per Amendment 002 queue
+7. **Fix EU dimension table** — "Europa-Park" → "Epic Universe"
+8. **Multi-property tweets** — DLR + Universal Orlando ready. Design schedule.
+9. **Daily Recap Phase 2** — add LLM narrative after template proven (~1 week of data)
 
 ---
 
 ## Blockers
 
-None. All systems operational.
+None. All systems operational. Bot health restored. Analytics automated. Service status accurate.
 
 ---
 
@@ -143,19 +157,20 @@ None. All systems operational.
 
 | Metric | Value | Updated |
 |--------|-------|---------|
-| Total predictions | ~46M/day | S25 |
+| Total predictions | ~46M/day | S26 |
 | WTI park-dates | 59,255 | S25 |
 | Forecast horizon | Through March 2028 | S1 |
-| Overall MAE | 8.4 min | S25 |
-| WTI MAE | 7.1 min | S25 |
-| 1-Day MAE | 7.3 min | S25 |
+| Overall MAE | 8.4 min | S26 |
+| WTI MAE | 7.2 min | S26 |
+| 1-Day MAE | 7.3 min | S26 |
 | Baseline models | 420 | S25 |
 | Fallback entities | 109 | S20 |
 | Properties with WTI | 13 | S22 |
-| Dino crons | 9 | S25 |
-| Active challengers | 1 (clean eval restarting) | S25 |
-| Tweet success rate | High — posting daily since gate fix | S25 |
-| Blog posts | 10 existing + daily recaps starting Apr 2 | S25 |
+| Dino crons | 10 | S26 (analytics refresh added) |
+| Active challengers | 1 (entity-weighted eval starting) | S26 |
+| Tweet success rate | High — posting daily, threading confirmed | S26 |
+| Blog posts | 10 existing + daily recaps live (Apr 2+) | S26 |
+| Gazoo composite | 5.9 → expect ~8+ next audit | S26 |
 
 ---
 
@@ -163,6 +178,12 @@ None. All systems operational.
 
 | Date | Session | Decision | Who |
 |------|---------|----------|-----|
+| 2026-04-02 | 26 | Shadow MAE must use entity-weighted averaging (match s10_accuracy) | Fred + Barney |
+| 2026-04-02 | 26 | Fix all Gazoo findings with proper fixes, not band-aids | Fred |
+| 2026-04-02 | 26 | DuckDB scraper: never hold write connections across sleep cycles | Barney |
+| 2026-04-02 | 26 | Analytics refresh: automated 7:30 AM cron on wilma-server | Barney |
+| 2026-04-02 | 26 | clawdbot.json: mode 400 (not 444) while gateway running | Barney |
+| 2026-04-02 | 26 | Broken monthly conversion cron removed (s05 retrains daily) | Barney |
 | 2026-04-01 | 25 | V4 Amendment 003 approved: WDW Daily Recap blog product | Fred + Barney |
 | 2026-04-01 | 25 | Daily Recap Phase 1: pure data/template, WDW only, 9 AM ET | Fred + Barney |
 | 2026-04-01 | 25 | Blog publishes to hazeydata/hazeydata.ai repo (master branch) | Barney |
@@ -189,8 +210,8 @@ None. All systems operational.
 
 | Ticket | Repo | Status | Notes |
 |--------|------|--------|-------|
-| #457 | TPCR | Open | Water park suppression (BB/TL/VB) — ETL filter implemented |
-| #453 | TPCR | Open | Competition — shadow eval overhauled + deployed, clean eval running |
+| #457 | TPCR | Ready to close | Water park suppression verified — 0 BB/TL/VB entities in live data (S26) |
+| #453 | TPCR | Open | Competition — entity-weighted eval deployed, clean eval running |
 | PR #1 | data-hub | Open | Firecrawl WDW park hours scraper |
 
 ---
@@ -210,20 +231,24 @@ None. All systems operational.
 - **Blog repo:** `hazeydata/hazeydata.ai` (master branch). Blog at `theme-park-crowd-report/blog/`. CSS: `blog.css` + `styles.css`.
 - **Briefings:** `docs/briefings/` in operations repo — version-controlled cross-tier comms.
 - **EU bug:** Epic Universe, NOT Europa-Park. Dimension table corrupted enterprise-wide. Fix pending.
-- **Water parks:** BB/TL/VB filtered at ETL. No models, no forecasts, no tweets.
-- **Shadow evaluation architecture (S25):** Evaluation logic lives in `pipeline/competition/shadow_evaluate.py` (TPCR). Uses identical SQL to `s10_accuracy.py`: ACTUAL wait_time_type, TIME_BUCKET with 2.5-min midpoint rounding, synthetic actuals fallback. Orchestrator (`rolling_shadow.py` in operations) calls it via SSH — never runs its own evaluation SQL. `shadow_run_challenger.py` deprecated to a redirect wrapper.
-- **Daily Recap architecture (S25):** `extract_daily_recap.py` (TPCR, wilma-server) queries pipeline data → JSON. `daily_recap_publish.py` (operations, Mac Mini) renders HTML, pushes to hazeydata.ai repo, posts Discord notification. Cron at 9 AM ET. Proof-batched Mar 29-31.
+- **Water parks:** BB/TL/VB filtered at ETL. No models, no forecasts, no tweets. Verified S26.
+- **Shadow evaluation architecture (S25+S26):** Evaluation logic lives in `pipeline/competition/shadow_evaluate.py` (TPCR). Uses identical SQL to `s10_accuracy.py`: ACTUAL wait_time_type, TIME_BUCKET with 2.5-min midpoint rounding, synthetic actuals fallback. **Entity-weighted MAE** (S26): average of per-entity MAEs, not flat slot average. Slot-level MAE available as `slot_baseline_mae`/`slot_challenger_mae`. Orchestrator (`rolling_shadow.py` in operations) calls it via SSH — never runs its own evaluation SQL. `shadow_run_challenger.py` deprecated to a redirect wrapper.
+- **Daily Recap architecture (S25):** `extract_daily_recap.py` (TPCR, wilma-server) queries pipeline data → JSON. `daily_recap_publish.py` (operations, Mac Mini) renders HTML, pushes to hazeydata.ai repo, posts Discord notification. Cron at 9 AM ET. Proof-batched Mar 29-31. First real post Apr 2.
+- **DuckDB lock fix (S26):** Scraper patched with gc.collect() after con.close(). WAL backups cleaned. Bot health restored.
+- **Service status fix (S26):** Alert check now reads correct pipeline log filename pattern. No longer reporting false degradation.
+- **Analytics automation (S26):** 7:30 AM cron on wilma-server refreshes analytics JSONs. Previously manual/disabled.
 
 ---
 
 ## How to Start Next Session
 
 1. Read this file (`SESSION_LOG.md` in `hazeydata/theme-park-crowd-report`)
-2. Check if Daily Recap published at 9 AM — look at hazeydata.ai/theme-park-crowd-report/blog/
-3. Check shadow run reports — should show MAE ~8-9 with corrected ACTUAL methodology (not 16-17)
-4. Check `#wti-pipeline` for pipeline status and shadow reports
-5. Verify tweets still posting on @DisneyStatsWhiz
-6. Pick up from "Next Actions" above
+2. Check shadow run report — should now show entity-weighted baseline MAE ~8-9 (not ~17)
+3. Check `#wti-pipeline` for pipeline status, shadow reports, and tweet confirmations
+4. Check `#gazoo` for audit score improvement (expect 5.9 → ~8+)
+5. Check if Daily Recap published at 9 AM
+6. Verify analytics data is fresh (7:30 AM auto-refresh)
+7. Pick up from "Next Actions" above
 
 ---
 
