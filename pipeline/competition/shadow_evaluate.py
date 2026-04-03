@@ -4,9 +4,15 @@ Uses the EXACT SAME evaluation methodology as s10_accuracy.py:
   - Actuals from wait_time_type = 'ACTUAL' (NOT POSTED)
   - TIME_BUCKET with 2.5-minute midpoint rounding for time slot alignment
   - Synthetic actuals as fallback when real actuals are missing
-  - Proper entity-level and overall metrics
+  - Entity-weighted MAE (average of per-entity MAEs, not flat slot average)
 
 This ensures shadow run results are directly comparable to pipeline accuracy.
+
+MAE methodology (aligned with s10_accuracy.py in Session 26):
+  1. Compute per-entity MAE = avg absolute error across that entity's time slots
+  2. Overall MAE = avg of per-entity MAEs (each entity weighted equally)
+  This matches how s10 computes entity_daily_accuracy then averages to overall_mae.
+  The old slot-level flat average over-weighted high-traffic entities open longer hours.
 
 Usage (CLI on wilma-server):
     cd /home/wilma/theme-park-crowd-report
@@ -40,6 +46,7 @@ def evaluate_shadow_day(
       - wait_time_type = 'ACTUAL' (real actuals, not POSTED)
       - TIME_BUCKET(INTERVAL '5 minutes', ts + 2m30s) for slot alignment
       - Synthetic actuals fallback for entities without real actuals
+      - Entity-weighted MAE (average of per-entity MAEs)
 
     Args:
         eval_date: The date to evaluate (YYYY-MM-DD). Predictions were made
@@ -129,9 +136,8 @@ def evaluate_shadow_day(
     if not chal_path.exists() or not base_path.exists():
         return None
 
-    # --- Evaluate: join both sets of predictions against actuals ---
-    try:
-        result = con.execute(f"""
+    # --- Build the matched CTE (reused by all queries) ---
+    matched_cte = f"""
             {actuals_cte},
             challenger AS (
                 SELECT entity_code, time_slot, predicted_actual
@@ -155,91 +161,88 @@ def evaluate_shadow_day(
                 FROM actuals a
                 JOIN baseline b ON a.entity_code = b.entity_code AND a.time_slot = b.time_slot
                 JOIN challenger c ON a.entity_code = c.entity_code AND a.time_slot = c.time_slot
+            )"""
+
+    # --- Per-entity breakdown (PRIMARY — this drives the overall MAE) ---
+    try:
+        entity_rows = con.execute(f"""
+            {matched_cte},
+            entity_metrics AS (
+                SELECT
+                    entity_code,
+                    ROUND(AVG(baseline_ae), 2) as entity_baseline_mae,
+                    ROUND(AVG(challenger_ae), 2) as entity_challenger_mae,
+                    ROUND(AVG(baseline_error), 2) as entity_baseline_bias,
+                    ROUND(AVG(challenger_error), 2) as entity_challenger_bias,
+                    COUNT(*) as entity_slots
+                FROM matched
+                GROUP BY entity_code
             )
             SELECT
-                ROUND(AVG(baseline_ae), 2) as baseline_mae,
-                ROUND(AVG(challenger_ae), 2) as challenger_mae,
-                ROUND(AVG(baseline_error), 2) as baseline_bias,
-                ROUND(AVG(challenger_error), 2) as challenger_bias,
-                COUNT(*) as n_matched,
-                COUNT(DISTINCT entity_code) as n_entities,
+                entity_code,
+                entity_baseline_mae,
+                entity_challenger_mae,
+                entity_baseline_bias,
+                entity_challenger_bias,
+                entity_slots
+            FROM entity_metrics
+            ORDER BY entity_code
+        """).fetchall()
+    except Exception as e:
+        print(f"EVAL_ERROR (entity): {e}", file=sys.stderr)
+        return None
+
+    if not entity_rows:
+        return None
+
+    # --- Derive overall MAE from entity-level (s10-aligned methodology) ---
+    # Each entity gets equal weight, regardless of how many time slots it has.
+    # This matches s10_accuracy.py which computes entity_daily_accuracy then averages.
+    n_entities = len(entity_rows)
+    baseline_mae = round(sum(r[1] for r in entity_rows) / n_entities, 2)
+    challenger_mae = round(sum(r[2] for r in entity_rows) / n_entities, 2)
+    baseline_bias = round(sum(r[3] for r in entity_rows) / n_entities, 2)
+    challenger_bias = round(sum(r[4] for r in entity_rows) / n_entities, 2)
+    total_slots = sum(r[5] for r in entity_rows)
+
+    entity_challenger_wins = sum(1 for r in entity_rows if r[2] < r[1])
+    entity_baseline_wins = sum(1 for r in entity_rows if r[1] < r[2])
+    entity_ties = n_entities - entity_challenger_wins - entity_baseline_wins
+
+    # --- Slot-level totals (for reference, NOT used as primary MAE) ---
+    try:
+        slot_result = con.execute(f"""
+            {matched_cte}
+            SELECT
+                ROUND(AVG(baseline_ae), 2) as slot_baseline_mae,
+                ROUND(AVG(challenger_ae), 2) as slot_challenger_mae,
+                COUNT(*) as n_slots,
                 SUM(CASE WHEN challenger_ae < baseline_ae THEN 1 ELSE 0 END) as challenger_slot_wins,
                 SUM(CASE WHEN baseline_ae < challenger_ae THEN 1 ELSE 0 END) as baseline_slot_wins
             FROM matched
         """).fetchone()
-    except Exception as e:
-        print(f"EVAL_ERROR: {e}", file=sys.stderr)
-        return None
-
-    if result[0] is None:
-        return None
-
-    # --- Per-entity breakdown ---
-    try:
-        entity_rows = con.execute(f"""
-            {actuals_cte},
-            challenger AS (
-                SELECT entity_code, time_slot, predicted_actual
-                FROM read_parquet('{challenger_parquet}')
-            ),
-            baseline AS (
-                SELECT entity_code, time_slot, predicted_actual
-                FROM read_parquet('{baseline_parquet}')
-            ),
-            matched AS (
-                SELECT
-                    a.entity_code,
-                    a.time_slot,
-                    a.actual_wait,
-                    b.predicted_actual as baseline_pred,
-                    c.predicted_actual as challenger_pred
-                FROM actuals a
-                JOIN baseline b ON a.entity_code = b.entity_code AND a.time_slot = b.time_slot
-                JOIN challenger c ON a.entity_code = c.entity_code AND a.time_slot = c.time_slot
-            )
-            SELECT
-                entity_code,
-                ROUND(AVG(ABS(baseline_pred - actual_wait)), 2) as entity_baseline_mae,
-                ROUND(AVG(ABS(challenger_pred - actual_wait)), 2) as entity_challenger_mae,
-                COUNT(*) as entity_slots
-            FROM matched
-            GROUP BY entity_code
-        """).fetchall()
     except Exception:
-        entity_rows = []
+        slot_result = (None, None, total_slots, 0, 0)
 
-    entity_challenger_wins = sum(1 for r in entity_rows if r[2] < r[1])
-    entity_baseline_wins = sum(1 for r in entity_rows if r[1] < r[2])
-
-    # --- Per-park breakdown ---
+    # --- Per-park breakdown (entity-weighted within each park) ---
     try:
         park_rows = con.execute(f"""
-            {actuals_cte},
-            challenger AS (
-                SELECT entity_code, time_slot, predicted_actual
-                FROM read_parquet('{challenger_parquet}')
-            ),
-            baseline AS (
-                SELECT entity_code, time_slot, predicted_actual
-                FROM read_parquet('{baseline_parquet}')
-            ),
-            matched AS (
+            {matched_cte},
+            entity_park AS (
                 SELECT
-                    a.entity_code,
-                    a.entity_code[:2] as park_code,
-                    a.actual_wait,
-                    b.predicted_actual as baseline_pred,
-                    c.predicted_actual as challenger_pred
-                FROM actuals a
-                JOIN baseline b ON a.entity_code = b.entity_code AND a.time_slot = b.time_slot
-                JOIN challenger c ON a.entity_code = c.entity_code AND a.time_slot = c.time_slot
+                    entity_code,
+                    entity_code[:2] as park_code,
+                    AVG(baseline_ae) as entity_baseline_mae,
+                    AVG(challenger_ae) as entity_challenger_mae
+                FROM matched
+                GROUP BY entity_code
             )
             SELECT
                 park_code,
-                ROUND(AVG(ABS(baseline_pred - actual_wait)), 2) as park_baseline_mae,
-                ROUND(AVG(ABS(challenger_pred - actual_wait)), 2) as park_challenger_mae,
-                COUNT(DISTINCT entity_code) as park_entities
-            FROM matched
+                ROUND(AVG(entity_baseline_mae), 2) as park_baseline_mae,
+                ROUND(AVG(entity_challenger_mae), 2) as park_challenger_mae,
+                COUNT(*) as park_entities
+            FROM entity_park
             GROUP BY park_code
             ORDER BY park_code
         """).fetchall()
@@ -250,16 +253,23 @@ def evaluate_shadow_day(
 
     report = {
         "date": eval_date,
-        "baseline_mae": float(result[0]),
-        "challenger_mae": float(result[1]),
-        "baseline_bias": float(result[2]),
-        "challenger_bias": float(result[3]),
-        "n_matched": result[4],
-        "n_entities": result[5],
-        "challenger_slot_wins": result[6],
-        "baseline_slot_wins": result[7],
+        # Primary MAE: entity-weighted (aligned with s10_accuracy.py)
+        "baseline_mae": float(baseline_mae),
+        "challenger_mae": float(challenger_mae),
+        "baseline_bias": float(baseline_bias),
+        "challenger_bias": float(challenger_bias),
+        # Slot-level MAE: for reference only (flat average, over-weights high-traffic entities)
+        "slot_baseline_mae": float(slot_result[0]) if slot_result[0] else None,
+        "slot_challenger_mae": float(slot_result[1]) if slot_result[1] else None,
+        "n_matched": total_slots,
+        "n_entities": n_entities,
+        # Entity-level win/loss
         "entity_challenger_wins": entity_challenger_wins,
         "entity_baseline_wins": entity_baseline_wins,
+        "entity_ties": entity_ties,
+        # Slot-level win/loss
+        "challenger_slot_wins": slot_result[3] if slot_result else 0,
+        "baseline_slot_wins": slot_result[4] if slot_result else 0,
         "parks": {
             r[0]: {
                 "baseline_mae": r[1],
