@@ -14,12 +14,25 @@ MAE methodology (aligned with s10_accuracy.py in Session 26):
   This matches how s10 computes entity_daily_accuracy then averages to overall_mae.
   The old slot-level flat average over-weighted high-traffic entities open longer hours.
 
+ARCHIVE FILE NAMING CONVENTION (Session 27):
+  Archive files are named by REFERENCE DATE — the date the predictions are FOR.
+    baseline_{reference_date}.parquet   → predictions for reference_date
+    challenger_{reference_date}.parquet → predictions for reference_date
+
+  Example: baseline_2026-04-05.parquet contains predictions FOR April 5.
+  The filename tells you exactly what's inside. No mental arithmetic needed.
+
+  To evaluate actuals for a given date, open the archive with that same date:
+    --reference-date 2026-04-03 opens baseline_2026-04-03.parquet
+    which contains predictions FOR 2026-04-03, compared against actuals from 2026-04-03.
+
 Usage (CLI on wilma-server):
     cd /home/wilma/theme-park-crowd-report
     source .venv/bin/activate
     python -m pipeline.competition.shadow_evaluate \
         --challenger xgb-highLR \
-        --eval-date 2026-03-31 \
+        --reference-date 2026-04-03 \
+        --shadow-dir /home/wilma/hazeydata/pipeline/competition/shadow/xgb-highLR \
         --output-base /home/wilma/hazeydata/pipeline
 
 Output: JSON report to stdout (RESULT:{...}) for parsing by the orchestrator.
@@ -35,7 +48,7 @@ from pathlib import Path
 
 
 def evaluate_shadow_day(
-    eval_date: str,
+    reference_date: str,
     challenger_parquet: str,
     baseline_parquet: str,
     output_base: str,
@@ -49,10 +62,11 @@ def evaluate_shadow_day(
       - Entity-weighted MAE (average of per-entity MAEs)
 
     Args:
-        eval_date: The date to evaluate (YYYY-MM-DD). Predictions were made
-                   for this date; actuals are now available.
-        challenger_parquet: Path to archived challenger predictions for eval_date.
-        baseline_parquet: Path to archived baseline predictions for eval_date.
+        reference_date: The date the predictions are FOR (YYYY-MM-DD).
+                        Actuals for this date are now available.
+                        Archive files are named with this date.
+        challenger_parquet: Path to archived challenger predictions for reference_date.
+        baseline_parquet: Path to archived baseline predictions for reference_date.
         output_base: Pipeline output base (e.g., /home/wilma/hazeydata/pipeline).
 
     Returns:
@@ -91,7 +105,7 @@ def evaluate_shadow_day(
             COUNT(*) as n_obs
         FROM read_parquet(['{parquet_glob}'])
         WHERE wait_time_type = 'ACTUAL'
-        AND park_date::VARCHAR = '{eval_date}'
+        AND park_date::VARCHAR = '{reference_date}'
         GROUP BY entity_code, park_date, time_slot
     )"""
 
@@ -106,7 +120,7 @@ def evaluate_shadow_day(
             AVG(synthetic_actual) as actual_wait,
             COUNT(*) as n_obs
         FROM read_parquet('{synth_glob}')
-        WHERE park_date::VARCHAR = '{eval_date}'
+        WHERE park_date::VARCHAR = '{reference_date}'
         AND synthetic_actual > 0
         GROUP BY entity_code, park_date, time_slot
     ),
@@ -252,7 +266,7 @@ def evaluate_shadow_day(
     con.close()
 
     report = {
-        "date": eval_date,
+        "reference_date": reference_date,
         # Primary MAE: entity-weighted (aligned with s10_accuracy.py)
         "baseline_mae": float(baseline_mae),
         "challenger_mae": float(challenger_mae),
@@ -288,34 +302,36 @@ def main():
         description="Evaluate shadow predictions against actuals (same methodology as s10_accuracy)"
     )
     parser.add_argument("--challenger", required=True, help="Challenger name (e.g., xgb-highLR)")
-    parser.add_argument("--eval-date", required=True, help="Date to evaluate (YYYY-MM-DD)")
+    parser.add_argument("--reference-date", required=True,
+                        help="The date the predictions are FOR (YYYY-MM-DD). "
+                             "Archive files are named with this date. "
+                             "Actuals for this date are compared against the archived predictions.")
     parser.add_argument("--shadow-dir", required=True, help="Directory containing shadow archives")
     parser.add_argument("--output-base", required=True, help="Pipeline output base directory")
-    parser.add_argument("--archive-date", required=True,
-                        help="Date of the archived predictions (YYYY-MM-DD, typically eval_date - 1 day)")
 
     args = parser.parse_args()
+    reference_date = args.reference_date
 
     shadow_dir = Path(args.shadow_dir)
-    challenger_parquet = str(shadow_dir / f"challenger_{args.archive_date}.parquet")
-    baseline_parquet = str(shadow_dir / f"baseline_{args.archive_date}.parquet")
+    challenger_parquet = str(shadow_dir / f"challenger_{reference_date}.parquet")
+    baseline_parquet = str(shadow_dir / f"baseline_{reference_date}.parquet")
 
     if not Path(challenger_parquet).exists():
-        print("NO_DATA: No challenger archive")
+        print(f"NO_DATA: No challenger archive for {reference_date}")
         return 0
     if not Path(baseline_parquet).exists():
-        print("NO_DATA: No baseline archive")
+        print(f"NO_DATA: No baseline archive for {reference_date}")
         return 0
 
     result = evaluate_shadow_day(
-        eval_date=args.eval_date,
+        reference_date=reference_date,
         challenger_parquet=challenger_parquet,
         baseline_parquet=baseline_parquet,
         output_base=args.output_base,
     )
 
     if result is None:
-        print("NO_MATCH: No matched prediction-actual pairs")
+        print(f"NO_MATCH: No matched prediction-actual pairs for {reference_date}")
         return 0
 
     print("RESULT:" + json.dumps(result))
