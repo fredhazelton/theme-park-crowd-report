@@ -1,8 +1,8 @@
 # Session Log
 
-**Last updated:** 2026-04-04 by Barney (Session 27)
-**Session:** 27
-**Status:** False degradation fixed. Competition system overhauled — archive naming by reference_date, multi-challenger rollout launched. Pipeline 13/13. Tweets posting. Daily Recap live.
+**Last updated:** 2026-04-05 by Barney (Session 28)
+**Session:** 28
+**Status:** Service status spam killed (65 msgs deleted, customer apology posted). Scraper fixed. Competition deployed with reference_date naming. Analytics cron fixed. Pipeline 13/13. Tweets posting. Daily Recap live.
 
 ---
 
@@ -23,7 +23,7 @@
 
 **Why it matters:** WTI is HazeyData's core product. Accurate crowd predictions are the foundation for all monetization — Discord bot, premium subscriptions, public dashboards, and the eventual customer-facing analytics layer.
 
-**How we got here:** Pipeline evolved v1→v4. Sessions 20-21 built Twitter content pipeline (Step 14 + quality gate). Session 22 proved the four-tier architecture, migrated tweets to Dino, launched rolling competition framework (Amendment 002), and excluded water parks from the pipeline. Session 23 relaxed the quality gate, diagnosed broken shadow run, and completed Priority Queue (Lightning Lane) research. Session 24 (Dino solo): fixed shadow paths, tweet threading, intel brief dedup. Session 25: overhauled shadow evaluation methodology, designed + approved + built WDW Daily Recap blog product. Session 26: fixed all Gazoo audit findings (DuckDB lock Day 31, service status, analytics staleness, etc.), aligned shadow MAE averaging with s10 methodology. Session 27: fixed false service degradation (path mismatch), overhauled competition archive naming to reference_date convention, launched multi-challenger rollout per Amendment 002.
+**How we got here:** Pipeline evolved v1→v4. Sessions 20-21 built Twitter content pipeline (Step 14 + quality gate). Session 22 proved the four-tier architecture, migrated tweets to Dino, launched rolling competition framework (Amendment 002), and excluded water parks from the pipeline. Session 23 relaxed the quality gate, diagnosed broken shadow run, and completed Priority Queue (Lightning Lane) research. Session 24 (Dino solo): fixed shadow paths, tweet threading, intel brief dedup. Session 25: overhauled shadow evaluation methodology, designed + approved + built WDW Daily Recap blog product. Session 26: fixed all Gazoo audit findings (DuckDB lock Day 31, service status, analytics staleness, etc.), aligned shadow MAE averaging with s10 methodology. Session 27: fixed false service degradation (path mismatch), overhauled competition archive naming to reference_date convention, launched multi-challenger rollout per Amendment 002. Session 28: killed service status notification spam (65 msgs deleted from customer channel), fixed scraper (stale lock files), deployed competition system, fixed analytics cron, gained Barney bot access to TPCR customer Discord server.
 
 **Key findings that still apply:**
 - Archive filenames MUST contain `YYYY-MM-DD` dates with hyphens or the forecast evaluator silently skips them
@@ -39,6 +39,8 @@
 - **DuckDB scraper lock fix (S26):** Scraper patched with `gc.collect()` after `con.close()` to release DuckDB lock. WAL backups cleaned. Never hold DuckDB connections across sleep cycles.
 - **Analytics refresh automated (S26):** 7:30 AM cron on wilma-server refreshes analytics JSONs after pipeline completes.
 - **Service status path fix (S27):** `pipeline_state.json` at `/mnt/data/pipeline/state/` — permanent fix via `update_pipeline_state.sh` cron at 07:15. Both paths are same inode on wilma-server. 76 WAL backups cleaned.
+- **service_status_manager.py DISABLED (S28):** Cron commented out (`#DISABLED_S28`). Was spamming customer announcements channel every 6-15 min by treating normal DuckDB WAL files as corruption. Do NOT re-enable until rebuilt with: (1) WAL files treated as normal, (2) edit-in-place instead of new posts, (3) rate limiting (max 1 status change/hour), (4) debounce (15 min before announcing degradation).
+- **DuckDB WAL files are NORMAL (S28):** WAL = write-ahead log, created during any write operation. The scraper writes continuously, so a WAL file is almost always present. This is NOT corruption. Never auto-fix by moving/deleting WAL files.
 - **gc-layer-validator (S27 note):** Crashed 112K+ times, disabled by Wilma. Not related to TPCR bot. Fix code if needed later.
 
 **Foundational documents:**
@@ -89,14 +91,14 @@ A scheduling system is deployed on `hazeydata/hazeydata.ai`:
 | 2:00 AM | Gazoo audit | ✅ Live |
 | 4:00 AM | SSD daily report | ✅ Live |
 | 6:00 AM | ACCORD intel brief | ✅ Live |
-| 7:00 AM | Shadow run (`rolling_shadow.py`) | ✅ Live — reference_date naming deployed S27 |
+| 7:00 AM | Shadow run (`rolling_shadow.py`) | ✅ Live — reference_date naming deployed S28 |
 | 7:07 AM | WTI daily report | ✅ Live |
-| 7:30 AM | **Analytics refresh** | ✅ Live — S26 |
+| 7:30 AM | **Analytics refresh** | ✅ FIXED S28 — absolute venv python path |
 | 8:30 AM | WTI observed tweet | ✅ Live |
 | 9:00 AM | **WDW Daily Recap** (`daily_recap_publish.py`) | ✅ Live — S25, proof-batched |
 | 4:00 PM | Gazoo audit + WTI predicted tweet | ✅ Live |
 
-wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` (S27 fix). Tweet crons DISABLED. Broken monthly conversion retrain cron REMOVED (s05 handles daily).
+wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` (S27 fix). Tweet crons DISABLED. service_status_manager cron DISABLED S28 (`#DISABLED_S28`). Broken monthly conversion retrain cron REMOVED (s05 handles daily).
 
 ---
 
@@ -105,49 +107,46 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 - **Forecast scope:** ~46M predictions/day, 59,255 WTI park-dates through March 2028
 - **Pipeline version:** V4 (governed by `PIPELINE_V4_DESIGN.md` + Amendments 001, 002, 003)
 - **Daily pipeline:** Running 6 AM ET on wilma-server, steps s01-s14, ~59 min, 13/13 passing daily
-- **Accuracy:** Overall MAE 8.4, WTI MAE 7.2, 1-Day MAE 7.3 (Apr 4)
-- **Challengers:** `xgb-highLR` reset to Day 0 (archive naming change). Multi-challenger rollout starting Apr 5.
+- **Accuracy:** Overall MAE 8.4, WTI MAE 7.2, 1-Day MAE 7.3 (Apr 5)
+- **Challengers:** `xgb-highLR` Day 1 (uses hypertuned_v1 module: eta 0.3, max_depth 6, n_estimators 500, inverse_freq weighting). Multi-challenger rollout pending — xgb-dow not yet trained.
 - **Models:** 420 baseline, 433 total coverage, 109 on fallback
 - **Twitter:** LIVE on @DisneyStatsWhiz — predicted + observed tweets posting daily, threading working
 - **Blog:** WDW Daily Recap live — publishing daily since Apr 2
 - **Quality gate:** Relaxed Session 23 (peer outlier 60%→90%, day-jump 15→25, staleness exact→24h)
-- **Scraper:** Running (Restart=always), DuckDB lock fix deployed S26
-- **Bot health:** Operational. gc-layer-validator was crashing (112K restarts), disabled — not TPCR bot.
-- **Service status:** FIXED S27 — false degradation cleared, permanent cron fix deployed, 76 WAL backups cleaned
-- **Analytics:** FRESH + AUTOMATED S26 — 7:30 AM cron refreshes daily
-- **Shadow run:** BREAKING CHANGE S27 — archive files now named by reference_date. Old archives deleted. Evaluation window reset.
+- **Scraper:** FIXED S28 — stale lock files cleared, restarted, data flowing. PID 1759694.
+- **Bot health:** Operational. TPCR bot running fine. gc-layer-validator disabled (not TPCR).
+- **Service status manager:** DISABLED S28 — was spamming customer announcements with false "Service Restored" every 6-15 min. 65 spam messages deleted. Apology posted. Customer complaint answered. Needs full redesign before re-enabling.
+- **Analytics:** FIXED S28 — cron updated to use absolute venv python path instead of `source .venv/bin/activate`. Manual run confirmed working.
+- **Shadow run:** Deployed S28 — reference_date naming active, xgb-highLR Day 1 (no comparison data yet, expected). First evaluation Apr 6.
 - **Water parks:** BB/TL/VB excluded from ETL — verified S26, TPCR #457 closed S27
 - **Properties with WTI data:** 13 (WDW, DLR, Universal Orlando, Universal Hollywood, Tokyo Disney, Epic Universe)
 
 ---
 
-## Session 27 Summary (2026-04-04)
+## Session 28 Summary (2026-04-05)
 
 ### Barney (Tier 2):
-1. Read SESSION_LOG, checked Discord #wti-pipeline (30 msgs), #barney-wilma-dev (15 msgs), #gazoo (15 msgs)
-2. **Situational awareness:** Pipeline stable 13/13 (Apr 3+4). Shadow baseline MAE 15.0 (not the expected 8-9). Gazoo overnight audit 7.1/10: two new HIGHs (false degradation, WAL accumulation). Tweets threading correctly. Daily Recap publishing.
-3. **False service degradation root cause:** Traced through `pipeline_state.py`, `pipeline_alert_check.py`, and `service_status_manager.py` (43KB). Root cause: path mismatch — pipeline writes state to `/home/wilma/hazeydata/pipeline/state/` but service_status_manager reads from `/mnt/data/pipeline/state/`. When the bridge cron fails, stale timestamps → false DEGRADED notice to customers.
-4. **Wrote Dino briefing:** `DINO_SERVICE_STATUS_FIX_20260404.md` — 4 fixes in priority order with verification steps.
-5. **Dino executed service status fix** — false degradation cleared, "Service Restored" posted, 76 WAL backups cleaned, permanent cron fix deployed (`update_pipeline_state.sh` at 07:15), hazeydata.ai repo synced, TPCR #457 closed.
-6. **Shadow MAE analysis:** Single-day entity-weighted MAE (15.0) is inherently more volatile than pipeline's multi-date average (8.4). Not a bug — the relative comparison (challenger vs baseline on same day) is what matters for promotion. Entity count difference (~224 shadow vs 271 pipeline) also contributes.
-7. **Competition system overhaul — archive naming:**
-   - Old: `baseline_{run_date}.parquet` containing predictions for `run_date + 1` (confusing)
-   - New: `baseline_{reference_date}.parquet` containing predictions FOR `reference_date` (filename = content)
-   - Updated `shadow_evaluate.py` in TPCR: `--archive-date` → `--reference-date`, internal `eval_date` → `reference_date`
-   - Updated `rolling_shadow.py` in operations: archive files named by reference_date, evaluate passes `--reference-date`
-   - Both scripts now have comprehensive DATE SEMANTICS docstrings
-8. **Multi-challenger rollout briefing:** `DINO_COMPETITION_RESET_20260404.md` — reset xgb-highLR, start adding one challenger per day from Amendment 002 queue (xgb-dow, xgb-deeper, xgb-recent, etc.)
-9. **Possible service interruption** — Fred flagged additional Wilma messages about another TPCR service issue. Could not locate the specific message. To investigate next session.
+1. Read SESSION_LOG, checked Discord #wti-pipeline (30 msgs), #barney-wilma-dev (15 msgs), #gazoo (15 msgs), #fred-wilma (10 msgs)
+2. **Situational awareness:** Pipeline stable 13/13 (Apr 5). Scraper offline (Wilma killed it ~1 AM due to 400-500% CPU spinning). Competition S27 deploy may not have landed. Gazoo overnight 7.1/10: stale scraper lock file (HIGH), analytics cron broken Day 2 (HIGH), service status now operational.
+3. **Scraper fix briefing:** `DINO_SHADOW_FIX_20260405.md` — 5 tasks: fix scraper (stale lock files), deploy competition changes, verify xgb-highLR module, pre-flight shadow run, fix analytics cron.
+4. **Dino executed all 5 tasks** in 10 min: scraper running (0% idle CPU, stale locks were root cause), TPCR pulled (5 commits), old archives deleted, registry reset, xgb-highLR confirmed as hypertuned_v1 module, shadow run ready, analytics cron fixed (absolute venv python path).
+5. **Investigated Fred's service interruption report:** Traced across #wti-pipeline, #fred-wilma, #gazoo. Root cause was `service_status_manager.py` — NOT actual service issues.
+6. **Gained access to TPCR customer Discord server** — Barney bot added via OAuth2. Can now read customer-facing channels directly.
+7. **Discovered service status spam disaster:** Read customer `#announcements` channel — **50+ identical "Service Restored" messages** in 15 hours, firing every 6-15 min. Customer .jeff318 complained in `#feedback`.
+8. **Root cause analysis of spam:** `service_status_manager.py --auto` runs on cron every 3 min. It sees normal DuckDB WAL files (created by scraper writes), treats them as "corruption," moves WAL to `.bak`, re-checks (passes since WAL gone), posts NEW "Service Restored" message. Minutes later scraper creates new WAL. Repeat forever. Three bugs: (a) WAL ≠ corruption, (b) posts new messages instead of editing, (c) no debounce/rate limiting.
+9. **Spam fix briefing:** `DINO_SERVICE_STATUS_SPAM_20260405.md` — disable cron, delete spam, post apology, respond to customer.
+10. **Dino executed in 3 min:** Cron disabled (`#DISABLED_S28`), 65 spam messages deleted, apology posted to #announcements, response posted to .jeff318 in #feedback, 42 WAL backups cleaned, bot + scraper confirmed running.
+11. **Verified customer channels clean:** #announcements now shows launch posts + apology only. #feedback has customer complaint + our response.
 
 ### Fred (Tier 1) — Decisions:
-- Fix customer-facing false degradation first
-- Archive files should be named by reference_date (what the predictions are FOR)
-- Reset xgb-highLR evaluation window (no promotions done yet, clean slate)
-- Launch multi-challenger rollout per Amendment 002 — one new challenger per day
+- Fix scraper and get 7 AM shadow run working
+- Investigate recurring service interruptions on customer server
+- Kill the service status spam immediately
+- Added Barney bot to TPCR customer Discord server
 
-### Dino (Tier 3) — Execution:
-- Service status fix: false degradation cleared, permanent 07:15 cron fix, 76 WAL backups cleaned, #457 closed
-- Pending: competition system deploy (pull both repos, delete old archives, reset registry, train xgb-dow)
+### Dino (Tier 3) — Execution (two briefings, both complete):
+- Briefing 1 (shadow fix): Scraper fixed, competition deployed, analytics cron fixed, shadow run Day 1 posted
+- Briefing 2 (spam fix): Service status cron disabled, 65 spam messages deleted, apology posted, customer responded to, 42 WAL backups cleaned
 
 ---
 
@@ -155,10 +154,9 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 
 | Item | Status | Details |
 |------|--------|---------|
-| **Competition archive naming** | Code committed, deploy pending | BREAKING: both repos need pull before 7 AM Apr 5. Old archives deleted, registry reset. |
-| **Multi-challenger rollout** | Briefing committed, starts Apr 5 | xgb-dow first, then one per day. Queue in `DINO_COMPETITION_RESET_20260404.md`. |
-| **xgb-highLR** | Reset to Day 0 | New evaluation with reference_date naming starts Apr 5. Promotion eligible ~Apr 12. |
-| **Possible service interruption** | Unresolved | Fred flagged Wilma messages about another issue. Message ID 1490083798245707969 not found in accessible channels. |
+| **xgb-highLR evaluation** | Day 1 of 7 | Uses hypertuned_v1 module (combined hypothesis: eta 0.3, depth 6, 500 trees, inverse_freq). First comparison Apr 6. Promotion eligible ~Apr 12. |
+| **Multi-challenger rollout** | Pending | xgb-dow not yet trained. Queue in `DINO_COMPETITION_RESET_20260404.md`. Need to train + register one per day. |
+| **Service status manager redesign** | Disabled, needs rebuild | Must fix: WAL=normal, edit-in-place, debounce, rate limit. Do NOT re-enable the cron until redesigned. |
 | **PQ research doc** | Needs commit | Ready for commit to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR |
 | **EU dimension fix** | Flagged | "Europa-Park" → "Epic Universe" across pipeline |
 | **extract_daily_wti.py date bug** | Flagged | Predicted mode date logic wrong — workaround in place |
@@ -168,22 +166,20 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 
 ## Next Actions (Priority Order)
 
-1. **Investigate service interruption** — Fred flagged something from Wilma. Check all channels next session.
-2. **Verify competition deploy** — confirm Dino pulled both repos, deleted old archives, reset registry before 7 AM Apr 5
-3. **Verify xgb-dow trained + registered** — second challenger should appear in Apr 5 shadow report
-4. **Continue daily challenger additions** — xgb-deeper (Apr 6), xgb-recent (Apr 7), xgb-narrow (Apr 8)
-5. **xgb-highLR promotion decision** — ~Apr 12 (Day 7 with new naming)
-6. **Commit PQ research doc** to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR
-7. **Refactor TPCR blog generators to use scheduler**
-8. **Fix EU dimension table** — "Europa-Park" → "Epic Universe"
-9. **Multi-property tweets** — DLR + Universal Orlando ready. Design schedule.
-10. **Daily Recap Phase 2** — add LLM narrative after template proven (~1 week of data)
+1. **Train + register xgb-dow** — second challenger, day-of-week feature. Then one per day from the queue.
+2. **Redesign service_status_manager.py** — needs proper architecture: WAL files normal, edit-in-place, debounce (15 min), rate limit (1/hour). Write design spec before implementing.
+3. **xgb-highLR Day 7 evaluation** — ~Apr 12. Note: it's actually hypertuned_v1 (combined hypothesis), not just a learning rate change.
+4. **Commit PQ research doc** to `docs/priority-queue/PRIORITY_QUEUE_RESEARCH.md` in TPCR
+5. **Refactor TPCR blog generators to use scheduler**
+6. **Fix EU dimension table** — "Europa-Park" → "Epic Universe"
+7. **Multi-property tweets** — DLR + Universal Orlando ready. Design schedule.
+8. **Daily Recap Phase 2** — add LLM narrative after template proven (~1 week of data)
 
 ---
 
 ## Blockers
 
-- **Possible service interruption** — needs investigation next session. May be false alarm or a channel Barney can't access.
+- None currently. Service interruption investigation (S27 blocker) resolved — it was the service_status_manager spam.
 
 ---
 
@@ -191,20 +187,20 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 
 | Metric | Value | Updated |
 |--------|-------|---------|
-| Total predictions | ~46M/day | S27 |
+| Total predictions | ~46M/day | S28 |
 | WTI park-dates | 59,255 | S25 |
 | Forecast horizon | Through March 2028 | S1 |
-| Overall MAE | 8.4 min | S27 |
-| WTI MAE | 7.2 min | S27 |
-| 1-Day MAE | 7.3 min | S27 |
+| Overall MAE | 8.4 min | S28 |
+| WTI MAE | 7.2 min | S28 |
+| 1-Day MAE | 7.3 min | S28 |
 | Baseline models | 420 | S25 |
 | Fallback entities | 109 | S20 |
 | Properties with WTI | 13 | S22 |
 | Dino crons | 10 | S26 |
-| Active challengers | 1 (reset to Day 0, multi-challenger starting Apr 5) | S27 |
+| Active challengers | 1 (xgb-highLR/hypertuned_v1, Day 1) | S28 |
 | Tweet success rate | High — posting daily, threading confirmed | S26 |
 | Blog posts | 10 existing + daily recaps live (Apr 2+) | S26 |
-| Gazoo composite | 7.1 (up from 5.9) | S27 |
+| Gazoo composite | 7.1 | S27 |
 
 ---
 
@@ -212,6 +208,9 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 
 | Date | Session | Decision | Who |
 |------|---------|----------|-----|
+| 2026-04-05 | 28 | **Disable service_status_manager.py** — cron commented out. Was spamming customer channel. Do not re-enable until redesigned. | Fred + Barney |
+| 2026-04-05 | 28 | **DuckDB WAL files are normal** — never treat WAL as corruption. Never auto-move/delete WAL files. | Barney |
+| 2026-04-05 | 28 | **Barney bot added to TPCR customer server** — can now monitor customer-facing channels (#announcements, #feedback) directly | Fred |
 | 2026-04-04 | 27 | **Archive files named by reference_date** — `baseline_2026-04-05.parquet` = predictions FOR Apr 5. Breaking change, both repos. | Fred + Barney |
 | 2026-04-04 | 27 | **Reset xgb-highLR** — evaluation window cleared for clean start with new naming | Fred + Barney |
 | 2026-04-04 | 27 | **Multi-challenger rollout NOW** — one per day from Amendment 002 queue, starting xgb-dow | Fred + Barney |
@@ -224,7 +223,7 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 | 2026-04-02 | 26 | clawdbot.json: mode 400 (not 444) while gateway running | Barney |
 | 2026-04-02 | 26 | Broken monthly conversion cron removed (s05 retrains daily) | Barney |
 | 2026-04-01 | 25 | V4 Amendment 003 approved: WDW Daily Recap blog product | Fred + Barney |
-| 2026-04-01 | 25 | Daily Recap Phase 1: pure data/template, WDW only, 9 AM ET | Fred + Barney |
+| 2026-04-01 | 25 | Daily Recap Phase 1: pure data/template, WDI only, 9 AM ET | Fred + Barney |
 | 2026-04-01 | 25 | Blog publishes to hazeydata/hazeydata.ai repo (master branch) | Barney |
 | 2026-04-01 | 25 | Shadow evaluation must use identical methodology to s10_accuracy.py | Fred + Barney |
 | 2026-04-01 | 25 | Shadow evaluation logic lives in TPCR repo (`shadow_evaluate.py`) | Barney |
@@ -249,8 +248,7 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 
 | Ticket | Repo | Status | Notes |
 |--------|------|--------|-------|
-| #457 | TPCR | **CLOSED S27** | Water park suppression verified + closed by Dino |
-| #453 | TPCR | Open | Competition — archive naming overhauled S27, multi-challenger starting |
+| #453 | TPCR | Open | Competition — archive naming deployed S28, multi-challenger pending |
 | PR #1 | data-hub | Open | Firecrawl WDW park hours scraper |
 
 ---
@@ -258,6 +256,7 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 ## Agent Notes
 
 - **Dino (Mac Mini):** Claude Code v2.1.84, Opus 4.6, Claude Max. `~/hazeydata/` repos. SSH to wilma@192.168.2.75. `bypassPermissions` enabled. Scripts at `~/hazeydata/operations/scripts/` and `~/hazeydata/scripts/`.
+- **Dino communication:** Briefings committed as markdown to `operations/docs/briefings/` — Dino cannot receive task assignments via Discord. Write a prompt file for Fred to paste into Claude Code.
 - **Wilma:** Does NOT know about Dino or v3.0 yet. Update when convenient. Her tweet crons are disabled (commented out, not deleted).
 - **Twitter creds:** Mac Mini `~/.env`. Wilma-server `/home/wilma/.clawdbot/.env`.
 - **Tweet state:** Mac Mini `~/hazeydata/reports/wti_daily/tweet_state.json`.
@@ -265,7 +264,8 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 - **Content JSONs:** `/home/wilma/hazeydata/pipeline/content/`.
 - **Recap JSONs:** `/home/wilma/hazeydata/pipeline/content/recap_{date}.json` on wilma-server.
 - **Shadow archives:** `{PIPELINE_BASE}/competition/shadow/{challenger_name}/` on wilma-server. **Named by reference_date (S27).**
-- **Challenger registry:** `pipeline/competition/challenger_registry.json` on wilma-server.
+- **Challenger registry (JSON):** `pipeline/competition/challenger_registry.json` on wilma-server. xgb-highLR uses module_name=hypertuned_v1.
+- **Challenger modules (Python):** `pipeline/competition/challengers/` in TPCR repo. Only `hypertuned_v1.py` exists. New challengers need module files created here.
 - **Baseline forecasts path:** `curves/forecast_parquet/all_forecasts.parquet` (from `config.py`).
 - **Blog repo:** `hazeydata/hazeydata.ai` (master branch). Blog at `theme-park-crowd-report/blog/`. CSS: `blog.css` + `styles.css`.
 - **Blog scheduling (SSD S23):** All blog posts should use the scheduler at `scheduled/` in hazeydata.ai.
@@ -274,7 +274,8 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 - **Water parks:** BB/TL/VB filtered at ETL. No models, no forecasts, no tweets. Verified S26, #457 closed S27.
 - **Shadow evaluation architecture (S25+S26+S27):** Evaluation logic lives in `pipeline/competition/shadow_evaluate.py` (TPCR). Uses identical SQL to `s10_accuracy.py`: ACTUAL wait_time_type, TIME_BUCKET with 2.5-min midpoint rounding, synthetic actuals fallback. **Entity-weighted MAE** (S26). **Reference_date naming** (S27): `--reference-date` CLI arg, archive files named `baseline_{reference_date}.parquet` = predictions FOR that date. Orchestrator (`rolling_shadow.py` in operations) calls it via SSH — never runs its own evaluation SQL.
 - **Daily Recap architecture (S25):** `extract_daily_recap.py` (TPCR, wilma-server) queries pipeline data → JSON. `daily_recap_publish.py` (operations, Mac Mini) renders HTML, pushes to hazeydata.ai repo, posts Discord notification. Cron at 9 AM ET.
-- **Service status fix (S27):** False degradation was caused by stale `pipeline_state.json` at `/mnt/data/pipeline/state/`. Permanent fix: `update_pipeline_state.sh` cron at 07:15. Both paths are same inode. 76 WAL backups cleaned. service_status_manager auto-fix creates WAL backups aggressively — consider disabling.
+- **Service status manager (S28):** DISABLED. Cron on wilma-server commented out with `#DISABLED_S28`. Was running every 3 min, treating normal DuckDB WAL files as corruption, posting "Service Restored" to customer #announcements channel in an infinite loop. 65 spam messages deleted, apology posted, customer responded to. Needs full redesign: WAL=normal, edit-in-place, debounce, rate limit. See `DINO_SERVICE_STATUS_SPAM_20260405.md` for design notes.
+- **TPCR customer Discord server:** Barney bot now has access (S28). Channel IDs: #announcements `1471935589371609162`, #feedback `1471935482513457266`. Guild ID `1471374656253591695`. Bot user ID `1471372989806411960`.
 - **gc-layer-validator (S27):** Crashed 112K+ times (every 10 sec), disabled by Wilma. Code bug at line 243 of validation_bot.py. Not related to TPCR bot.
 
 ---
@@ -282,13 +283,12 @@ wilma-server: Pipeline at 6 AM (compute only). 07:15 `update_pipeline_state.sh` 
 ## How to Start Next Session
 
 1. Read this file (`SESSION_LOG.md` in `hazeydata/theme-park-crowd-report`)
-2. **Investigate service interruption** Fred flagged from Wilma — check all channels, try message ID 1490083798245707969
-3. Verify competition deploy landed — both repos pulled, old archives deleted, registry reset
-4. Check shadow report — should show xgb-highLR Day 1 + xgb-dow Day 1 (if trained)
-5. Check `#wti-pipeline` for pipeline status, shadow reports, tweet confirmations
-6. Check `#gazoo` for audit score
-7. Verify Daily Recap published at 9 AM
-8. Pick up from "Next Actions" above
+2. Check `#wti-pipeline` for pipeline status, shadow reports, tweet confirmations
+3. Check `#gazoo` for audit score — expect improved score with scraper fixed + analytics cron fixed
+4. Check TPCR customer `#announcements` (`1471935589371609162`) — confirm no new spam messages
+5. Check shadow report — should show xgb-highLR Day 2+ with first comparison data
+6. Train + register xgb-dow (next challenger from Amendment 002 queue)
+7. Pick up from "Next Actions" above
 
 ---
 
