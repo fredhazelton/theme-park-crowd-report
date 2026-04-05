@@ -61,7 +61,11 @@ def check_duckdb() -> str:
         con.execute("SELECT count(*) FROM information_schema.tables")
         con.close()
         return "healthy"
-    except Exception:
+    except Exception as e:
+        err = str(e).lower()
+        # A lock conflict means the scraper is actively writing — database is alive
+        if "lock" in err or "conflicting" in err or "busy" in err:
+            return "healthy"
         return "unhealthy"
 
 def determine_status(pipeline: str, bot: str, duckdb: str) -> str:
