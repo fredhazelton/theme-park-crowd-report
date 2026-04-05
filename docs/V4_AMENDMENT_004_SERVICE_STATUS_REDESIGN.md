@@ -1,10 +1,11 @@
 # V4 Amendment 004: Service Status Manager Redesign
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-04-05
 **Authors:** Barney (architect) + Fred (decision-maker)
 **Status:** APPROVED — Fred approved Session 29 (2026-04-05)
 **Based on:** Session 28 service status spam incident (65 false "Service Restored" messages in 15 hours)
+**V1.1 addendum:** Deployment lesson from Session 29 false alert incident
 
 ---
 
@@ -207,9 +208,12 @@ Every check result (pass or fail) gets logged locally. Failures also post to int
 
 ### Cron Schedule
 
+The cron requires two environment variables that are not available in the default cron environment:
+
 ```
 # Run every 5 minutes on wilma-server
-*/5 * * * * /home/wilma/theme-park-crowd-report/.venv/bin/python /home/wilma/theme-park-crowd-report/scripts/service_status_v2.py --announce >> /mnt/data/pipeline/logs/service_status.log 2>&1
+# CRITICAL: XDG_RUNTIME_DIR required for systemctl --user, DISCORD_BOT_TOKEN required for posting
+*/5 * * * * export XDG_RUNTIME_DIR=/run/user/1001 DISCORD_BOT_TOKEN=$(grep DISCORD_BOT_TOKEN ~/.env | head -1 | cut -d= -f2) && /home/wilma/theme-park-crowd-report/.venv/bin/python /home/wilma/theme-park-crowd-report/scripts/service_status_v2.py --announce >> /mnt/data/pipeline/logs/service_status.log 2>&1
 ```
 
 At 5-minute intervals with a debounce threshold of 3, the minimum time before a customer sees an announcement is **15 minutes** of sustained failure. This filters out transient blips while still alerting quickly for real outages.
@@ -256,14 +260,49 @@ Before enabling the cron:
 
 ### Phase 4: Enable cron
 
-Add the cron entry on wilma-server. Monitor the first 24 hours via Gazoo audit.
+**⚠️ DEPLOYMENT LESSON (Session 29 incident):** On first deployment, a false "Service Interruption" was posted to customer #announcements because the cron was enabled with missing env vars (`XDG_RUNTIME_DIR`, `DISCORD_BOT_TOKEN`). The broken runs accumulated debounce state (consec=2). When the cron was fixed mid-stream, the next run hit the debounce threshold of 3 and posted to customers — even though the bot was running fine. The debounce worked correctly; the deployment sequencing was wrong.
+
+**Correct deployment sequence (mandatory):**
+
+```bash
+# Step 1: Write the FINAL cron line with all env vars
+# (see Cron Schedule section above for the complete line)
+
+# Step 2: Reset the state file AFTER the cron line is finalized
+ssh wilma@192.168.2.75 'python3 -c "
+import json
+state = {\"current_status\": \"operational\", \"consecutive_non_operational\": 0,
+         \"consecutive_status\": None, \"debounce_threshold\": 3,
+         \"last_announcement_time\": None, \"announcement_message_id\": None,
+         \"incident_start\": None}
+with open(\"/mnt/data/pipeline/state/service_status_state.json\", \"w\") as f:
+    json.dump(state, f, indent=2)
+print(\"State reset\")
+"'
+
+# Step 3: Wait for the FIRST cron cycle to complete (~5 min)
+sleep 360
+
+# Step 4: Verify the first run was clean
+tail -5 /mnt/data/pipeline/logs/service_status.log
+# Should show: operational, consec=0, no announcement posted
+cat /mnt/data/pipeline/state/service_status_state.json
+# Should show: consecutive_non_operational = 0
+
+# Step 5: ONLY if Step 4 is clean, leave the cron running
+# If Step 4 shows errors: disable cron immediately, diagnose, start over from Step 1
+```
+
+**The key rule:** Never fix a cron line mid-stream while stale state exists. Always reset state AFTER the final cron line is written, then verify the first clean cycle before walking away.
+
+Monitor the first 24 hours via Gazoo audit.
 
 ---
 
 ## Anti-Spam Guarantees
 
 | Safeguard | Protection |
-|-----------|-----------|
+|-----------|------------|
 | Debounce (3 consecutive checks) | Transient blips never reach customers |
 | Rate limit (6h between new posts) | Maximum 4 new announcements per day, ever |
 | Edit-in-place | Status changes update existing message, not new messages |
