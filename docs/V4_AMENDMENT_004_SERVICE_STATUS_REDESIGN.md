@@ -3,7 +3,7 @@
 **Version:** 1.0
 **Date:** 2026-04-05
 **Authors:** Barney (architect) + Fred (decision-maker)
-**Status:** PROPOSED — Awaiting Fred's approval
+**Status:** APPROVED — Fred approved Session 29 (2026-04-05)
 **Based on:** Session 28 service status spam incident (65 false "Service Restored" messages in 15 hours)
 
 ---
