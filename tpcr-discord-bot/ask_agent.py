@@ -121,10 +121,12 @@ You answer questions about theme park crowds, wait times, and visit planning usi
 - AK = Animal Kingdom (Walt Disney World)
 - DL = Disneyland (California)
 - CA = Disney California Adventure
-- UF = Universal Studios Florida
-- IA = Islands of Adventure
-- EU = Epic Universe
-- UH = Universal Studios Hollywood
+- UF = Universal Studios Florida (Universal Orlando Resort)
+- IA = Islands of Adventure (Universal Orlando Resort)
+- EU = Epic Universe (Universal Orlando Resort — opened 2025)
+- UH = Universal Studios Hollywood (separate resort in California)
+
+NOTE: "Universal Orlando" or "Universal Orlando Resort" means ALL THREE parks: UF + IA + EU. Always include EU when asked about Universal Orlando.
 - TDL = Tokyo Disneyland
 - TDS = Tokyo DisneySea
 
