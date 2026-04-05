@@ -1,95 +1,93 @@
 # Session Log
 
-**Last updated:** 2026-04-05 by Barney (Session 28 — FINAL)
-**Session:** 28
-**Status:** Service status spam killed. Scraper fixed. Competition deployed. Analytics cron fixed. TPCR Customer Service Audit complete (4.3/10). Amendment 004 drafted. Pipeline 13/13.
+**Last updated:** 2026-04-05 by Barney (Session 29)
+**Session:** 29
+**Status:** Customer Service Design Spec APPROVED. Amendment 004 APPROVED. 6 tickets filed. Dino briefed. Website audit complete. Pipeline 13/13 stable.
 
 ---
 
-## Session 28 Addendum — TPCR Customer Service Audit
+## Session 29 Summary
 
-Late in S28, Fred identified that the TPCR customer-facing Discord server was never included in the master audit & redesign process. Barney conducted a Phase 0-2 audit (landscape survey + audit document) of the entire customer server.
+### Stream 1: Customer Service Design Spec (Playbook Phase 3 → Phase 4 APPROVED)
 
-**Key finding:** The product layer scores 4.3/10 overall — significantly below the backend pipeline (~8/10). The engine room is solid; the showroom floor needs work.
+Reviewed the S28 customer service audit (4.3/10) with Fred. Wrote the full Customer Service Design Spec covering all 9 domains: communication governance, service status redesign, bot error handling, daily report reliability, onboarding, feedback tracking, Barney monitoring, Gazoo customer domain, announcement cadence.
 
-**Audit document:** `docs/TPCR_CUSTOMER_SERVICE_AUDIT_S28.md` in TPCR repo.
+**Product vision (Fred directive):** Free, community-oriented, organic growth, stunning visuals, feedback-driven improvement.
 
-**Critical gaps identified:**
-- No governance on automated customer-facing posts (caused the 65-message spam incident)
-- No monitoring of what customers actually see (Barney didn't have server access until S28)
-- 10-day gap in daily crowd reports with no customer communication
-- 28 days of silence in #announcements while significant product improvements shipped
-- Generic error messages visible to customers ("Something went wrong")
-- No onboarding flow for new members (82 members, no welcome message)
-- Feedback channel has only 16 messages in 5 weeks, no systematic tracking
+Fred approved both the Design Spec and Amendment 004 this session.
 
-**Next session:** Write Customer Service Design Spec (Playbook Phase 3) covering communication governance, bot error standards, onboarding, feedback tracking, and monitoring protocol. Fred review in Phase 4.
+### Stream 2: Website Audit (hazeydata.ai)
 
----
+Audited hazeydata.ai/theme-park-crowd-report/ to verify that heatmaps and visuals referenced in the spec actually exist and are navigable.
 
-## Full Session 28 Summary
+**Findings:**
+- Year View heatmap exists but is buried in footer (not in main nav)
+- Year View shows "January 2024 - December 2024" — stale data or rendering bug
+- Daily recap blog posts exist but aren't surfaced on the blog index page
+- No per-park forecast pages on the website (only via Discord bot)
 
-This was a long, dense session with three major work streams:
+### Stream 3: Ticket Filing
 
-### Stream 1: Emergency Fixes (Dino Briefing #1)
-- Scraper offline → fixed (stale lock files)
-- Competition S27 deploy → verified and completed
-- xgb-highLR module → confirmed as hypertuned_v1
-- Shadow run → Day 1 posted successfully
-- Analytics cron → fixed (absolute venv python path)
+Filed 6 tickets across two repos:
 
-### Stream 2: Service Status Spam (Dino Briefing #2)
-- Discovered 65 false "Service Restored" messages on customer #announcements
-- Root-caused to service_status_manager.py WAL detection bug
-- Disabled cron, deleted spam, posted apology, responded to customer
-- Drafted Amendment 004: Service Status Manager Redesign
+**hazeydata.ai:**
+- #9 — Promote Year View (Crowd Calendar) to main navigation
+- #10 — Year View stale data (shows 2024 instead of 2026)
+- #11 — Blog index missing daily recaps
 
-### Stream 3: TPCR Customer Service Audit
-- Added Barney bot to customer Discord server
-- Full landscape survey of all 5 channels
-- Wrote and committed audit document (4.3/10 overall score)
-- Identified this as a missing piece in the master audit & redesign process
+**theme-park-crowd-report:**
+- #458 — Customer Service Design Spec Phase 1 implementation (umbrella)
+- #459 — Bot error handling: replace generic errors + add error logging
+- #460 — Epic Universe not in Universal Orlando results (customer-reported bug, 33 days old)
+- #461 — Daily crowd report: quality gate + gap detection alerting
+
+### Stream 4: Dino Briefing
+
+Briefing committed to `operations/docs/briefings/DINO_CUSTOMER_SERVICE_PHASE2_20260405.md` with 5 tasks and full prompts.
 
 ### Documents Committed This Session
 | Document | Repo | What |
 |----------|------|------|
-| `docs/briefings/DINO_SHADOW_FIX_20260405.md` | operations | Scraper + competition + analytics fix |
-| `docs/briefings/DINO_SERVICE_STATUS_SPAM_20260405.md` | operations | Kill spam + customer apology |
-| `docs/V4_AMENDMENT_004_SERVICE_STATUS_REDESIGN.md` | TPCR | Service status manager redesign (PROPOSED) |
-| `docs/TPCR_CUSTOMER_SERVICE_AUDIT_S28.md` | TPCR | Customer-facing server audit |
+| `docs/TPCR_CUSTOMER_SERVICE_DESIGN_SPEC.md` | TPCR | Customer service governing doc (APPROVED) |
+| `docs/V4_AMENDMENT_004_SERVICE_STATUS_REDESIGN.md` | TPCR | Status updated to APPROVED |
+| `docs/briefings/DINO_CUSTOMER_SERVICE_PHASE2_20260405.md` | operations | Dino briefing: 5 tasks with prompts |
 
 ### Decisions This Session
 | Decision | Who |
 |----------|-----|
-| Disable service_status_manager.py — do not re-enable until redesigned | Fred + Barney |
-| DuckDB WAL files are normal — never treat as corruption | Barney |
-| Barney bot added to TPCR customer server | Fred |
-| TPCR customer server needs full audit & redesign (was missing from master process) | Fred + Barney |
-| Amendment 004 drafted — needs Fred approval before implementation | Barney |
+| Customer Service Design Spec APPROVED | Fred |
+| Amendment 004 (service status redesign) APPROVED | Fred |
+| Product vision: free, community, organic growth, stunning visuals | Fred |
+| No new Discord channels until 250+ members | Barney |
+| Remove DISBOARD bot | Fred + Barney |
+| Biweekly announcement cadence (Fred writes, every other Friday) | Fred + Barney |
+| Feedback tracking: every actionable item → GitHub issue with customer-feedback label | Barney |
+
+### Process Fix: Dino Communication
+**Barney must NEVER address Dino via Discord.** Dino is Claude Code on the Mac Mini — he cannot read Discord messages. Task assignments for Dino go ONLY via committed briefing files in `operations/docs/briefings/`. Fred points Dino at the file path. Discord posts about Dino's tasks are for Fred/Wilma situational awareness only, not for Dino delivery.
 
 ---
 
 ## How to Start Next Session
 
 1. Read this file (`SESSION_LOG.md` in `hazeydata/theme-park-crowd-report`)
-2. Read `docs/TPCR_CUSTOMER_SERVICE_AUDIT_S28.md` — the customer audit findings
-3. **Get Fred's approval on Amendment 004** (service status redesign) — it's PROPOSED, not APPROVED
-4. Check `#wti-pipeline` for pipeline status, shadow reports
-5. Check TPCR customer `#announcements` — confirm no new spam
-6. Check `#gazoo` for audit score
-7. Check shadow report — xgb-highLR should be Day 2+ with first comparison data
-8. **Write Customer Service Design Spec** (Playbook Phase 3) — the product-layer governing document
-9. Train + register xgb-dow (next challenger)
-10. Pick up from Next Actions below
+2. Read TPCR customer channels: `#announcements`, `#feedback`, `#crowd-reports` (Domain 7 monitoring)
+3. Check `#wti-pipeline` for Dino completion reports on S29 briefing tasks
+4. Check `#gazoo` for audit score
+5. Check shadow report — xgb-highLR Day 2+ comparison data
+6. Verify Fred completed Phase 1 quick wins (welcome message, server description, DISBOARD removal)
+7. Review Dino's Year View investigation results (hazeydata.ai #10)
+8. Review Dino's Epic Universe bug investigation (TPCR #460)
+9. If service_status_v2.py is built, review proof-batch results
 
 ## Next Actions (Priority Order)
 
-1. **Fred: Review + approve Amendment 004** (service status redesign)
-2. **Write TPCR Customer Service Design Spec** — Playbook Phase 3, the product-layer governing doc
-3. **Train + register xgb-dow** — second challenger, day-of-week feature
-4. **Implement service_status_v2.py** — per approved Amendment 004
-5. **Fix tpcr_bot_health_check.py** — remove WAL backup logic
-6. **xgb-highLR Day 7 evaluation** — ~Apr 12
+1. **Fred: Phase 1 quick wins** — welcome message in #general, server description, DISBOARD removal
+2. **Dino: Execute S29 briefing** — Year View investigation, EU bug, service_status_v2.py, health check fix, proof batch
+3. **Fred: First biweekly announcement** — 28 days of silence, lots shipped, time to tell customers
+4. **Train + register xgb-dow** — second challenger, day-of-week feature
+5. **xgb-highLR Day 7 evaluation** — ~Apr 12
+6. **Update AUDIT_SCOPE.md** — add Customer Experience domain for Gazoo
 7. **Commit PQ research doc** to TPCR
 8. **Refactor blog generators to use scheduler**
 9. **Fix EU dimension table**
@@ -97,25 +95,26 @@ This was a long, dense session with three major work streams:
 
 ## Blockers
 
-- **Amendment 004 needs Fred approval** before implementation
-- **Customer Service Design Spec** needs to be written before product-layer improvements begin
+- None — both governing docs approved, all tickets filed, briefing committed
 
 ## Key Numbers
 
 | Metric | Value | Updated |
 |--------|-------|---------|
-| Total predictions | ~46M/day | S28 |
-| Overall MAE | 8.4 min | S28 |
-| WTI MAE | 7.2 min | S28 |
-| 1-Day MAE | 7.3 min | S28 |
+| Total predictions | ~46M/day | S29 |
+| Overall MAE | 8.4 min | S29 |
+| WTI MAE | 7.2 min | S29 |
+| 1-Day MAE | 7.3 min | S29 |
 | TPCR server members | 82 | S28 |
 | Customer audit score | 4.3/10 | S28 |
+| Customer service spec | APPROVED | S29 |
+| Amendment 004 | APPROVED | S29 |
 | Pipeline audit score | ~8/10 | S28 |
-| Active challengers | 1 (xgb-highLR/hypertuned_v1, Day 1) | S28 |
-| Gazoo composite | 7.1 | S27 |
+| Active challengers | 1 (xgb-highLR/hypertuned_v1, Day 1 reset) | S29 |
+| Gazoo composite | 7.1 | S29 |
+| Open TPCR tickets | 4 (#458-461) | S29 |
+| Open hazeydata.ai tickets | 5 (#7-11) | S29 |
 
 ---
 
 *Shared project memory for WTI Pipeline. Updated every session. Git history preserves all versions.*
-
-*Note: This is a condensed session log focused on S28 outcomes. For full historical context (enterprise architecture, agent notes, decisions log, foundational docs, cron schedules, etc.), see the previous commit's SESSION_LOG.md in git history.*
