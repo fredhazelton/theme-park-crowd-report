@@ -1,0 +1,115 @@
+{
+  "eval_date": "2026-03-23",
+  "parks": [
+    {
+      "park_code": "AK",
+      "wti_forecast": 8.7,
+      "wti_actual": 14.2,
+      "error": -5.5,
+      "abs_error": 5.5,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "CA",
+      "wti_forecast": 14.6,
+      "wti_actual": 21.1,
+      "error": -6.500000000000002,
+      "abs_error": 6.500000000000002,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "DL",
+      "wti_forecast": 12.2,
+      "wti_actual": 16.3,
+      "error": -4.100000000000001,
+      "abs_error": 4.100000000000001,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "EP",
+      "wti_forecast": 10.2,
+      "wti_actual": 16.8,
+      "error": -6.600000000000001,
+      "abs_error": 6.600000000000001,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "EU",
+      "wti_forecast": 19.4,
+      "wti_actual": 26.4,
+      "error": -7.0,
+      "abs_error": 7.0,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "HS",
+      "wti_forecast": 14.5,
+      "wti_actual": 11.8,
+      "error": 2.6999999999999993,
+      "abs_error": 2.6999999999999993,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "IA",
+      "wti_forecast": 19.2,
+      "wti_actual": 14.9,
+      "error": 4.299999999999999,
+      "abs_error": 4.299999999999999,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "MK",
+      "wti_forecast": 10.3,
+      "wti_actual": 9.3,
+      "error": 1.0,
+      "abs_error": 1.0,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "TDL",
+      "wti_forecast": 22.1,
+      "wti_actual": 20.7,
+      "error": 1.4000000000000021,
+      "abs_error": 1.4000000000000021,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "TDS",
+      "wti_forecast": 24.8,
+      "wti_actual": 26.2,
+      "error": -1.3999999999999986,
+      "abs_error": 1.3999999999999986,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "UF",
+      "wti_forecast": 14.6,
+      "wti_actual": 11.7,
+      "error": 2.9000000000000004,
+      "abs_error": 2.9000000000000004,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    },
+    {
+      "park_code": "UH",
+      "wti_forecast": 7.2,
+      "wti_actual": 17.3,
+      "error": -10.100000000000001,
+      "abs_error": 10.100000000000001,
+      "model_type": "v2+synth",
+      "made_date": "2026-03-21"
+    }
+  ],
+  "yesterday_mae": 4.458333333333334,
+  "yesterday_bias": -2.408333333333333
+}
