@@ -268,19 +268,9 @@ def attempt_fix(results):
         else:
             fixes.append(f"restart_error: {err[:100]}")
 
-    # DuckDB WAL corruption → remove WAL and restart
-    duckdb_check = next((r for r in results if r["check"] == "duckdb"), None)
-    if duckdb_check and duckdb_check.get("status") == "error" and "WAL" in duckdb_check.get("error", ""):
-        wal_path = f"{DUCKDB_PATH}.wal"
-        if os.path.exists(wal_path):
-            bak = f"{wal_path}.bak.{datetime.now().strftime('%Y%m%d%H%M%S')}"
-            logger.info(f"🔧 Backing up corrupt WAL: {wal_path} → {bak}")
-            os.rename(wal_path, bak)
-            fixes.append("wal_backed_up")
-            # Restart bot to reconnect cleanly
-            run_cmd(f"systemctl --user restart {SERVICE_NAME}")
-            time.sleep(5)
-            fixes.append("restarted_after_wal_fix")
+    # WAL files are normal DuckDB behavior — do not move or delete them (Amendment 004)
+    # The previous WAL backup logic was removed because it caused the April 4-5 2026
+    # service status spam incident (65 false "Service Restored" messages in 15 hours).
 
     return fixes
 
