@@ -1,108 +1,121 @@
 # Session Log
 
-**Last updated:** 2026-04-05 by Barney (Session 29 — FINAL)
+**Last updated:** 2026-04-06 by Barney (Session 29 — FINAL UPDATE)
 **Session:** 29
-**Status:** Design Spec + Amendment 004 APPROVED. All 5 Dino tasks complete. service_status_v2.py built + proof-batched. EU bug fixed. Cron pending enable. Pipeline 13/13 stable.
+**Status:** Monster session. Design Spec + Amendment 004 APPROVED. service_status_v2.py live. 5 hazeydata.ai tickets closed. EU bug fixed. Year View refreshed + in nav + auto-cron. Blog index recaps added. Gazoo Customer Experience domain live. TDS50 root-caused (Tokyo data calibration). Internal spam fixed. Pipeline 13/13 stable.
 
 ---
 
 ## Session 29 Summary
 
-### Stream 1: Customer Service Design Spec (Playbook Phase 3 → Phase 4 APPROVED)
+Largest single session to date — 12+ deliverables across both repos.
 
-Reviewed the S28 customer service audit (4.3/10) with Fred. Wrote the full Customer Service Design Spec covering all 9 domains: communication governance, service status redesign, bot error handling, daily report reliability, onboarding, feedback tracking, Barney monitoring, Gazoo customer domain, announcement cadence.
+### Stream 1: Customer Service Design Spec (Playbook Phase 3 → Phase 4 APPROVED)
+Wrote the full 9-domain Customer Service Design Spec. Fred approved both the Design Spec and Amendment 004.
 
 **Product vision (Fred directive):** Free, community-oriented, organic growth, stunning visuals, feedback-driven improvement.
 
-Fred approved both the Design Spec and Amendment 004 this session.
+### Stream 2: Website Audit + Fixes (hazeydata.ai)
+Audited hazeydata.ai/theme-park-crowd-report/ and fixed every finding:
+- Year View data refreshed with current pipeline forecasts
+- Year View date range rendering fixed (dynamic from JSON data)
+- "Crowd Calendar" added to main nav (TPCR index + blog pages)
+- Daily recap section added to blog index
+- Year View auto-refresh cron set (8 AM ET daily)
+- Screenshot git push resolved
 
-### Stream 2: Website Audit (hazeydata.ai)
+### Stream 3: service_status_v2.py — Full Lifecycle
+Built → proof-batched → false-alerted (deployment sequencing error) → root-caused → redeployed correctly → internal spam fixed → pipeline night-check fixed → running clean in production.
 
-Audited hazeydata.ai/theme-park-crowd-report/ to verify that heatmaps and visuals referenced in the spec actually exist and are navigable.
+Amendment 004 updated to v1.1 with deployment lesson and correct cron env vars.
 
-**Findings:**
-- Year View heatmap exists but is buried in footer (not in main nav)
-- Year View shows "January 2024 - December 2024" — stale data or rendering bug
-- Daily recap blog posts exist but aren't surfaced on the blog index page
-- No per-park forecast pages on the website (only via Discord bot)
+### Stream 4: Customer-Facing Fixes
+- Epic Universe bot bug fixed (TPCR #460 — CLOSED)
+- Gazoo Customer Experience audit domain added to AUDIT_SCOPE.md
 
-### Stream 3: Ticket Filing
+### Stream 5: TDS50 Investigation
+Root-caused MAE 79.3: Tokyo parks have POSTED data but zero ACTUAL data. Conversion model has no Tokyo-specific training. Model predicts ~96 min for rides with ~175 min actual waits. Fred directive: apply global POSTED→ACTUAL ratios to Tokyo entities, retrain.
 
-Filed 6 tickets across two repos:
+**Dino tasks still running at session end:** Tokyo conversion fix, bot error handling (#459), daily report quality gate (#461). Prompts provided to Fred for sequential execution.
 
-**hazeydata.ai:**
-- #9 — Promote Year View (Crowd Calendar) to main navigation
-- #10 — Year View stale data (shows 2024 instead of 2026) — Dino investigated, refreshed + commented
-- #11 — Blog index missing daily recaps
+### Tickets — Session 29
 
-**theme-park-crowd-report:**
-- #458 — Customer Service Design Spec Phase 1 implementation (umbrella)
-- #459 — Bot error handling: replace generic errors + add error logging
-- #460 — Epic Universe not in Universal Orlando results — **FIXED + CLOSED** (Dino, commit `d7230d14`)
-- #461 — Daily crowd report: quality gate + gap detection alerting
+**Closed this session:**
+| Ticket | What |
+|--------|------|
+| hazeydata.ai #9 | Crowd Calendar in main nav |
+| hazeydata.ai #10 | Year View data + dynamic date range |
+| hazeydata.ai #11 | Blog index daily recaps |
+| TPCR #460 | Epic Universe bot bug |
 
-### Stream 4: Dino Execution (all 5 tasks complete)
+**Still open:**
+| Ticket | What | Status |
+|--------|------|--------|
+| TPCR #458 | Phase 1 umbrella | Service status done. Fred quick wins pending. |
+| TPCR #459 | Bot error handling | Dino prompt ready, awaiting execution |
+| TPCR #461 | Daily report quality gate | Dino prompt ready, awaiting execution |
 
-Briefing: `operations/docs/briefings/DINO_CUSTOMER_SERVICE_PHASE2_20260405.md`
-
-| Task | Ticket | Result |
-|------|--------|--------|
-| Year View data | hazeydata.ai #10 | Refreshed + commented |
-| Epic Universe bug | TPCR #460 | Fixed — explicit UOR grouping added to ask_agent.py, bot restarted. **CLOSED.** |
-| service_status_v2.py | TPCR #458 | Built (250 lines), committed `342e5956`. Also fixed DuckDB lock conflict handling during proof-batch. |
-| Health check WAL fix | TPCR #458 | WAL backup logic removed from attempt_fix() |
-| Proof batch (Rule 17) | — | 3 phases passed. Cron not yet enabled — awaiting Fred to give Dino the enable command. |
+### Deployed This Session
+| What | Where |
+|------|-------|
+| service_status_v2.py | wilma-server cron (*/5, with env vars) |
+| Year View auto-refresh | wilma-server cron (8 AM ET daily) |
+| Crowd Calendar nav link | hazeydata.ai (Cloudflare Pages) |
+| Dynamic year-view date range | hazeydata.ai |
+| Blog index daily recaps | hazeydata.ai |
+| EU bot fix (UOR grouping) | tpcr-discord-bot on wilma-server |
+| Gazoo Customer Experience domain | AUDIT_SCOPE.md in operations |
+| service_status_v2.py spam fix | Internal posts only on status changes |
+| service_status_v2.py night fix | Pipeline check treats off-hours as ok |
 
 ### Documents Committed This Session
-| Document | Repo | What |
-|----------|------|------|
-| `docs/TPCR_CUSTOMER_SERVICE_DESIGN_SPEC.md` | TPCR | Customer service governing doc (APPROVED) |
-| `docs/V4_AMENDMENT_004_SERVICE_STATUS_REDESIGN.md` | TPCR | Status updated to APPROVED |
-| `docs/briefings/DINO_CUSTOMER_SERVICE_PHASE2_20260405.md` | operations | Dino briefing: 5 tasks with prompts |
-| `scripts/service_status_v2.py` | TPCR | New service status monitor (Dino) |
-| `tpcr-discord-bot/ask_agent.py` | TPCR | EU fix — UOR grouping (Dino) |
-| `tpcr_bot_health_check.py` | TPCR | WAL backup logic removed (Dino) |
+| Document | Repo |
+|----------|------|
+| `docs/TPCR_CUSTOMER_SERVICE_DESIGN_SPEC.md` (APPROVED) | TPCR |
+| `docs/V4_AMENDMENT_004_SERVICE_STATUS_REDESIGN.md` (APPROVED v1.1) | TPCR |
+| `docs/briefings/DINO_CUSTOMER_SERVICE_PHASE2_20260405.md` | operations |
+| `scripts/service_status_v2.py` | TPCR |
+| `tpcr-discord-bot/ask_agent.py` (EU fix) | TPCR |
+| `docs/AUDIT_SCOPE.md` (Customer Experience domain) | operations |
 
 ### Decisions This Session
 | Decision | Who |
 |----------|-----|
 | Customer Service Design Spec APPROVED | Fred |
-| Amendment 004 (service status redesign) APPROVED | Fred |
+| Amendment 004 APPROVED | Fred |
 | Product vision: free, community, organic growth, stunning visuals | Fred |
+| Retrain TDS50 — apply global POSTED→ACTUAL ratios to Tokyo parks | Fred |
 | No new Discord channels until 250+ members | Barney |
 | Remove DISBOARD bot | Fred + Barney |
-| Biweekly announcement cadence (Fred writes, every other Friday) | Fred + Barney |
-| Feedback tracking: every actionable item → GitHub issue with customer-feedback label | Barney |
-| Enable service_status_v2.py cron — proof batch passed | Barney |
+| Biweekly announcement cadence | Fred + Barney |
+| service_status_v2.py deployment sequence: write final cron → reset state → verify first cycle | Barney (learned from incident) |
 
 ### Process Fix: Dino Communication
-**Barney must NEVER address Dino via Discord.** Dino is Claude Code on the Mac Mini — he cannot read Discord messages. Task assignments for Dino go ONLY via committed briefing files in `operations/docs/briefings/`. Fred points Dino at the file path. Discord posts about Dino's tasks are for Fred/Wilma situational awareness only, not for Dino delivery.
+**Barney must NEVER address Dino via Discord.** Dino is Claude Code on the Mac Mini — he cannot read Discord. Task assignments via committed briefings in `operations/docs/briefings/` only. Fred pastes prompts into Dino's terminal. Discord posts are for situational awareness only.
 
 ---
 
 ## How to Start Next Session
 
-1. Read this file (`SESSION_LOG.md` in `hazeydata/theme-park-crowd-report`)
-2. Read TPCR customer channels: `#announcements`, `#feedback`, `#crowd-reports` (Domain 7 monitoring)
-3. Check `#wti-pipeline` for pipeline status and shadow reports
-4. Check `#gazoo` for audit score — should now reflect service_status_v2.py if cron enabled
-5. Verify service_status_v2.py cron is running and producing clean logs
-6. Verify Fred completed Phase 1 quick wins (welcome message, server description, DISBOARD removal)
-7. Verify Fred closed the loop with Chela in #feedback about EU fix
-8. Check shadow report — xgb-highLR should have comparison data by now
+1. Read this file
+2. Read TPCR customer channels: `#announcements`, `#feedback`, `#crowd-reports` (Domain 7)
+3. Check `#gazoo` — should now include Customer Experience domain score
+4. Verify service_status_v2.py cron is running clean (check log)
+5. Check if Dino completed: Tokyo conversion fix, bot error handling (#459), daily report quality gate (#461)
+6. Verify Fred completed: welcome message, server description, DISBOARD removal, Chela response
+7. Check shadow report — xgb-highLR comparison data
+8. Check if TDL/TDS MAE improved after Tokyo conversion fix
 
 ## Next Actions (Priority Order)
 
-1. **Fred: Enable service_status_v2.py cron** — paste Dino prompt from S29 to enable
-2. **Fred: Phase 1 quick wins** — welcome message in #general, server description, DISBOARD removal
-3. **Fred: Close the loop with Chela** — respond in TPCR #feedback about EU fix
-4. **Fred: First biweekly announcement** — 28 days of silence, lots shipped, time to tell customers
-5. **Train + register xgb-dow** — second challenger, day-of-week feature
+1. **Dino (prompts provided):** Tokyo conversion fix → bot error handling (#459) → daily report quality gate (#461)
+2. **Fred: Phase 1 quick wins** — welcome message, server description, DISBOARD removal
+3. **Fred: Close loop with Chela** — respond in TPCR #feedback about EU fix
+4. **Fred: First biweekly announcement** — lots shipped, time to tell customers
+5. **Train + register xgb-dow** — second challenger
 6. **xgb-highLR Day 7 evaluation** — ~Apr 12
-7. **Update AUDIT_SCOPE.md** — add Customer Experience domain for Gazoo
-8. **Commit PQ research doc** to TPCR
-9. **Refactor blog generators to use scheduler**
-10. **Multi-property tweets** — DLR + Universal Orlando
+7. **Commit PQ research doc** to TPCR
+8. **Multi-property tweets** — DLR + Universal Orlando
 
 ## Blockers
 
@@ -117,15 +130,15 @@ Briefing: `operations/docs/briefings/DINO_CUSTOMER_SERVICE_PHASE2_20260405.md`
 | WTI MAE | 7.2 min | S29 |
 | 1-Day MAE | 7.3 min | S29 |
 | TPCR server members | 82 | S28 |
-| Customer audit score | 4.3/10 | S28 |
 | Customer service spec | APPROVED | S29 |
-| Amendment 004 | APPROVED | S29 |
-| service_status_v2.py | Built + proof-batched, cron pending | S29 |
-| Pipeline audit score | ~8/10 | S28 |
-| Active challengers | 1 (xgb-highLR/hypertuned_v1, Day 1 reset) | S29 |
-| Gazoo composite | 7.1 | S29 |
+| Amendment 004 | APPROVED v1.1 | S29 |
+| service_status_v2.py | Live, running clean | S29 |
+| Gazoo Customer Experience | Domain added, next audit picks it up | S29 |
+| Active challengers | 1 (xgb-highLR, Day 1 reset) | S29 |
+| Gazoo composite | 7.1 (expect improvement next cycle) | S29 |
 | Open TPCR tickets | 3 (#458, #459, #461) | S29 |
-| Open hazeydata.ai tickets | 5 (#7-11) | S29 |
+| Open hazeydata.ai tickets | 2 (#7, #8 — SSD, not TPCR) | S29 |
+| Tickets closed this session | 4 | S29 |
 
 ---
 
