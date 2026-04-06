@@ -37,6 +37,18 @@ from pipeline.core.validation import ValidationError
 
 TIME_EPOCH = date(2015, 1, 1)
 
+# Global POSTED→ACTUAL hourly ratios — computed from 750K+ matched pairs across all parks
+# with both POSTED and ACTUAL data. Used as fallback for parks without ACTUAL data
+# (e.g., TDL, TDS, UH). Source: TPCR #462, verified Apr 5 2026.
+HOURLY_RATIOS = {
+    0: 0.521, 1: 0.555, 2: 0.490, 3: 0.438, 4: 0.566, 5: 0.473,
+    6: 0.524, 7: 0.582, 8: 0.599, 9: 0.625, 10: 0.665, 11: 0.668,
+    12: 0.682, 13: 0.688, 14: 0.687, 15: 0.672, 16: 0.667, 17: 0.665,
+    18: 0.655, 19: 0.646, 20: 0.616, 21: 0.590, 22: 0.573, 23: 0.555,
+}
+GLOBAL_RATIO = 0.600
+
+
 
 def _get_model_dir(cfg: PipelineConfig) -> Path:
     if cfg.shadow and cfg.shadow_output_base:
@@ -181,10 +193,9 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 # Fallback path: park has no ACTUAL data (e.g., TDL, TDS, UH)
                 # Apply global hourly POSTED→ACTUAL ratio instead of model with unknown encodings
                 log.info(f"  {park_code}: no model encoding — using hourly ratio fallback")
-                park_df["synthetic_actual"] = park_df.apply(
-                    lambda row: max(1.0, row["posted_wait"] * hourly_ratios.get(int(row["hour_bucket"]), global_ratio)),
-                    axis=1
-                ).astype(np.float32)
+                park_df["hour_int"] = park_df["hour_bucket"].astype(int)
+                park_df["ratio"] = park_df["hour_int"].map(HOURLY_RATIOS).fillna(GLOBAL_RATIO)
+                park_df["synthetic_actual"] = (park_df["posted_wait"] * park_df["ratio"]).clip(lower=1.0).astype(np.float32)
 
             # Write immediately
             out_df = park_df[output_cols].copy()
@@ -198,7 +209,9 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
             log.info(f"  {park_code}: {n_rows:,} rows written")
 
             # Free ALL memory for this park
-            del park_df, out_df, X, dmatrix
+            del park_df, out_df
+            if park_has_encoding:
+                del X, dmatrix
             gc.collect()
 
     log.info(f"Written {parks_written} park files to {synth_dir}")
