@@ -40,9 +40,19 @@ def check_pipeline() -> str:
             capture_output=True, text=True, timeout=30,
         )
         data = json.loads(r.stdout)
-        return data.get("status", "error")
+        status = data.get("status", "error")
     except Exception:
-        return "error"
+        status = "error"
+    # Outside the pipeline run window (6-10 AM ET), errors are expected — no pipeline scheduled
+    if status in ("error", "critical"):
+        try:
+            from zoneinfo import ZoneInfo
+            hour_et = datetime.now(ZoneInfo("America/Toronto")).hour
+            if hour_et < 6 or hour_et >= 10:
+                return "ok"  # Not scheduled — silence is golden
+        except Exception:
+            pass
+    return status
 
 def check_bot() -> str:
     try:
@@ -162,15 +172,19 @@ def run_announce(dry_run: bool = False):
             state["consecutive_status"] = status
     debounced = state["consecutive_non_operational"] >= DEBOUNCE_THRESHOLD
 
-    # Internal alert (always)
+    # Internal alert — only on status CHANGE (silence is golden, Amendment 004)
     internal_msg = (
         f"[status-check] {status} | pipeline={checks['pipeline']} "
         f"bot={checks['bot']} duckdb={checks['duckdb']} "
         f"consec={state['consecutive_non_operational']}"
     )
+    status_changed = status != prev_status
     if dry_run:
-        print(f"[DRY-RUN] Internal: {internal_msg}")
-    else:
+        if status_changed:
+            print(f"[DRY-RUN] Internal (status change): {internal_msg}")
+        else:
+            print(f"[DRY-RUN] No change: {internal_msg}")
+    elif status_changed:
         try:
             discord_post(INTERNAL_CHANNEL, internal_msg)
         except Exception as e:
