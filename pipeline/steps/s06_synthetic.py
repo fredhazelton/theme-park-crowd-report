@@ -157,23 +157,34 @@ def run(cfg: PipelineConfig, log: PipelineLogger) -> dict:
                 (park_df["park_date_dt"].dt.year - TIME_EPOCH.year) * 12
                 + (park_df["park_date_dt"].dt.month - TIME_EPOCH.month)
             ).astype(np.float32)
-            park_df["park_encoded"] = park_map.get(park_code, -1)
-            park_df["entity_encoded"] = park_df["entity_code"].map(entity_map).fillna(unknown_entity).astype(np.float32)
-            park_df["scope_encoded"] = park_df["scope_and_scale"].map(scope_map).fillna(-1).astype(np.float32)
+            # Check if this park has model encodings (was in training data)
+            park_has_encoding = park_code in park_map
 
-            # Verify features
-            missing = [c for c in feature_cols if c not in park_df.columns]
-            if missing:
-                log.warning(f"  {park_code}: missing features {missing}, skipping")
-                del park_df
-                gc.collect()
-                continue
+            if park_has_encoding:
+                # Standard path: use XGBoost conversion model
+                park_df["park_encoded"] = park_map.get(park_code, -1)
+                park_df["entity_encoded"] = park_df["entity_code"].map(entity_map).fillna(unknown_entity).astype(np.float32)
+                park_df["scope_encoded"] = park_df["scope_and_scale"].map(scope_map).fillna(-1).astype(np.float32)
 
-            # Predict
-            X = park_df[feature_cols].values.astype(np.float32)
-            dmatrix = xgb.DMatrix(X, feature_names=feature_cols)
-            park_df["synthetic_actual"] = model.predict(dmatrix)
-            park_df["synthetic_actual"] = park_df["synthetic_actual"].clip(lower=1.0)
+                missing = [c for c in feature_cols if c not in park_df.columns]
+                if missing:
+                    log.warning(f"  {park_code}: missing features {missing}, skipping")
+                    del park_df
+                    gc.collect()
+                    continue
+
+                X = park_df[feature_cols].values.astype(np.float32)
+                dmatrix = xgb.DMatrix(X, feature_names=feature_cols)
+                park_df["synthetic_actual"] = model.predict(dmatrix)
+                park_df["synthetic_actual"] = park_df["synthetic_actual"].clip(lower=1.0)
+            else:
+                # Fallback path: park has no ACTUAL data (e.g., TDL, TDS, UH)
+                # Apply global hourly POSTED→ACTUAL ratio instead of model with unknown encodings
+                log.info(f"  {park_code}: no model encoding — using hourly ratio fallback")
+                park_df["synthetic_actual"] = park_df.apply(
+                    lambda row: max(1.0, row["posted_wait"] * hourly_ratios.get(int(row["hour_bucket"]), global_ratio)),
+                    axis=1
+                ).astype(np.float32)
 
             # Write immediately
             out_df = park_df[output_cols].copy()
