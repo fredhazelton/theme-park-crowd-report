@@ -125,20 +125,21 @@ def _write_to_live_duckdb(
 ) -> bool:
     """
     Append new wait time rows to tpcr_live.duckdb live_waits table.
-    Called after CSV write. Retries on lock conflicts (e.g. bot reading).
-    Fails gracefully if DuckDB/init not available.
+    Uses subprocess to ensure DuckDB file handles are fully released after each write.
+    The subprocess imports duckdb, writes, and exits — no persistent lock (#463).
     """
     import time as _time
-    import gc
+    import subprocess
+    import tempfile
 
     if duckdb is None or df.empty:
         return False
     db_path = output_base / "tpcr_live.duckdb"
     if not db_path.exists():
-        logger.debug("Skipping DuckDB write: tpcr_live.duckdb not found (run init_live_duckdb.py)")
+        logger.debug("Skipping DuckDB write: tpcr_live.duckdb not found")
         return False
 
-    # Prepare data once, outside retry loop
+    # Prepare data
     try:
         df = df.copy()
         df["park_date"] = derive_park_date(df["observed_at"], park_tz)
@@ -152,87 +153,64 @@ def _write_to_live_duckdb(
         logger.warning(f"DuckDB data prep failed: {e}")
         return False
 
+    # Write data to temp CSV, then use subprocess to INSERT into DuckDB
+    # Subprocess ensures DuckDB connection is fully closed (no persistent file handles)
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as tmp:
+            tmp_path = tmp.name
+            df[["entity_code", "observed_at", "wait_time_type", "wait_time_minutes", "park_date"]].to_csv(tmp, index=False)
+    except Exception as e:
+        logger.warning(f"Failed to write temp CSV: {e}")
+        return False
+
+    write_script = f'''import duckdb, os, sys
+try:
+    con = duckdb.connect("{db_path}")
+    con.execute("""
+        INSERT OR IGNORE INTO live_waits (entity_code, observed_at, wait_time_type, wait_time_minutes, park_date)
+        SELECT entity_code, observed_at::TIMESTAMPTZ, wait_time_type,
+               wait_time_minutes::INTEGER, park_date::DATE
+        FROM read_csv_auto("{tmp_path}")
+    """)
+    con.execute("""
+        INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
+        VALUES ('scraper', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM live_waits), 'queue-times')
+    """)
+    con.close()
+    os.unlink("{tmp_path}")
+    print("OK")
+except Exception as e:
+    print(f"ERR:{{e}}", file=sys.stderr)
+    sys.exit(1)
+'''
+
     for attempt in range(max_retries):
         try:
-            con = duckdb.connect(str(db_path))
-            try:
-                con.register("_live_df", df)
-                con.execute("""
-                    INSERT OR IGNORE INTO live_waits 
-                        (entity_code, observed_at, wait_time_type, wait_time_minutes, park_date)
-                    SELECT entity_code, observed_at::TIMESTAMPTZ, wait_time_type, 
-                           wait_time_minutes::INTEGER, park_date::DATE
-                    FROM _live_df
-                """)
-                con.execute("""
-                    INSERT OR REPLACE INTO data_freshness (source, last_updated, row_count, notes)
-                    VALUES ('scraper', CURRENT_TIMESTAMP, (SELECT COUNT(*) FROM live_waits), 'queue-times')
-                """)
-            finally:
-                con.close()
-                del con
-                gc.collect()
-            logger.debug(f"Wrote {len(df)} rows to live_waits")
-            return True
+            result = subprocess.run(
+                [sys.executable, "-c", write_script],
+                capture_output=True, text=True, timeout=30,
+            )
+            if result.returncode == 0 and "OK" in result.stdout:
+                logger.debug(f"Wrote {len(df)} rows to live_waits (subprocess)")
+                return True
+            raise RuntimeError(result.stderr[:300] if result.stderr else "subprocess failed")
         except Exception as e:
             error_str = str(e).lower()
             is_lock = any(kw in error_str for kw in ("lock", "busy", "io error", "could not set", "blocked"))
             if is_lock and attempt < max_retries - 1:
-                wait_s = 1.0 * (attempt + 1)  # 1s, 2s, 3s, 4s
+                wait_s = 1.0 * (attempt + 1)
                 logger.debug(f"DuckDB write lock (attempt {attempt + 1}/{max_retries}), retrying in {wait_s}s...")
                 _time.sleep(wait_s)
                 continue
             logger.warning(f"DuckDB write failed after {attempt + 1} attempts: {e}")
+            try:
+                import os as _os
+                _os.unlink(tmp_path)
+            except OSError:
+                pass
             return False
 
     return False
-
-
-# =============================================================================
-# QUEUE-TIMES.COM PARK ID TO PARK CODE MAPPING
-# =============================================================================
-# Maps queue-times.com park IDs to our park codes.
-# Based on supported parks: wdw, dlr, uor, ush, tdr
-# Park codes match PARK_CODE_MAP in get_tp_wait_time_data_from_s3.py
-
-QUEUE_TIMES_PARK_MAP: Dict[int, str] = {
-    # Walt Disney World (wdw)
-    6: "mk",   # Disney Magic Kingdom -> MK prefix
-    5: "ep",   # Epcot -> EP prefix
-    7: "hs",   # Disney Hollywood Studios -> HS prefix
-    8: "ak",   # Animal Kingdom -> AK prefix
-    
-    # Disneyland Resort (dlr)
-    16: "dl",  # Disneyland -> DL prefix
-    17: "ca",  # Disney California Adventure -> CA prefix
-    
-    # Universal Orlando Resort (uor)
-    64: "ia",  # Islands Of Adventure At Universal Orlando -> IA prefix
-    65: "uf",  # Universal Studios At Universal Orlando -> UF prefix
-    334: "eu",  # Epic Universe -> EU prefix
-    # Note: Volcano Bay (67) not in PARK_CODE_MAP, skipping for now
-    
-    # Universal Studios Hollywood (ush)
-    66: "uh",  # Universal Studios Hollywood -> USH prefix (maps to "uh" park code)
-    
-    # Tokyo Disney Resort (tdr)
-    274: "tdl",  # Tokyo Disneyland -> TDL prefix
-    275: "tds",  # Tokyo DisneySea -> TDS prefix
-    
-    # Additional parks (commented out - not in current PARK_CODE_MAP):
-    # 4: "dlp",   # Disneyland Park Paris
-    # 28: "wdsp", # Walt Disney Studios Paris
-    # 31: "hkdl", # Disneyland Hong Kong
-    # 30: "shdr", # Shanghai Disney Resort
-    # 67: "vb",   # Universal Volcano Bay (not in PARK_CODE_MAP)
-}
-
-# =============================================================================
-# QUEUE-TIMES.COM RIDE ID TO ENTITY CODE MAPPING
-# =============================================================================
-# Master mapping table: entity_code <-> queue_times_id
-# Stored in config/queue_times_entity_mapping.csv
-# Format: entity_code, park_code, queue_times_id, queue_times_name, touringplans_name
 
 def load_queue_times_mapping(config_dir: Path) -> Optional[pd.DataFrame]:
     """
