@@ -282,9 +282,9 @@ def run_duckdb_query(sql: str, max_retries: int = 8) -> str:
                 # Even for non-lock errors, retry once with a brief pause
                 time.sleep(1)
                 continue
-            return f"Query error: {str(e)}"
+            return "I hit a temporary glitch querying the data — please try your question again in a moment. If it keeps happening, let us know in #feedback!"
 
-    return "Database is temporarily busy. Please try again in a minute."
+    return "Our database is momentarily busy — try your question again in a minute! The data refreshes constantly and things should clear up quickly. 🎢"
 
 
 async def ask_agent(question: str, user_id: str, api_key: str, username: str = "unknown") -> str:

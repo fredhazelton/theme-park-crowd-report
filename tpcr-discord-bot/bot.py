@@ -11,6 +11,27 @@ import logging
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
+
+import json as _json
+from datetime import datetime as _dt, timezone as _tz
+
+def _log_bot_error(command: str, error_type: str, detail: str, resolution: str):
+    """Append error to bot_errors.jsonl for monitoring."""
+    try:
+        entry = {
+            "timestamp": _dt.now(_tz.utc).isoformat(),
+            "command": command,
+            "error_type": error_type,
+            "error_detail": detail[:500],
+            "resolution": resolution,
+        }
+        log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
+        os.makedirs(log_dir, exist_ok=True)
+        with open(os.path.join(log_dir, "bot_errors.jsonl"), "a") as f:
+            f.write(_json.dumps(entry) + "\n")
+    except Exception:
+        pass  # Never let logging break the bot
+
 import duckdb
 from datetime import datetime, date as date_type, timedelta
 from dateutil import parser
@@ -958,12 +979,14 @@ async def best_day_command(interaction: discord.Interaction, park: str, timefram
             df = duckdb.sql(query).fetchdf()
     except Exception as e:
         print(f"⚠️ Error in /best-day: {e}")
-        await interaction.followup.send("😔 Something went wrong querying the data.", ephemeral=True)
+        _log_bot_error("best-day", type(e).__name__, str(e), "shown_error")
+        await interaction.followup.send("I hit a temporary glitch — please try your question again in a moment. If it keeps happening, drop a note in #feedback and we'll look into it. 🎢", ephemeral=True)
+        _log_bot_error("best-day", "query_error", str(e), "shown_error")
         return
 
     if len(df) == 0:
         await interaction.followup.send(
-            f"😔 No forecast data for **{park_full}** in the next {timeframe} days.",
+            f"I don't have enough forecast data for **{park_full}** in the next {timeframe} days to find the best day. Try a shorter window or different park! 🎢",
             ephemeral=True
         )
         return
