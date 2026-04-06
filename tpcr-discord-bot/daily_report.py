@@ -25,6 +25,81 @@ HEADERS = {
 # WTI code mapping (TDL and TDS now have their own WTI scores)
 WTI_CODE_MAP = {}
 
+import json as _json
+from datetime import datetime as _dt, timezone as _tz
+from pathlib import Path as _Path
+
+PIPELINE_STATE = _Path("/mnt/data/pipeline/state/pipeline_state.json")
+GATE_LOG = _Path("/home/wilma/theme-park-crowd-report/logs/daily_report_gate.log")
+
+WDW_PARKS = ["MK", "EP", "HS", "AK"]  # Must all have WTI scores
+
+
+def quality_gate(park_groups, get_wti_fn, today) -> tuple[bool, str]:
+    """Quality gate — verify data before posting to customers.
+
+    Returns (passed: bool, reason: str).
+    A missing report is better than a broken one.
+    """
+    # Check 1: Pipeline ran today (state file updated within 26 hours)
+    try:
+        with open(PIPELINE_STATE) as f:
+            state = _json.load(f)
+        fc = state.get("forecast_completed")
+        if fc:
+            fc_dt = _dt.fromisoformat(fc.replace("Z", "+00:00")) if "+" in fc or fc.endswith("Z") else _dt.fromisoformat(fc)
+            now = _dt.now(_tz.utc)
+            # Make fc_dt timezone-aware if needed
+            if fc_dt.tzinfo is None:
+                fc_dt = fc_dt.replace(tzinfo=_tz.utc)
+            age_hours = (now - fc_dt).total_seconds() / 3600
+            if age_hours > 26:
+                return False, f"Pipeline state stale ({age_hours:.0f}h old)"
+    except Exception as e:
+        return False, f"Pipeline state check failed: {e}"
+
+    # Check 2: All 4 WDW parks have WTI scores
+    wdw_scores = {}
+    for park_code in WDW_PARKS:
+        wti = get_wti_fn(park_code, today)
+        wdw_scores[park_code] = wti
+        if wti is None:
+            return False, f"Missing WTI for {park_code}"
+        if wti <= 0:
+            return False, f"Zero/negative WTI for {park_code}: {wti}"
+        if wti > 70:
+            return False, f"WTI out of bounds for {park_code}: {wti}"
+
+    # Check 3: At least one non-WDW park has data (basic sanity)
+    non_wdw_count = 0
+    for _, parks in park_groups:
+        for park_code, _ in parks:
+            if park_code not in WDW_PARKS:
+                wti = get_wti_fn(park_code, today)
+                if wti is not None and wti > 0:
+                    non_wdw_count += 1
+    # Don't fail on non-WDW — just log
+    if non_wdw_count == 0:
+        print(f"\u26a0\ufe0f Warning: No non-WDW parks have data")
+
+    return True, f"All checks passed (WDW: {wdw_scores})"
+
+
+def log_gate_result(passed: bool, reason: str):
+    """Log quality gate result."""
+    try:
+        GATE_LOG.parent.mkdir(parents=True, exist_ok=True)
+        entry = {
+            "timestamp": _dt.now(_tz.utc).isoformat(),
+            "passed": passed,
+            "reason": reason,
+        }
+        with open(GATE_LOG, "a") as f:
+            f.write(_json.dumps(entry) + "\n")
+    except Exception:
+        pass
+
+
 
 def wti_emoji(wti: float) -> str:
     if wti <= 12: return "❄️"
@@ -99,6 +174,15 @@ def main():
             ("TDS", "Tokyo DisneySea"),
         ]),
     ]
+
+    # === QUALITY GATE ===
+    passed, reason = quality_gate(park_groups, get_wti, today)
+    log_gate_result(passed, reason)
+    if not passed:
+        print(f"\u274c Quality gate FAILED: {reason}")
+        print(f"Skipping #crowd-reports post — a missing report is better than a broken one.")
+        return
+    print(f"\u2705 Quality gate passed: {reason}")
 
     THIN_LINE = "\u2500" * 35
     desc_parts = []
