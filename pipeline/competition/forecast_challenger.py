@@ -108,6 +108,11 @@ def _forecast_challenger_entity(
         method = f"model_{challenger_name}"
         feat_key = f"challenger_{challenger_name}"
         
+        # Compute derived features if requested
+        if "day_of_week" in features and "day_of_week" not in df.columns:
+            import pandas as _pd
+            df["day_of_week"] = _pd.to_datetime(df["park_date"]).dt.dayofweek.astype("float32")
+
         # Check if all features are available
         missing = [f for f in features if f not in df.columns]
         if missing:

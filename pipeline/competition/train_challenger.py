@@ -72,6 +72,10 @@ def train_challenger_model(
     # Use baseline features (challenger doesn't add new features)
     features = BASELINE_FEATURES if challenger.features is None else challenger.features
     
+    # Compute derived features if requested but not in data
+    if "day_of_week" in features and "day_of_week" not in entity_df.columns:
+        entity_df["day_of_week"] = pd.to_datetime(entity_df["park_date"]).dt.dayofweek.astype(np.float32)
+
     # Validate features exist
     missing = [f for f in features if f not in entity_df.columns]
     if missing:
