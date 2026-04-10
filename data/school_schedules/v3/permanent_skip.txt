@@ -1,0 +1,12 @@
+# Permanent Skip List — districts that consistently fail extraction
+# Created: 2026-04-10 by Dino on instruction from Fred/Barney
+# Reason: 16 days of continuous retry produced zero successful extractions.
+#         Each district was burning ~3 API calls per attempt, ~6 per loop iteration,
+#         at ~1 iteration/minute. Loop killed at this date. These districts may be
+#         revisited manually, but should NOT be re-added to any automated batch.
+#
+# Format: one district per line, "STATE|DISTRICT_NAME|DISTRICT_ID" (pipe-separated)
+# Comments start with #
+
+MN|BIRD ISLAND-OLIVIA-LAKE LILLIAN|MN_2705660
+AZ|Coconino County Accommodation School District (10386)|AZ_0400163
