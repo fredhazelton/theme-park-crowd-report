@@ -113,6 +113,37 @@ REQUEST_RETRY_DELAY = 2
 STALE_OBSERVED_AT_THRESHOLD_HOURS = 24
 
 # =============================================================================
+# Maps queue-times.com park IDs to our park codes.
+# Based on supported parks: wdw, dlr, uor, ush, tdr
+# Park codes match PARK_CODE_MAP in get_tp_wait_time_data_from_s3.py
+# Restored after accidental removal in c4d11f2d (#464)
+# =============================================================================
+
+QUEUE_TIMES_PARK_MAP: Dict[int, str] = {
+    # Walt Disney World (wdw)
+    6: "mk",   # Disney Magic Kingdom
+    5: "ep",   # Epcot
+    7: "hs",   # Disney Hollywood Studios
+    8: "ak",   # Animal Kingdom
+
+    # Disneyland Resort (dlr)
+    16: "dl",  # Disneyland
+    17: "ca",  # Disney California Adventure
+
+    # Universal Orlando Resort (uor)
+    64: "ia",  # Islands Of Adventure
+    65: "uf",  # Universal Studios Orlando
+    334: "eu", # Epic Universe
+
+    # Universal Studios Hollywood (ush)
+    66: "uh",  # Universal Studios Hollywood
+
+    # Tokyo Disney Resort (tdr)
+    274: "tdl", # Tokyo Disneyland
+    275: "tds", # Tokyo DisneySea
+}
+
+# =============================================================================
 # DUCKDB DUAL-WRITE (live_waits for bot + dashboard)
 # =============================================================================
 
