@@ -1,19 +1,13 @@
-"""Step 7: Model Training — V4 XGB-DOW Baseline.
+"""Step 7: Model Training — V4 Pure Baseline.
 
 === V4 DESIGN PRINCIPLE: ONE MODEL PER ENTITY ===
 
-The baseline pipeline trains ONE XGBoost model per entity using 6 features:
+The baseline pipeline trains ONE XGBoost model per entity using 5 features:
   - mins_since_6am
   - mins_since_open
   - date_group_id_encoded
   - season_encoded
   - season_year_encoded
-  - day_of_week (0=Mon, 6=Sun)
-
-PROMOTED TO BASELINE 2026-04-14: xgb-dow challenger promoted after 8 days
-of shadow-run validation showing +0.5 delta improvement on Day 8 with no
-regressions. Day-of-week captures weekend/weekday crowd patterns that the
-original 5-feature baseline missed.
 
 No multi-candidate selection. No posted_time features. No lite fallback.
 The baseline is the simplest thing that works.
@@ -47,14 +41,13 @@ from pipeline.core.park_codes import entity_to_park
 from pipeline.core.validation import ValidationError
 
 
-# V4 xgb-dow baseline features — the ONLY features used for production models
+# V4 baseline features — the ONLY features used for production models
 BASELINE_FEATURES = [
     "mins_since_6am",
     "mins_since_open",
     "date_group_id_encoded",
     "season_encoded",
     "season_year_encoded",
-    "day_of_week",
 ]
 
 
