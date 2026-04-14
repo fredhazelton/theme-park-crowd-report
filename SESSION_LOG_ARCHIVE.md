@@ -4,6 +4,30 @@
 
 ---
 
+## Session 33 — 2026-04-12 → 2026-04-14 (CLOSED)
+
+S33 opened mid-flight on Apr 12 with the four-file restructure landed (ops #30) and xgb-highLR auto-retired. Pipeline held green for the full window — 9 → 12 consecutive clean days, MAE flat at 8.4, WTI 7.2. The session ran across three calendar days due to Fred's evening Sept 12 question and the resulting overnight Dino investigations.
+
+**Fred's Sept 12 question (Apr 11 23:36 ET).** A customer asked for crowd forecasts for Sept 12, 2026 in the TPCR customer Discord; Fred relayed the question to `#wti-pipeline`. Dino ran a comprehensive 4-report investigation overnight Apr 13: (1) confirmed forecast horizon is 730 days, Sept 12 is only 153 days out — well within range; (2) confirmed prod DuckDB has Sept 12 fully populated — 63,020 forecast rows, all 422 entities, all 12 WTI parks (MK=16.2); (3) audited every serving path — `/crowd`, `/best-day`, `/ask`, year-view JSON, calendar images — found no date filtering that would exclude Sept 12; (4) deep-dived bot response paths, confirmed data is intact at every layer. Dino correctly stopped and asked Fred to clarify the surface where it appeared missing. Fred answered (Apr 14) it was the customer Discord — likely conflated with the broader 365-day truncation Dino had uncovered as a bonus finding. Resolved as data-fine, presentation-layer, addressed via #469.
+
+**Twitter API failures (Apr 7, 11, 12, 14).** Pattern: `:x: WTI Predicted Tweet — Twitter API error, tweet failed` at 8 PM ET on Apr 7/11/12, plus `:x: WTI Observed Tweet` at 12:30 PM ET Apr 14. Dino diagnosis (Apr 13): HTTP 400 from `POST /2/tweets` with `"Your media IDs are invalid."` Root cause is the cron firing twice per scheduled time — first invocation succeeds, phantom second invocation uploads new media and posts with a media_id Twitter rejects (likely still processing). The media_id in the error matches the next day's successful run, confirming a race. Dino proposed a 3-part fix and stopped for approval per process discipline.
+
+**Bonus finding — systemic 365-day truncation.** During Sept 12 work Dino found pipeline produces 730-day forecasts but four downstream paths cap at 365: `export_year_view_data.py:161`, `generate_calendar_images.py:50`, `bot.py:929` (`/best-day`), `barney_pipeline_review.py:117`. Pricing page advertises 730. Customers see at most ~April 2027.
+
+**Fred decisions (Apr 14 morning).** All four of Dino's threads green-lit: (1) full 3-part tweet-cron fix approved; (2) horizon lifted to **380 days** — one year + two-week dark-day buffer (not 365, not 730); (3) Sept 12 closed as data-intact / surface-was-customer-Discord; (4) xgb-dow promotion approved.
+
+**Tickets filed during S33 close (in S34 conversation):** TPCR #468 (tweet cron double-fire, HIGH, agent:dino), TPCR #469 (horizon 365→380, MEDIUM, agent:dino), TPCR #470 (xgb-dow promotion to baseline, MEDIUM, agent:wilma).
+
+**Briefings issued:** `operations/docs/briefings/DINO_TWEET_CRON_AND_HORIZON_20260414.md` (Dino, covers #468 + #469 + Sept 12 closure). Wilma briefed in `#barney-wilma-dev` re: #470 with snapshot-first / proof-batch-first discipline.
+
+**Other Apr 11 noise.** Apr 11 03:00 alert `HIGH_FALLBACK_RATIO: 89/89 (100%)` was the same #467 stale-list noise from S32, not a real outage. Apr 10 12:45 `WTI Observed Tweet — No ready content found` was a one-off SSH-host-key failure, not recurrent. Both filed under existing tickets.
+
+**Tickets at close:** 5 open (#466 heartbeat alarm, #467 stale-list bug, #468 tweet cron, #469 horizon, #470 xgb-dow promotion). Strategic queue carries forward.
+
+**Process notes.** Dino's overnight discipline was excellent — 4 structured reports in `#wti-pipeline`, clear "stop and ask Fred" pattern, found a class-of-bug while solving an instance. The "wait for Fred clarification before continuing" instinct on Sept 12 saved hours of investigating non-existent gaps. Sept 12 chain reinforces: when the data investigation comes up clean, the next question is always presentation layer — and presentation layer often has buried-constant bugs (here, four `365`s).
+
+---
+
 ## Session 32 — 2026-04-11 (CLOSED)
 
 S32 opened with two surprises layered on S31's clean handoff: (1) the 03:00 ET Apr 11 data quality alert reported `HIGH_FALLBACK_RATIO: 89/89 entities (100%) using fallback predictions` — not in S31's log, looked alarming; (2) Gazoo's 06:02 ET audit was still pre-scraper-fix and showed Day 5 / 110h scraper outage, creating brief uncertainty about whether the S31 fix held. Both resolved without firefighting.
