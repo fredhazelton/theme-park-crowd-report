@@ -926,7 +926,7 @@ TIMEFRAME_CHOICES = [
     app_commands.Choice(name="Next 7 days", value=7),
     app_commands.Choice(name="Next 30 days", value=30),
     app_commands.Choice(name="Next 90 days — heat map", value=90),
-    app_commands.Choice(name="Next 1 year — heat map", value=365),
+    app_commands.Choice(name="Next 1 year — heat map", value=380),  # #469: extended from 365
 ]
 
 @tree.command(name="best-day", description="Find the best day to visit a park (lowest wait times)")

@@ -158,7 +158,7 @@ def main():
 
     con = duckdb.connect()
     today = date.today()
-    end_date = today + timedelta(days=365)
+    end_date = today + timedelta(days=380)  # #469: extended from 365
 
     exported = 0
     for park_code, park_name in PARK_NAMES.items():

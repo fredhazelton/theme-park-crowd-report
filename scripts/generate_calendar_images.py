@@ -47,7 +47,7 @@ ENTITY_PREFIXES = {
     "UH": ["UH", "USH"],
 }
 
-TIMEFRAMES = [90, 365]
+TIMEFRAMES = [90, 380]  # #469: extended from 365
 
 
 def _entity_filter_sql(park_code: str) -> str:

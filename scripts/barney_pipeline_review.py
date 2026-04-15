@@ -114,7 +114,7 @@ REVIEW_SCHEMA = {
     },
     "config_drift": {
         "forecast_workers": 2,
-        "forecast_days": 365,
+        "forecast_days": 380,  # #469: extended from 365
         "issues_found": [],  # ["Cloudflare ID still hardcoded", ...]
         "grade": "🟢|🟡|🔴",
     },
