@@ -96,9 +96,12 @@ def _get_eval_dates(cfg: PipelineConfig, log: PipelineLogger) -> list[str]:
     archive_dir = cfg.accuracy_dir / "archive"
 
     # Collect ALL archived forecasts (new naming + legacy v3 naming)
+    # Sort by extracted date, not filename — forecast_v3_* sorts after forecast_* alphabetically
+    # but may be older by date (#472)
     archive_files = sorted(
-        f for f in archive_dir.glob("forecast_*.parquet")
-        if not f.name.endswith(".CONTAMINATED_BACKUP")
+        (f for f in archive_dir.glob("forecast_*.parquet")
+         if not f.name.endswith(".CONTAMINATED_BACKUP")),
+        key=lambda f: _extract_date(f.name) or ""
     )
     if not archive_files:
         log.info("No archived forecasts found")
@@ -163,9 +166,11 @@ def _evaluate_slots_and_entities(
 
     archive_dir = cfg.accuracy_dir / "archive"
     # All forecast archives (new naming + legacy v3 naming)
+    # Sort by extracted date, not filename (#472)
     archive_files = sorted(
-        f for f in archive_dir.glob("forecast_*.parquet")
-        if not f.name.endswith(".CONTAMINATED_BACKUP")
+        (f for f in archive_dir.glob("forecast_*.parquet")
+         if not f.name.endswith(".CONTAMINATED_BACKUP")),
+        key=lambda f: _extract_date(f.name) or ""
     )
     if not archive_files:
         log.warning("No archived forecasts found")
