@@ -334,9 +334,12 @@ def _evaluate_wti(
 
     archive_dir = cfg.accuracy_dir / "archive"
     # Collect all WTI archives (new wti_ + legacy wti_v3_)
+    # Sort by extracted date, not filename — wti_v3_* sorts after wti_* alphabetically
+    # but may be older by date (same bug as #472 for forecast archives)
     wti_archives = sorted(
-        f for f in archive_dir.glob("wti_*.parquet")
-        if not f.name.endswith(".CONTAMINATED_BACKUP")
+        (f for f in archive_dir.glob("wti_*.parquet")
+         if not f.name.endswith(".CONTAMINATED_BACKUP")),
+        key=lambda f: _extract_date(f.name) or ""
     )
     if not wti_archives:
         log.info("No archived WTI files — WTI accuracy will start tomorrow")
