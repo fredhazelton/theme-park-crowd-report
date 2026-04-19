@@ -16,7 +16,7 @@ import time
 import requests
 from datetime import datetime
 
-BRAVE_API_KEY = os.environ.get("BRAVE_SEARCH_API_KEY", "BSAEB_N4ZkM3WOQN6bokdPKGkL6HWuN")
+BRAVE_API_KEY = os.environ.get("BRAVE_SEARCH_API_KEY")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
 
