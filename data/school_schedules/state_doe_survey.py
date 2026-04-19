@@ -7,7 +7,7 @@ import time
 import requests
 import os
 
-BRAVE_API_KEY = os.environ.get("BRAVE_SEARCH_API_KEY", "BSAEB_N4ZkM3WOQN6bokdPKGkL6HWuN")
+BRAVE_API_KEY = os.environ.get("BRAVE_API_KEY", "")
 
 STATES = [
     "Alabama", "Alaska", "Arizona", "Arkansas", "California",
