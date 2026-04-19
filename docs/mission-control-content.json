@@ -37,9 +37,9 @@
         {
             "emoji": "\ud83d\udd04",
             "event": "Conversion model retrain",
-            "date": "Apr 20",
-            "days_out": 2,
-            "urgency": ""
+            "date": "Tomorrow",
+            "days_out": 1,
+            "urgency": "tomorrow"
         }
     ],
     "pipeline_status": {
@@ -77,10 +77,10 @@
     "accuracy": {
         "entity_mae": "8.4 min",
         "entity_bias": "+0.9 min",
-        "overall_rmse": "9.5",
+        "overall_rmse": "9.4",
         "wti_mae": "6.8",
         "wti_bias": "-1.8",
-        "days_evaluated": 66
+        "days_evaluated": 67
     },
     "ask_analytics": {
         "total_questions": 108,
@@ -94,17 +94,17 @@
         "services": [
             {
                 "name": "tpcr-discord-bot",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Discord bot"
             },
             {
                 "name": "chat-server",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Stream overlay"
             },
             {
                 "name": "twitch-chat",
-                "status": "unknown",
+                "status": "active",
                 "detail": "Stream overlay"
             },
             {
@@ -114,11 +114,11 @@
             }
         ],
         "disk_main_pct": 7,
-        "disk_data_pct": 26,
+        "disk_data_pct": 27,
         "db_entities": 1713,
-        "db_forecasts": 45527620,
-        "db_live_waits": 126781014,
+        "db_forecasts": 45465517,
+        "db_live_waits": 126867489,
         "db_wti": 59255
     },
-    "last_updated": "2026-04-18T07:30:31.477690"
+    "last_updated": "2026-04-19T17:10:19.044224"
 }
