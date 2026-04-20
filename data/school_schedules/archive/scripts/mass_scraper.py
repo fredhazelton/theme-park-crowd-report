@@ -35,7 +35,7 @@ NCES_ALL_FILE = BASE_DIR / "nces_all_districts.csv"
 RESULTS_FILE = BASE_DIR / "mass_scraper_results.json"
 LOG_FILE = BASE_DIR / "mass_scraper.log"
 
-BRAVE_API_KEY = "BSAEB_N4ZkM3WOQN6bokdPKGkL6HWuN"
+BRAVE_API_KEY = ""
 BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search"
 FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
 FIRECRAWL_SCRAPE_URL = "https://api.firecrawl.dev/v1/scrape"

@@ -32,7 +32,7 @@ CONFIRMATION_RESULTS = BASE_DIR / "confirmation_results.json"
 MEGA_RESULTS_FILE = BASE_DIR / "mega_scraper_results.json"
 LOG_FILE = BASE_DIR / "mega_scraper.log"
 
-BRAVE_API_KEY = "BSAEB_N4ZkM3WOQN6bokdPKGkL6HWuN"
+BRAVE_API_KEY = ""
 BRAVE_SEARCH_URL = "https://api.brave.com/res/v1/web/search"
 
 # Rate limits
