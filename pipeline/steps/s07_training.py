@@ -2,12 +2,13 @@
 
 === V4 DESIGN PRINCIPLE: ONE MODEL PER ENTITY ===
 
-The baseline pipeline trains ONE XGBoost model per entity using 5 features:
+The baseline pipeline trains ONE XGBoost model per entity using 6 features:
   - mins_since_6am
   - mins_since_open
   - date_group_id_encoded
   - season_encoded
   - season_year_encoded
+  - day_of_week  (promoted from xgb-dow challenger, TPCR #470, 2026-04-22)
 
 No multi-candidate selection. No posted_time features. No lite fallback.
 The baseline is the simplest thing that works.
@@ -48,6 +49,7 @@ BASELINE_FEATURES = [
     "date_group_id_encoded",
     "season_encoded",
     "season_year_encoded",
+    "day_of_week",
 ]
 
 
@@ -168,6 +170,10 @@ def _train_baseline_model(
 
     if len(entity_df) < min_samples:
         return None
+
+    # Compute derived features if requested but not in data
+    if "day_of_week" in BASELINE_FEATURES and "day_of_week" not in entity_df.columns:
+        entity_df["day_of_week"] = pd.to_datetime(entity_df["park_date"]).dt.dayofweek.astype(np.float32)
 
     # Validate features exist
     missing = [f for f in BASELINE_FEATURES if f not in entity_df.columns]
