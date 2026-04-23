@@ -42,6 +42,7 @@ from pipeline.core.validation import ValidationError, require_file
 FEATURES_BASELINE = [
     "mins_since_6am", "mins_since_open",
     "date_group_id_encoded", "season_encoded", "season_year_encoded",
+    "day_of_week",
 ]
 FEATURES_LITE = ["mins_since_6am", "mins_since_open"]
 FEATURES_LEGACY_V2 = [
@@ -54,7 +55,7 @@ FEATURES_LEGACY_V2 = [
 ALL_POSSIBLE_FEATURES = [
     "mins_since_6am", "mins_since_open",
     "date_group_id_encoded", "season_encoded", "season_year_encoded",
-    "posted_time", "hour_of_day",
+    "posted_time", "hour_of_day", "day_of_week",
 ]
 
 
@@ -234,6 +235,13 @@ def _forecast_entity_fast(
 
     df = time_grid.copy()
     df["entity_code"] = entity_code
+
+    # Compute derived features if requested but not in data
+    # (Kept at top of function so DOW is present for every model path, incl. the
+    # meta_features check at L284 which would silently fall back to 5-feature
+    # baseline if day_of_week were missing after retrain.)
+    if "day_of_week" in FEATURES_BASELINE and "day_of_week" not in df.columns:
+        df["day_of_week"] = pd.to_datetime(df["park_date"]).dt.dayofweek.astype(np.float32)
 
     # O(1) operating calendar filter
     if oc_by_entity is not None:
