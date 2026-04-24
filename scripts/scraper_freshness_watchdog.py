@@ -40,6 +40,11 @@ from zoneinfo import ZoneInfo
 STATE_FILE = Path("/mnt/data/pipeline/state/scraper_watchdog_state.json")
 DUCKDB_PATH = "/mnt/data/pipeline/tpcr_live.duckdb"
 INTERNAL_CHANNEL = "1479351574177513576"  # #wti-pipeline
+# Failsafe: every alert we try to post is also appended to this file. If the
+# Discord path is down (bot identity issue, 403, network), the log file is
+# the durable record. State advances regardless of post success so we never
+# get stuck in a "should-have-alerted-but-couldn't" loop.
+ALERT_LOG_FILE = Path("/home/wilma/hazeydata/pipeline/logs/scraper_watchdog_alerts.log")
 
 # Freshness thresholds (minutes) — ops hours vs off hours.
 # Ops hours cover all global parks: 06:00-02:00 ET (includes Tokyo evenings
@@ -145,6 +150,17 @@ def save_state(path: Path, state: dict) -> None:
     path.write_text(json.dumps(state, indent=2))
 
 
+def log_alert_failsafe(content: str) -> None:
+    """Append alert to failsafe log file — durable record even when Discord is down."""
+    try:
+        ALERT_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with ALERT_LOG_FILE.open("a") as f:
+            ts = datetime.now(timezone.utc).isoformat()
+            f.write(f"[{ts}]\n{content}\n\n")
+    except Exception as e:
+        print(f"[WARN] alert log write failed: {e}", file=sys.stderr)
+
+
 # ── Discord posting ─────────────────────────────────────────────────────
 def _discord_token() -> str:
     t = os.environ.get("DISCORD_BOT_TOKEN", "")
@@ -172,7 +188,15 @@ def discord_post(channel: str, content: str) -> bool:
     )
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
-            return r.status in (200, 201)
+            if r.status in (200, 201):
+                try:
+                    body = json.loads(r.read().decode("utf-8"))
+                    msg_id = body.get("id", "?")
+                    print(f"[watchdog] posted message_id={msg_id} channel={channel}")
+                except Exception:
+                    pass
+                return True
+            return False
     except Exception as e:
         print(f"[WARN] discord post failed: {e}", file=sys.stderr)
         return False
@@ -285,17 +309,18 @@ def run(dry_run: bool, simulate_stale_mins: int, state_file: Path, no_post: bool
         f"simulate_stale={simulate_stale_mins}"
     )
 
-    # State progression rule:
-    # - If an alert is required and Discord post fails, DO NOT advance state.
-    #   The next tick will retry. Otherwise we'd skip the 🚨 and then post a
-    #   misleading ✅ "recovered" on the next fresh tick.
-    post_ok = True
+    # Delivery model: Discord is best-effort, failsafe log is durable.
+    # Every alert is written to ALERT_LOG_FILE regardless of Discord success,
+    # and state advances either way so the watchdog never gets stuck in a
+    # "couldn't post → didn't advance → permanently wrong state" loop.
     if alert:
         if dry_run or no_post:
             tag = "DRY-RUN" if dry_run else "NO-POST"
-            print(f"[{tag}] would post to {INTERNAL_CHANNEL}")
+            print(f"[{tag}] would post to {INTERNAL_CHANNEL} and log to {ALERT_LOG_FILE}")
             print(alert)
         else:
+            # Write to durable log first — if Discord 403s, the record survives.
+            log_alert_failsafe(alert)
             post_ok = discord_post(INTERNAL_CHANNEL, alert)
             if post_ok:
                 state["last_alert_ts"] = now.isoformat()
@@ -305,12 +330,18 @@ def run(dry_run: bool, simulate_stale_mins: int, state_file: Path, no_post: bool
                     state["incident_start"] = None
             else:
                 print(
-                    "[watchdog] Discord post failed — NOT advancing state; will retry next tick",
+                    f"[watchdog] Discord post failed — alert recorded in {ALERT_LOG_FILE}; "
+                    f"state still advancing",
                     file=sys.stderr,
                 )
+                # Still track incident timing off the log entry so recovery posts
+                # (if/when Discord auth is restored) show accurate duration.
+                if is_staleness_new and not state.get("incident_start"):
+                    state["incident_start"] = now.isoformat()
+                if is_recovery:
+                    state["incident_start"] = None
 
-    if post_ok or not alert:
-        state["current_state"] = new_state
+    state["current_state"] = new_state
     state["last_check_ts"] = now.isoformat()
     if not dry_run:
         save_state(state_file, state)
