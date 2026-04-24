@@ -11,6 +11,11 @@ ANNOUNCEMENTS_CHANNEL = "1471935589371609162"
 INTERNAL_CHANNEL = "1479351574177513576"
 DEBOUNCE_THRESHOLD = 3
 RATE_LIMIT_SECONDS = 6 * 3600
+# #466: scraper freshness threshold in minutes. The dedicated watchdog
+# (scripts/scraper_freshness_watchdog.py) owns paging; this constant lets
+# check_duckdb() surface 'stale' as a degraded state instead of silently
+# reporting healthy on old data.
+SCRAPER_STALE_THRESHOLD_MINS = 15
 DEFAULT_STATE = {
     "current_status": "operational",
     "consecutive_non_operational": 0,
@@ -65,23 +70,43 @@ def check_bot() -> str:
         return "stopped"
 
 def check_duckdb() -> str:
+    """Connect + freshness check on the scraper heartbeat (#466).
+
+    Return values:
+        healthy   — connect OK, scraper data fresh within threshold
+        stale     — connect OK, scraper data older than threshold
+        unhealthy — connect failed or no scraper row in data_freshness
+    """
     try:
         import duckdb
         con = duckdb.connect(DUCKDB_PATH, read_only=True)
-        con.execute("SELECT count(*) FROM information_schema.tables")
-        con.close()
+        try:
+            con.execute("SELECT count(*) FROM information_schema.tables")
+            r = con.execute(
+                "SELECT last_updated FROM data_freshness WHERE source='scraper'"
+            ).fetchone()
+        finally:
+            con.close()
+        if not r or r[0] is None:
+            return "unhealthy"
+        age_mins = (datetime.now(timezone.utc) - r[0].astimezone(timezone.utc)).total_seconds() / 60
+        if age_mins > SCRAPER_STALE_THRESHOLD_MINS:
+            return "stale"
         return "healthy"
     except Exception as e:
         err = str(e).lower()
-        # A lock conflict means the scraper is actively writing — database is alive
+        # A lock conflict means the scraper is actively writing — database is alive.
+        # Watchdog (scripts/scraper_freshness_watchdog.py) owns the stale-data alarm.
         if "lock" in err or "conflicting" in err or "busy" in err:
             return "healthy"
         return "unhealthy"
 
 def determine_status(pipeline: str, bot: str, duckdb: str) -> str:
-    if bot != "running" or duckdb != "healthy":
+    # 'unhealthy' = bot or DB unreachable → hard 'down'.
+    # 'stale' = data is old but system is responsive → degraded (softer signal).
+    if bot != "running" or duckdb == "unhealthy":
         return "down"
-    if pipeline == "critical":
+    if pipeline == "critical" or duckdb == "stale":
         return "degraded"
     return "operational"
 
@@ -111,6 +136,8 @@ def format_issue_message(status: str, checks: dict, incident_start: str) -> str:
         parts.append("pipeline")
     if checks.get("duckdb") == "unhealthy":
         parts.append("database")
+    elif checks.get("duckdb") == "stale":
+        parts.append("data freshness")
     if checks.get("bot") == "stopped":
         parts.append("service")
     component = "/".join(parts) if parts else "service"
