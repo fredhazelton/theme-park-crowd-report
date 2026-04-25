@@ -183,7 +183,14 @@ def discord_post(channel: str, content: str) -> bool:
     req = urllib.request.Request(
         url,
         data=json.dumps({"content": content}).encode("utf-8"),
-        headers={"Authorization": f"Bot {token}", "Content-Type": "application/json"},
+        headers={
+            "Authorization": f"Bot {token}",
+            "Content-Type": "application/json",
+            # User-Agent is REQUIRED by Discord; without it, Cloudflare's WAF
+            # blocks urllib with HTTP 403 (CF error 1010). See post-merge
+            # discovery during #466 verification.
+            "User-Agent": "DiscordBot (https://github.com/hazeydata/theme-park-crowd-report, 1.0)",
+        },
         method="POST",
     )
     try:
