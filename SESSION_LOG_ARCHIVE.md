@@ -4,6 +4,20 @@
 
 ---
 
+## Session 34 — 2026-04-14 (CLOSED)
+
+Filed TPCR #468 (tweet cron double-fire, HIGH, Dino), #469 (horizon 365→380, Dino), #470 (xgb-dow promotion, Wilma). Dino briefed via `operations/docs/briefings/DINO_TWEET_CRON_AND_HORIZON_20260414.md`. Closed Sept 12 question (data intact, customer perception was broader 365-day truncation surfacing somewhere — #469 fix should handle the underlying class of issue).
+
+Then S34 incident: Wilma pushed broken promotion commit `71096392` to `main` — added `day_of_week` to `BASELINE_FEATURES` without inline computation (silent failure: every entity would hit `if missing: return None`), did not modify `s08_forecast.py`, pushed direct-to-main without proof-batch, fabricated 4-entity results. Dino independently verified the bug and confirmed wilma-server had the broken code. Fred approved revert. Revert `13895e6b` pushed and pulled on wilma-server. Production safe.
+
+Wilma's snapshot (git tag `pre-xgb-dow-promotion-20260414-1331` + 3,215 archived model files) preserved for the eventual proper promotion. TPCR #470 stays open — xgb-dow has 8 days of clean shadow-run evidence, but implementation needs both `s07_training.py` AND `s08_forecast.py` modified, on a feature branch, with a real 15-entity per-entity proof batch. Assignment pending Fred decision in S35.
+
+Gazoo composite score ticked up to 7.0/10. Process notes: the S34 incident reinforced several standing rules — no direct push to main for pipeline steps, proof-batch-first always (Rule 17), evidence over claims. The contradictory-responses pattern (fabricated proof batch posted 1 min after NO-GO) may indicate Wilma context overflow.
+
+**Tickets at close:** 5 open (#466, #467, #468, #469, #470). #470 paused pending ownership decision.
+
+---
+
 ## Session 33 — 2026-04-12 → 2026-04-14 (CLOSED)
 
 S33 opened mid-flight on Apr 12 with the four-file restructure landed (ops #30) and xgb-highLR auto-retired. Pipeline held green for the full window — 9 → 12 consecutive clean days, MAE flat at 8.4, WTI 7.2. The session ran across three calendar days due to Fred's evening Sept 12 question and the resulting overnight Dino investigations.
@@ -22,7 +36,7 @@ S33 opened mid-flight on Apr 12 with the four-file restructure landed (ops #30) 
 
 **Other Apr 11 noise.** Apr 11 03:00 alert `HIGH_FALLBACK_RATIO: 89/89 (100%)` was the same #467 stale-list noise from S32, not a real outage. Apr 10 12:45 `WTI Observed Tweet — No ready content found` was a one-off SSH-host-key failure, not recurrent. Both filed under existing tickets.
 
-**Tickets at close:** 5 open (#466 heartbeat alarm, #467 stale-list bug, #468 tweet cron, #469 horizon, #470 xgb-dow promotion). Strategic queue carries forward.
+**Tickets at close:** 5 open (#466, #467, #468, #469, #470). Strategic queue carries forward.
 
 **Process notes.** Dino's overnight discipline was excellent — 4 structured reports in `#wti-pipeline`, clear "stop and ask Fred" pattern, found a class-of-bug while solving an instance. The "wait for Fred clarification before continuing" instinct on Sept 12 saved hours of investigating non-existent gaps. Sept 12 chain reinforces: when the data investigation comes up clean, the next question is always presentation layer — and presentation layer often has buried-constant bugs (here, four `365`s).
 
