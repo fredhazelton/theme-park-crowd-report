@@ -925,6 +925,14 @@ def main() -> None:
             while True:
                 run += 1
                 logger.info(f"--- Run #{run} ---")
+                
+                # ops #35 - Check for backup lock file before any database operations
+                if os.path.exists('/tmp/b2_backup.lock'):
+                    logger.info("Backup in progress, skipping cycle")
+                    logger.info(f"Sleeping {args.interval}s...")
+                    time.sleep(args.interval)
+                    continue
+                
                 try:
                     total_rows = run_once()
                     if total_rows > 0:
