@@ -37,9 +37,9 @@
         {
             "emoji": "\ud83d\udd04",
             "event": "Conversion model retrain",
-            "date": "Today",
-            "days_out": 0,
-            "urgency": "today"
+            "date": "Jun 1",
+            "days_out": 6,
+            "urgency": ""
         }
     ],
     "pipeline_status": {
@@ -76,11 +76,11 @@
     },
     "accuracy": {
         "entity_mae": "8.3 min",
-        "entity_bias": "+0.3 min",
+        "entity_bias": "+0.4 min",
         "overall_rmse": "9.2",
         "wti_mae": "6.4",
         "wti_bias": "-0.8",
-        "days_evaluated": 103
+        "days_evaluated": 104
     },
     "ask_analytics": {
         "total_questions": 113,
@@ -116,9 +116,9 @@
         "disk_main_pct": 5,
         "disk_data_pct": 30,
         "db_entities": 1713,
-        "db_forecasts": 43222005,
-        "db_live_waits": 130088219,
+        "db_forecasts": 43154554,
+        "db_live_waits": 130181464,
         "db_wti": 59255
     },
-    "last_updated": "2026-05-25T07:30:39.790020"
+    "last_updated": "2026-05-26T07:30:39.729138"
 }
